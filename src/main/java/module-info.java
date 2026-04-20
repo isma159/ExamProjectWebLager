@@ -1,8 +1,11 @@
 module dk.easv.examprojectweblager {
     requires javafx.controls;
     requires javafx.fxml;
+    requires de.mkammerer.argon2.nolibs;
 
 
-    opens dk.easv.examprojectweblager to javafx.fxml;
-    exports dk.easv.examprojectweblager;
+    exports ScanHub.GUI.controllers;
+    opens ScanHub.GUI.controllers to javafx.fxml;
+    exports ScanHub;
+    opens ScanHub to javafx.fxml;
 }
