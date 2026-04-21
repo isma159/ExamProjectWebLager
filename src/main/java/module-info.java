@@ -1,4 +1,4 @@
-module dk.easv.examprojectweblager {
+module ScanHub {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.naming;

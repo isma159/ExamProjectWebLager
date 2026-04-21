@@ -1,4 +1,4 @@
 package ScanHub.BE;
 
-public class Page {
+public class File {
 }
