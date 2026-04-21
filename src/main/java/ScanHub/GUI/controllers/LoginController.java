@@ -1,15 +1,12 @@
 package ScanHub.GUI.controllers;
 
-import ScanHub.BE.User;
 import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.DAL.interfaces.IPasswordEncrypter;
-import ScanHub.GUI.facade.ControllerModelFacade;
+import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.Main;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -31,11 +28,11 @@ public class LoginController implements Initializable {
     private Stage currentStage;
     private boolean isHidden = true;
     private IPasswordEncrypter encrypter = new PasswordEncrypter();
-    private ControllerModelFacade facade;
+    private ModelFacade facade;
 
     public LoginController() {
         try {
-            facade = new ControllerModelFacade();
+            facade = new ModelFacade();
         }
         catch (Exception e) {
             e.printStackTrace();

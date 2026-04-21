@@ -2,53 +2,49 @@ package ScanHub.BE;
 
 public class User {
 
-    private int id;
+    private int userId;
     private String username;
-    private String password;
-    private String email;
-    private String name;
-    private String role;
+    private String passwordHash;
+    private Role role;
 
     public User() {
-
     }
 
-    public int getId() {
-        return this.id;
+    public User(int userId, String username, String passwordHash, Role role) {
+        this.userId = userId;
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.role = role;
+    }
+
+    public int getUserId() {
+        return userId;
     }
     public String getUsername() {
-        return this.username;
+        return username;
     }
-    public String getPassword() {
-        return this.password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
-    public String getName() {
-        return this.name;
-    }
-    public String getEmail() {
-        return this.email;
-    }
-    public String getRole() {
-        return this.role;
+    public Role getRole() {
+        return role;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
     public void setUsername(String username) {
         this.username = username;
     }
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
+    }
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
     }
 
     @Override
