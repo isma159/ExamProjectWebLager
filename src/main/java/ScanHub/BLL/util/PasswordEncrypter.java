@@ -1,9 +1,10 @@
 package ScanHub.BLL.util;
 
+import ScanHub.DAL.interfaces.IPasswordEncrypter;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 
-public class PasswordEncrypter {
+public class PasswordEncrypter implements IPasswordEncrypter {
 
     private static final Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
 

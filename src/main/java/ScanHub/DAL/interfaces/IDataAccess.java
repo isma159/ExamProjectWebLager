@@ -1,10 +1,12 @@
 package ScanHub.DAL.interfaces;
 
+import java.util.List;
+
 public interface IDataAccess<T> {
 
-    T getData() throws Exception;
-    T addData(T data) throws Exception;
-    T updateData(T newData) throws Exception;
-    T deleteData(T data) throws Exception;
+    T createData(T data) throws Exception;
+    List<T> getData() throws Exception;
+    void updateData(T newData) throws Exception;
+    void deleteData(T data) throws Exception;
 
 }

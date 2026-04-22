@@ -1,38 +1,65 @@
 package ScanHub.BE;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Document {
 
-    private int id;
-    private List<Page> pages;
-    private String status;
+    private int documentId;
+    private int boxId;
+    private Status status; // "IN_PROGRESS", "PENDING_QA", "QA_COMPLETED"
+    private LocalDateTime createdAt;
+    private List<File> files;
 
-    public Document(int id, List<Page> pages, String status) {
-        this.id = id;
-        this.pages = pages;
+    public Document() {
+        this.files = new ArrayList<>();
+    }
+
+    public Document(int documentId, int boxId, Status status, LocalDateTime createdAt) {
+        this.documentId = documentId;
+        this.boxId = boxId;
         this.status = status;
+        this.createdAt = createdAt;
+        this.files = new ArrayList<>();
     }
 
-    public Document(List<Page> pages, String status) {
-        this.pages = pages;
-        this.status = status;
+    public int getDocumentId() {
+        return documentId;
     }
-
-    public int getId() {
-        return id;
+    public int getBoxId() {
+        return boxId;
     }
-    public List<Page> getPages() {
-        return pages;
-    }
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
-
-    public void setPages(List<Page> pages) {
-        this.pages = pages;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
-    public void setStatus(String status) {
+    public List<File> getFiles() {
+        return files;
+    }
+
+    public void setDocumentId(int documentId) {
+        this.documentId = documentId;
+    }
+    public void setBoxId(int boxId) {
+        this.boxId = boxId;
+    }
+    public void setStatus(Status status) {
         this.status = status;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public void setFiles(List<File> files) {
+        this.files = files;
+    }
+
+    //public void addFile(File file) {this.files.add(file);}
+
+    @Override
+    public String toString() {
+        return "Document #" + this.documentId;
     }
 }

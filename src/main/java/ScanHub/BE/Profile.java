@@ -2,37 +2,41 @@ package ScanHub.BE;
 
 public class Profile {
 
-    private int id;
-    private String name;
-    private String splitBehaviour;
+    private int profileId;
+    private String profileName;
+    private SplitBehavior splitBehaviour; // "NONE", "MANUAL", "BARCODE" TODO: find out if they mean like this
 
-    public Profile(int id, String name, String splitBehaviour) {
-        this.id = id;
-        this.name = name;
+    public Profile() {
+    }
+
+    public Profile(int profileId, String profileName, SplitBehavior splitBehaviour) {
+        this.profileId = profileId;
+        this.profileName = profileName;
         this.splitBehaviour = splitBehaviour;
     }
 
-    public Profile(String name, String splitBehaviour) {
-        this.name = name;
-        this.splitBehaviour = splitBehaviour;
+    public int getProfileId() {
+        return profileId;
     }
-
-    public int getId() {
-        return id;
+    public String getProfileName() {
+        return profileName;
     }
-    public String getName() {
-        return name;
-    }
-    public String getSplitBehaviour() {
+    public SplitBehavior getSplitBehaviour() {
         return splitBehaviour;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setProfileId(int profileId) {
+        this.profileId = profileId;
     }
-    public void setSplitBehaviour(String splitBehaviour) {
+    public void setProfileName(String profileName) {
+        this.profileName = profileName;
+    }
+    public void setSplitBehaviour(SplitBehavior splitBehaviour) {
         this.splitBehaviour = splitBehaviour;
     }
 
-
+    @Override
+    public String toString() {
+        return this.profileName;
+    }
 }
