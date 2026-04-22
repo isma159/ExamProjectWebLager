@@ -1,5 +1,6 @@
 package ScanHub;
 
+import ScanHub.GUI.controllers.LoginController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,7 +18,12 @@ public class Main extends Application{
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.resizableProperty().setValue(false);
+
+        LoginController loginController = fxmlLoader.getController();
+        loginController.setStage(stage);
+
+        stage.setResizable(false);
+
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.show();
