@@ -16,7 +16,7 @@
    <children>
       <ImageView fitHeight="96.0" fitWidth="192.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../images/LogoBlueH.png" />
+            <Image url="@../images/Main Blue/LogoBlueH.png" />
          </image>
       </ImageView>
       <Region prefHeight="17.0" prefWidth="600.0" />
