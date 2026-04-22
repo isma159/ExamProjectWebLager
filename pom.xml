@@ -50,12 +50,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
-            <version>13.4.0.jre11</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
             <version>5.18.1</version>
@@ -65,12 +59,6 @@
             <groupId>de.mkammerer</groupId>
             <artifactId>argon2-jvm</artifactId>
             <version>2.12</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>5.18.1</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
