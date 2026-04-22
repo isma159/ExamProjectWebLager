@@ -1,7 +1,10 @@
-module dk.easv.examprojectweblager {
+module ScanHub {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.naming;
     requires de.mkammerer.argon2.nolibs;
+    requires java.sql;
+    requires com.microsoft.sqlserver.jdbc;
 
 
     exports ScanHub.GUI.controllers;

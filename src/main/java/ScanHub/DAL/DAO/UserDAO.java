@@ -5,14 +5,13 @@ import ScanHub.DAL.interfaces.IDataAccess;
 
 public class UserDAO implements IDataAccess<User> {
 
-
     @Override
-    public User getData() throws Exception {
+    public User createData(User data) throws Exception {
         return null;
     }
 
     @Override
-    public User addData(User data) throws Exception {
+    public User getData() throws Exception {
         return null;
     }
 

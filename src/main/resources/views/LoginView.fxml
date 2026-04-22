@@ -1,16 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ScanHub.GUI.controllers.LoginController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
-
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<AnchorPane prefHeight="522.0" prefWidth="424.0" stylesheets="@../css/login.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.LoginController">
+    <children>
+        <VBox alignment="TOP_CENTER" prefHeight="522.0" prefWidth="424.0">
+            <children>
+                <Region prefHeight="11.0" prefWidth="424.0" />
+                <HBox prefHeight="26.0" prefWidth="424.0">
+                    <children>
+                        <Region prefHeight="26.0" prefWidth="14.0" />
+                    </children>
+                </HBox>
+                <Region prefHeight="34.0" prefWidth="424.0" />
+                <Pane fx:id="imagePane" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="124.0" prefWidth="173.0">
+                    <children>
+                        <ImageView fitHeight="153.0" fitWidth="153.0" layoutX="10.0" layoutY="-3.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/Main Blue/LogoBlueV.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                </Pane>
+                <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="60.0" prefWidth="424.0" text="ScanHub Login">
+                    <font>
+                        <Font name="Arial Bold" size="26.0" />
+                    </font>
+                </Label>
+                <Label fx:id="lblSignIn" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="185.0" prefHeight="43.0" prefWidth="424.0" text="Sign in to manage events and tickets" textAlignment="CENTER" textFill="#979797">
+                    <font>
+                        <Font name="Arial" size="15.0" />
+                    </font>
+                </Label>
+                <Label prefHeight="39.0" prefWidth="388.0" text="Username">
+                    <font>
+                        <Font name="Arial Bold" size="14.0" />
+                    </font>
+                </Label>
+                <TextField fx:id="txtFldUser" maxWidth="-Infinity" minWidth="-Infinity" onKeyPressed="#onEnterClick" prefHeight="33.0" prefWidth="390.0" promptText="Enter your username">
+                    <font>
+                        <Font name="Arial" size="12.0" />
+                    </font></TextField>
+                <Label layoutX="28.0" layoutY="273.0" prefHeight="39.0" prefWidth="388.0" text="Password">
+                    <font>
+                        <Font name="Arial Bold" size="14.0" />
+                    </font>
+                </Label>
+                <HBox alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="424.0">
+                    <children>
+                        <Region prefHeight="30.0" prefWidth="16.0" />
+                        <PasswordField fx:id="passFldPass" maxWidth="-Infinity" minWidth="-Infinity" onKeyPressed="#onEnterClick" prefHeight="33.0" prefWidth="164.0" promptText="Enter your password">
+                            <font>
+                                <Font name="Arial" size="12.0" />
+                            </font>
+                        </PasswordField>
+                        <TextField fx:id="txtFldPass" onKeyPressed="#onEnterClick" prefHeight="33.0" prefWidth="183.0" promptText="Enter your password">
+                            <font>
+                                <Font name="Arial" size="12.0" />
+                            </font>
+                        </TextField>
+                        <Region prefHeight="33.0" prefWidth="12.0" />
+                        <Button fx:id="showHideBtn" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onShowHideBtnClick" prefHeight="30.0" prefWidth="30.0">
+                            <graphic>
+                                <ImageView fx:id="showImg" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../images/Custom/show.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                        </Button>
+                    </children>
+                </HBox>
+                <Region prefHeight="33.0" prefWidth="424.0" />
+                <Button fx:id="signInBtn" mnemonicParsing="false" onAction="#onSignInBtnClick" onKeyPressed="#onEnterClick" prefHeight="36.0" prefWidth="393.0" text="Sign in" textFill="WHITE">
+                    <font>
+                        <Font name="Arial Bold" size="15.0" />
+                    </font>
+                </Button>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
