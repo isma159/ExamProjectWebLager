@@ -19,7 +19,7 @@ public class ProfileManager {
     }
 
     public List<Profile> getProfiles() throws Exception {
-        return Collections.singletonList(dataAccess.getData());
+        return dataAccess.getData();
     }
 
     public void updateProfile(Profile updatedProfile) throws Exception {

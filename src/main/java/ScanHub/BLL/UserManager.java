@@ -19,7 +19,7 @@ public class UserManager {
     }
 
     public List<User> getUsers() throws Exception {
-        return Collections.singletonList(dataAccess.getData());
+        return dataAccess.getData();
     }
 
     public void updateUser(User updatedUser) throws Exception {

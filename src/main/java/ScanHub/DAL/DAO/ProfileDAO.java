@@ -3,6 +3,12 @@ package ScanHub.DAL.DAO;
 import ScanHub.BE.Profile;
 import ScanHub.DAL.interfaces.IDataAccess;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
@@ -11,17 +17,17 @@ public class ProfileDAO implements IDataAccess<Profile> {
     }
 
     @Override
-    public Profile getData() throws Exception {
+    public List<Profile> getData() throws Exception {
         return null;
     }
 
     @Override
-    public Profile updateData(Profile newData) throws Exception {
-        return null;
+    public void updateData(Profile newData) throws Exception {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public Profile deleteData(Profile data) throws Exception {
-        return null;
+    public void deleteData(Profile data) throws Exception {
+        throw new UnsupportedOperationException();
     }
 }

@@ -4,12 +4,12 @@ public class Profile {
 
     private int profileId;
     private String profileName;
-    private String splitBehaviour; // "NONE", "MANUAL", "BARCODE" TODO: find out if they mean like this
+    private SplitBehavior splitBehaviour; // "NONE", "MANUAL", "BARCODE" TODO: find out if they mean like this
 
     public Profile() {
     }
 
-    public Profile(int profileId, String profileName, String splitBehaviour) {
+    public Profile(int profileId, String profileName, SplitBehavior splitBehaviour) {
         this.profileId = profileId;
         this.profileName = profileName;
         this.splitBehaviour = splitBehaviour;
@@ -21,7 +21,7 @@ public class Profile {
     public String getProfileName() {
         return profileName;
     }
-    public String getSplitBehaviour() {
+    public SplitBehavior getSplitBehaviour() {
         return splitBehaviour;
     }
 
@@ -31,7 +31,7 @@ public class Profile {
     public void setProfileName(String profileName) {
         this.profileName = profileName;
     }
-    public void setSplitBehaviour(String splitBehaviour) {
+    public void setSplitBehaviour(SplitBehavior splitBehaviour) {
         this.splitBehaviour = splitBehaviour;
     }
 
