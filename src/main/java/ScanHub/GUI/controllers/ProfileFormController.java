@@ -49,4 +49,12 @@ public class ProfileFormController {
     private void updateProfile() {
 
     }
+
+    @FXML
+    private void handleCancel(ActionEvent actionEvent) {
+    }
+
+    @FXML
+    private void handleSave(ActionEvent actionEvent) {
+    }
 }
