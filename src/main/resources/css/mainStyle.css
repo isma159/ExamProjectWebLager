@@ -71,13 +71,39 @@
 .primary-btn {
 
     -fx-text-fill: #ffffff;
-    -fx-font-size: 12;
-    -fx-font-weight: 500;
 
     -fx-background-color: #2D3D4F;
     -fx-background-radius: 6px;
 
     transition: -fx-background-color 150ms ease-out;
+
+}
+
+.secondary-navigation-btn {
+
+    -fx-text-fill: #ffffff;
+
+    -fx-background-color: #415060;
+    -fx-background-radius: 6px;
+
+}
+
+.btn-text {
+
+    -fx-font-size: 12;
+    -fx-font-weight: 500;
+
+}
+
+.primary-navigation-bg {
+
+    -fx-background-color: #2d3d4f;
+
+}
+
+.secondary-navigation-bg {
+
+    -fx-background-color: #24C79F;
 
 }
 
@@ -105,9 +131,47 @@
     -fx-border-radius: 10px;
     -fx-border-width: 2;
 
-    -fx-background-color: #ffffff;
     -fx-background-radius: 10px;
     -fx-background-insets: 1;
 
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 12, 0, 0, 2);
+
+}
+
+.card-bg {
+
+    -fx-background-color: #ffffff;
+
+}
+
+.avatar-initial {
+
+    -fx-background-radius: 6px;
+    -fx-background-color: #2d3d4f;
+
+}
+
+.half-card {
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 10 10 0 0;
+    -fx-border-width: 2 2 0 2;
+    -fx-border-insets: -2;
+
+    -fx-background-radius: 10 10 0 0;
+
+}
+
+.separator .line {
+
+    -fx-border-color: #2d3d4f;
+    -fx-border-width: 0.8;
+
+}
+
+.toggle-button:selected {
+
+    -fx-background-color: #2d3d4f;
+    -fx-text-fill: #ffffff;
 
 }
