@@ -88,13 +88,12 @@ public class UserDAO implements IDataAccess<User> {
 
     @Override
     public void deleteData(User selectedUser) throws Exception {
-        String sql = "UPDATE Users SET deleted_at = ? WHERE userId = ?";
+        String sql = "UPDATE Users SET deleted_at = GETDATE() WHERE userId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setObject(1, LocalDateTime.now());
-            ps.setInt(2, selectedUser.getUserId());
+            ps.setInt(1, selectedUser.getUserId());
             ps.executeUpdate();
 
         } catch (SQLException e) {
