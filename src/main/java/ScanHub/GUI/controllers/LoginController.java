@@ -2,6 +2,7 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.GUI.util.TextFieldListeners;
 import ScanHub.Main;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +57,9 @@ public class LoginController implements Initializable {
         TextFieldListeners.addErrorListener(passFldPass, containers);
         TextFieldListeners.addErrorListener(txtFldPass, containers);
 
+        passFldPass.setOnAction(event -> onSignInBtnClick());
+        txtFldPass.setOnAction(event -> onSignInBtnClick());
+        txtFldUser.setOnAction(event -> onSignInBtnClick());
     }
 
     private String userMock = "admin";
@@ -71,6 +76,7 @@ public class LoginController implements Initializable {
 
                     stage.setTitle("Admin Panel");
                     stage.setScene(scene);
+                    stage.setMaximized(true);
                     stage.show();
 
                     currentStage.close();

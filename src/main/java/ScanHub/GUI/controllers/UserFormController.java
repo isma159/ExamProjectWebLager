@@ -1,14 +1,29 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 
 public class UserFormController {
 
+    @FXML private TextField usernameField;
+    @FXML private PasswordField passwordField, confirmPasswordField;
+    @FXML private ComboBox<Role> roleComboBox;
+    @FXML private Button saveButton, cancelButton;
+
     private ModelFacade modelFacade;
     private User editingUser = null; // null means create mode, non-null means edit mode
+
+    @FXML
+    public void initialize() {
+        roleComboBox.getItems().setAll(Role.values());
+    }
 
     /**
      * Receives the shared model and optionally a user to edit.
@@ -47,5 +62,11 @@ public class UserFormController {
 
     private void updateUser() {
 
+    }
+
+    public void handleCancel(ActionEvent actionEvent) {
+    }
+
+    public void handleSave(ActionEvent actionEvent) {
     }
 }

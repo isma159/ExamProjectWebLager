@@ -1,14 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ScanHub.GUI.controllers.UserFormController"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ScanHub.GUI.controllers.UserFormController"
+      prefWidth="520"
+      style="-fx-background-color: #F5F5F5;">
+    <padding><Insets top="0" right="0" bottom="0" left="0"/></padding>
+    <HBox prefHeight="56" alignment="CENTER_LEFT" spacing="12"
+          style="-fx-background-color: #2D3D4F;">
+        <padding><Insets top="0" right="20" bottom="0" left="20"/></padding>
+        <Rectangle width="8" height="28" arcWidth="4" arcHeight="4"
+                   style="-fx-fill: #24C79F;"/>
+        <Label fx:id="formTitle" text="Create user"
+               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="userIdLabel" text=""
+               style="-fx-font-size: 11px; -fx-text-fill: #9DB4C4;"/>
+    </HBox>
+    <VBox VBox.vgrow="ALWAYS" style="-fx-background-color: #F5F5F5;">
+        <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+        <VBox spacing="0"
+              style="-fx-background-color: white; -fx-background-radius: 10;
+                     -fx-border-color: #E2E4E8; -fx-border-radius: 10; -fx-border-width: 1;">
+            <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+            <Label text="Username"
+                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;"/>
+            <Region prefHeight="6"/>
+            <TextField fx:id="usernameField" promptText="e.g. jens.hansen" prefHeight="30"
+                       style="-fx-font-size: 12px; -fx-background-color: white;
+                              -fx-border-color: #E2E4E8; -fx-border-radius: 6;
+                              -fx-background-radius: 6; -fx-border-width: 1;
+                              -fx-text-fill: #2D3D4F; -fx-prompt-text-fill: #BFBFBF;"/>
+            <Label fx:id="usernameError" text="Username is required."
+                   visible="false" managed="false"
+                   style="-fx-font-size: 10px; -fx-text-fill: #FF3D32;"/>
 
-</AnchorPane>
+            <Region prefHeight="18"/>
+            <Label text="Password"
+                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;"/>
+            <Region prefHeight="4"/>
+            <Label fx:id="passwordHint" text="Choose a password for this user."
+                   style="-fx-font-size: 11px; -fx-text-fill: #64748B;"/>
+            <Region prefHeight="8"/>
+            <PasswordField fx:id="passwordField" promptText="Password" prefHeight="30"
+                           style="-fx-font-size: 12px; -fx-background-color: white;
+                                  -fx-border-color: #E2E4E8; -fx-border-radius: 6;
+                                  -fx-background-radius: 6; -fx-border-width: 1;
+                                  -fx-text-fill: #2D3D4F; -fx-prompt-text-fill: #BFBFBF;"/>
+            <Label fx:id="passwordError" text="Password is required."
+                   visible="false" managed="false"
+                   style="-fx-font-size: 10px; -fx-text-fill: #FF3D32;"/>
+            <Region prefHeight="10"/>
+            <PasswordField fx:id="confirmPasswordField" promptText="Confirm password" prefHeight="30"
+                           style="-fx-font-size: 12px; -fx-background-color: white;
+                                  -fx-border-color: #E2E4E8; -fx-border-radius: 6;
+                                  -fx-background-radius: 6; -fx-border-width: 1;
+                                  -fx-text-fill: #2D3D4F; -fx-prompt-text-fill: #BFBFBF;"/>
+            <Label fx:id="confirmError" text="Passwords do not match."
+                   visible="false" managed="false"
+                   style="-fx-font-size: 10px; -fx-text-fill: #FF3D32;"/>
+
+            <Region prefHeight="18"/>
+            <Label text="Role"
+                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;"/>
+            <Region prefHeight="4"/>
+            <Label text="Defines what the user can access in the system."
+                   style="-fx-font-size: 11px; -fx-text-fill: #64748B;"/>
+            <Region prefHeight="8"/>
+            <VBox spacing="8"
+                  style="-fx-background-color: #F9F9F9; -fx-background-radius: 6;
+                         -fx-border-color: #E2E4E8; -fx-border-radius: 6; -fx-border-width: 1;">
+                <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+                <HBox spacing="10" alignment="TOP_LEFT">
+                    <RadioButton fx:id="radioUSER" selected="true"
+                                 style="-fx-font-size: 12px; -fx-text-fill: #2D3D4F;"/>
+                    <VBox spacing="2">
+                        <Label text="User"
+                               style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;"/>
+                        <Label text="Can select profiles, scan documents, review files, and export."
+                               wrapText="true" prefWidth="360"
+                               style="-fx-font-size: 11px; -fx-text-fill: #64748B;"/>
+                    </VBox>
+                </HBox>
+                <Separator/>
+                <HBox spacing="10" alignment="TOP_LEFT">
+                    <RadioButton fx:id="radioADMIN"
+                                 style="-fx-font-size: 12px; -fx-text-fill: #2D3D4F;"/>
+                    <VBox spacing="2">
+                        <Label text="Admin"
+                               style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;"/>
+                        <Label text="Full access. Can manage users, profiles, and view all logs."
+                               wrapText="true" prefWidth="360"
+                               style="-fx-font-size: 11px; -fx-text-fill: #64748B;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+            <Region prefHeight="18"/>
+            <Label text="Assign profiles"
+                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;"/>
+            <Region prefHeight="4"/>
+            <Label text="Select which profiles this user can access."
+                   style="-fx-font-size: 11px; -fx-text-fill: #64748B;"/>
+            <Region prefHeight="8"/>
+            <VBox fx:id="profileCheckboxList" spacing="6"
+                  style="-fx-background-color: #F9F9F9; -fx-background-radius: 6;
+                         -fx-border-color: #E2E4E8; -fx-border-radius: 6; -fx-border-width: 1;">
+                <padding><Insets top="12" right="14" bottom="12" left="14"/></padding>
+                <Label text="Loading profiles..."
+                       style="-fx-font-size: 11px; -fx-text-fill: #BFBFBF;"/>
+            </VBox>
+        </VBox>
+    </VBox>
+    <HBox prefHeight="56" alignment="CENTER_RIGHT" spacing="8"
+          style="-fx-background-color: #F5F5F5;
+                 -fx-border-color: #E2E4E8; -fx-border-width: 1 0 0 0;">
+        <padding><Insets top="0" right="24" bottom="0" left="24"/></padding>
+        <Button text="Cancel" prefHeight="30" onAction="#handleCancel"
+                style="-fx-font-size: 12px; -fx-background-color: white;
+                       -fx-border-color: #E2E4E8; -fx-border-radius: 6;
+                       -fx-background-radius: 6; -fx-border-width: 1;
+                       -fx-text-fill: #2D3D4F; -fx-cursor: hand; -fx-padding: 0 16 0 16;"/>
+        <Button fx:id="saveButton" text="Create user" prefHeight="33"
+                onAction="#handleSave" defaultButton="true"
+                style="-fx-font-size: 12px; -fx-font-weight: bold;
+                       -fx-background-color: #2D3D4F; -fx-background-radius: 6;
+                       -fx-text-fill: white; -fx-border-width: 0;
+                       -fx-cursor: hand; -fx-padding: 0 20 0 20;"/>
+    </HBox>
+</VBox>
