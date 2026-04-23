@@ -39,6 +39,7 @@ public class LoginController implements Initializable {
 
                     stage.setTitle("Admin Panel");
                     stage.setScene(scene);
+                    stage.setMaximized(true);
                     stage.show();
 
                     currentStage.close();
@@ -120,6 +121,10 @@ public class LoginController implements Initializable {
         TextFieldListeners.addErrorListener(txtFldUser, containers);
         TextFieldListeners.addErrorListener(passFldPass, containers);
         TextFieldListeners.addErrorListener(txtFldPass, containers);
+
+        passFldPass.setOnAction(event -> onSignInBtnClick());
+        txtFldUser.setOnAction(event -> onSignInBtnClick());
+        txtFldPass.setOnAction(event -> onSignInBtnClick());
 
     }
 }
