@@ -23,7 +23,7 @@ public class UserDAO implements IDataAccess<User> {
 
     @Override
     public User createData(User newUser) throws Exception {
-        String sql = "INSERT INTO [User] (username, passwordHash, role) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Users (username, passwordHash, role) VALUES (?, ?, ?)";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -50,7 +50,7 @@ public class UserDAO implements IDataAccess<User> {
         List<User> users = new ArrayList<>();
 
         try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement("SELECT userId, username, passwordHash, role FROM [User] WHERE deleted_at IS NULL");
+            PreparedStatement ps = connection.prepareStatement("SELECT userId, username, passwordHash, role FROM Users WHERE deleted_at IS NULL");
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -70,7 +70,7 @@ public class UserDAO implements IDataAccess<User> {
 
     @Override
     public void updateData(User updatedUser) throws Exception {
-        String sql = "UPDATE [User] SET username = ?, passwordHash = ?, role = ? WHERE userId = ?";
+        String sql = "UPDATE Users SET username = ?, passwordHash = ?, role = ? WHERE userId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -88,13 +88,12 @@ public class UserDAO implements IDataAccess<User> {
 
     @Override
     public void deleteData(User selectedUser) throws Exception {
-        String sql = "UPDATE [User] SET deleted_at = ? WHERE userId = ?";
+        String sql = "UPDATE Users SET deleted_at = GETDATE() WHERE userId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setObject(1, LocalDateTime.now());
-            ps.setInt(2, selectedUser.getUserId());
+            ps.setInt(1, selectedUser.getUserId());
             ps.executeUpdate();
 
         } catch (SQLException e) {

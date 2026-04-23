@@ -125,6 +125,12 @@
 
 }
 
+.container.success-border {
+
+    -fx-border-color: #4CD07D;
+
+}
+
 .card {
 
     -fx-border-color: #E2E4E8;
