@@ -25,6 +25,38 @@ public class LoginController implements Initializable {
 
     private Stage currentStage;
 
+    public void setStage(Stage stage) {
+        this.currentStage = stage;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+        List<HBox> containers = new ArrayList<>();
+        containers.add(hboxUser);
+        containers.add(hboxPass1);
+        containers.add(hboxPass2);
+
+        passFldPass.textProperty().bindBidirectional(txtFldPass.textProperty());
+
+        hboxPass1.setVisible(true);
+        hboxPass1.setManaged(true);
+        hboxPass2.setVisible(false);
+        hboxPass2.setManaged(false);
+
+        hboxPass1.setPrefWidth(300);
+        hboxPass2.setPrefWidth(300);
+
+        TextFieldListeners.addFocusListener(txtFldUser, hboxUser);
+        TextFieldListeners.addFocusListener(passFldPass, hboxPass1);
+        TextFieldListeners.addFocusListener(txtFldPass, hboxPass2);
+
+        TextFieldListeners.addErrorListener(txtFldUser, containers);
+        TextFieldListeners.addErrorListener(passFldPass, containers);
+        TextFieldListeners.addErrorListener(txtFldPass, containers);
+
+    }
+
     private String userMock = "admin";
     private String passMock = "admin123";
 
@@ -87,39 +119,5 @@ public class LoginController implements Initializable {
         hboxPass1.setManaged(true);
         hboxPass2.setVisible(false);
         hboxPass2.setManaged(false);
-    }
-
-    public void setStage(Stage stage) {
-
-        this.currentStage = stage;
-
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-        List<HBox> containers = new ArrayList<>();
-        containers.add(hboxUser);
-        containers.add(hboxPass1);
-        containers.add(hboxPass2);
-
-        passFldPass.textProperty().bindBidirectional(txtFldPass.textProperty());
-
-        hboxPass1.setVisible(true);
-        hboxPass1.setManaged(true);
-        hboxPass2.setVisible(false);
-        hboxPass2.setManaged(false);
-
-        hboxPass1.setPrefWidth(300);
-        hboxPass2.setPrefWidth(300);
-
-        TextFieldListeners.addFocusListener(txtFldUser, hboxUser);
-        TextFieldListeners.addFocusListener(passFldPass, hboxPass1);
-        TextFieldListeners.addFocusListener(txtFldPass, hboxPass2);
-
-        TextFieldListeners.addErrorListener(txtFldUser, containers);
-        TextFieldListeners.addErrorListener(passFldPass, containers);
-        TextFieldListeners.addErrorListener(txtFldPass, containers);
-
     }
 }
