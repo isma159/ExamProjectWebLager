@@ -63,6 +63,10 @@ public class LoginController implements Initializable {
         TextFieldListeners.addErrorListener(passFldPass, containers);
         TextFieldListeners.addErrorListener(txtFldPass, containers);
 
+        txtFldUser.setOnAction(e -> onSignInBtnClick());
+        txtFldPass.setOnAction(e -> onSignInBtnClick());
+        passFldPass.setOnAction(e -> onSignInBtnClick());
+
     }
 
     private String userMock = "admin";
@@ -82,6 +86,7 @@ public class LoginController implements Initializable {
 
                     stage.setTitle("Admin Panel");
                     stage.setScene(scene);
+                    stage.setMaximized(true);
                     stage.show();
 
                     currentStage.close();
@@ -113,6 +118,7 @@ public class LoginController implements Initializable {
         }
         if(!hboxPass2.getStyleClass().contains("error-border")) {
             hboxPass2.getStyleClass().add("error-border");
+
         }
     }
 

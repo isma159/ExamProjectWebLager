@@ -48,4 +48,12 @@ public class UserFormController {
     private void updateUser() {
 
     }
+
+    @FXML
+    private void handleCancel(ActionEvent actionEvent) {
+    }
+
+    @FXML
+    private void handleSave(ActionEvent actionEvent) {
+    }
 }
