@@ -4,15 +4,15 @@ public class Profile {
 
     private int profileId;
     private String profileName;
-    private SplitBehavior splitBehaviour; // "NONE", "MANUAL", "BARCODE" TODO: find out if they mean like this
+    private SplitBehavior splitBehavior; // "NONE", "MANUAL", "BARCODE" TODO: find out if they mean like this
 
     public Profile() {
     }
 
-    public Profile(int profileId, String profileName, SplitBehavior splitBehaviour) {
+    public Profile(int profileId, String profileName, SplitBehavior splitBehavior) {
         this.profileId = profileId;
         this.profileName = profileName;
-        this.splitBehaviour = splitBehaviour;
+        this.splitBehavior = splitBehavior;
     }
 
     public int getProfileId() {
@@ -21,8 +21,8 @@ public class Profile {
     public String getProfileName() {
         return profileName;
     }
-    public SplitBehavior getSplitBehaviour() {
-        return splitBehaviour;
+    public SplitBehavior getSplitBehavior() {
+        return splitBehavior;
     }
 
     public void setProfileId(int profileId) {
@@ -31,8 +31,8 @@ public class Profile {
     public void setProfileName(String profileName) {
         this.profileName = profileName;
     }
-    public void setSplitBehaviour(SplitBehavior splitBehaviour) {
-        this.splitBehaviour = splitBehaviour;
+    public void setSplitBehavior(SplitBehavior splitBehavior) {
+        this.splitBehavior = splitBehavior;
     }
 
     @Override

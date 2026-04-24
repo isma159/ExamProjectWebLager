@@ -2,27 +2,36 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.BE.Role;
 import ScanHub.BE.User;
+import ScanHub.BLL.interfaces.IPasswordEncrypter;
+import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-public class UserFormController {
+import java.net.URL;
+import java.util.ResourceBundle;
 
+public class UserFormController implements Initializable {
+
+    @FXML private Label formTitle, userIdLabel, usernameError, passwordHint, passwordError, confirmError;
+    @FXML private RadioButton radioADMIN, radioUSER;
+    @FXML private VBox profileCheckboxList;
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField, confirmPasswordField;
-    @FXML private ComboBox<Role> roleComboBox;
-    @FXML private Button saveButton, cancelButton;
 
+    private Stage currentStage;
     private ModelFacade modelFacade;
     private User editingUser = null; // null means create mode, non-null means edit mode
+    private IPasswordEncrypter encrypter = new PasswordEncrypter();
 
-    @FXML
-    public void initialize() {
-        roleComboBox.getItems().setAll(Role.values());
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
     }
 
     /**
@@ -31,7 +40,8 @@ public class UserFormController {
      * @param modelFacade the shared model instance from AdminController
      * @param user the user to edit, or null if creating a new one
      */
-    public void setModel(ModelFacade modelFacade, User user) {
+    public void setModel(Stage currentStage, ModelFacade modelFacade, User user) {
+        this.currentStage = currentStage;
         this.modelFacade = modelFacade;
         this.editingUser = user;
 
@@ -43,7 +53,12 @@ public class UserFormController {
     /**
      * Pre-fills input fields when editing an existing user.
      */
-    private void populateFields(User user) {
+    private void populateFields(User user) { // TODO populate profiles
+
+        usernameField.setText(user.getUsername());
+
+        if (user.getRole() == Role.ADMIN) { radioADMIN.fire(); }
+        else { radioUSER.fire(); }
 
     }
 
@@ -58,15 +73,19 @@ public class UserFormController {
 
     private void createUser() {
 
+        String username = usernameField.getText();
+        String password = encrypter.hashedPassword(passwordField.getText());
+        String passwordConfirm = encrypter.hashedPassword(confirmPasswordField.getText());
+
+
     }
 
     private void updateUser() {
 
     }
 
-    public void handleCancel(ActionEvent actionEvent) {
-    }
-
-    public void handleSave(ActionEvent actionEvent) {
+    @FXML
+    private void onClickCancel(ActionEvent actionEvent) {
+        currentStage.close();
     }
 }

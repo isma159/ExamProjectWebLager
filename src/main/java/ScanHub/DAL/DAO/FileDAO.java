@@ -1,27 +1,36 @@
 package ScanHub.DAL.DAO;
 
+import ScanHub.BE.File;
+import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
+import java.io.IOException;
 import java.util.List;
 
-public class FileDAO implements IDataAccess {
+public class FileDAO implements IDataAccess<File> {
+
+    DBConnector dbConnector = new DBConnector();
+
+    public FileDAO() throws IOException {
+    }
+
     @Override
-    public Object createData(Object data) throws Exception {
+    public File createData(File file) throws Exception {
         return null;
     }
 
     @Override
-    public List getData() throws Exception {
+    public List<File> getData() throws Exception {
         return List.of();
     }
 
     @Override
-    public void updateData(Object newData) throws Exception {
+    public void updateData(File newData) throws Exception {
 
     }
 
     @Override
-    public void deleteData(Object data) throws Exception {
+    public void deleteData(File data) throws Exception {
 
     }
 }

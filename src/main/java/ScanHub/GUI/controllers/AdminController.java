@@ -25,14 +25,16 @@ public class AdminController implements Initializable {
 
     public void setModel(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
-        // tblUser.setItems(modelFacade.getObservableUsers());
+        tblUser.setItems(modelFacade.userModel.getUsers());
+        tblProfile.setItems(modelFacade.profileModel.getProfiles());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
     }
 
-    // CREATE & EDIT PROFILE
+    // ----- CREATE & EDIT PROFILE -----
     @FXML
     private void onClickCreateUser(ActionEvent actionEvent) throws IOException {
         openUserForm(null);
@@ -55,7 +57,7 @@ public class AdminController implements Initializable {
         Stage stage = new Stage();
 
         UserFormController controller = loader.getController();
-        controller.setModel(modelFacade, user); // user is null for create, non-null for edit
+        controller.setModel(stage, modelFacade, user); // user is null for create, non-null for edit
 
         if (user == null) {
             stage.setTitle("Create User");
@@ -67,7 +69,7 @@ public class AdminController implements Initializable {
         stage.show();
     }
 
-    // CREATE & UPDATE PROFILE
+    // ----- CREATE & UPDATE PROFILE -----
     @FXML
     private void onClickCreateProfile(ActionEvent actionEvent) throws IOException {
         openProfileForm(null);
@@ -90,7 +92,7 @@ public class AdminController implements Initializable {
         Stage stage = new Stage();
 
         ProfileFormController controller = loader.getController();
-        controller.setModel(modelFacade, profile); // profile is null for create, non-null for edit
+        controller.setModel(stage, modelFacade, profile); // profile is null for create, non-null for edit
 
         if (profile == null) {
             stage.setTitle("Create Profile");

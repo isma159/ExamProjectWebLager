@@ -225,7 +225,7 @@
                               <TableView fx:id="tblProfile" layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" prefHeight="390.0" prefWidth="500.0">
                                  <columns>
                                     <TableColumn prefWidth="103.0" text="Name" />
-                                    <TableColumn prefWidth="89.0" text="Split Behaviour" />
+                                    <TableColumn prefWidth="89.0" text="Split Behavior" />
                                     <TableColumn minWidth="2.0" prefWidth="113.0" text="Status" />
                                  </columns>
                                  <columnResizePolicy>

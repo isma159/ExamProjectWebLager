@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProfileDAO implements IDataAccess<Profile> {
+
     DBConnector dbConnector = new DBConnector();
 
     public ProfileDAO() throws IOException {
@@ -21,14 +22,13 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public Profile createData(Profile newProfile) throws Exception {
-        String sql = "INSERT INTO Profiles (profileId, name, splitBehavior ) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Profiles (profileName, splitBehavior) VALUES (?, ?)";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            ps.setInt(1, newProfile.getProfileId());
-            ps.setString(2, newProfile.getProfileName());
-            ps.setString(3, newProfile.getSplitBehaviour().toString());
+            ps.setString(1, newProfile.getProfileName());
+            ps.setString(2, newProfile.getSplitBehavior().toString());
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
@@ -41,17 +41,14 @@ public class ProfileDAO implements IDataAccess<Profile> {
         } catch (SQLException e) {
             throw new Exception("Could not create user", e);
         }
-
-
     }
 
     @Override
     public List<Profile> getData() throws Exception {
+
         List<Profile> profiles = new ArrayList<>();
         try (Connection connection = dbConnector.getConnection()) {
-
             PreparedStatement ps = connection.prepareStatement("SELECT profileId, profileName, splitBehavior FROM Profiles WHERE deleted_at IS NULL");
-
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -61,18 +58,12 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 SplitBehavior splitBehavior = SplitBehavior.valueOf(rs.getString("splitBehavior"));
 
                 profiles.add(new Profile(profileId, profileName, splitBehavior));
-
             }
-
-        }
-        catch (SQLException e) {
-
+        } catch (SQLException e) {
             throw new Exception("Could not get users", e);
-
         }
 
         return profiles;
-
     }
 
     @Override
@@ -83,19 +74,18 @@ public class ProfileDAO implements IDataAccess<Profile> {
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, newData.getProfileName());
-            ps.setString(2, newData.getSplitBehaviour().toString());
+            ps.setString(2, newData.getSplitBehavior().toString());
             ps.setInt(3, newData.getProfileId());
             ps.executeUpdate();
 
         } catch (SQLException e) {
             throw new Exception("Could not update user", e);
         }
-
     }
 
     @Override
     public void deleteData(Profile data) throws Exception {
-        String sql = "UPDATE Profiles SET deleted_at = GETDATE() WHERE profileId = ?";
+        String sql = "UPDATE Profiles SET deleted_at = SYSDATETIME() WHERE profileId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {

@@ -1,0 +1,105 @@
+.background {
+    -fx-background-color: #465160;
+}
+
+/* ---------- Dark Surfaces ---------- */
+
+.surface-bg {
+    -fx-background-color: #354556;
+}
+
+.card-bg {
+    -fx-background-color: #2d3d4f;
+}
+
+.card-content-bg {
+    -fx-background-color: #2d3d4f;
+}
+
+.card {
+    -fx-border-color: #2B3B4C;
+}
+
+/* ---------- Dark Navigation ---------- */
+
+.primary-navigation-bg {
+    -fx-background-color: #0094EA;
+}
+
+.primary-navigation-btn {
+    -fx-background-color: #33A9EE;
+}
+
+.secondary-navigation-bg {
+    -fx-background-color: #2d3d4f;
+}
+
+.secondary-navigation-btn {
+    -fx-background-color: #008FF7;
+}
+
+/* ---------- Dark Inputs ---------- */
+
+.container {
+    -fx-border-color: #2B3B4C;
+    -fx-background-color: #465160;
+}
+
+.container.focused {
+    -fx-border-color: #008FF7;
+}
+
+/* ---------- Dark Buttons ---------- */
+
+.primary-btn {
+    -fx-background-color: #008FF7;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #0094EA;
+}
+
+.secondary-btn {
+    -fx-background-color: #697489;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #2B3B4C;
+}
+
+.tertiary-btn {
+    -fx-background-color: #4B5563;
+    -fx-text-fill: #ffffff;
+}
+
+/* ---------- Dark State & Feedback ---------- */
+
+.surface-hover {
+    -fx-background-color: #2B3B4C;
+}
+
+.separator .line {
+    -fx-border-color: #2B3B4C;
+}
+
+/* ---------- Dark Toggle / Switch ---------- */
+
+.toggle-button:selected {
+    -fx-background-color: #008FF7;
+}
+
+/* ---------- Dark Avatar ---------- */
+
+.avatar-initial {
+    -fx-background-color: #008FF7;
+}
+
+/* ---------- Dark Pagination ---------- */
+
+.pagination-btn {
+    -fx-border-color: #2B3B4C;
+}
+
+.pagination-btn-active {
+    -fx-background-color: #008FF7;
+}

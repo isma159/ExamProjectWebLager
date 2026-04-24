@@ -2,7 +2,6 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.GUI.util.TextFieldListeners;
 import ScanHub.Main;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,7 +12,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,18 +60,19 @@ public class LoginController implements Initializable {
         txtFldUser.setOnAction(event -> onSignInBtnClick());
     }
 
-    private String userMock = "admin";
-    private String passMock = "admin123";
+    private String usernameMockAdmin = "admin";
+    private String passwordMockAdmin = "admin123";
+    private String usernameMockUser = "user";
+    private String passwoordMockUser = "user123";
 
     @FXML
     private void onSignInBtnClick() {
         if (!txtFldUser.getText().isBlank() && !passFldPass.getText().isBlank()) {
-            if (txtFldUser.getText().equals(userMock) && passFldPass.getText().equals(passMock)) {
+            if (txtFldUser.getText().equals(usernameMockAdmin) && passFldPass.getText().equals(passwordMockAdmin)) {
                 try {
                     FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/AdminView.fxml"));
                     Scene scene = new Scene(fxmlLoader.load());
                     Stage stage = new Stage();
-
                     stage.setTitle("Admin Panel");
                     stage.setScene(scene);
                     stage.setMaximized(true);
@@ -85,6 +84,27 @@ public class LoginController implements Initializable {
 
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setHeaderText("Failed to open Admin Panel");
+                    alert.setContentText("Please try again!");
+                    alert.showAndWait();
+
+                }
+            }
+            else if (txtFldUser.getText().equals(usernameMockUser) && passFldPass.getText().equals(passwoordMockUser)) {
+                try {
+                    FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/UserView.fxml"));
+                    Scene scene = new Scene(fxmlLoader.load());
+                    Stage stage = new Stage();
+                    stage.setTitle("User Panel");
+                    stage.setScene(scene);
+                    stage.setMaximized(true);
+                    stage.show();
+
+                    currentStage.close();
+                }
+                catch (Exception e) {
+
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setHeaderText("Failed to open User Panel");
                     alert.setContentText("Please try again!");
                     alert.showAndWait();
 

@@ -1,183 +1,285 @@
 .root {
-
     -fx-font-family: Montserrat;
     -fx-font-size: 12;
     -fx-font-weight: 400;
-
 }
 
 .background {
-
-    -fx-background-color: #F5f5f5;
-
+    -fx-background-color: #F5F5F5;
 }
 
+/* ---------- Typography ---------- */
+
 .h1 {
-
-    -fx-font-weight: bold;
+    -fx-font-weight: 700;
     -fx-font-size: 21;
-
 }
 
 .h2 {
-
     -fx-font-weight: 600;
     -fx-font-size: 18;
-
 }
 
 .h3 {
-
     -fx-font-weight: 600;
     -fx-font-size: 15;
-
 }
 
 .lbl {
-
     -fx-font-size: 12;
     -fx-font-weight: 500;
-
 }
 
-.container {
-
-    -fx-border-radius: 6px;
-    -fx-border-color: #E2E4E8;
-    -fx-border-width: 2;
-
-    -fx-background-color: WHITE;
-    -fx-background-radius: 6px;
-    -fx-background-insets: 1;
-
-    transition: -fx-border-color 150ms ease-out;
-
+.helper-text {
+    -fx-font-size: 10;
+    -fx-font-weight: 400;
 }
 
-.container .text-field {
+/* ---------- Surfaces ---------- */
 
-    -fx-font-size: 12;
-
-    -fx-background-color: TRANSPARENT;
-
+.surface-bg {
+    -fx-background-color: #ffffff;
 }
 
-.container.focused {
-
-    -fx-border-color: #2d3d4f;
-
+.card-content-bg {
+    -fx-background-color: #f9f9f9;
 }
 
-.primary-btn {
-
-    -fx-text-fill: #ffffff;
-
-    -fx-background-color: #2D3D4F;
-    -fx-background-radius: 6px;
-
-    transition: -fx-background-color 150ms ease-out;
-
-}
-
-.secondary-navigation-btn {
-
-    -fx-text-fill: #ffffff;
-
-    -fx-background-color: #415060;
-    -fx-background-radius: 6px;
-
-}
-
-.btn-text {
-
-    -fx-font-size: 12;
-    -fx-font-weight: 500;
-
-}
+/* ---------- Navigation ---------- */
 
 .primary-navigation-bg {
-
     -fx-background-color: #2d3d4f;
+}
 
+.primary-navigation-btn {
+    -fx-background-color: #415060;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 6px;
 }
 
 .secondary-navigation-bg {
-
     -fx-background-color: #24C79F;
-
 }
 
-.primary-btn:hover {
-
-    -fx-background-color: #1C252F;
-
+.secondary-navigation-btn {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #2d3d4f;
+    -fx-background-radius: 6px;
 }
 
-.clear-btn {
+/* ---------- Containers / Inputs ---------- */
 
+.container {
+    -fx-border-radius: 6px;
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 2;
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+    transition: -fx-border-color 150ms ease-out;
+}
+
+.container .text-field {
+    -fx-font-size: 12;
     -fx-background-color: TRANSPARENT;
+}
 
+.container.focused {
+    -fx-border-color: #2d3d4f;
 }
 
 .container.error-border {
-
     -fx-border-color: #FF3D32;
-
 }
 
 .container.success-border {
-
     -fx-border-color: #4CD07D;
-
 }
 
-.card {
+.container:disabled {
+    -fx-opacity: 0.6;
+}
 
+.placeholder {
+    -fx-text-fill: #BFBFBF;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn-text {
+    -fx-font-size: 12;
+    -fx-font-weight: 500;
+}
+
+.primary-btn {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #2D3D4F;
+    -fx-background-radius: 6px;
+    transition: -fx-background-color 150ms ease-out;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #1C252F;
+}
+
+.primary-btn:disabled {
+    -fx-opacity: 0.6;
+}
+
+.secondary-btn {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #64748B;
+    -fx-background-radius: 6px;
+    transition: -fx-background-color 150ms ease-out;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #354556;
+}
+
+.secondary-btn:disabled {
+    -fx-opacity: 0.6;
+}
+
+.tertiary-btn {
+    -fx-text-fill: #2d3d4f;
+    -fx-background-color: #F9F9F9;
+    -fx-background-radius: 6px;
+}
+
+.tertiary-btn-inner {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6px;
+}
+
+.outline-btn {
+    -fx-text-fill: #2d3d4f;
+    -fx-background-color: TRANSPARENT;
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1.5;
+}
+
+.clear-btn {
+    -fx-background-color: TRANSPARENT;
+}
+
+.destructive-btn {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #EF4444;
+    -fx-background-radius: 6px;
+}
+
+.destructive-text {
+    -fx-text-fill: #EF4444;
+}
+
+/* ---------- Cards ---------- */
+
+.card {
     -fx-border-color: #E2E4E8;
     -fx-border-radius: 10px;
     -fx-border-width: 2;
-
     -fx-background-radius: 10px;
     -fx-background-insets: 1;
-
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 12, 0, 0, 2);
-
 }
 
 .card-bg {
-
     -fx-background-color: #ffffff;
-
-}
-
-.avatar-initial {
-
-    -fx-background-radius: 6px;
-    -fx-background-color: #2d3d4f;
-
 }
 
 .half-card {
-
     -fx-border-color: #E2E4E8;
     -fx-border-radius: 10 10 0 0;
     -fx-border-width: 2 2 0 2;
     -fx-border-insets: -2;
-
     -fx-background-radius: 10 10 0 0;
-
 }
+
+/* ---------- Chips ---------- */
+
+.chip {
+    -fx-background-color: #F9F9F9;
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1;
+    -fx-background-radius: 3px;
+    -fx-font-size: 12;
+}
+
+.chip:disabled {
+    -fx-opacity: 0.6;
+}
+
+.chip-selected {
+    -fx-border-color: #2d3d4f;
+}
+
+/* ---------- Avatar ---------- */
+
+.avatar-initial {
+    -fx-background-radius: 6px;
+    -fx-background-color: #2d3d4f;
+}
+
+.avatar-image {
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+}
+
+/* ---------- State & Feedback ---------- */
+
+.surface-hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.success-color {
+    -fx-text-fill: #4CD07D;
+}
+
+.error-color {
+    -fx-text-fill: #FF3D32;
+}
+
+.disabled {
+    -fx-opacity: 0.6;
+}
+
+/* ---------- Separator / Divider ---------- */
 
 .separator .line {
-
     -fx-border-color: #2d3d4f;
     -fx-border-width: 0.8;
-
 }
 
-.toggle-button:selected {
+/* ---------- Toggle / Switch ---------- */
 
+.toggle-button:selected {
     -fx-background-color: #2d3d4f;
     -fx-text-fill: #ffffff;
+}
 
+/* ---------- Overlay ---------- */
+
+.overlay-bg {
+    -fx-background-color: rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- Pagination ---------- */
+
+.pagination-btn {
+    -fx-background-color: TRANSPARENT;
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1;
+    -fx-background-radius: 6px;
+    -fx-font-size: 12;
+}
+
+.pagination-btn-active {
+    -fx-background-color: #2d3d4f;
+    -fx-text-fill: #ffffff;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
 }
