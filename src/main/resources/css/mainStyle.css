@@ -4,6 +4,8 @@
     -fx-font-size: 12;
     -fx-font-weight: 400;
 
+    -fx-text-fill: #2d3d4f;
+
 }
 
 .background {
@@ -14,22 +16,30 @@
 
 .h1 {
 
+    -fx-font-family: "Montserrat";
     -fx-font-weight: bold;
     -fx-font-size: 21;
+
+    -fx-text-fill: #2d3d4f;
 
 }
 
 .h2 {
 
+    -fx-font-family: "Montserrat SemiBold";
     -fx-font-weight: 600;
     -fx-font-size: 18;
+
+    -fx-text-fill: #2d3d4f;
 
 }
 
 .h3 {
 
-    -fx-font-weight: 600;
+    -fx-font-family: "Montserrat SemiBold";
     -fx-font-size: 15;
+
+    -fx-text-fill: #2d3d4f;
 
 }
 
@@ -74,8 +84,28 @@
 
     -fx-background-color: #2D3D4F;
     -fx-background-radius: 6px;
+    -fx-background-insets: 1;
 
     transition: -fx-background-color 150ms ease-out;
+
+}
+
+.secondary-btn {
+
+    -fx-text-fill: #ffffff;
+
+    -fx-background-color: #64748B;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    transition: -fx-background-color 150ms ease-out, -fx-text-fill 150ms ease-out;
+
+}
+
+.secondary-btn:hover {
+
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #000000;
 
 }
 
@@ -113,9 +143,47 @@
 
 }
 
+.primary-btn:focused {
+
+    -fx-border-color: #64748B;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+
+}
+
+.clear-btn:focused {
+
+    -fx-border-color: #2d3d4f;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+
+}
+
 .clear-btn {
 
     -fx-background-color: TRANSPARENT;
+
+}
+
+.filter-btn {
+
+    -fx-background-color: TRANSPARENT;
+
+}
+
+.filter-btn:hover {
+
+    -fx-background-color: #F1F5F9;
+
+}
+
+.filter-btn:selected {
+
+    -fx-border-color: #2d3d4f;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-insets: 2;
+
+    -fx-font-family: "Montserrat SemiBold";
 
 }
 
@@ -140,6 +208,10 @@
     -fx-background-radius: 10px;
     -fx-background-insets: 1;
 
+}
+
+.shadow {
+
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 12, 0, 0, 2);
 
 }
@@ -147,6 +219,12 @@
 .card-bg {
 
     -fx-background-color: #ffffff;
+
+}
+
+.second-card-bg {
+
+    -fx-background-color: #f9f9f9;
 
 }
 
@@ -168,6 +246,52 @@
 
 }
 
+.pagination {
+
+    -fx-page-information-visible: false;
+
+
+}
+
+.pagination .number-button, .pagination .left-arrow-button, .pagination .right-arrow-button {
+
+    -fx-background-color: TRANSPARENT;
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+
+    -fx-min-height: 33;
+    -fx-min-width: 33;
+
+}
+
+.pagination .left-arrow, .pagination .right-arrow {
+    -fx-shape: " ";
+    -fx-scale-x: 0;
+    -fx-scale-y: 0;
+}
+
+.pagination .left-arrow-button {
+
+    -fx-background-image: url("../images/icons/angle-left.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 33px 33px;
+    -fx-background-color: TRANSPARENT;
+
+}
+
+.pagination .right-arrow-button {
+
+    -fx-background-image: url("../images/icons/angle-right.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 33px 33px;
+    -fx-background-color: TRANSPARENT;
+
+}
+
 .separator .line {
 
     -fx-border-color: #2d3d4f;
@@ -175,9 +299,85 @@
 
 }
 
-.toggle-button:selected {
+.primary-navigation-btn {
+
+    -fx-background-color: TRANSPARENT;
+
+}
+
+.primary-navigation-btn:selected {
 
     -fx-background-color: #2d3d4f;
     -fx-text-fill: #ffffff;
+
+}
+
+.box-card {
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 2;
+    -fx-border-insets: -2 -2 0 -2;
+
+}
+
+.scroll-pane {
+
+    -fx-background-color: #ffffff;
+
+}
+
+.scroll-pane .viewport {
+
+    -fx-border-color: TRANSPARENT;
+    -fx-background-color: TRANSPARENT;
+
+}
+
+.v-card {
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 0 2 0 2;
+    -fx-border-insets: -2;
+
+}
+
+.half-card-bottom {
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 0 0 10 10;
+    -fx-border-width: 0 2 2 2;
+    -fx-border-insets: -2;
+
+    -fx-background-radius: 0 0 10 10;
+
+}
+
+.scroll-pane .scroll-bar {
+
+    -fx-background-color: TRANSPARENT;
+    -fx-pref-width: 18;
+
+}
+
+.scroll-pane .scroll-bar .thumb {
+
+    -fx-background-color: #BFBFBF;
+
+}
+
+.scroll-pane .scroll-bar .increment-button,
+.scroll-pane .scroll-bar .decrement-button {
+    -fx-padding: 0;
+    -fx-shape: null;
+    visibility: hidden;
+    -fx-text-fill: TRANSPARENT;
+}
+
+.scroll-pane .scroll-bar .increment-button .increment-arrow,
+.scroll-pane .scroll-bar .decrement-button .decrement-arrow {
+    -fx-padding: 0;
+    -fx-shape: null;
+    visibility: hidden;
+    -fx-text-fill: TRANSPARENT;
 
 }

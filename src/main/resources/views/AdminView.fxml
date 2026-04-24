@@ -2,9 +2,8 @@
 
 <?import java.lang.String?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
@@ -53,7 +52,7 @@
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Region prefHeight="200.0" prefWidth="9.0" />
-                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" selected="true" styleClass="clear-btn" text="• Dashboard">
+                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" selected="true" styleClass="primary-navigation-btn" text="• Dashboard">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="sidebarBtns" />
                                  </toggleGroup>
@@ -63,7 +62,7 @@
                         <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="144.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Region prefHeight="200.0" prefWidth="9.0" />
-                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="clear-btn" text="• Analytics" toggleGroup="$sidebarBtns" />
+                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="primary-navigation-btn" text="• Analytics" toggleGroup="$sidebarBtns" />
                            </children>
                         </HBox>
                         <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" prefWidth="200.0" />
@@ -78,19 +77,19 @@
                         <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="144.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Region prefHeight="200.0" prefWidth="9.0" />
-                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="clear-btn" text="• Users" toggleGroup="$sidebarBtns" />
+                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="primary-navigation-btn" text="• Users" toggleGroup="$sidebarBtns" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="252.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Region prefHeight="200.0" prefWidth="9.0" />
-                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="clear-btn" text="• Profiles" toggleGroup="$sidebarBtns" />
+                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="primary-navigation-btn" text="• Profiles" toggleGroup="$sidebarBtns" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="282.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Region prefHeight="200.0" prefWidth="9.0" />
-                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="clear-btn" text="• Metadata" toggleGroup="$sidebarBtns" />
+                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="primary-navigation-btn" text="• Metadata" toggleGroup="$sidebarBtns" />
                            </children>
                         </HBox>
                         <Region layoutX="12.0" layoutY="189.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" prefWidth="200.0" />
@@ -105,19 +104,19 @@
                         <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="282.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Region prefHeight="200.0" prefWidth="9.0" />
-                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="clear-btn" text="• Activity Logs" toggleGroup="$sidebarBtns" />
+                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="primary-navigation-btn" text="• Activity Logs" toggleGroup="$sidebarBtns" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="405.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Region prefHeight="200.0" prefWidth="9.0" />
-                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="clear-btn" text="• Settings" toggleGroup="$sidebarBtns" />
+                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="primary-navigation-btn" text="• Settings" toggleGroup="$sidebarBtns" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="435.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Region prefHeight="200.0" prefWidth="9.0" />
-                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="clear-btn" text="• Shortcuts" toggleGroup="$sidebarBtns" />
+                              <ToggleButton alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" styleClass="primary-navigation-btn" text="• Shortcuts" toggleGroup="$sidebarBtns" />
                            </children>
                         </HBox>
                         <Region layoutX="12.0" layoutY="360.0" prefHeight="510.0" prefWidth="230.0" />
@@ -143,6 +142,7 @@
                      <styleClass>
                         <String fx:value="secondary-navigation-bg" />
                         <String fx:value="card" />
+                        <String fx:value="shadow" />
                      </styleClass>
                   </VBox>
                   <Region layoutX="23.0" layoutY="10.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="9.0" prefWidth="200.0" />
@@ -160,6 +160,7 @@
                      <styleClass>
                         <String fx:value="card" />
                         <String fx:value="card-bg" />
+                        <String fx:value="shadow" />
                      </styleClass>
                      <children>
                         <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="18.0" />
@@ -170,71 +171,199 @@
                   <Region layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="75.0" prefWidth="9.0" />
                </children>
             </HBox>
-            <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0" />
+            <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" prefWidth="200.0" />
             <HBox prefHeight="969.0" prefWidth="1671.0">
                <children>
                   <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="9.0" />
-                  <VBox prefHeight="200.0" prefWidth="210.0">
-                     <children>
-                        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="210.0">
-                           <styleClass>
-                              <String fx:value="card-bg" />
-                              <String fx:value="card" />
-                           </styleClass>
-                        </VBox>
-                        <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="21.0" prefWidth="200.0" />
-                        <VBox layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="210.0">
-                           <styleClass>
-                              <String fx:value="card-bg" />
-                              <String fx:value="card" />
-                           </styleClass>
-                        </VBox>
-                        <Region layoutX="10.0" layoutY="220.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="21.0" prefWidth="200.0" />
-                        <VBox layoutX="10.0" layoutY="250.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="210.0">
-                           <styleClass>
-                              <String fx:value="card-bg" />
-                              <String fx:value="card" />
-                           </styleClass>
-                        </VBox>
-                        <Region layoutX="10.0" layoutY="460.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="21.0" prefWidth="200.0" />
-                        <VBox layoutX="10.0" layoutY="490.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="210.0">
-                           <styleClass>
-                              <String fx:value="card-bg" />
-                              <String fx:value="card" />
-                           </styleClass>
-                        </VBox>
-                        <Region layoutX="10.0" layoutY="682.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="21.0" prefWidth="200.0" />
-                     </children>
-                  </VBox>
-                  <Region layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="30.0" />
                   <VBox prefHeight="200.0" prefWidth="1550.0">
                      <children>
                         <HBox prefHeight="390.0" prefWidth="1550.0">
                            <children>
-                              <TableView fx:id="tblUser" maxWidth="-Infinity" prefHeight="390.0" prefWidth="500.0">
-                                <columns>
-                                  <TableColumn prefWidth="103.0" text="Name" />
-                                  <TableColumn prefWidth="89.0" text="Email" />
-                                    <TableColumn minWidth="2.0" prefWidth="113.0" text="Role" />
-                                </columns>
-                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </TableView>
-                              <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="390.0" prefWidth="30.0" />
-                              <TableView fx:id="tblProfile" layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" prefHeight="390.0" prefWidth="500.0">
-                                 <columns>
-                                    <TableColumn prefWidth="103.0" text="Name" />
-                                    <TableColumn prefWidth="89.0" text="Split Behaviour" />
-                                    <TableColumn minWidth="2.0" prefWidth="113.0" text="Status" />
-                                 </columns>
-                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </TableView>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="210.0">
+                                 <children>
+                                    <VBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="150.0">
+                                       <styleClass>
+                                          <String fx:value="card-bg" />
+                                          <String fx:value="card" />
+                                          <String fx:value="shadow" />
+                                       </styleClass>
+                                    </VBox>
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="9.0" prefWidth="200.0" />
+                                    <VBox layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="150.0">
+                                       <styleClass>
+                                          <String fx:value="card-bg" />
+                                          <String fx:value="card" />
+                                          <String fx:value="shadow" />
+                                       </styleClass>
+                                    </VBox>
+                                    <Region layoutX="10.0" layoutY="220.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="9.0" prefWidth="200.0" />
+                                    <VBox layoutX="10.0" layoutY="250.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="150.0">
+                                       <styleClass>
+                                          <String fx:value="card-bg" />
+                                          <String fx:value="card" />
+                                          <String fx:value="shadow" />
+                                       </styleClass>
+                                    </VBox>
+                                    <Region layoutX="10.0" layoutY="460.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="9.0" prefWidth="200.0" />
+                                    <VBox layoutX="10.0" layoutY="490.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="150.0">
+                                       <styleClass>
+                                          <String fx:value="card-bg" />
+                                          <String fx:value="card" />
+                                          <String fx:value="shadow" />
+                                       </styleClass>
+                                    </VBox>
+                                 </children>
+                              </VBox>
+                              <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                              <VBox prefHeight="390.0" prefWidth="1000.0" styleClass="shadow">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0">
+                                       <styleClass>
+                                          <String fx:value="half-card" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                       <children>
+                                          <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                                          <Label styleClass="h2" text="Users" />
+                                       </children>
+                                    </HBox>
+                                    <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                                       <styleClass>
+                                          <String fx:value="box-card" />
+                                          <String fx:value="second-card-bg" />
+                                       </styleClass>
+                                       <children>
+                                          <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                                          <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" selected="true" styleClass="filter-btn" text="All Users">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="userFilter" />
+                                             </toggleGroup>
+                                          </ToggleButton>
+                                          <ToggleButton layoutX="25.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Admins" toggleGroup="$userFilter" />
+                                          <ToggleButton layoutX="100.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Users" toggleGroup="$userFilter" />
+                                       </children>
+                                    </HBox>
+                                    <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                                       <styleClass>
+                                          <String fx:value="second-card-bg" />
+                                          <String fx:value="box-card" />
+                                       </styleClass>
+                                    </HBox>
+                                    <VBox prefHeight="240.0" prefWidth="100.0">
+                                       <styleClass>
+                                          <String fx:value="box-card" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                    </VBox>
+                                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                                       <styleClass>
+                                          <String fx:value="half-card-bottom" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                       <children>
+                                          <Pagination maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="390.0" prefWidth="15.0" />
+                              <VBox layoutX="10.0" layoutY="10.0" prefHeight="390.0" prefWidth="1000.0" styleClass="shadow">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0">
+                                       <styleClass>
+                                          <String fx:value="half-card" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                       <children>
+                                          <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                                          <Label styleClass="h2" text="Profiles" />
+                                       </children>
+                                    </HBox>
+                                    <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                                       <styleClass>
+                                          <String fx:value="box-card" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                    </HBox>
+                                    <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                                       <styleClass>
+                                          <String fx:value="second-card-bg" />
+                                          <String fx:value="box-card" />
+                                       </styleClass>
+                                    </HBox>
+                                    <VBox prefHeight="240.0" prefWidth="100.0">
+                                       <styleClass>
+                                          <String fx:value="box-card" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                    </VBox>
+                                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                                       <styleClass>
+                                          <String fx:value="half-card-bottom" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                       <children>
+                                          <Pagination maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Region layoutX="520.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="390.0" prefWidth="30.0" />
                            </children>
                         </HBox>
-                        <HBox prefHeight="390.0" prefWidth="1550.0" />
+                        <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" prefWidth="200.0" />
+                        <HBox alignment="CENTER" prefHeight="285.0" prefWidth="1550.0">
+                           <children>
+                              <VBox prefHeight="285.0" prefWidth="1550.0" styleClass="shadow">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0">
+                                       <styleClass>
+                                          <String fx:value="half-card" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                       <children>
+                                          <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                                          <Label styleClass="h2" text="Activity Logs" />
+                                       </children>
+                                    </HBox>
+                                    <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                                       <styleClass>
+                                          <String fx:value="box-card" />
+                                          <String fx:value="second-card-bg" />
+                                       </styleClass>
+                                       <children>
+                                          <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                                          <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" selected="true" styleClass="filter-btn" text="Scan">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="logFilter" />
+                                             </toggleGroup>
+                                          </ToggleButton>
+                                          <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Create" toggleGroup="$logFilter" />
+                                          <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Delete" toggleGroup="$logFilter" />
+                                          <ToggleButton layoutX="175.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Export" toggleGroup="$logFilter" />
+                                          <ToggleButton layoutX="250.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Login" toggleGroup="$logFilter" />
+                                       </children>
+                                    </HBox>
+                                    <VBox prefHeight="165.0" prefWidth="100.0">
+                                       <styleClass>
+                                          <String fx:value="box-card" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                    </VBox>
+                                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                                       <styleClass>
+                                          <String fx:value="half-card-bottom" />
+                                          <String fx:value="card-bg" />
+                                       </styleClass>
+                                       <children>
+                                          <Pagination prefHeight="45.0" prefWidth="1092.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="30.0" />
+                           </children></HBox>
+                        <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="21.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                </children>

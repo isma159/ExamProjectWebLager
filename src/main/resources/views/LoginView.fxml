@@ -90,6 +90,6 @@
          </children>
       </HBox>
       <Region layoutX="10.0" layoutY="284.0" prefHeight="17.0" prefWidth="600.0" />
-      <Button mnemonicParsing="false" onAction="#onSignInBtnClick" prefHeight="33.0" prefWidth="300.0" styleClass="primary-btn" text="Sign In" />
+      <Button fx:id="signInBtn" mnemonicParsing="false" onAction="#onSignInBtnClick" prefHeight="33.0" prefWidth="300.0" styleClass="primary-btn" text="Sign In" />
    </children>
 </VBox>
