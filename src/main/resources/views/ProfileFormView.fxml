@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<VBox prefWidth="520" style="-fx-background-color: #F5F5F5;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
+<VBox prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
     <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
     <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12" style="-fx-background-color: #2D3D4F;">
         <padding><Insets bottom="0" left="20" right="20" top="0" /></padding>
@@ -20,14 +20,17 @@
             <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
             <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Profile name" />
             <Region prefHeight="6" />
-            <TextField fx:id="profileNameField" prefHeight="30" promptText="e.g. Maersk Oil" style="-fx-font-size: 12px; -fx-background-color: white;                               -fx-border-color: #E2E4E8; -fx-border-radius: 6;                               -fx-background-radius: 6; -fx-border-width: 1;                               -fx-text-fill: #2D3D4F; -fx-prompt-text-fill: #BFBFBF;" />
-            <Label fx:id="nameError" managed="false" style="-fx-font-size: 10px; -fx-text-fill: #FF3D32;" text="Profile name is required." visible="false" />
+         <HBox styleClass="container">
+            <children>
+                  <TextField fx:id="profileNameField" prefHeight="30" prefWidth="422.0" promptText="e.g. Maersk Oil" />
+            </children>
+         </HBox>
             <Region prefHeight="18" />
             <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Split Behavior" />
             <Region prefHeight="4" />
             <Label style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Defines how documents are split during a scanning session." />
             <Region prefHeight="8" />
-            <VBox spacing="8" style="-fx-background-color: #F9F9F9; -fx-background-radius: 6;                          -fx-border-color: #E2E4E8; -fx-border-radius: 6; -fx-border-width: 1;">
+            <VBox spacing="8" styleClass="container">
                 <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
                 <HBox alignment="TOP_LEFT" spacing="10">
                     <RadioButton fx:id="radioBARCODE" style="-fx-font-size: 12px; -fx-text-fill: #2D3D4F;">
@@ -59,14 +62,13 @@
             <Region prefHeight="18" />
             <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Export name preview" />
             <Region prefHeight="6" />
-            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #F9F9F9; -fx-background-radius: 6;                          -fx-border-color: #E2E4E8; -fx-border-radius: 6; -fx-border-width: 1;">
+            <HBox alignment="CENTER_LEFT" styleClass="container">
                 <padding><Insets bottom="8" left="12" right="12" top="8" /></padding>
                 <Label fx:id="exportPreviewLabel" style="-fx-font-size: 12px; -fx-font-family: monospace; -fx-text-fill: #2D3D4F;" text="ProfileName_BOX-042.tiff" />
             </HBox>
             <Label style="-fx-font-size: 10px; -fx-text-fill: #BFBFBF;" text="Format: {profileName}_{boxLabel}.tiff" />
 
             <Region prefHeight="18" />
-            <Label fx:id="usersError" managed="false" style="-fx-font-size: 10px; -fx-text-fill: #FF3D32;" text="Assign at least one user." visible="false" />
         </VBox>
     </VBox>
     <HBox alignment="CENTER_RIGHT" prefHeight="56" spacing="8" style="-fx-background-color: #F5F5F5;                  -fx-border-color: #E2E4E8; -fx-border-width: 1 0 0 0;">

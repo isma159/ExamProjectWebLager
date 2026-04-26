@@ -1,14 +1,14 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.Profile;
+import ScanHub.BE.Role;
 import ScanHub.BE.SplitBehavior;
+import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -17,6 +17,7 @@ import java.util.ResourceBundle;
 
 public class ProfileFormController implements Initializable {
 
+    @FXML private ToggleGroup toggleGroupSplitBehavior;
     @FXML private Label formTitle, profileIdLabel, nameError, exportPreviewLabel, usersError;
     @FXML private RadioButton radioBARCODE, radioMANUAL, radioNONE;
     @FXML private VBox userCheckboxList;
@@ -44,7 +45,13 @@ public class ProfileFormController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        radioBARCODE.setUserData(SplitBehavior.BARCODE);
+        radioMANUAL.setUserData(SplitBehavior.MANUAL);
+        radioNONE.setUserData(SplitBehavior.NONE);
 
+        if (editingProfile != null) {
+            formTitle.setText("Edit profile");
+        }
     }
 
     /**
@@ -71,6 +78,21 @@ public class ProfileFormController implements Initializable {
 
     private void createProfile() {
 
+        String profileName = profileNameField.getText();
+        Toggle selectedToggle = toggleGroupSplitBehavior.getSelectedToggle();
+
+
+
+        SplitBehavior splitBehavior = (SplitBehavior) selectedToggle.getUserData();
+
+        try {
+            Profile newProfile = new Profile(0, profileName, splitBehavior);
+            modelFacade.profileModel.createProfile(newProfile);
+            currentStage.close();
+        } catch (Exception e) {
+            // TODO add the AlertView
+            throw new RuntimeException(e);
+        }
     }
 
     private void updateProfile() {

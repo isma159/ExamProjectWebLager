@@ -21,7 +21,10 @@ public class AdminController implements Initializable {
     @FXML TableView<User> tblUser;
     @FXML TableView<Profile> tblProfile;
 
-    private ModelFacade modelFacade;
+    private ModelFacade modelFacade = new ModelFacade();
+
+    public AdminController() throws Exception {
+    }
 
     public void setModel(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
@@ -31,10 +34,10 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        
     }
 
-    // ----- CREATE & EDIT PROFILE -----
+    // ----- CREATE & EDIT USER -----
     @FXML
     private void onClickCreateUser(ActionEvent actionEvent) throws IOException {
         openUserForm(null);
@@ -49,7 +52,7 @@ public class AdminController implements Initializable {
 
     /**
      * Opens the UserFormView. If user is null, opens in create mode.
-     * If user is provided, opens in edit mode with fields pre-filled.
+     * If user is provided (selected), opens in edit mode with fields prefilled.
      */
     private void openUserForm(User user) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/UserFormView.fxml"));
@@ -84,7 +87,7 @@ public class AdminController implements Initializable {
 
     /**
      * Opens the ProfileFormView. If profile is null, opens in create mode.
-     * If profile is provided, opens in edit mode with fields pre-filled.
+     * If profile is provided (selected), opens in edit mode with fields prefilled.
      */
     private void openProfileForm(Profile profile) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ProfileFormView.fxml"));

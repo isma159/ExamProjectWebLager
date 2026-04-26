@@ -18,12 +18,9 @@ public class Main extends Application{
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-
         LoginController loginController = fxmlLoader.getController();
         loginController.setStage(stage);
-
         stage.setResizable(false);
-
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.show();
