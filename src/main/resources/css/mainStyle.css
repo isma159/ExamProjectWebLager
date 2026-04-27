@@ -14,13 +14,42 @@
 
 }
 
+.icon {
+
+    -fx-font-family: "primeicons";
+    -fx-font-size: 20px;
+
+}
+
+.white-icon {
+
+    -fx-font-family: "primeicons";
+    -fx-font-size: 20px;
+
+    -fx-text-fill: #ffffff;
+
+}
+
+.chip {
+
+    -fx-background-radius: 3px;
+    -fx-background-color: #F5f5f5;
+
+}
+
+.chip-color {
+
+    -fx-background-color: #008FF7;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
+
+}
+
 .h1 {
 
     -fx-font-family: "Montserrat";
     -fx-font-weight: bold;
     -fx-font-size: 21;
-
-    -fx-text-fill: #2d3d4f;
 
 }
 
@@ -30,16 +59,12 @@
     -fx-font-weight: 600;
     -fx-font-size: 18;
 
-    -fx-text-fill: #2d3d4f;
-
 }
 
 .h3 {
 
     -fx-font-family: "Montserrat SemiBold";
     -fx-font-size: 15;
-
-    -fx-text-fill: #2d3d4f;
 
 }
 
