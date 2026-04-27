@@ -24,6 +24,10 @@ public class UserModel {
         return userObservableList;
     }
 
+    public User getUserFromUsername(String username) throws Exception {
+        return userManager.getUserFromUsername(username);
+    }
+
     public void updateUser(User updatedUser) throws Exception {
         userManager.updateUser(updatedUser);
         // Update the local observable list so the table refreshes automatically

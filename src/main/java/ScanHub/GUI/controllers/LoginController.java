@@ -1,7 +1,13 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.User;
+import ScanHub.BLL.interfaces.IPasswordEncrypter;
+import ScanHub.BLL.util.PasswordEncrypter;
+import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.TextFieldListeners;
 import ScanHub.Main;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,10 +28,16 @@ public class LoginController implements Initializable {
     @FXML private Button signInBtn;
     @FXML private HBox hboxUser, hboxPass1, hboxPass2;
 
+    private ModelFacade modelFacade;
+    private IPasswordEncrypter encrypter = new PasswordEncrypter();
     private Stage currentStage;
 
     public void setStage(Stage stage) {
         this.currentStage = stage;
+    }
+
+    public void setModelFacade(ModelFacade modelFacade) {
+        this.modelFacade = modelFacade;
     }
 
     @Override
@@ -60,72 +72,71 @@ public class LoginController implements Initializable {
         TextFieldListeners.addErrorListener(passFldPass, containers);
         TextFieldListeners.addErrorListener(txtFldPass, containers);
 
-        txtFldUser.setOnAction(e -> onSignInBtnClick());
-        txtFldPass.setOnAction(e -> onSignInBtnClick());
-        passFldPass.setOnAction(e -> onSignInBtnClick());
-
+        EventHandler<ActionEvent> signIn = event -> {
+            try {
+                onSignInBtnClick();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        };
+        txtFldUser.setOnAction(signIn);
+        txtFldPass.setOnAction(signIn);
+        passFldPass.setOnAction(signIn);
     }
 
-    private String usernameMockAdmin = "admin";
-    private String passwordMockAdmin = "admin123";
-    private String usernameMockUser = "user";
-    private String passwoordMockUser = "user123";
-
+    // Admin            Username: admin     Password: admin123
+    // User             Username: user      Password: user123
     @FXML
-    private void onSignInBtnClick() {
-        if (!txtFldUser.getText().isBlank() && !passFldPass.getText().isBlank()) {
-            if (txtFldUser.getText().equals(usernameMockAdmin) && passFldPass.getText().equals(passwordMockAdmin)) {
-                try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/AdminView.fxml"));
-                    Scene scene = new Scene(fxmlLoader.load());
-                    Stage stage = new Stage();
+    private void onSignInBtnClick() throws Exception {
+        if (txtFldUser.getText().isBlank() || passFldPass.getText().isBlank()) {
+            onLoginError();
+            // TODO add AlertView (Description: Missing fields)
+            return;
+        }
 
-                    stage.setMinWidth(1200);
-                    stage.setMinHeight(600);
+        User user = modelFacade.userModel.getUserFromUsername(txtFldUser.getText().strip());
 
-                    stage.setTitle("Admin Panel");
-                    stage.setScene(scene);
-                    stage.setMaximized(true);
-                    stage.show();
+        if (user == null || !encrypter.verifyPassword(passFldPass.getText(), user.getPasswordHash())) {
+            onLoginError();
+            // TODO add AlertView (Description: Incorrect username or password)
+            return;
+        }
 
-                    currentStage.close();
-                }
-                catch (Exception e) {
+        try {
+            String view;
+            String title;
 
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setHeaderText("Failed to open Admin Panel");
-                    alert.setContentText("Please try again!");
-                    alert.showAndWait();
-
-                }
+            if (user.isAdmin()) {
+                view = "/views/AdminView.fxml";
+                title = "Admin Panel";
+            } else {
+                view = "/views/UserView.fxml";
+                title = "User Panel";
             }
-            else if (txtFldUser.getText().equals(usernameMockUser) && passFldPass.getText().equals(passwoordMockUser)) {
-                try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/UserView.fxml"));
-                    Scene scene = new Scene(fxmlLoader.load());
-                    Stage stage = new Stage();
-                    stage.setTitle("User Panel");
-                    stage.setScene(scene);
-                    stage.setMaximized(true);
-                    stage.show();
 
-                    currentStage.close();
-                }
-                catch (Exception e) {
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(view));
+            Scene scene = new Scene(fxmlLoader.load());
 
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setHeaderText("Failed to open User Panel");
-                    alert.setContentText("Please try again!");
-                    alert.showAndWait();
-
-                }
+            if (user.isAdmin()) {
+                AdminController adminController = fxmlLoader.getController();
+                adminController.setModel(modelFacade);
             }
             else {
-                onLoginError();
+                UserController userController = fxmlLoader.getController();
+                userController.setModel(modelFacade);
             }
-        }
-        else {
-            onLoginError();
+
+            Stage stage = new Stage();
+            stage.setMinWidth(1200);
+            stage.setMinHeight(600);
+            stage.setTitle(title);
+            stage.setScene(scene);
+            stage.setMaximized(true);
+            stage.show();
+
+            currentStage.close();
+        } catch (Exception e) {
+            // TODO add AlertView (Failed to login / open panel. Try again.)
         }
     }
 

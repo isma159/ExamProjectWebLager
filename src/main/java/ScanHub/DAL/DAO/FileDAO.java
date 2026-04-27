@@ -25,6 +25,11 @@ public class FileDAO implements IDataAccess<File> {
     }
 
     @Override
+    public File getDataFromName(String name) throws Exception {
+        return null;
+    }
+
+    @Override
     public void updateData(File newData) throws Exception {
 
     }

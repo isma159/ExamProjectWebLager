@@ -67,6 +67,11 @@ public class ProfileDAO implements IDataAccess<Profile> {
     }
 
     @Override
+    public Profile getDataFromName(String name) throws Exception {
+        return null;
+    }
+
+    @Override
     public void updateData(Profile newData) throws Exception {
         String sql = "UPDATE Profiles SET profileName = ?, splitBehavior = ? WHERE profileId = ?";
 

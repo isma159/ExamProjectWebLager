@@ -4,7 +4,7 @@ public class Profile {
 
     private int profileId;
     private String profileName;
-    private SplitBehavior splitBehavior; // "NONE", "MANUAL", "BARCODE" TODO: find out if they mean like this
+    private SplitBehavior splitBehavior; // "NONE", "MANUAL", "BARCODE"
 
     public Profile() {
     }

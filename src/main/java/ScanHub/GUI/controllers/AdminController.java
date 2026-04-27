@@ -30,14 +30,13 @@ public class AdminController implements Initializable {
     @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, settingsBtn, shortcutsBtn;
 
 
-    private ModelFacade modelFacade = new ModelFacade();
+    private ModelFacade modelFacade;
 
     public AdminController() throws Exception {
     }
 
     public void setModel(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
-        // tblUser.setItems(modelFacade.getObservableUsers());
     }
 
     @Override
