@@ -1,4 +1,4 @@
-package ScanHub.DAL.interfaces;
+package ScanHub.BLL.interfaces;
 
 public interface IPasswordEncrypter {
     String hashedPassword(String password);

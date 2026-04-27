@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +48,10 @@ public class UserDAO implements IDataAccess<User> {
     public List<User> getData() throws Exception {
         List<User> users = new ArrayList<>();
 
+        String sql = "SELECT userId, username, passwordHash, role FROM Users WHERE deleted_at IS NULL";
+
         try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement("SELECT userId, username, passwordHash, role FROM Users WHERE deleted_at IS NULL");
+            PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -66,6 +67,29 @@ public class UserDAO implements IDataAccess<User> {
             throw new Exception("Could not get users", e);
         }
         return users;
+    }
+
+    public User getDataFromName(String name) throws Exception {
+
+        String sql = "SELECT * FROM Users WHERE username = ?";
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+
+            User user = null;
+
+            if (rs.next()) {
+                user = new User(rs.getInt("userId"), rs.getString("username"), rs.getString("passwordHash"), Role.valueOf(rs.getString("role")));
+            }
+
+            return user;
+
+        } catch (SQLException e) {
+            throw new Exception("Could not fetch user from username " + name, e);
+        }
     }
 
     @Override

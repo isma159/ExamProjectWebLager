@@ -1,6 +1,6 @@
 package ScanHub.BLL.util;
 
-import ScanHub.DAL.interfaces.IPasswordEncrypter;
+import ScanHub.BLL.interfaces.IPasswordEncrypter;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 

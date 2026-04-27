@@ -32,9 +32,11 @@ public class AdminController implements Initializable {
 
     private ModelFacade modelFacade;
 
+    public AdminController() throws Exception {
+    }
+
     public void setModel(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
-        // tblUser.setItems(modelFacade.getObservableUsers());
     }
 
     @Override
@@ -53,9 +55,15 @@ public class AdminController implements Initializable {
 
     }
 
+    // ----- CREATE & EDIT USER -----
+    @FXML
+    private void onClickCreateUser(ActionEvent actionEvent) throws IOException {
+        openUserForm(null);
+    }
+
     /**
      * Opens the UserFormView. If user is null, opens in create mode.
-     * If user is provided, opens in edit mode with fields pre-filled.
+     * If user is provided (selected), opens in edit mode with fields prefilled.
      */
     private void openUserForm(User user) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/UserFormView.fxml"));
@@ -63,7 +71,7 @@ public class AdminController implements Initializable {
         Stage stage = new Stage();
 
         UserFormController controller = loader.getController();
-        controller.setModel(modelFacade, user); // user is null for create, non-null for edit
+        controller.setModel(stage, modelFacade, user); // user is null for create, non-null for edit
 
         if (user == null) {
             stage.setTitle("Create User");
@@ -75,7 +83,7 @@ public class AdminController implements Initializable {
         stage.show();
     }
 
-    // CREATE & UPDATE PROFILE
+    // ----- CREATE & UPDATE PROFILE -----
     @FXML
     private void onClickCreateProfile(ActionEvent actionEvent) throws IOException {
         openProfileForm(null);
@@ -90,7 +98,7 @@ public class AdminController implements Initializable {
 
     /**
      * Opens the ProfileFormView. If profile is null, opens in create mode.
-     * If profile is provided, opens in edit mode with fields pre-filled.
+     * If profile is provided (selected), opens in edit mode with fields prefilled.
      */
     private void openProfileForm(Profile profile) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ProfileFormView.fxml"));
@@ -98,7 +106,7 @@ public class AdminController implements Initializable {
         Stage stage = new Stage();
 
         ProfileFormController controller = loader.getController();
-        controller.setModel(modelFacade, profile); // profile is null for create, non-null for edit
+        controller.setModel(stage, modelFacade, profile); // profile is null for create, non-null for edit
 
         if (profile == null) {
             stage.setTitle("Create Profile");

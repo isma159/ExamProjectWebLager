@@ -22,6 +22,10 @@ public class UserManager {
         return dataAccess.getData();
     }
 
+    public User getUserFromUsername(String username) throws Exception {
+        return dataAccess.getDataFromName(username);
+    }
+
     public void updateUser(User updatedUser) throws Exception {
         dataAccess.updateData(updatedUser);
     }
