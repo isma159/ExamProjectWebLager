@@ -1,91 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
+<VBox prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
     <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
-    <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12" style="-fx-background-color: #2D3D4F;">
+    <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12" styleClass="primary-navigation-bg">
         <padding><Insets bottom="0" left="20" right="20" top="0" /></padding>
-        <Rectangle arcHeight="4" arcWidth="4" height="28" style="-fx-fill: #24C79F;" width="8" />
-        <Label fx:id="formTitle" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;" text="Create user" />
+      <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/Green/WeblagerGreenIcon.png" />
+         </image>
+      </ImageView>
+        <Label fx:id="formTitle" styleClass="h3" text="Create user" textFill="WHITE" />
         <Region HBox.hgrow="ALWAYS" />
-        <Label fx:id="userIdLabel" style="-fx-font-size: 11px; -fx-text-fill: #9DB4C4;" text="" />
+        <Label fx:id="userIdLabel" text="" />
     </HBox>
-    <VBox style="-fx-background-color: #F5F5F5;" VBox.vgrow="ALWAYS">
+    <VBox alignment="CENTER" prefWidth="520.0" VBox.vgrow="ALWAYS">
         <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
-        <VBox spacing="0" style="-fx-background-color: white; -fx-background-radius: 10;                      -fx-border-color: #E2E4E8; -fx-border-radius: 10; -fx-border-width: 1;">
+        <VBox spacing="0">
             <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
-            <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Username" />
+            <Label styleClass="h3" text="Username" />
             <Region prefHeight="6" />
-         <HBox fx:id="hBoxUsername" styleClass="container">
-            <children>
-                  <TextField fx:id="usernameField" prefHeight="30" prefWidth="422.0" promptText="e.g. jens.hansen" />
-            </children>
-         </HBox>
+            <TextField fx:id="usernameField" prefHeight="30" promptText="e.g. jens.hansen" styleClass="container" />
+            <Label fx:id="usernameError" managed="false" text="Username is required." visible="false" />
 
             <Region prefHeight="18" />
-            <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Password" />
+            <Label styleClass="h3" text="Password" />
             <Region prefHeight="4" />
-            <Label fx:id="passwordHint" style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Choose a password for this user." />
+            <Label fx:id="passwordHint" styleClass="lbl" text="Choose a password for this user." />
             <Region prefHeight="8" />
-         <HBox fx:id="hBoxPassword" styleClass="container">
-            <children>
-                  <PasswordField fx:id="passwordField" prefHeight="30" prefWidth="422.0" promptText="Password" />
-            </children>
-         </HBox>
+            <PasswordField fx:id="passwordField" prefHeight="30" promptText="Password" styleClass="container" />
+            <Label fx:id="passwordError" managed="false" text="Password is required." visible="false" />
             <Region prefHeight="10" />
-         <HBox fx:id="hBoxConfirmPassword" styleClass="container">
-            <children>
-                  <PasswordField fx:id="confirmPasswordField" prefHeight="30" prefWidth="422.0" promptText="Confirm password" />
-            </children>
-         </HBox>
+            <PasswordField fx:id="confirmPasswordField" prefHeight="30" promptText="Confirm password" styleClass="container" />
+            <Label fx:id="confirmError" managed="false" text="Passwords do not match." visible="false" />
 
             <Region prefHeight="18" />
-            <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Role" />
+            <Label styleClass="h3" text="Role" />
             <Region prefHeight="4" />
-            <Label style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Defines what the user can access in the system." />
+            <Label styleClass="lbl" text="Defines what the user can access in the system." />
             <Region prefHeight="8" />
-            <VBox fx:id="vBoxRole" spacing="8" styleClass="container">
-                <padding>
-               <Insets bottom="14" left="14" right="14" top="14" />
-            </padding>
+            <VBox spacing="8">
+                <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
                 <HBox alignment="TOP_LEFT" spacing="10">
-                    <RadioButton fx:id="radioUSER" style="-fx-font-size: 12px; -fx-text-fill: #2D3D4F;">
-                  <toggleGroup>
-                     <ToggleGroup fx:id="toggleGroupRole" />
-                  </toggleGroup>
-               </RadioButton>
+                    <RadioButton fx:id="radioUSER" selected="true" />
                     <VBox spacing="2">
-                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold;" text="User" />
-                        <Label prefWidth="360" style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Can select profiles, scan documents, review files, and export." wrapText="true" />
+                        <Label styleClass="lbl" text="User" />
+                        <Label prefWidth="360" text="Can select profiles, scan documents, review files, and export." wrapText="true" />
                     </VBox>
                 </HBox>
                 <Separator />
                 <HBox alignment="TOP_LEFT" spacing="10">
-                    <RadioButton fx:id="radioADMIN" style="-fx-font-size: 12px; -fx-text-fill: #2D3D4F;" toggleGroup="$toggleGroupRole" />
+                    <RadioButton fx:id="radioADMIN" />
                     <VBox spacing="2">
-                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Admin" />
-                        <Label prefWidth="360" style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Full access. Can manage users, profiles, and view all logs." wrapText="true" />
+                        <Label text="Admin" />
+                        <Label prefWidth="360" text="Full access. Can manage users, profiles, and view all logs." wrapText="true" />
                     </VBox>
                 </HBox>
+            <styleClass>
+               <String fx:value="second-card-bg" />
+               <String fx:value="card" />
+            </styleClass>
             </VBox>
             <Region prefHeight="18" />
-            <Label style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Assign profiles" />
+            <Label styleClass="h3" text="Assign profiles" />
             <Region prefHeight="4" />
-            <Label style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Select which profiles this user can access." />
+            <Label text="Select which profiles this user can access." />
             <Region prefHeight="8" />
-            <VBox fx:id="vBoxProfiles" spacing="6" styleClass="container">
+            <VBox fx:id="vboxProfiles" spacing="6">
                 <padding><Insets bottom="12" left="14" right="14" top="12" /></padding>
-                <Label style="-fx-font-size: 11px; -fx-text-fill: #BFBFBF;" text="Loading profiles..." />
+                <Label text="Loading profiles..." />
+            <styleClass>
+               <String fx:value="second-card-bg" />
+               <String fx:value="card" />
+            </styleClass>
             </VBox>
+         <styleClass>
+            <String fx:value="card" />
+            <String fx:value="card-bg" />
+            <String fx:value="shadow" />
+         </styleClass>
         </VBox>
     </VBox>
-    <HBox alignment="CENTER_RIGHT" prefHeight="56" spacing="8" style="-fx-background-color: #F5F5F5;                  -fx-border-color: #E2E4E8; -fx-border-width: 1 0 0 0;">
+    <HBox alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="520.0" spacing="8">
         <padding><Insets bottom="0" left="24" right="24" top="0" /></padding>
-        <Button onAction="#onClickCancel" prefHeight="30" style="-fx-font-size: 12px; -fx-background-color: white;                        -fx-border-color: #E2E4E8; -fx-border-radius: 6;                        -fx-background-radius: 6; -fx-border-width: 1;                        -fx-text-fill: #2D3D4F; -fx-cursor: hand; -fx-padding: 0 16 0 16;" text="Cancel" />
-        <Button fx:id="saveButton" defaultButton="true" onAction="#onClickSave" prefHeight="33" style="-fx-font-size: 12px; -fx-font-weight: bold;                        -fx-background-color: #2D3D4F; -fx-background-radius: 6;                        -fx-text-fill: white; -fx-border-width: 0;                        -fx-cursor: hand; -fx-padding: 0 20 0 20;" text="Save" />
+        <Button onAction="#onClickCancel" prefHeight="30" text="Cancel">
+         <styleClass>
+            <String fx:value="container" />
+            <String fx:value="card-bg" />
+         </styleClass></Button>
+        <Button fx:id="saveButton" defaultButton="true" onAction="#onClickSave" prefHeight="33" styleClass="primary-btn" text="Create user" />
     </HBox>
 </VBox>

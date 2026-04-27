@@ -7,8 +7,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -18,8 +22,13 @@ import java.util.ResourceBundle;
 
 public class AdminController implements Initializable {
 
-    @FXML TableView<User> tblUser;
-    @FXML TableView<Profile> tblProfile;
+    @FXML private TableView<User> tblUser;
+    @FXML private TableView<Profile> tblProfile;
+    @FXML private StackPane contentArea;
+
+    @FXML private ToggleGroup sidebarBtns;
+    @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, settingsBtn, shortcutsBtn;
+
 
     private ModelFacade modelFacade = new ModelFacade();
 
@@ -28,26 +37,29 @@ public class AdminController implements Initializable {
 
     public void setModel(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
-        tblUser.setItems(modelFacade.userModel.getUsers());
-        tblProfile.setItems(modelFacade.profileModel.getProfiles());
+        // tblUser.setItems(modelFacade.getObservableUsers());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
+
+        sidebarBtns.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == dashboardBtn) {
+                loadPage("/views/AdminDashboardView.fxml");
+            }
+            else if (newValue == usersBtn) {
+                loadPage("/views/AdminUsersView.fxml");
+            }
+        });
+
+        dashboardBtn.fire();
+
     }
 
     // ----- CREATE & EDIT USER -----
     @FXML
     private void onClickCreateUser(ActionEvent actionEvent) throws IOException {
         openUserForm(null);
-    }
-
-    @FXML
-    private void onClickUpdateUser(ActionEvent actionEvent) throws IOException {
-        User selectedUser = tblUser.getSelectionModel().getSelectedItem();
-        if (selectedUser == null) return;
-        openUserForm(selectedUser);
     }
 
     /**
@@ -105,5 +117,37 @@ public class AdminController implements Initializable {
         stage.setScene(scene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
+    }
+
+    private void loadPage(String fxml) {
+
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+
+            loader.setControllerFactory(controllerClass -> {
+                if (controllerClass == AdminDashboardController.class) {
+                    return new AdminDashboardController(modelFacade);
+                }
+                else if (controllerClass == AdminUsersController.class) {
+                    return new AdminUsersController(modelFacade);
+                }
+
+                try {
+                    return controllerClass.getDeclaredConstructor().newInstance();
+                }
+                catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            Node page = loader.load();
+            contentArea.getChildren().setAll(page);
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
