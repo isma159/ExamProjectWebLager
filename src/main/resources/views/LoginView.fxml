@@ -32,57 +32,37 @@
       <Region layoutX="10.0" layoutY="202.0" prefHeight="17.0" prefWidth="600.0" />
       <HBox fx:id="hboxUser" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="300.0" styleClass="container">
          <children>
-            <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../images/icons/user.png" />
-               </image>
-            </ImageView>
+            <Label fx:id="userIcon" alignment="CENTER" prefHeight="24.0" prefWidth="24.0" styleClass="icon" text="" />
             <TextField fx:id="txtFldUser" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="265.0" promptText="Username" />
          </children>
       </HBox>
       <Region layoutX="10.0" layoutY="273.0" prefHeight="17.0" prefWidth="600.0" />
-      <HBox maxWidth="-Infinity" prefHeight="33.0" prefWidth="300.0">
+      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="300.0">
          <children>
             <HBox fx:id="hboxPass1" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="150.0" styleClass="container">
                <children>
-                  <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/icons/lock.png" />
-                     </image>
-                  </ImageView>
+                  <Label fx:id="lockIcon1" alignment="CENTER" prefHeight="24.0" prefWidth="24.0" styleClass="icon" text="" />
                   <PasswordField fx:id="passFldPass" maxWidth="-Infinity" prefHeight="33.0" prefWidth="240.0" promptText="Password" />
                   <Button alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onShowBtnClick" prefHeight="24.0" prefWidth="24.0" styleClass="clear-btn" textAlignment="CENTER">
-                     <graphic>
-                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/icons/eye.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
+                     <graphic>
+                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="icon" text="" />
+                     </graphic>
                   </Button>
                </children>
             </HBox>
             <HBox fx:id="hboxPass2" alignment="CENTER" layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="150.0" styleClass="container">
                <children>
-                  <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/icons/lock.png" />
-                     </image>
-                  </ImageView>
+                  <Label fx:id="lockIcon2" alignment="CENTER" prefHeight="24.0" prefWidth="24.0" styleClass="icon" text="" />
                   <TextField fx:id="txtFldPass" maxWidth="-Infinity" prefHeight="33.0" prefWidth="240.0" promptText="Password" />
                   <Button alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onHideBtnClick" prefHeight="24.0" prefWidth="24.0" styleClass="clear-btn" textAlignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="OPEN_HAND" />
                      </cursor>
                      <graphic>
-                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/icons/eye-slash.png" />
-                           </image>
-                        </ImageView>
+                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="icon" text="" />
                      </graphic>
                   </Button>
                </children>
@@ -90,6 +70,6 @@
          </children>
       </HBox>
       <Region layoutX="10.0" layoutY="284.0" prefHeight="17.0" prefWidth="600.0" />
-      <Button mnemonicParsing="false" onAction="#onSignInBtnClick" prefHeight="33.0" prefWidth="300.0" styleClass="primary-btn" text="Sign In" />
+      <Button fx:id="signInBtn" mnemonicParsing="false" onAction="#onSignInBtnClick" prefHeight="33.0" prefWidth="300.0" styleClass="primary-btn" text="Sign In" />
    </children>
 </VBox>

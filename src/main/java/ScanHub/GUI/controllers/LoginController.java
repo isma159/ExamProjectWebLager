@@ -6,9 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
@@ -21,6 +19,7 @@ public class LoginController implements Initializable {
 
     @FXML private TextField txtFldUser, txtFldPass;
     @FXML private PasswordField passFldPass;
+    @FXML private Button signInBtn;
     @FXML private HBox hboxUser, hboxPass1, hboxPass2;
 
     private Stage currentStage;
@@ -36,6 +35,12 @@ public class LoginController implements Initializable {
         containers.add(hboxUser);
         containers.add(hboxPass1);
         containers.add(hboxPass2);
+
+        signInBtn.focusedProperty().addListener((observable, oldValue, newValue) -> {
+
+            System.out.println(newValue );
+
+        });
 
         passFldPass.textProperty().bindBidirectional(txtFldPass.textProperty());
 
@@ -72,6 +77,9 @@ public class LoginController implements Initializable {
                     FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/AdminView.fxml"));
                     Scene scene = new Scene(fxmlLoader.load());
                     Stage stage = new Stage();
+
+                    stage.setMinWidth(1200);
+                    stage.setMinHeight(600);
 
                     stage.setTitle("Admin Panel");
                     stage.setScene(scene);
