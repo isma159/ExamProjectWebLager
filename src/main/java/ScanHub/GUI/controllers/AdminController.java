@@ -28,6 +28,7 @@ public class AdminController implements Initializable {
 
     public void setModel(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
+        sidebarBtns.selectToggle(dashboardBtn);
     }
 
     @Override
@@ -41,8 +42,6 @@ public class AdminController implements Initializable {
                 loadPage("/views/AdminProfilesView.fxml");
             }
         });
-
-        dashboardBtn.fire();
     }
 
     private void loadPage(String fxml) {

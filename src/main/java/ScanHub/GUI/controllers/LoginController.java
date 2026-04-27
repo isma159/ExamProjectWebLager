@@ -49,12 +49,6 @@ public class LoginController implements Initializable {
         containers.add(hboxPass1);
         containers.add(hboxPass2);
 
-        signInBtn.focusedProperty().addListener((observable, oldValue, newValue) -> {
-
-            System.out.println(newValue );
-
-        });
-
         passFldPass.textProperty().bindBidirectional(txtFldPass.textProperty());
 
         hboxPass1.setVisible(true);
@@ -104,7 +98,7 @@ public class LoginController implements Initializable {
         }
 
         try {
-            String view = user.isAdmin() ? "/views/AdminView.fxm" : "/views/UserView.fxml";
+            String view = user.isAdmin() ? "/views/AdminView.fxml" : "/views/UserView.fxml";
             String title = user.isAdmin() ? "Admin Panel" : "User Panel";
 
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(view));
