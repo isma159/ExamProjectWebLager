@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
@@ -103,16 +104,8 @@ public class LoginController implements Initializable {
         }
 
         try {
-            String view;
-            String title;
-
-            if (user.isAdmin()) {
-                view = "/views/AdminView.fxml";
-                title = "Admin Panel";
-            } else {
-                view = "/views/UserView.fxml";
-                title = "User Panel";
-            }
+            String view = user.isAdmin() ? "/views/AdminView.fxm" : "/views/UserView.fxml";
+            String title = user.isAdmin() ? "Admin Panel" : "User Panel";
 
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(view));
             Scene scene = new Scene(fxmlLoader.load());

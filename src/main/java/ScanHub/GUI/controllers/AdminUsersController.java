@@ -3,24 +3,32 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.Profile;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class AdminUsersController {
+public class AdminUsersController implements Initializable {
 
-    ModelFacade modelFacade;
+    @FXML TableView<User> tblUsers;
+
+    private ModelFacade modelFacade;
 
     public AdminUsersController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
     }
 
-    // CREATE & EDIT PROFILE
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+    }
+
     @FXML
     private void onClickCreateUser() {
         openUserForm(null);
@@ -28,33 +36,26 @@ public class AdminUsersController {
 
     @FXML
     private void onClickUpdateUser() {
-        User selectedUser = null; //= tblUser.getSelectionModel().getSelectedItem();
+        User selectedUser = null; // TODO: add when sat up tblUsers.getSelectionModel().getSelectedItem();
         if (selectedUser == null) return;
         openUserForm(selectedUser);
     }
 
-    /**
-     * Opens the ProfileFormView. If profile is null, opens in create mode.
-     * If profile is provided, opens in edit mode with fields pre-filled.
-     */
     private void openUserForm(User user) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/UserFormView.fxml"));
             Scene scene = new Scene(loader.load());
             Stage stage = new Stage();
 
-            if (user == null) {
-                stage.setTitle("Create User");
-            } else {
-                stage.setTitle("Edit User");
-            }
+            UserFormController controller = loader.getController();
+            controller.setModel(stage, modelFacade, user);
 
+            stage.setTitle(user == null ? "Create User" : "Edit User");
             stage.setScene(scene);
             stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

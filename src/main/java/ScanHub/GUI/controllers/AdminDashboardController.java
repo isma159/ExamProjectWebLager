@@ -15,7 +15,7 @@ public class AdminDashboardController implements Initializable {
 
     @FXML private VBox userTableBox;
 
-    ModelFacade modelFacade;
+    private ModelFacade modelFacade;
 
     public AdminDashboardController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;

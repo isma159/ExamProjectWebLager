@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
+<VBox prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
     <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
     <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12" styleClass="primary-navigation-bg">
         <padding><Insets bottom="0" left="20" right="20" top="0" /></padding>
@@ -52,10 +44,13 @@
             <Region prefHeight="4" />
             <Label styleClass="lbl" text="Defines what the user can access in the system." />
             <Region prefHeight="8" />
-            <VBox spacing="8">
+            <VBox fx:id="vboxRole" spacing="8" styleClass="container">
                 <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
                 <HBox alignment="TOP_LEFT" spacing="10">
-                    <RadioButton fx:id="radioUSER" selected="true" />
+                    <RadioButton fx:id="radioUSER">
+                  <toggleGroup>
+                     <ToggleGroup fx:id="toggleGroupRole" />
+                  </toggleGroup></RadioButton>
                     <VBox spacing="2">
                         <Label styleClass="lbl" text="User" />
                         <Label prefWidth="360" text="Can select profiles, scan documents, review files, and export." wrapText="true" />
@@ -63,29 +58,21 @@
                 </HBox>
                 <Separator />
                 <HBox alignment="TOP_LEFT" spacing="10">
-                    <RadioButton fx:id="radioADMIN" />
+                    <RadioButton fx:id="radioADMIN" toggleGroup="$toggleGroupRole" />
                     <VBox spacing="2">
                         <Label text="Admin" />
                         <Label prefWidth="360" text="Full access. Can manage users, profiles, and view all logs." wrapText="true" />
                     </VBox>
                 </HBox>
-            <styleClass>
-               <String fx:value="second-card-bg" />
-               <String fx:value="card" />
-            </styleClass>
             </VBox>
             <Region prefHeight="18" />
             <Label styleClass="h3" text="Assign profiles" />
             <Region prefHeight="4" />
             <Label text="Select which profiles this user can access." />
             <Region prefHeight="8" />
-            <VBox fx:id="vboxProfiles" spacing="6">
+            <VBox fx:id="vboxProfiles" spacing="6" styleClass="container">
                 <padding><Insets bottom="12" left="14" right="14" top="12" /></padding>
                 <Label text="Loading profiles..." />
-            <styleClass>
-               <String fx:value="second-card-bg" />
-               <String fx:value="card" />
-            </styleClass>
             </VBox>
          <styleClass>
             <String fx:value="card" />
