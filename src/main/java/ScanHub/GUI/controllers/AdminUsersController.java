@@ -1,6 +1,5 @@
 package ScanHub.GUI.controllers;
 
-import ScanHub.BE.Profile;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.UserTableRow;
@@ -8,7 +7,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -19,9 +19,11 @@ import java.util.ResourceBundle;
 
 public class AdminUsersController implements Initializable {
 
-    @FXML VBox userTableBox;
+    @FXML private VBox userTableBox;
 
     private ModelFacade modelFacade;
+    private User selectedUser = null;
+    private HBox selectedRow = null;
 
     public AdminUsersController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
@@ -29,11 +31,36 @@ public class AdminUsersController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try {
-            List<User> users = modelFacade.userModel.getUsers();
+        loadUsers();
+    }
 
+    private void loadUsers() {
+        try {
+            // resets
+            userTableBox.getChildren().clear();
+            selectedUser = null;
+            selectedRow = null;
+
+            // sets up with all users by running a for-loop that makes an interactive HBox of every user
+            List<User> users = modelFacade.userModel.getUsers();
             for (User user : users) {
-                userTableBox.getChildren().add(UserTableRow.addRow(user));
+                HBox row = UserTableRow.addRow(user, (clickedUser, rowHBox) -> {
+                    // clear highlight of previously selected row
+                    if (selectedRow != null) {
+                        selectedRow.getStyleClass().remove("row-selected");
+                    }
+                    // remove selected row if clicked on again
+                    if (selectedUser == clickedUser) {
+                        selectedUser = null;
+                        selectedRow = null;
+                        return; // will reselect on the next line if not returning
+                    }
+                    // select clicked row as selected user (with highlight to show)
+                    selectedUser = clickedUser;
+                    selectedRow = rowHBox;
+                    rowHBox.getStyleClass().add("row-selected");
+                });
+                userTableBox.getChildren().add(row);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,9 +74,19 @@ public class AdminUsersController implements Initializable {
 
     @FXML
     private void onClickUpdateUser() {
-        User selectedUser = null; // TODO: add when sat up tblUsers.getSelectionModel().getSelectedItem();
         if (selectedUser == null) return;
         openUserForm(selectedUser);
+    }
+
+    @FXML
+    private void onClickDeleteUser(MouseEvent mouseEvent) {
+        if (selectedUser == null) return;
+        try {
+            modelFacade.userModel.deleteUser(selectedUser);
+            loadUsers();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void openUserForm(User user) {

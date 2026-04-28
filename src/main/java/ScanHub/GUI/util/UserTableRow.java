@@ -11,9 +11,35 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
+import java.util.function.BiConsumer;
+
+/**
+ * Utility class for creating styled JavaFX rows representing a {@link User}.
+ * <p>
+ * Each row is an HBox containing user information such as username,
+ * and role along with visual elements like avatar (name initials) and separators.
+ * <p>
+ * Optionally supports a click handler via {@link BiConsumer} to define custom
+ * behavior when a row is selected.
+ */
 public class UserTableRow {
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     public static HBox addRow(User user) {
+        return addRow(user, null);
+    }
+
+    /**
+     *
+     * @param user
+     * @param onSelect
+     * @return
+     */
+    public static HBox addRow(User user, BiConsumer<User, HBox> onSelect) {
 
         // Avatar
         Label avatarLabel = new Label("JD");
@@ -107,10 +133,15 @@ public class UserTableRow {
         // Main row
         HBox row = new HBox(nameBox, sep1, usernameLabel, sep2, emailLabel, sep3, roleBox);
         row.getStyleClass().add("box-card");
+        row.getStyleClass().add("user-row");
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPrefHeight(45);
         row.setPrefWidth(200);
         row.setMaxWidth(Double.MAX_VALUE);
+
+        if (onSelect != null) {
+            row.setOnMouseClicked(e -> onSelect.accept(user, row));
+        }
 
         return row;
     }

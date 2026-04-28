@@ -35,11 +35,6 @@ public class UserFormController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         radioADMIN.setUserData(Role.ADMIN);
         radioUSER.setUserData(Role.USER);
-
-        if (editingUser != null) {
-            formTitle.setText("Edit user");
-            passwordHint.setText("Only type in a password if you want to change the current password for this user.");
-        }
     }
 
     /**
@@ -54,6 +49,8 @@ public class UserFormController implements Initializable {
         this.editingUser = user;
 
         if (editingUser != null) {
+            formTitle.setText("Edit user");
+            passwordHint.setText("Only type in a password if you want to change the current password for this user.");
             populateFields(editingUser);
         }
     }
