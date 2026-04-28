@@ -1,12 +1,16 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.UserTableRow;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -14,16 +18,22 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class AdminUsersController implements Initializable {
 
     @FXML private VBox userTableBox;
+    @FXML private TextField txtFldUserSearch;
+    private List<User> currentUsers = new ArrayList<>();
+    private boolean ascending = true;
 
     private ModelFacade modelFacade;
     private User selectedUser = null;
     private HBox selectedRow = null;
+    private Role selectedRole = null;
 
     public AdminUsersController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
@@ -32,6 +42,7 @@ public class AdminUsersController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadUsers();
+        txtFldUserSearch.textProperty().addListener((observable, oldValue, newValue) -> filterUsers(newValue));
     }
 
     private void loadUsers() {
@@ -43,7 +54,8 @@ public class AdminUsersController implements Initializable {
 
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<User> users = modelFacade.userModel.getUsers();
-            for (User user : users) {
+            currentUsers = new ArrayList<>(users);
+            for (User user : currentUsers) {
                 HBox row = UserTableRow.addRow(user, (clickedUser, rowHBox) -> {
                     // clear highlight of previously selected row
                     if (selectedRow != null) {
@@ -60,6 +72,7 @@ public class AdminUsersController implements Initializable {
                     selectedRow = rowHBox;
                     rowHBox.getStyleClass().add("row-selected");
                 });
+                row.setUserData(user);
                 userTableBox.getChildren().add(row);
             }
         } catch (Exception e) {
@@ -105,6 +118,58 @@ public class AdminUsersController implements Initializable {
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void filterUsers(String search) {
+        // loops through every row in user table
+        for (var node : userTableBox.getChildren()) {
+            HBox row = (HBox) node;
+            User user = (User) row.getUserData();
+
+            // checks input matching for username and role
+            boolean matching = search.isBlank()
+            || user.getUsername().toLowerCase().contains(search.toLowerCase());
+            // for the togglebuttons filtering
+            boolean matchingRole = selectedRole ==  null || user.getRole() == selectedRole;
+
+            // show or hide if matching or not
+            row.setVisible(matching && matchingRole);
+            row.setManaged(matching && matchingRole);
+        }
+    }
+
+    public void onTbAllUsersClick(ActionEvent actionEvent) {
+        selectedRole = null;
+        filterUsers(txtFldUserSearch.getText());
+    }
+
+    public void onTbAdminsClick(ActionEvent actionEvent) {
+        selectedRole = Role.ADMIN;
+        filterUsers(txtFldUserSearch.getText());
+    }
+
+    public void onTbUsersClick(ActionEvent actionEvent) {
+        selectedRole = Role.USER;
+        filterUsers(txtFldUserSearch.getText());
+    }
+
+    @FXML
+    private void onUsernameClick(Event event) {
+        System.out.println("clicked");
+        ascending = !ascending;
+        currentUsers.sort(ascending ? Comparator.comparing(User::getUsername) : Comparator.comparing(User::getUsername).reversed());
+        userTableBox.getChildren().clear();
+        for (User user : currentUsers) {
+            HBox row = UserTableRow.addRow(user, (clickedUser, rowHBox) -> {
+                if (selectedUser != null) selectedRow.getStyleClass().remove("row-selected");
+                if (selectedUser == clickedUser) { selectedUser = null; selectedRow = null; return;}
+                selectedUser = clickedUser;
+                selectedRow = rowHBox;
+                rowHBox.getStyleClass().add("row-selected");
+            });
+            row.setUserData(user);
+            userTableBox.getChildren().add(row);
         }
     }
 }
