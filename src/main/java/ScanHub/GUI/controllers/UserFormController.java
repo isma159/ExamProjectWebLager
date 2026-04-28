@@ -21,8 +21,7 @@ public class UserFormController implements Initializable {
     @FXML private ToggleGroup toggleGroupRole;
     @FXML private Label formTitle, passwordHint, usernameError, passwordError, confirmError;
     @FXML private RadioButton radioADMIN, radioUSER;
-    @FXML private HBox hBoxUsername, hBoxPassword, hBoxConfirmPassword;
-    @FXML private VBox vBoxRole, vBoxProfiles;
+    @FXML private VBox vboxRole, vboxProfiles;
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField, confirmPasswordField;
 
@@ -81,11 +80,9 @@ public class UserFormController implements Initializable {
         if (editingUser != null) {
             updateUser();
             // TODO show success
-            currentStage.close();
         } else {
             createUser();
             // TODO show success
-            currentStage.close();
         }
     }
 
@@ -102,21 +99,21 @@ public class UserFormController implements Initializable {
         if (username.isBlank() || password.isBlank() || passwordConfirm.isBlank() || selectedToggle == null) {
 
             if (username.isBlank())
-                hBoxUsername.getStyleClass().add("error-border");
+                usernameField.getStyleClass().add("error-border");
             if (password.isBlank())
-                hBoxPassword.getStyleClass().add("error-border");
+                passwordField.getStyleClass().add("error-border");
             if (passwordConfirm.isBlank())
-                hBoxConfirmPassword.getStyleClass().add("error-border");
+                confirmPasswordField.getStyleClass().add("error-border");
             if (selectedToggle == null)
-                vBoxRole.getStyleClass().add("error-border");
+                vboxRole.getStyleClass().add("error-border");
 
             // TODO add AlertView
             return;
         }
 
         if (!password.equals(passwordConfirm) || !passwordConfirm.equals(password)) {
-            hBoxPassword.getStyleClass().add("error-border");
-            hBoxConfirmPassword.getStyleClass().add("error-border");
+            passwordField.getStyleClass().add("error-border");
+            confirmPasswordField.getStyleClass().add("error-border");
 
             // TODO add AlertView
             return;
@@ -146,17 +143,17 @@ public class UserFormController implements Initializable {
 
         if (newUsername.isBlank() || selectedToggle == null) {
             if (newUsername.isBlank())
-                hBoxUsername.getStyleClass().add("error-border");
+                usernameField.getStyleClass().add("error-border");
             if (selectedToggle == null)
-                vBoxRole.getStyleClass().add("error-border");
+                vboxRole.getStyleClass().add("error-border");
 
             // TODO add AlertView
             return;
         }
 
         if (!newPassword.equals(newPasswordConfirm) || !newPasswordConfirm.equals(newPassword)) {
-            hBoxPassword.getStyleClass().add("error-border");
-            hBoxConfirmPassword.getStyleClass().add("error-border");
+            passwordField.getStyleClass().add("error-border");
+            confirmPasswordField.getStyleClass().add("error-border");
 
             // TODO add AlertView
             return;
@@ -179,10 +176,10 @@ public class UserFormController implements Initializable {
     }
 
     private void clearError() {
-        hBoxUsername.getStyleClass().remove("error-border");
-        hBoxPassword.getStyleClass().remove("error-border");
-        hBoxConfirmPassword.getStyleClass().remove("error-border");
-        vBoxRole.getStyleClass().remove("error-border");
+        usernameField.getStyleClass().remove("error-border");
+        passwordField.getStyleClass().remove("error-border");
+        confirmPasswordField.getStyleClass().remove("error-border");
+        vboxRole.getStyleClass().remove("error-border");
     }
 
     @FXML

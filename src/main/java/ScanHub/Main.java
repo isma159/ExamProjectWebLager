@@ -22,9 +22,11 @@ public class Main extends Application{
 
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+
         LoginController loginController = fxmlLoader.getController();
         loginController.setStage(stage);
         loginController.setModelFacade(new ModelFacade());
+
         stage.setResizable(false);
         stage.setTitle("Login");
         stage.setScene(scene);

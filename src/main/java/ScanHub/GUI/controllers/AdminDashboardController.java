@@ -9,13 +9,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class AdminDashboardController implements Initializable {
 
     @FXML private VBox userTableBox;
 
-    ModelFacade modelFacade;
+    private ModelFacade modelFacade;
 
     public AdminDashboardController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
@@ -23,6 +24,14 @@ public class AdminDashboardController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        userTableBox.getChildren().add(UserTableRow.addRow(new User(0, "johndoe123", "fnskaofneqo", Role.ADMIN)));
+        try {
+            List<User> users = modelFacade.userModel.getUsers();
+
+            for (User user : users) {
+                userTableBox.getChildren().add(UserTableRow.addRow(user));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

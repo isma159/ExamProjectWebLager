@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
@@ -47,12 +48,6 @@ public class LoginController implements Initializable {
         containers.add(hboxUser);
         containers.add(hboxPass1);
         containers.add(hboxPass2);
-
-        signInBtn.focusedProperty().addListener((observable, oldValue, newValue) -> {
-
-            System.out.println(newValue );
-
-        });
 
         passFldPass.textProperty().bindBidirectional(txtFldPass.textProperty());
 
@@ -103,16 +98,8 @@ public class LoginController implements Initializable {
         }
 
         try {
-            String view;
-            String title;
-
-            if (user.isAdmin()) {
-                view = "/views/AdminView.fxml";
-                title = "Admin Panel";
-            } else {
-                view = "/views/UserView.fxml";
-                title = "User Panel";
-            }
+            String view = user.isAdmin() ? "/views/AdminView.fxml" : "/views/UserView.fxml";
+            String title = user.isAdmin() ? "Admin Panel" : "User Panel";
 
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(view));
             Scene scene = new Scene(fxmlLoader.load());
