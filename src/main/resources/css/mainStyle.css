@@ -337,6 +337,14 @@
 
 }
 
+.user-row:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.user-row.row-selected {
+    -fx-background-color: #e0eaf5;
+}
+
 .box-card {
 
     -fx-border-color: #E2E4E8;

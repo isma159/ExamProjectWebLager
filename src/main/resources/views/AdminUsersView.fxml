@@ -29,7 +29,7 @@
                      </children>
                   </HBox>
                   <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                  <HBox alignment="CENTER_LEFT" layoutX="1449.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                  <HBox alignment="CENTER_LEFT" layoutX="1449.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickUpdateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                      <children>
                         <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
                         <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
@@ -42,7 +42,7 @@
                      </children>
                   </HBox>
                   <Region layoutX="1554.0" layoutY="12.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                  <HBox alignment="CENTER_LEFT" layoutX="1569.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                  <HBox alignment="CENTER_LEFT" layoutX="1569.0" layoutY="24.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                      <children>
                         <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
                         <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
