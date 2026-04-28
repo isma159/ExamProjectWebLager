@@ -3,13 +3,17 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.Profile;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.Main;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -21,19 +25,25 @@ public class AdminController implements Initializable {
     @FXML private ToggleGroup sidebarBtns;
     @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, settingsBtn, shortcutsBtn;
 
+    private Stage currentStage;
     private ModelFacade modelFacade;
 
     public AdminController() throws Exception {
     }
 
-    public void setModel(ModelFacade modelFacade) {
+    public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
         sidebarBtns.selectToggle(dashboardBtn);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         sidebarBtns.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                oldValue.setSelected(true);
+            }
+
             if (newValue == dashboardBtn) {
                 loadPage("/views/AdminDashboardView.fxml");
             } else if (newValue == usersBtn) {
@@ -68,6 +78,27 @@ public class AdminController implements Initializable {
             contentArea.getChildren().setAll(page);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void onClickLogOut(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage stage = new Stage();
+
+            LoginController loginController = fxmlLoader.getController();
+            loginController.setModel(modelFacade, stage);
+
+            stage.setResizable(false);
+            stage.setTitle("Login");
+            stage.setScene(scene);
+            stage.show();
+
+            currentStage.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+            // TODO add AlertView
         }
     }
 }

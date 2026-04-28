@@ -33,12 +33,9 @@ public class LoginController implements Initializable {
     private IPasswordEncrypter encrypter = new PasswordEncrypter();
     private Stage currentStage;
 
-    public void setStage(Stage stage) {
-        this.currentStage = stage;
-    }
-
-    public void setModelFacade(ModelFacade modelFacade) {
+    public void setModel (ModelFacade modelFacade, Stage stage) {
         this.modelFacade = modelFacade;
+        this.currentStage = stage;
     }
 
     @Override
@@ -104,23 +101,23 @@ public class LoginController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(view));
             Scene scene = new Scene(fxmlLoader.load());
 
-            if (user.isAdmin()) {
-                AdminController adminController = fxmlLoader.getController();
-                adminController.setModel(modelFacade);
-            }
-            else {
-                UserController userController = fxmlLoader.getController();
-                userController.setModel(modelFacade);
-            }
-
             Stage stage = new Stage();
             stage.setMinWidth(1200);
             stage.setMinHeight(600);
             stage.setTitle(title);
             stage.setScene(scene);
             stage.setMaximized(true);
-            stage.show();
 
+            if (user.isAdmin()) {
+                AdminController adminController = fxmlLoader.getController();
+                adminController.setModel(modelFacade, stage);
+            }
+            else {
+                UserController userController = fxmlLoader.getController();
+                userController.setModel(modelFacade, stage);
+            }
+
+            stage.show();
             currentStage.close();
         } catch (Exception e) {
             // TODO add AlertView (Failed to login / open panel. Try again.)
