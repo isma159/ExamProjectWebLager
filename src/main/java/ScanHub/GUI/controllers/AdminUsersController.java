@@ -156,10 +156,12 @@ public class AdminUsersController implements Initializable {
 
     @FXML
     private void onUsernameClick(Event event) {
-        System.out.println("clicked");
+        // toggle ascending and descending order
         ascending = !ascending;
+        // sorting the usernames on the direction
         currentUsers.sort(ascending ? Comparator.comparing(User::getUsername) : Comparator.comparing(User::getUsername).reversed());
         userTableBox.getChildren().clear();
+
         for (User user : currentUsers) {
             HBox row = UserTableRow.addRow(user, (clickedUser, rowHBox) -> {
                 if (selectedUser != null) selectedRow.getStyleClass().remove("row-selected");
