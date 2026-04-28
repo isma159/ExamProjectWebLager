@@ -2,19 +2,22 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.GUI.facade.ModelFacade;
 import javafx.fxml.Initializable;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class UserController implements Initializable {
 
+    private Stage currentStage;
     private ModelFacade modelFacade;
 
     public UserController() throws Exception {
     }
 
-    public void setModel(ModelFacade modelFacade) {
+    public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override

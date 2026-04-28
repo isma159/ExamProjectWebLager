@@ -23,6 +23,7 @@ public class UserFormController implements Initializable {
     @FXML private RadioButton radioADMIN, radioUSER;
     @FXML private VBox vboxRole, vboxProfiles;
     @FXML private TextField usernameField;
+    @FXML private Button saveButton;
     @FXML private PasswordField passwordField, confirmPasswordField;
 
     private Stage currentStage;
@@ -50,7 +51,8 @@ public class UserFormController implements Initializable {
 
         if (editingUser != null) {
             formTitle.setText("Edit user");
-            passwordHint.setText("Only type in a password if you want to change the current password for this user.");
+            passwordHint.setText("Enter a password only to change the current one.");
+            saveButton.setText("Save changes");
             populateFields(editingUser);
         }
     }
