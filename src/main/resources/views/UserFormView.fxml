@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
+<VBox prefHeight="810.0" prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
     <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
     <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12" styleClass="primary-navigation-bg">
         <padding><Insets bottom="0" left="20" right="20" top="0" /></padding>
@@ -19,13 +29,13 @@
         <Region HBox.hgrow="ALWAYS" />
         <Label fx:id="userIdLabel" text="" />
     </HBox>
-    <VBox alignment="CENTER" prefWidth="520.0" VBox.vgrow="ALWAYS">
+    <VBox alignment="CENTER" prefWidth="540.0" VBox.vgrow="ALWAYS">
         <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
-        <VBox spacing="0">
+        <VBox prefHeight="675.0" prefWidth="480.0" spacing="0">
             <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
             <Label styleClass="h3" text="Username" />
             <Region prefHeight="6" />
-            <TextField fx:id="usernameField" prefHeight="30" promptText="e.g. jens.hansen" styleClass="container" />
+            <TextField fx:id="usernameField" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30" promptText="e.g. jens.hansen" styleClass="container" />
             <Label fx:id="usernameError" managed="false" text="Username is required." visible="false" />
 
             <Region prefHeight="18" />
@@ -33,10 +43,10 @@
             <Region prefHeight="4" />
             <Label fx:id="passwordHint" styleClass="lbl" text="Choose a password for this user." />
             <Region prefHeight="8" />
-            <PasswordField fx:id="passwordField" prefHeight="30" promptText="Password" styleClass="container" />
+            <PasswordField fx:id="passwordField" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30" promptText="Password" styleClass="container" />
             <Label fx:id="passwordError" managed="false" text="Password is required." visible="false" />
             <Region prefHeight="10" />
-            <PasswordField fx:id="confirmPasswordField" prefHeight="30" promptText="Confirm password" styleClass="container" />
+            <PasswordField fx:id="confirmPasswordField" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30" promptText="Confirm password" styleClass="container" />
             <Label fx:id="confirmError" managed="false" text="Passwords do not match." visible="false" />
 
             <Region prefHeight="18" />
@@ -70,10 +80,11 @@
             <Region prefHeight="4" />
             <Label text="Select which profiles this user can access." />
             <Region prefHeight="8" />
-            <VBox fx:id="vboxProfiles" spacing="6" styleClass="container">
-                <padding><Insets bottom="12" left="14" right="14" top="12" /></padding>
-                <Label text="Loading profiles..." />
-            </VBox>
+         <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0" styleClass="card">
+            <content>
+               <VBox fx:id="vboxProfiles" prefHeight="50.0" prefWidth="100.0" />
+            </content>
+         </ScrollPane>
          <styleClass>
             <String fx:value="card" />
             <String fx:value="card-bg" />

@@ -1,20 +1,28 @@
 package ScanHub.BE;
 
+import java.util.List;
+
 public class User {
 
     private int userId;
     private String username;
     private String passwordHash;
     private Role role;
+    private List<Profile> profiles;
 
-    public User() {
-    }
-
-    public User(int userId, String username, String passwordHash, Role role) {
+    public User(int userId, String username, String passwordHash, Role role, List<Profile> profiles) {
         this.userId = userId;
         this.username = username;
         this.passwordHash = passwordHash;
         this.role = role;
+        this.profiles = profiles;
+    }
+
+    public User(String username, String passwordHash, Role role, List<Profile> profiles) {
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.profiles = profiles;
     }
 
     public int getUserId() {
@@ -29,6 +37,7 @@ public class User {
     public Role getRole() {
         return role;
     }
+    public List<Profile> getProfiles() {return profiles;}
 
     public void setUserId(int userId) {
         this.userId = userId;
@@ -42,6 +51,7 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
+    public void setProfiles(List<Profile> profiles) {this.profiles = profiles;}
 
     public boolean isAdmin() {
         return this.role == Role.ADMIN;

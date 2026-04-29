@@ -1,10 +1,12 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.Profile;
 import ScanHub.BE.Role;
 import ScanHub.BE.User;
 import ScanHub.BLL.interfaces.IPasswordEncrypter;
 import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.RowMaker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,6 +16,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class UserFormController implements Initializable {
@@ -29,12 +33,14 @@ public class UserFormController implements Initializable {
     private ModelFacade modelFacade;
     private User editingUser = null; // null means create mode, non-null means edit mode
     private IPasswordEncrypter encrypter = new PasswordEncrypter();
+    private List<Profile> selectedProfiles;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         radioADMIN.setUserData(Role.ADMIN);
         radioUSER.setUserData(Role.USER);
+        selectedProfiles = new ArrayList<>();
     }
 
     /**
@@ -52,6 +58,27 @@ public class UserFormController implements Initializable {
             formTitle.setText("Edit user");
             passwordHint.setText("Only type in a password if you want to change the current password for this user.");
             populateFields(editingUser);
+        }
+
+        loadProfiles();
+    }
+
+    private void loadProfiles() {
+
+        List<Profile> profiles = modelFacade.profileModel.getProfiles();
+
+        for (Profile profile: profiles) {
+
+            vboxProfiles.getChildren().add(RowMaker.addProfileRowToForm(profile, editingUser, (selectedProfile, isChecked) -> {
+                if (isChecked) {
+                    selectedProfiles.add(profile);
+                }
+                else {
+                    selectedProfiles.remove(profile);
+                }
+
+                System.out.println(selectedProfiles);
+            }));
         }
     }
 
@@ -120,7 +147,7 @@ public class UserFormController implements Initializable {
         Role role = (Role) selectedToggle.getUserData();
 
         try {
-            User newUser = new User(0, username, hashedPassword, role);
+            User newUser = new User(username, hashedPassword, role, selectedProfiles);
             modelFacade.userModel.createUser(newUser);
             currentStage.close();
         } catch (Exception e) {
@@ -162,6 +189,7 @@ public class UserFormController implements Initializable {
         editingUser.setUsername(newUsername);
         editingUser.setPasswordHash(newHashedPassword);
         editingUser.setRole(newRole);
+        editingUser.setProfiles(selectedProfiles);
 
         try {
             modelFacade.userModel.updateUser(editingUser);

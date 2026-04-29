@@ -1,21 +1,69 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.Profile;
+import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.RowMaker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class AdminProfilesController {
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
 
-    @FXML TableView <Profile> tblProfiles;
+public class AdminProfilesController implements Initializable {
+
+    @FXML private VBox profileTableBox;
     private ModelFacade modelFacade;
+    private Profile selectedProfile;
+    private HBox selectedRow;
 
     public AdminProfilesController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {loadProfiles();}
+
+    private void loadProfiles() {
+        try {
+            // resets
+            profileTableBox.getChildren().clear();
+            selectedProfile = null;
+            selectedRow = null;
+
+            // sets up with all users by running a for-loop that makes an interactive HBox of every user
+            List<Profile> profiles = modelFacade.profileModel.getProfiles();
+            for (Profile profile : profiles) {
+                HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
+                    // clear highlight of previously selected row
+                    if (selectedRow != null) {
+                        selectedRow.getStyleClass().remove("row-selected");
+                    }
+                    // remove selected row if clicked on again
+                    if (selectedProfile == clickedProfile) {
+                        selectedProfile = null;
+                        selectedRow = null;
+                        return; // will reselect on the next line if not returning
+                    }
+                    // select clicked row as selected user (with highlight to show)
+                    selectedProfile = clickedProfile;
+                    selectedRow = rowHBox;
+                    rowHBox.getStyleClass().add("row-selected");
+                });
+                profileTableBox.getChildren().add(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -25,9 +73,20 @@ public class AdminProfilesController {
 
     @FXML
     private void onClickUpdateProfile() {
-        Profile selectedProfile = null; // TODO: add when sat up tblProfiles.getSelectionModel().getSelectedItem();
         if (selectedProfile == null) return;
         openProfileForm(selectedProfile);
+    }
+
+    @FXML
+    private void onClickDeleteProfile(MouseEvent mouseEvent) {
+        System.out.println("pressed delete");
+        if (selectedProfile == null) return;
+        try {
+            modelFacade.profileModel.deleteProfile(selectedProfile);
+            loadProfiles();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void openProfileForm(Profile profile) {

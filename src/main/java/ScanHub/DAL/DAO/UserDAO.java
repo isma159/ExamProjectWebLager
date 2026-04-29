@@ -1,7 +1,6 @@
 package ScanHub.DAL.DAO;
 
-import ScanHub.BE.Role;
-import ScanHub.BE.User;
+import ScanHub.BE.*;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
@@ -23,6 +22,7 @@ public class UserDAO implements IDataAccess<User> {
     @Override
     public User createData(User newUser) throws Exception {
         String sql = "INSERT INTO Users (username, passwordHash, role) VALUES (?, ?, ?)";
+        String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -35,6 +35,15 @@ public class UserDAO implements IDataAccess<User> {
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 newUser.setUserId(rs.getInt(1));
+
+                for (Profile profile: newUser.getProfiles()) {
+
+                    PreparedStatement ps2 = connection.prepareStatement(insertJunctionSQL);
+                    ps2.setInt(1, newUser.getUserId());
+                    ps2.setInt(2, profile.getProfileId());
+                    ps2.executeUpdate();
+
+                }
             }
 
             return newUser;
@@ -49,18 +58,35 @@ public class UserDAO implements IDataAccess<User> {
         List<User> users = new ArrayList<>();
 
         String sql = "SELECT userId, username, passwordHash, role FROM Users WHERE deleted_at IS NULL";
+        String selectProfilesSQL = "SELECT p.profileId, p.profileName, p.splitBehavior, p.exportLabel, p.status FROM Profiles p JOIN UserProfiles up ON p.profileId = up.profileId WHERE up.userId = ? AND p.deleted_at IS NULL";
 
         try (Connection connection = dbConnector.getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+
+                PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);
+                ps2.setInt(1, rs.getInt("userId"));
+                ResultSet rs2 = ps2.executeQuery();
+
+                List<Profile> profiles = new ArrayList<>();
+
+                while (rs2.next()) {
+
+                    profiles.add(new Profile(rs2.getInt("profileId"),
+                            rs2.getString("profileName"),
+                            SplitBehavior.valueOf(rs2.getString("splitBehavior")),
+                            ProfileStatus.valueOf(rs2.getString("status")),
+                            rs2.getString("exportLabel")));
+                }
+
                 int userId = rs.getInt("userId");
                 String username = rs.getString("username");
                 String passwordHash = rs.getString("passwordHash");
                 Role role = Role.valueOf(rs.getString("role"));
 
-                users.add(new User(userId, username, passwordHash, role));
+                users.add(new User(userId, username, passwordHash, role, profiles));
             }
         }
         catch (SQLException e) {
@@ -72,6 +98,7 @@ public class UserDAO implements IDataAccess<User> {
     public User getDataFromName(String name) throws Exception {
 
         String sql = "SELECT * FROM Users WHERE username = ?";
+        String selectProfilesSQL = "SELECT p.profileId, p.profileName, p.splitBehavior, p.exportLabel, p.status FROM Profiles p JOIN UserProfiles up ON p.profileId = up.profileId WHERE up.userId = ? AND p.deleted_at IS NULL";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -82,7 +109,23 @@ public class UserDAO implements IDataAccess<User> {
             User user = null;
 
             if (rs.next()) {
-                user = new User(rs.getInt("userId"), rs.getString("username"), rs.getString("passwordHash"), Role.valueOf(rs.getString("role")));
+
+                PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);
+                ps2.setInt(1, rs.getInt("userId"));
+                ResultSet rs2 = ps2.executeQuery();
+
+                List<Profile> profiles = new ArrayList<>();
+
+                while (rs2.next()) {
+
+                    profiles.add(new Profile(rs2.getInt("profileId"),
+                            rs2.getString("profileName"),
+                            SplitBehavior.valueOf(rs2.getString("splitBehaviour")),
+                            ProfileStatus.valueOf(rs2.getString("status")),
+                            rs2.getString("exportLabel")));
+                }
+
+                user = new User(rs.getInt("userId"), rs.getString("username"), rs.getString("passwordHash"), Role.valueOf(rs.getString("role")), profiles);
             }
 
             return user;
@@ -95,6 +138,8 @@ public class UserDAO implements IDataAccess<User> {
     @Override
     public void updateData(User updatedUser) throws Exception {
         String sql = "UPDATE Users SET username = ?, passwordHash = ?, role = ? WHERE userId = ?";
+        String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
+        String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -105,6 +150,17 @@ public class UserDAO implements IDataAccess<User> {
             ps.setInt(4, updatedUser.getUserId());
             ps.executeUpdate();
 
+            PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL);
+            ps2.setInt(1, updatedUser.getUserId());
+            ps2.executeUpdate();
+
+            for (Profile profile: updatedUser.getProfiles()) {
+                PreparedStatement ps3 = connection.prepareStatement(insertJunctionSQL);
+                ps3.setInt(1, updatedUser.getUserId());
+                ps3.setInt(2, profile.getProfileId());
+                ps3.executeUpdate();
+            }
+
         } catch (SQLException e) {
             throw new Exception("Could not update user", e);
         }
@@ -113,12 +169,17 @@ public class UserDAO implements IDataAccess<User> {
     @Override
     public void deleteData(User selectedUser) throws Exception {
         String sql = "UPDATE Users SET deleted_at = GETDATE() WHERE userId = ?";
+        String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, selectedUser.getUserId());
             ps.executeUpdate();
+
+            PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL);
+            ps2.setInt(1, selectedUser.getUserId());
+            ps2.executeUpdate();
 
         } catch (SQLException e) {
             throw new Exception("Could not delete user", e);
