@@ -54,7 +54,8 @@ public class AdminUsersController implements Initializable {
 
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<User> users = modelFacade.userModel.getUsers();
-            for (User user : users) {
+            currentUsers = new ArrayList<>(users);
+            for (User user : currentUsers) {
                 HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
                     // clear highlight of previously selected row
                     if (selectedRow != null) {

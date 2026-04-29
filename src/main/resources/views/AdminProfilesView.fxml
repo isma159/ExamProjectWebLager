@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
@@ -12,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
     <children>
         <VBox prefHeight="200.0" prefWidth="1800.0">
             <children>
@@ -26,6 +27,7 @@
                             <children>
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                                 <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="75.0" styleClass="h2" text="Profiles" />
+                        <TextField fx:id="txtFldSearchProfiles" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for profiles" styleClass="container" />
                               <Region prefHeight="56.0" prefWidth="1482.0" />
                               <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateProfile" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                                   <children>
@@ -75,13 +77,13 @@
                             </styleClass>
                             <children>
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" selected="true" styleClass="filter-btn" text="All Profiles">
+                                <ToggleButton mnemonicParsing="false" onAction="#onTbAllProfilesClick" prefHeight="30.0" prefWidth="90.0" selected="true" styleClass="filter-btn" text="All Profiles">
                            <toggleGroup>
                               <ToggleGroup fx:id="profileFilter" />
                            </toggleGroup>
                                 </ToggleButton>
-                                <ToggleButton layoutX="25.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" styleClass="filter-btn" text="Active" toggleGroup="$profileFilter" />
-                        <ToggleButton layoutX="115.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" styleClass="filter-btn" text="Inactive" toggleGroup="$profileFilter" />
+                                <ToggleButton layoutX="25.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTbActiveClick" prefHeight="30.0" prefWidth="90.0" styleClass="filter-btn" text="Active" toggleGroup="$profileFilter" />
+                        <ToggleButton layoutX="115.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTbInactiveClick" prefHeight="30.0" prefWidth="90.0" styleClass="filter-btn" text="Inactive" toggleGroup="$profileFilter" />
                             </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
@@ -90,9 +92,9 @@
                                 <String fx:value="box-card" />
                             </styleClass>
                             <children>
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Profile Name" HBox.hgrow="ALWAYS" />
+                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onProfileNameClick" onMouseClicked="#onProfileNameClick" prefWidth="210.0" styleClass="lbl" text="Profile Name" HBox.hgrow="ALWAYS" />
                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
-                                <Label alignment="CENTER" layoutX="40.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Split Behaviour" HBox.hgrow="ALWAYS" />
+                                <Label alignment="CENTER" layoutX="40.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onSplitBehaviorClick" onMouseClicked="#onSplitBehaviorClick" prefWidth="210.0" styleClass="lbl" text="Split Behaviour" HBox.hgrow="ALWAYS" />
                                 <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
                                 <Label alignment="CENTER" layoutX="958.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Export Label" HBox.hgrow="ALWAYS" />
                         <Separator layoutX="1360.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />

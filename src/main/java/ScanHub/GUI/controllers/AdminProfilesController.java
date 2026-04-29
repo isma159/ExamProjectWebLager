@@ -1,6 +1,7 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.Profile;
+import ScanHub.BE.ProfileStatus;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.RowMaker;
@@ -9,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,14 +18,20 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class AdminProfilesController implements Initializable {
 
     @FXML private VBox profileTableBox;
+    @FXML private TextField txtFldSearchProfiles;
+    private List<Profile> currentProfiles = new ArrayList<>();
+    private boolean ascending;
     private ModelFacade modelFacade;
-    private Profile selectedProfile;
+    private Profile selectedProfile = null;
+    private ProfileStatus selectedStatus = null;
     private HBox selectedRow;
 
     public AdminProfilesController(ModelFacade modelFacade) {
@@ -31,7 +39,8 @@ public class AdminProfilesController implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {loadProfiles();}
+    public void initialize(URL location, ResourceBundle resources) {loadProfiles();
+    txtFldSearchProfiles.textProperty().addListener((observable, oldValue, newValue) -> filterProfiles(newValue));}
 
     private void loadProfiles() {
         try {
@@ -42,7 +51,8 @@ public class AdminProfilesController implements Initializable {
 
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<Profile> profiles = modelFacade.profileModel.getProfiles();
-            for (Profile profile : profiles) {
+            currentProfiles = new ArrayList<>(profiles);
+            for (Profile profile : currentProfiles) {
                 HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
                     // clear highlight of previously selected row
                     if (selectedRow != null) {
@@ -59,6 +69,7 @@ public class AdminProfilesController implements Initializable {
                     selectedRow = rowHBox;
                     rowHBox.getStyleClass().add("row-selected");
                 });
+                row.setUserData(profile);
                 profileTableBox.getChildren().add(row);
             }
         } catch (Exception e) {
@@ -105,6 +116,80 @@ public class AdminProfilesController implements Initializable {
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void filterProfiles(String search) {
+        for (var node : profileTableBox.getChildren()) {
+            HBox row = (HBox) node;
+            Profile profile = (Profile) row.getUserData();
+
+            boolean matching = search.isBlank()
+            || profile.getProfileName().toLowerCase().contains(search.toLowerCase()) || profile.getSplitBehavior().name().toLowerCase().contains(search.toLowerCase());
+            boolean matchingStatus = selectedStatus == null || profile.getStatus() == selectedStatus;
+            row.setVisible(matching && matchingStatus);
+            row.setManaged(matching && matchingStatus);
+        }
+    }
+
+    @FXML
+    private void onTbAllProfilesClick(){
+    selectedStatus =  null;
+    filterProfiles(txtFldSearchProfiles.getText());
+    }
+
+    @FXML
+    private void onTbActiveClick(){
+        selectedStatus = ProfileStatus.Active;
+        filterProfiles(txtFldSearchProfiles.getText());
+    }
+
+
+    @FXML
+    private void onTbInactiveClick()
+    { selectedStatus = ProfileStatus.Inactive;
+        filterProfiles(txtFldSearchProfiles.getText());
+    }
+
+    @FXML
+    private void onProfileNameClick() {
+        // toggle ascending and descending order
+        ascending = !ascending;
+        // sorting the profile names on the direction
+        currentProfiles.sort(ascending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
+        profileTableBox.getChildren().clear();
+
+        for (Profile profile : currentProfiles) {
+            HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
+                if (selectedProfile != null) selectedRow.getStyleClass().remove("row-selected");
+                if (selectedProfile == clickedProfile) { selectedProfile = null; selectedRow = null; return;}
+                selectedProfile = clickedProfile;
+                selectedRow = rowHBox;
+                rowHBox.getStyleClass().add("row-selected");
+            });
+            row.setUserData(profile);
+            profileTableBox.getChildren().add(row);
+        }
+    }
+
+    @FXML
+    private void onSplitBehaviorClick() {
+        // toggle ascending and descending order
+        ascending = !ascending;
+        // sorting the profile names on the direction
+        currentProfiles.sort(ascending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
+        profileTableBox.getChildren().clear();
+
+        for (Profile profile : currentProfiles) {
+            HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
+                if (selectedProfile != null) selectedRow.getStyleClass().remove("row-selected");
+                if (selectedProfile == clickedProfile) { selectedProfile = null; selectedRow = null; return;}
+                selectedProfile = clickedProfile;
+                selectedRow = rowHBox;
+                rowHBox.getStyleClass().add("row-selected");
+            });
+            row.setUserData(profile);
+            profileTableBox.getChildren().add(row);
         }
     }
 }
