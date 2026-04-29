@@ -44,6 +44,22 @@
 
 }
 
+.chip-color-success {
+
+    -fx-background-color: #4CD07D;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
+
+}
+
+.chip-color-error {
+
+    -fx-background-color: #FF3D32;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
+
+}
+
 .h1 {
 
     -fx-font-family: "Montserrat";
@@ -320,6 +336,40 @@
 
     -fx-border-color: #2d3d4f;
     -fx-border-width: 0.8;
+
+}
+
+.check-box .box {
+
+    -fx-background-color: TRANSPARENT;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 2;
+    -fx-border-radius: 3px;
+
+}
+
+.check-box:selected .box {
+
+    -fx-background-color: #4CD07D;
+
+}
+
+.check-box:selected .mark {
+
+    -fx-background-color: #ffffff;
+
+}
+
+.radio-button .radio {
+
+    -fx-background-color: TRANSPARENT;
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 2;
+    -fx-border-radius: 20px;
 
 }
 

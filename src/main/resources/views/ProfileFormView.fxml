@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
 
-<VBox prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
+<VBox prefWidth="520" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
     <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
     <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12" style="-fx-background-color: #2D3D4F;">
         <padding><Insets bottom="0" left="20" right="20" top="0" /></padding>
@@ -20,17 +27,13 @@
             <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
             <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Profile name" />
             <Region prefHeight="6" />
-         <HBox styleClass="container">
-            <children>
-                  <TextField fx:id="profileNameField" prefHeight="30" prefWidth="422.0" promptText="e.g. Maersk Oil" />
-            </children>
-         </HBox>
+            <TextField fx:id="profileNameField" prefHeight="30" prefWidth="422.0" promptText="e.g. Maersk Oil" styleClass="container" />
             <Region prefHeight="18" />
             <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Split Behavior" />
             <Region prefHeight="4" />
             <Label style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Defines how documents are split during a scanning session." />
             <Region prefHeight="8" />
-            <VBox spacing="8" styleClass="container">
+            <VBox fx:id="vboxSplitBehavior" spacing="8" styleClass="container">
                 <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
                 <HBox alignment="TOP_LEFT" spacing="10">
                     <RadioButton fx:id="radioBARCODE" style="-fx-font-size: 12px; -fx-text-fill: #2D3D4F;">
@@ -60,13 +63,52 @@
                 </HBox>
             </VBox>
             <Region prefHeight="18" />
+         <Label layoutX="35.0" layoutY="108.0" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Profile Status" />
+         <Region layoutX="35.0" layoutY="123.0" prefHeight="4" />
+         <Label layoutX="35.0" layoutY="127.0" style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="Defines the state the profile is currently in." />
+         <Region layoutX="35.0" layoutY="141.0" prefHeight="8" />
+         <VBox fx:id="vboxStatus" layoutX="35.0" layoutY="149.0" spacing="8" styleClass="container">
+            <padding>
+               <Insets bottom="14" left="14" right="14" top="14" />
+            </padding>
+            <children>
+               <HBox alignment="TOP_LEFT" spacing="10">
+                  <children>
+                     <RadioButton fx:id="radioACTIVE" style="-fx-font-size: 12px; -fx-text-fill: #2D3D4F;">
+                        <toggleGroup>
+                           <ToggleGroup fx:id="toggleGroupProfileStatus" />
+                        </toggleGroup>
+                     </RadioButton>
+                     <VBox spacing="2">
+                        <children>
+                           <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Active" />
+                           <Label prefWidth="360" style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="The profile is available for use and can be assigned to any user." wrapText="true" />
+                        </children>
+                     </VBox>
+                  </children>
+               </HBox>
+               <Separator />
+               <HBox alignment="TOP_LEFT" spacing="10">
+                  <children>
+                     <RadioButton fx:id="radioINACTIVE" style="-fx-font-size: 12px; -fx-text-fill: #2D3D4F;" toggleGroup="$toggleGroupProfileStatus" />
+                     <VBox spacing="2">
+                        <children>
+                           <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Inactive" />
+                           <Label prefWidth="360" style="-fx-font-size: 11px; -fx-text-fill: #64748B;" text="The profile is unable to be utilized for scanning and cannot be assigned" wrapText="true" />
+                        </children>
+                     </VBox>
+                  </children>
+               </HBox>
+            </children>
+         </VBox>
+         <Region layoutX="35.0" layoutY="324.0" prefHeight="18" />
             <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2D3D4F;" text="Export name preview" />
             <Region prefHeight="6" />
             <HBox alignment="CENTER_LEFT" styleClass="container">
                 <padding><Insets bottom="8" left="12" right="12" top="8" /></padding>
-                <Label fx:id="exportPreviewLabel" style="-fx-font-size: 12px; -fx-font-family: monospace; -fx-text-fill: #2D3D4F;" text="ProfileName_BOX-042.tiff" />
+                <Label fx:id="exportPreviewLabel" style="-fx-font-size: 12px; -fx-font-family: monospace; -fx-text-fill: #2D3D4F;" text="ProfileName_24" />
             </HBox>
-            <Label style="-fx-font-size: 10px; -fx-text-fill: #BFBFBF;" text="Format: {profileName}_{boxLabel}.tiff" />
+            <Label style="-fx-font-size: 10px; -fx-text-fill: #BFBFBF;" text="Format: {profileName}_{boxId}" />
 
             <Region prefHeight="18" />
         </VBox>

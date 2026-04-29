@@ -3,9 +3,7 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
-import ScanHub.GUI.util.UserTableRow;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
+import ScanHub.GUI.util.RowMaker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -54,9 +52,8 @@ public class AdminUsersController implements Initializable {
 
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<User> users = modelFacade.userModel.getUsers();
-            currentUsers = new ArrayList<>(users);
-            for (User user : currentUsers) {
-                HBox row = UserTableRow.addRow(user, (clickedUser, rowHBox) -> {
+            for (User user : users) {
+                HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
                     // clear highlight of previously selected row
                     if (selectedRow != null) {
                         selectedRow.getStyleClass().remove("row-selected");

@@ -81,7 +81,7 @@
                               <ToggleButton layoutX="100.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Users" toggleGroup="$userFilter" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                        <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <styleClass>
                               <String fx:value="second-card-bg" />
                               <String fx:value="box-card" />
@@ -130,16 +130,35 @@
                               <String fx:value="box-card" />
                               <String fx:value="card-bg" />
                            </styleClass>
+                           <children>
+                              <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" selected="true" styleClass="filter-btn" text="All Profiles">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="profileFilter" />
+                                 </toggleGroup>
+                              </ToggleButton>
+                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" styleClass="filter-btn" text="Active" toggleGroup="$profileFilter" />
+                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" styleClass="filter-btn" text="Inactive" toggleGroup="$profileFilter" />
+                           </children>
                         </HBox>
-                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                        <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <styleClass>
                               <String fx:value="second-card-bg" />
                               <String fx:value="box-card" />
                            </styleClass>
+                           <children>
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Profile Name" />
+                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Split Behaviour" />
+                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Export Label" />
+                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Status" />
+                           </children>
                         </HBox>
                         <ScrollPane fitToWidth="true" prefHeight="450.0" styleClass="box-card">
                            <content>
-                              <VBox prefHeight="50.0" prefWidth="100.0" />
+                              <VBox fx:id="profileTableBox" prefHeight="50.0" prefWidth="100.0" />
                            </content>
                         </ScrollPane>
                         <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">

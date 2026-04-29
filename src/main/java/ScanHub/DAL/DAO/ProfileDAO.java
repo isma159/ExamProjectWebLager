@@ -1,6 +1,7 @@
 package ScanHub.DAL.DAO;
 
 import ScanHub.BE.Profile;
+import ScanHub.BE.ProfileStatus;
 import ScanHub.BE.SplitBehavior;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
@@ -22,21 +23,29 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public Profile createData(Profile newProfile) throws Exception {
-        String sql = "INSERT INTO Profiles (profileName, splitBehavior) VALUES (?, ?)";
+        String sql = "INSERT INTO Profiles (profileName, splitBehavior, status, exportLabel) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, newProfile.getProfileName());
             ps.setString(2, newProfile.getSplitBehavior().toString());
+            ps.setString(3, newProfile.getStatus().toString());
+            ps.setString(4, newProfile.getExportLabel());
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
+            Profile createdProfile = null;
+
             if (rs.next()) {
-                newProfile.setProfileId(rs.getInt(1));
+                createdProfile = new Profile(rs.getInt(1),
+                        newProfile.getProfileName(),
+                        newProfile.getSplitBehavior(),
+                        newProfile.getStatus(),
+                        newProfile.getExportLabel());
             }
 
-            return newProfile;
+            return createdProfile;
 
         } catch (SQLException e) {
             throw new Exception("Could not create user", e);
@@ -48,7 +57,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
         List<Profile> profiles = new ArrayList<>();
         try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement("SELECT profileId, profileName, splitBehavior FROM Profiles WHERE deleted_at IS NULL");
+            PreparedStatement ps = connection.prepareStatement("SELECT profileId, profileName, splitBehavior, status, exportLabel FROM Profiles WHERE deleted_at IS NULL");
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -56,8 +65,10 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 int profileId = rs.getInt("profileId");
                 String profileName = rs.getString("profileName");
                 SplitBehavior splitBehavior = SplitBehavior.valueOf(rs.getString("splitBehavior"));
+                ProfileStatus status = ProfileStatus.valueOf(rs.getString("status"));
+                String exportLabel = rs.getString("exportLabel");
 
-                profiles.add(new Profile(profileId, profileName, splitBehavior));
+                profiles.add(new Profile(profileId, profileName, splitBehavior, status, exportLabel));
             }
         } catch (SQLException e) {
             throw new Exception("Could not get users", e);
@@ -73,14 +84,16 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public void updateData(Profile newData) throws Exception {
-        String sql = "UPDATE Profiles SET profileName = ?, splitBehavior = ? WHERE profileId = ?";
+        String sql = "UPDATE Profiles SET profileName = ?, splitBehavior = ?, status = ?, exportLabel = ? WHERE profileId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, newData.getProfileName());
             ps.setString(2, newData.getSplitBehavior().toString());
-            ps.setInt(3, newData.getProfileId());
+            ps.setString(3, newData.getStatus().toString());
+            ps.setString(4, newData.getExportLabel());
+            ps.setInt(5, newData.getProfileId());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -91,12 +104,17 @@ public class ProfileDAO implements IDataAccess<Profile> {
     @Override
     public void deleteData(Profile data) throws Exception {
         String sql = "UPDATE Profiles SET deleted_at = SYSDATETIME() WHERE profileId = ?";
+        String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE profileId = ?";
 
         try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql);
+             PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL)) {
 
             ps.setInt(1, data.getProfileId());
             ps.executeUpdate();
+
+            ps2.setInt(1, data.getProfileId());
+            ps2.executeUpdate();
 
         } catch (SQLException e) {
             throw new Exception("Could not delete user", e);
