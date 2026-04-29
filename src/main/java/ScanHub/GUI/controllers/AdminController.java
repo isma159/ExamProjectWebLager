@@ -1,8 +1,8 @@
 package ScanHub.GUI.controllers;
 
-import ScanHub.BE.Profile;
-import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertCaller;
+import ScanHub.GUI.util.AlertTypes;
 import ScanHub.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,8 +12,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -24,6 +24,7 @@ public class AdminController implements Initializable {
     @FXML private StackPane contentArea;
     @FXML private ToggleGroup sidebarBtns;
     @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, settingsBtn, shortcutsBtn;
+    @FXML private HBox analyticsBox, metadataBox, systemBox, logBox, settingsBox, shortcutBox;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -52,6 +53,18 @@ public class AdminController implements Initializable {
                 loadPage("/views/AdminProfilesView.fxml");
             }
         });
+
+        analyticsBox.setVisible(false);
+        analyticsBox.setManaged(false);
+        metadataBox.setVisible(false);
+        metadataBox.setManaged(false);
+        logBox.setVisible(false);
+        logBox.setManaged(false);
+        settingsBox.setManaged(false);
+        settingsBox.setVisible(false);
+        shortcutBox.setVisible(false);
+        shortcutBox.setManaged(false);
+
     }
 
     private void loadPage(String fxml) {
@@ -97,8 +110,12 @@ public class AdminController implements Initializable {
 
             currentStage.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
-            // TODO add AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("Logout Failed")
+                    .setContentText("Unexpected error due to " + e.getMessage() + ". Try again.")
+                    .setType(AlertTypes.ERROR)
+                    .show();
         }
     }
 }
