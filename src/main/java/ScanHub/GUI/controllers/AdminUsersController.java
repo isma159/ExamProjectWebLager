@@ -139,17 +139,20 @@ public class AdminUsersController implements Initializable {
         }
     }
 
-    public void onTbAllUsersClick(ActionEvent actionEvent) {
+    @FXML
+    private void onTbAllUsersClick(ActionEvent actionEvent) {
         selectedRole = null;
         filterUsers(txtFldUserSearch.getText());
     }
 
-    public void onTbAdminsClick(ActionEvent actionEvent) {
+    @FXML
+    private void onTbAdminsClick(ActionEvent actionEvent) {
         selectedRole = Role.ADMIN;
         filterUsers(txtFldUserSearch.getText());
     }
 
-    public void onTbUsersClick(ActionEvent actionEvent) {
+    @FXML
+    private void onTbUsersClick(ActionEvent actionEvent) {
         selectedRole = Role.USER;
         filterUsers(txtFldUserSearch.getText());
     }
