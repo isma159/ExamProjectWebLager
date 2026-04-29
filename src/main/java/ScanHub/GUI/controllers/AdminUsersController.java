@@ -4,6 +4,8 @@ import ScanHub.BE.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.RowMaker;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -160,7 +162,7 @@ public class AdminUsersController implements Initializable {
         userTableBox.getChildren().clear();
 
         for (User user : currentUsers) {
-            HBox row = UserTableRow.addRow(user, (clickedUser, rowHBox) -> {
+            HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
                 if (selectedUser != null) selectedRow.getStyleClass().remove("row-selected");
                 if (selectedUser == clickedUser) { selectedUser = null; selectedRow = null; return;}
                 selectedUser = clickedUser;
