@@ -3,6 +3,7 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.Profile;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -40,6 +41,7 @@ public class AdminDashboardController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Load Error", "Failed to load dashboard data.");
         }
     }
 }

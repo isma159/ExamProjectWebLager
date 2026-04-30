@@ -2,8 +2,7 @@ package ScanHub;
 
 import ScanHub.GUI.controllers.LoginController;
 import ScanHub.GUI.facade.ModelFacade;
-import ScanHub.GUI.util.AlertCaller;
-import ScanHub.GUI.util.AlertTypes;
+import ScanHub.GUI.util.AlertHelper;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -36,6 +35,7 @@ public class Main extends Application{
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Startup Error", "Failed to start the application. Please try again.");
         }
     }
 }

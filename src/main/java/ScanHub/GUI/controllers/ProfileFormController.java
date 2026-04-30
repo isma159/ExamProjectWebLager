@@ -3,8 +3,7 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.*;
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
-import ScanHub.GUI.util.AlertCaller;
-import ScanHub.GUI.util.AlertTypes;
+import ScanHub.GUI.util.AlertHelper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -59,20 +58,15 @@ public class ProfileFormController implements Initializable {
         }
 
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
-
             String result = newValue.replace(" ", "");
-
             exportPreviewLabel.setText(result + "_1");
-
         }));
-
     }
 
     /**
      * Pre-fills input fields when editing an existing Profile.
      */
     private void populateFields(Profile profile) {
-
         profileNameField.setText(profile.getProfileName());
 
         if (profile.getSplitBehavior() == SplitBehavior.BARCODE) { radioBARCODE.fire(); }
@@ -81,7 +75,6 @@ public class ProfileFormController implements Initializable {
 
         if (profile.getStatus() == ProfileStatus.Active) { radioACTIVE.fire(); }
         else radioINACTIVE.fire();
-
     }
 
     @FXML
@@ -94,13 +87,13 @@ public class ProfileFormController implements Initializable {
     }
 
     private void createProfile() {
-
         String profileName = profileNameField.getText();
         Toggle selectedSplitBehaviorToggle = toggleGroupSplitBehavior.getSelectedToggle();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
 
-        if (profileName.isBlank() || selectedSplitBehaviorToggle == null || selectedStatusToggle == null) {
+        clearError();
 
+        if (profileName.isBlank() || selectedSplitBehaviorToggle == null || selectedStatusToggle == null) {
             if (profileName.isBlank()) {
                 profileNameField.getStyleClass().add("error-border");
             }
@@ -110,6 +103,7 @@ public class ProfileFormController implements Initializable {
             if (selectedStatusToggle == null) {
                 vboxStatus.getStyleClass().add("error-border");
             }
+            AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
             return;
         }
 
@@ -121,7 +115,8 @@ public class ProfileFormController implements Initializable {
             modelFacade.profileModel.createProfile(newProfile);
             currentStage.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            AlertHelper.showError("Create Failed", "Failed to create profile. Please try again.");
         }
     }
 
@@ -136,7 +131,6 @@ public class ProfileFormController implements Initializable {
         clearError();
 
         if (newProfileName.isBlank() || selectedSplitToggle == null || selectedStatusToggle == null) {
-
             if (newProfileName.isBlank()) {
                 profileNameField.getStyleClass().add("error-border");
             }
@@ -146,6 +140,7 @@ public class ProfileFormController implements Initializable {
             if (selectedStatusToggle == null) {
                 vboxStatus.getStyleClass().add("error-border");
             }
+            AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
             return;
         }
 
@@ -158,14 +153,12 @@ public class ProfileFormController implements Initializable {
         editingProfile.setExportLabel(newExportLabel);
 
         try {
-
             modelFacade.profileModel.updateProfile(editingProfile);
             currentStage.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Update Failed", "Failed to update profile. Please try again.");
         }
-
     }
 
     private void clearError() {

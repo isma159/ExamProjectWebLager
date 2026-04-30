@@ -2,8 +2,7 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
-import ScanHub.GUI.util.AlertCaller;
-import ScanHub.GUI.util.AlertTypes;
+import ScanHub.GUI.util.AlertHelper;
 import ScanHub.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -56,7 +55,6 @@ public class AdminController implements Initializable {
                 loadPage("/views/AdminProfilesView.fxml");
             }
         });
-
     }
 
     private void loadPage(String fxml) {
@@ -83,27 +81,32 @@ public class AdminController implements Initializable {
             contentArea.getChildren().setAll(page);
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Navigation Error", "Failed to load the selected page. Please try again.");
         }
     }
 
     public void onClickLogOut(ActionEvent actionEvent) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            Stage stage = new Stage();
+        AlertHelper.showConfirmation("Log Out", "Are you sure you want to log out?", () -> {
+                    try {
+                        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
+                        Scene scene = new Scene(fxmlLoader.load());
+                        Stage stage = new Stage();
 
-            LoginController loginController = fxmlLoader.getController();
-            loginController.setModel(modelFacade, stage);
+                        LoginController loginController = fxmlLoader.getController();
+                        loginController.setModel(modelFacade, stage);
 
-            stage.setResizable(false);
-            stage.setTitle("Login");
-            stage.setScene(scene);
-            stage.show();
+                        stage.setResizable(false);
+                        stage.setTitle("Login");
+                        stage.setScene(scene);
+                        stage.show();
 
-            currentStage.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                        currentStage.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertHelper.showError("Logout Error", "Failed to log out. Please try again.");
+                    }
+                }
+        );
     }
 
     @FXML

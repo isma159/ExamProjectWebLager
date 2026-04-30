@@ -7,8 +7,7 @@ import ScanHub.BLL.ThemeManager;
 import ScanHub.BLL.interfaces.IPasswordEncrypter;
 import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
-import ScanHub.GUI.util.AlertCaller;
-import ScanHub.GUI.util.AlertTypes;
+import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -60,7 +59,7 @@ public class UserFormController implements Initializable {
         if (editingUser != null) {
             formTitle.setText("Edit user");
             passwordHint.setText("Enter a password only to change the current one.");
-            saveButton.setText("Save changes");
+            saveButton.setText("Save Changes");
             populateFields(editingUser);
         }
 
@@ -69,11 +68,9 @@ public class UserFormController implements Initializable {
     }
 
     private void loadProfiles() {
-
         List<Profile> profiles = modelFacade.profileModel.getProfiles();
 
         for (Profile profile: profiles) {
-
             vboxProfiles.getChildren().add(RowMaker.addProfileRowToForm(profile, editingUser, (selectedProfile, isChecked) -> {
                 if (isChecked) {
                     selectedProfiles.add(profile);
@@ -89,9 +86,9 @@ public class UserFormController implements Initializable {
 
     /**
      * Pre-fills input fields when editing an existing user.
+     * TODO: populate profile checkboxes from user's assigned profiles
      */
-    private void populateFields(User user) { // TODO populate profiles
-
+    private void populateFields(User user) {
         usernameField.setText(user.getUsername());
 
         if (user.getRole() == Role.ADMIN) {
@@ -100,21 +97,21 @@ public class UserFormController implements Initializable {
         else if (user.getRole() == Role.USER) {
             toggleGroupRole.selectToggle(radioUSER);
         }
-
-
     }
 
     @FXML
     private void onClickSave(ActionEvent actionEvent) {
         if (editingUser != null) {
             updateUser();
-            // TODO show success
         } else {
             createUser();
-            // TODO show success
         }
     }
 
+    /**
+     * TODO compare usernames so no identical
+     * TODO minimum username/password length ?
+     */
     private void createUser() {
         String username = usernameField.getText();
         String password = passwordField.getText();
@@ -123,10 +120,7 @@ public class UserFormController implements Initializable {
 
         clearError(); // prevents stacking of error borders
 
-        // TODO compare usernames so no identical
-        // TODO ? minimum username/password length ?
         if (username.isBlank() || password.isBlank() || passwordConfirm.isBlank() || selectedToggle == null) {
-
             if (username.isBlank())
                 usernameField.getStyleClass().add("error-border");
             if (password.isBlank())
@@ -136,12 +130,14 @@ public class UserFormController implements Initializable {
             if (selectedToggle == null)
                 vboxRole.getStyleClass().add("error-border");
 
+            AlertHelper.showWarning("Missing Fields", "Please fill in all required fields and select a role.");
             return;
         }
 
-        if (!password.equals(passwordConfirm) || !passwordConfirm.equals(password)) {
+        if (!password.equals(passwordConfirm)) {
             passwordField.getStyleClass().add("error-border");
             confirmPasswordField.getStyleClass().add("error-border");
+            AlertHelper.showWarning("Password Mismatch", "Passwords do not match.");
             return;
         }
 
@@ -154,17 +150,20 @@ public class UserFormController implements Initializable {
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Create Failed", "Failed to create user. Please try again.");
         }
     }
 
-    // TODO find out if a user should be be able to be updated to admin and vice versa
+    /**
+     * TODO find out if a user should be be able to be updated to admin and vice versa
+     */
     private void updateUser() {
         String newUsername = usernameField.getText();
         String newPassword = passwordField.getText();
         String newPasswordConfirm = confirmPasswordField.getText();
         Toggle selectedToggle = toggleGroupRole.getSelectedToggle();
 
-        clearError(); // prevents that stacking baby
+        clearError(); // prevents stacking of error borders
 
         if (newUsername.isBlank() || selectedToggle == null) {
             if (newUsername.isBlank())
@@ -172,29 +171,38 @@ public class UserFormController implements Initializable {
             if (selectedToggle == null)
                 vboxRole.getStyleClass().add("error-border");
 
+            AlertHelper.showWarning("Missing Fields", "Please fill in username and select a role.");
             return;
         }
 
-        if (!newPassword.equals(newPasswordConfirm) || !newPasswordConfirm.equals(newPassword)) {
-            passwordField.getStyleClass().add("error-border");
-            confirmPasswordField.getStyleClass().add("error-border");
-
-            return;
+        // only validate passwords if the user has entered something
+        if (!newPassword.isBlank() || !newPasswordConfirm.isBlank()) {
+            // validate passwords
+            if (!newPassword.equals(newPasswordConfirm)) {
+                passwordField.getStyleClass().add("error-border");
+                confirmPasswordField.getStyleClass().add("error-border");
+                AlertHelper.showWarning("Password Mismatch", "Passwords do not match. Please try again.");
+                return;
+            }
         }
 
-        String newHashedPassword = encrypter.hashedPassword(newPassword);
         Role newRole = (Role) selectedToggle.getUserData();
 
         editingUser.setUsername(newUsername);
-        editingUser.setPasswordHash(newHashedPassword);
         editingUser.setRole(newRole);
         editingUser.setProfiles(selectedProfiles);
+
+        // only update password if user filled in a new one
+        if (!newPassword.isBlank()) {
+            editingUser.setPasswordHash(encrypter.hashedPassword(newPassword));
+        }
 
         try {
             modelFacade.userModel.updateUser(editingUser);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Update Failed", "Failed to update user. Please try again.");
         }
     }
 
