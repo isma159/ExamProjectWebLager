@@ -1,6 +1,7 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.*;
+import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertCaller;
 import ScanHub.GUI.util.AlertTypes;
@@ -40,6 +41,8 @@ public class ProfileFormController implements Initializable {
         if (editingProfile != null) {
             populateFields(editingProfile);
         }
+
+        ThemeManager.apply(currentStage.getScene());
     }
 
     @Override

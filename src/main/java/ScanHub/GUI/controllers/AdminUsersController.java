@@ -108,13 +108,14 @@ public class AdminUsersController implements Initializable {
             Scene scene = new Scene(loader.load());
             Stage stage = new Stage();
 
-            UserFormController controller = loader.getController();
-            controller.setModel(stage, modelFacade, user);
-
             stage.setTitle(user == null ? "Create User" : "Edit User");
             stage.setScene(scene);
             stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
+
+            UserFormController controller = loader.getController();
+            controller.setModel(stage, modelFacade, user);
+
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();

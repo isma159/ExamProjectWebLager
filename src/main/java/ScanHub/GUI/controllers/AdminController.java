@@ -1,5 +1,6 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertCaller;
 import ScanHub.GUI.util.AlertTypes;
@@ -15,6 +16,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.controlsfx.control.ToggleSwitch;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -25,6 +27,7 @@ public class AdminController implements Initializable {
     @FXML private ToggleGroup sidebarBtns;
     @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, settingsBtn, shortcutsBtn;
     @FXML private HBox analyticsBox, metadataBox, systemBox, logBox, settingsBox, shortcutBox;
+    @FXML private ToggleSwitch darkMode;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -117,5 +120,10 @@ public class AdminController implements Initializable {
                     .setType(AlertTypes.ERROR)
                     .show();
         }
+    }
+
+    @FXML
+    private void onDarkModeToggle() {
+        ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());
     }
 }
