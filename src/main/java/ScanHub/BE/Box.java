@@ -7,21 +7,23 @@ import java.util.List;
 public class Box {
 
     private int boxId;
-    private String boxName; // TODO: <clarification needed> change to int boxNumber as well in db?
+    private String boxName;
     private int profileId;
     private Profile profile;
     private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private List<Document> documents;
 
     public Box() {
         this.documents = new ArrayList<>();
     }
 
-    public Box(int boxId, String boxName, int profileId, LocalDateTime createdAt) {
+    public Box(int boxId, String boxName, int profileId, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.boxId = boxId;
         this.boxName = boxName;
         this.profileId = profileId;
         this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
         this.documents = new ArrayList<>();
     }
 
@@ -39,6 +41,9 @@ public class Box {
     }
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+    public LocalDateTime getModifiedAt() {
+        return modifiedAt;
     }
     public List<Document> getDocuments() {
         return documents;
@@ -58,6 +63,9 @@ public class Box {
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public void setModifiedAt(LocalDateTime modifiedAt) {
+        this.modifiedAt = modifiedAt;
     }
     public void setDocuments(List<Document> documents) {
         this.documents = documents;

@@ -4,8 +4,7 @@ import ScanHub.BE.User;
 import ScanHub.BLL.interfaces.IPasswordEncrypter;
 import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
-import ScanHub.GUI.util.AlertCaller;
-import ScanHub.GUI.util.AlertTypes;
+import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.TextFieldListeners;
 import ScanHub.Main;
 import javafx.event.ActionEvent;
@@ -84,12 +83,7 @@ public class LoginController implements Initializable {
     private void onSignInBtnClick() throws Exception {
         if (txtFldUser.getText().isBlank() || passFldPass.getText().isBlank()) {
             onLoginError();
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("MISSING FIELDS!")
-                    .setContentText("Please fill in all required fields.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
+            AlertHelper.showWarning("Missing Fields", "Please enter your username and password.");
             return;
         }
 
@@ -97,12 +91,7 @@ public class LoginController implements Initializable {
 
         if (user == null || !encrypter.verifyPassword(passFldPass.getText(), user.getPasswordHash())) {
             onLoginError();
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Incorrect username or password")
-                    .setContentText("Make sure to type in the correct username and corresponding password.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
+            AlertHelper.showError("Login Failed", "Incorrect username or password.");
             return;
         }
 
@@ -133,12 +122,8 @@ public class LoginController implements Initializable {
             stage.show();
             currentStage.close();
         } catch (Exception e) {
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Login Failed!")
-                    .setContentText("Unexpected error due to " + e.getMessage() + ". Try again.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
+            e.printStackTrace();
+            AlertHelper.showError("Login Error", "Failed to open panel. Please try again.");
         }
     }
 
