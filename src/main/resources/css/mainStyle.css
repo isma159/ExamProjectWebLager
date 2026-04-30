@@ -499,3 +499,21 @@
     -fx-text-fill: TRANSPARENT;
 
 }
+
+.toggle-switch .thumb-area {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 50px;
+}
+
+.toggle-switch:selected .thumb-area {
+    -fx-background-color: #008FF7;
+}
+
+.toggle-switch .label {
+    -fx-text-fill: #000000;
+}
+
+.toggle-switch .thumb {
+    -fx-background-color: white;
+    -fx-background-radius: 50px;
+}

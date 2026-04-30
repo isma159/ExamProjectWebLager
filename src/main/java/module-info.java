@@ -9,6 +9,7 @@ module scanhub {
     requires java.naming;
     requires java.desktop;
     requires java.net.http;
+    requires org.controlsfx.controls;
 
     exports ScanHub.GUI.controllers;
     opens ScanHub.GUI.controllers to javafx.fxml;
