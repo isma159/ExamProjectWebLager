@@ -2,6 +2,8 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.BE.*;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertCaller;
+import ScanHub.GUI.util.AlertTypes;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -57,7 +59,7 @@ public class ProfileFormController implements Initializable {
 
             String result = newValue.replace(" ", "");
 
-            exportPreviewLabel.setText(result + "_24");
+            exportPreviewLabel.setText(result + "_1");
 
         }));
 
@@ -106,7 +108,12 @@ public class ProfileFormController implements Initializable {
                 vboxStatus.getStyleClass().add("error-border");
             }
 
-            // TODO add AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("MISSING FIELDS!")
+                    .setContentText("Please fill in all required fields.")
+                    .setType(AlertTypes.ERROR)
+                    .show();
             return;
         }
 
@@ -114,11 +121,16 @@ public class ProfileFormController implements Initializable {
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
 
         try {
-            Profile newProfile = new Profile(profileName, splitBehavior, status, exportPreviewLabel.getText());
+            Profile newProfile = new Profile(profileName, splitBehavior, status, exportPreviewLabel.getText().replace("1", ""));
             modelFacade.profileModel.createProfile(newProfile);
             currentStage.close();
         } catch (Exception e) {
-            // TODO add the AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("Could not create profile")
+                    .setContentText("Unable to create profile due to " + e.getMessage())
+                    .setType(AlertTypes.ERROR)
+                    .show();
             throw new RuntimeException(e);
         }
     }
@@ -129,7 +141,7 @@ public class ProfileFormController implements Initializable {
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
         SplitBehavior newSplitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
         ProfileStatus newStatus = (ProfileStatus) selectedStatusToggle.getUserData();
-        String newExportLabel = exportPreviewLabel.getText();
+        String newExportLabel = exportPreviewLabel.getText().replace("1", "");
 
         clearError();
 
@@ -145,7 +157,12 @@ public class ProfileFormController implements Initializable {
                 vboxStatus.getStyleClass().add("error-border");
             }
 
-            // TODO add AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("MISSING FIELDS!")
+                    .setContentText("Please fill in all required fields.")
+                    .setType(AlertTypes.ERROR)
+                    .show();
             return;
         }
 
@@ -163,7 +180,12 @@ public class ProfileFormController implements Initializable {
             currentStage.close();
         }
         catch (Exception e) {
-            // TODO add AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("Could not update profile")
+                    .setContentText("Unable to update profile due to " + e.getMessage())
+                    .setType(AlertTypes.ERROR)
+                    .show();
             e.printStackTrace();
         }
 

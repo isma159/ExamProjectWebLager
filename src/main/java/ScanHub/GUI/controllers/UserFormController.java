@@ -6,12 +6,13 @@ import ScanHub.BE.User;
 import ScanHub.BLL.interfaces.IPasswordEncrypter;
 import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertCaller;
+import ScanHub.GUI.util.AlertTypes;
 import ScanHub.GUI.util.RowMaker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -133,7 +134,13 @@ public class UserFormController implements Initializable {
             if (selectedToggle == null)
                 vboxRole.getStyleClass().add("error-border");
 
-            // TODO add AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("MISSING FIELDS!")
+                    .setContentText("Please fill in all required fields.")
+                    .setType(AlertTypes.ERROR)
+                    .show();
+
             return;
         }
 
@@ -141,7 +148,12 @@ public class UserFormController implements Initializable {
             passwordField.getStyleClass().add("error-border");
             confirmPasswordField.getStyleClass().add("error-border");
 
-            // TODO add AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("Password Mismatch!")
+                    .setContentText("Make sure the passwords match in the password fields.")
+                    .setType(AlertTypes.ERROR)
+                    .show();
             return;
         }
 
@@ -153,8 +165,12 @@ public class UserFormController implements Initializable {
             modelFacade.userModel.createUser(newUser);
             currentStage.close();
         } catch (Exception e) {
-            // TODO add the AlertView
-            throw new RuntimeException(e);
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("Could not create user")
+                    .setContentText("Unable to create user due to " + e.getMessage())
+                    .setType(AlertTypes.ERROR)
+                    .show();
         }
     }
 
@@ -173,7 +189,12 @@ public class UserFormController implements Initializable {
             if (selectedToggle == null)
                 vboxRole.getStyleClass().add("error-border");
 
-            // TODO add AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("MISSING FIELDS!")
+                    .setContentText("Please fill in all required fields.")
+                    .setType(AlertTypes.ERROR)
+                    .show();
             return;
         }
 
@@ -181,7 +202,12 @@ public class UserFormController implements Initializable {
             passwordField.getStyleClass().add("error-border");
             confirmPasswordField.getStyleClass().add("error-border");
 
-            // TODO add AlertView
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("Password Mismatch!")
+                    .setContentText("Make sure the passwords match in the password fields.")
+                    .setType(AlertTypes.ERROR)
+                    .show();
             return;
         }
 
@@ -197,8 +223,12 @@ public class UserFormController implements Initializable {
             modelFacade.userModel.updateUser(editingUser);
             currentStage.close();
         } catch (Exception e) {
-            // TODO add AlertView
-            throw new RuntimeException(e);
+            AlertCaller.alert()
+                    .setTitle("ERROR")
+                    .setHeaderText("Could not update user")
+                    .setContentText("Unable to update user due to " + e.getMessage())
+                    .setType(AlertTypes.ERROR)
+                    .show();
         }
     }
 

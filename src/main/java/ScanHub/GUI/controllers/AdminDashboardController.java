@@ -6,6 +6,7 @@ import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.RowMaker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -16,6 +17,8 @@ public class AdminDashboardController implements Initializable {
 
     @FXML private VBox userTableBox;
     @FXML private VBox profileTableBox;
+    @FXML private VBox statsBox;
+    @FXML private HBox logBox;
 
     private ModelFacade modelFacade;
 
@@ -40,5 +43,10 @@ public class AdminDashboardController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        statsBox.setVisible(false);
+        statsBox.setManaged(false);
+        logBox.setManaged(false);
+        logBox.setVisible(false);
     }
 }
