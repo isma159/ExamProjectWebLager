@@ -48,43 +48,6 @@ public class RowMaker {
      */
     public static HBox addUserRow(User user, BiConsumer<User, HBox> onSelect) {
 
-        // Avatar
-        Label avatarLabel = new Label("JD");
-        avatarLabel.getStyleClass().add("lbl");
-        avatarLabel.setTextFill(javafx.scene.paint.Color.WHITE);
-        avatarLabel.setPrefHeight(30);
-        avatarLabel.setPrefWidth(30);
-        avatarLabel.setAlignment(Pos.CENTER);
-
-        Pane avatar = new Pane(avatarLabel);
-        avatar.getStyleClass().add("avatar-initial");
-        avatar.setPrefHeight(30);
-        avatar.setPrefWidth(30);
-        avatar.setMaxHeight(Pane.USE_PREF_SIZE);
-        avatar.setMaxWidth(Pane.USE_PREF_SIZE);
-        avatar.setMinHeight(Pane.USE_PREF_SIZE);
-        avatar.setMinWidth(Pane.USE_PREF_SIZE);
-        HBox.setHgrow(avatar, Priority.NEVER);
-
-        Region avatarSpacing = new Region();
-        avatarSpacing.setPrefWidth(9);
-        avatarSpacing.setPrefHeight(200);
-        HBox.setHgrow(avatarSpacing, Priority.NEVER);
-
-        Label nameLabel = new Label("John Doe");
-        nameLabel.getStyleClass().add("lbl");
-
-        HBox nameBox = new HBox(avatar, avatarSpacing, nameLabel);
-        nameBox.setAlignment(Pos.CENTER);
-        nameBox.setPrefWidth(210);
-        nameBox.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(nameBox, Priority.ALWAYS);
-
-        /* Separator 1
-        Separator sep1 = new Separator(Orientation.VERTICAL);
-        sep1.setPrefHeight(30);
-        sep1.setMaxHeight(Separator.USE_PREF_SIZE);*/
-
         // Username
         Label usernameLabel = new Label(user.getUsername());
         usernameLabel.getStyleClass().add("lbl");
@@ -97,14 +60,6 @@ public class RowMaker {
         Separator sep2 = new Separator(Orientation.VERTICAL);
         sep2.setPrefHeight(30);
         sep2.setMaxHeight(Separator.USE_PREF_SIZE);*/
-
-        // Email
-        Label emailLabel = new Label("johndoe123@email.com");
-        emailLabel.getStyleClass().add("lbl");
-        emailLabel.setAlignment(Pos.CENTER);
-        emailLabel.setPrefWidth(210);
-        emailLabel.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(emailLabel, Priority.ALWAYS);
 
         /* Separator 3
         Separator sep3 = new Separator(Orientation.VERTICAL);
@@ -121,7 +76,7 @@ public class RowMaker {
         HBox.setHgrow(roleBox, Priority.ALWAYS);
 
         // Main row
-        HBox row = new HBox(nameBox, usernameLabel, emailLabel, roleBox);
+        HBox row = new HBox(usernameLabel, roleBox);
         row.getStyleClass().add("box-card");
         row.getStyleClass().add("user-row");
         row.setAlignment(Pos.CENTER_LEFT);
