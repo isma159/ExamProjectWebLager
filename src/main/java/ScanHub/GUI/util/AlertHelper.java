@@ -25,6 +25,7 @@ public class AlertHelper {
             stage.setTitle(title);
             stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);
+            stage.setResizable(false);
 
             controller.setStage(stage);
             controller.setHeaderText(header);
