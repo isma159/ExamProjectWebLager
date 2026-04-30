@@ -1,105 +1,307 @@
-.background {
+/* ---------- Dark Surfaces ---------- */
+.dark .background {
     -fx-background-color: #465160;
 }
 
-/* ---------- Dark Surfaces ---------- */
+.dark .card-bg {
+    -fx-background-color: #2d3d4f;
+}
 
-.surface-bg {
+.dark .second-card-bg {
     -fx-background-color: #354556;
 }
 
-.card-bg {
-    -fx-background-color: #2d3d4f;
-}
-
-.card-content-bg {
-    -fx-background-color: #2d3d4f;
-}
-
-.card {
+.dark .card {
     -fx-border-color: #2B3B4C;
+    -fx-border-radius: 10px;
+    -fx-border-width: 2;
+}
+
+.dark .box-card {
+    -fx-border-color: #2B3B4C;
+    -fx-border-width: 2;
+    -fx-border-insets: -2 -2 0 -2;
+}
+
+.dark .half-card {
+    -fx-border-color: #2B3B4C;
+    -fx-border-radius: 10 10 0 0;
+    -fx-border-width: 2 2 0 2;
+    -fx-border-insets: -2;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.dark .half-card-bottom {
+    -fx-border-color: #2B3B4C;
+    -fx-border-radius: 0 0 10 10;
+    -fx-border-width: 0 2 2 2;
+    -fx-border-insets: -2;
+    -fx-background-radius: 0 0 10 10;
+}
+
+.dark .v-card {
+    -fx-border-color: #2B3B4C;
+    -fx-border-width: 0 2 0 2;
+    -fx-border-insets: -2;
+}
+
+.dark .shadow {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 12, 0, 0, 2);
+}
+
+/* ---------- Dark Text ---------- */
+.dark .lbl {
+    -fx-text-fill: #ffffff;
+}
+
+.dark .h1 {
+    -fx-text-fill: #ffffff;
+}
+
+.dark .h2 {
+    -fx-text-fill: #ffffff;
+}
+
+.dark .h3 {
+    -fx-text-fill: #ffffff;
 }
 
 /* ---------- Dark Navigation ---------- */
-
-.primary-navigation-bg {
+.dark .primary-navigation-bg {
     -fx-background-color: #0094EA;
 }
 
-.primary-navigation-btn {
-    -fx-background-color: #33A9EE;
+.dark .primary-navigation-btn {
+    -fx-background-color: TRANSPARENT;
 }
 
-.secondary-navigation-bg {
+.dark .primary-navigation-btn:selected {
+    -fx-background-color: #33A9EE;
+    -fx-text-fill: #ffffff;
+}
+
+.dark .secondary-navigation-bg {
     -fx-background-color: #2d3d4f;
 }
 
-.secondary-navigation-btn {
+.dark .secondary-navigation-btn {
     -fx-background-color: #008FF7;
 }
 
 /* ---------- Dark Inputs ---------- */
-
-.container {
+.dark .container {
     -fx-border-color: #2B3B4C;
     -fx-background-color: #465160;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
 }
 
-.container.focused {
+.dark .container .text-field {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: TRANSPARENT;
+}
+
+.dark .container.focused {
     -fx-border-color: #008FF7;
 }
 
+.dark .container.error-border {
+    -fx-border-color: #FF3D32;
+}
+
+.dark .container.success-border {
+    -fx-border-color: #4CD07D;
+}
+
 /* ---------- Dark Buttons ---------- */
-
-.primary-btn {
+.dark .primary-btn {
     -fx-background-color: #008FF7;
-}
-
-.primary-btn:hover {
-    -fx-background-color: #0094EA;
-}
-
-.secondary-btn {
-    -fx-background-color: #697489;
-}
-
-.secondary-btn:hover {
-    -fx-background-color: #2B3B4C;
-}
-
-.tertiary-btn {
-    -fx-background-color: #4B5563;
     -fx-text-fill: #ffffff;
 }
 
-/* ---------- Dark State & Feedback ---------- */
+.dark .primary-btn:hover {
+    -fx-background-color: #0094EA;
+}
 
-.surface-hover {
+.dark .primary-btn:focused {
+    -fx-border-color: #33A9EE;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+}
+
+.dark .secondary-btn {
+    -fx-background-color: #697489;
+    -fx-text-fill: #ffffff;
+}
+
+.dark .secondary-btn:hover {
+    -fx-background-color: #354556;
+    -fx-text-fill: #ffffff;
+}
+
+.dark .tertiary-btn {
+    -fx-background-color: #4B5563;
+    -fx-border-color: #2B3B4C;
+    -fx-text-fill: #ffffff;
+}
+
+.dark .tertiary-btn:hover {
     -fx-background-color: #2B3B4C;
 }
 
-.separator .line {
-    -fx-border-color: #2B3B4C;
+.dark .destructive-btn {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: #ffffff;
 }
 
-/* ---------- Dark Toggle / Switch ---------- */
+.dark .clear-btn {
+    -fx-background-color: TRANSPARENT;
+}
 
-.toggle-button:selected {
+.dark .clear-btn:focused {
+    -fx-border-color: #008FF7;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+}
+
+/* ---------- Dark Filter Buttons ---------- */
+.dark .filter-btn {
+    -fx-background-color: TRANSPARENT;
+}
+
+.dark .filter-btn:hover {
+    -fx-background-color: #2B3B4C;
+}
+
+.dark .filter-btn:selected {
+    -fx-border-color: #008FF7;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-insets: 2;
+}
+
+/* ---------- Dark State & Feedback ---------- */
+.dark .user-row:hover {
+    -fx-background-color: #2B3B4C;
+}
+
+.dark .user-row.row-selected {
+    -fx-background-color: #354556;
+}
+
+/* ---------- Dark Separators ---------- */
+.dark .separator .line {
+    -fx-border-color: #2B3B4C;
+    -fx-border-width: 0.8;
+}
+
+/* ---------- Dark Scroll ---------- */
+.dark .scroll-pane {
+    -fx-background-color: #354556;
+}
+
+.dark .scroll-pane .viewport {
+    -fx-background-color: TRANSPARENT;
+}
+
+.dark .scroll-pane .scroll-bar {
+    -fx-background-color: TRANSPARENT;
+}
+
+.dark .scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #2B3B4C;
+}
+
+/* ---------- Dark Chip ---------- */
+.dark .chip {
+    -fx-background-color: #354556;
+    -fx-background-radius: 3px;
+}
+
+.dark .chip-color {
     -fx-background-color: #008FF7;
+}
+
+.dark .chip-color-success {
+    -fx-background-color: #4CD07D;
+}
+
+.dark .chip-color-error {
+    -fx-background-color: #FF3D32;
 }
 
 /* ---------- Dark Avatar ---------- */
-
-.avatar-initial {
+.dark .avatar-initial {
     -fx-background-color: #008FF7;
+    -fx-background-radius: 6px;
 }
 
 /* ---------- Dark Pagination ---------- */
-
-.pagination-btn {
+.dark .pagination .number-button,
+.dark .pagination .left-arrow-button,
+.dark .pagination .right-arrow-button {
+    -fx-background-color: TRANSPARENT;
     -fx-border-color: #2B3B4C;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+
+    -fx-text-fill: #ffffff;
 }
 
-.pagination-btn-active {
+.dark .pagination .left-arrow-button {
+    -fx-background-image: url("../images/icons/angle-left-white.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 33px 33px;
+    -fx-background-color: TRANSPARENT;
+}
+
+.dark .pagination .right-arrow-button {
+    -fx-background-image: url("../images/icons/angle-right-white.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 33px 33px;
+    -fx-background-color: TRANSPARENT;
+}
+/* ---------- Dark Checkbox ---------- */
+.dark .check-box .box {
+    -fx-background-color: TRANSPARENT;
+    -fx-border-color: #2B3B4C;
+    -fx-border-width: 2;
+    -fx-border-radius: 3px;
+}
+
+.dark .check-box:selected .box {
+    -fx-background-color: #4CD07D;
+}
+
+.dark .check-box:selected .mark {
+    -fx-background-color: #ffffff;
+}
+
+/* ---------- Dark Radio Button ---------- */
+.dark .radio-button .radio {
+    -fx-background-color: TRANSPARENT;
+    -fx-border-color: #2B3B4C;
+    -fx-border-width: 2;
+    -fx-border-radius: 20px;
+}
+
+/* ---------- Dark Toggle Switch ---------- */
+.dark .toggle-switch .thumb-area {
+    -fx-background-color: #697489;
+    -fx-background-radius: 50px;
+}
+
+.dark .toggle-switch:selected .thumb-area {
     -fx-background-color: #008FF7;
+}
+
+.dark .toggle-switch .label {
+    -fx-text-fill: #ffffff;
+}
+
+
+.dark .toggle-switch .thumb {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 50px;
 }

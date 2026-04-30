@@ -101,6 +101,7 @@ public class LoginController implements Initializable {
 
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(view));
             Scene scene = new Scene(fxmlLoader.load());
+            scene.getRoot().getStyleClass().add("dark");
 
             Stage stage = new Stage();
             stage.setMinWidth(1200);

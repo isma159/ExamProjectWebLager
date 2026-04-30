@@ -120,13 +120,14 @@ public class AdminProfilesController implements Initializable {
             Scene scene = new Scene(loader.load());
             Stage stage = new Stage();
 
-            ProfileFormController controller = loader.getController();
-            controller.setModel(stage, modelFacade, profile);
-
             stage.setTitle(profile == null ? "Create Profile" : "Edit Profile");
             stage.setScene(scene);
             stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
+
+            ProfileFormController controller = loader.getController();
+            controller.setModel(stage, modelFacade, profile);
+
             stage.showAndWait();
 
             // refresh the list after the form closes

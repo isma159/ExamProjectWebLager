@@ -3,6 +3,7 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.Profile;
 import ScanHub.BE.Role;
 import ScanHub.BE.User;
+import ScanHub.BLL.ThemeManager;
 import ScanHub.BLL.interfaces.IPasswordEncrypter;
 import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
@@ -62,6 +63,7 @@ public class UserFormController implements Initializable {
             populateFields(editingUser);
         }
 
+        ThemeManager.apply(currentStage.getScene());
         loadProfiles();
     }
 
