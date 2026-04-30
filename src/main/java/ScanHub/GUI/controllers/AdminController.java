@@ -24,7 +24,6 @@ public class AdminController implements Initializable {
     @FXML private StackPane contentArea;
     @FXML private ToggleGroup sidebarBtns;
     @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, settingsBtn, shortcutsBtn;
-    @FXML private HBox analyticsBox, metadataBox, systemBox, logBox, settingsBox, shortcutBox;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -53,17 +52,6 @@ public class AdminController implements Initializable {
                 loadPage("/views/AdminProfilesView.fxml");
             }
         });
-
-        analyticsBox.setVisible(false);
-        analyticsBox.setManaged(false);
-        metadataBox.setVisible(false);
-        metadataBox.setManaged(false);
-        logBox.setVisible(false);
-        logBox.setManaged(false);
-        settingsBox.setManaged(false);
-        settingsBox.setVisible(false);
-        shortcutBox.setVisible(false);
-        shortcutBox.setManaged(false);
 
     }
 
@@ -110,12 +98,7 @@ public class AdminController implements Initializable {
 
             currentStage.close();
         } catch (Exception e) {
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Logout Failed")
-                    .setContentText("Unexpected error due to " + e.getMessage() + ". Try again.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
+            e.printStackTrace();
         }
     }
 }

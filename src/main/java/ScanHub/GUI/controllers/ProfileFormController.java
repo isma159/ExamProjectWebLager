@@ -107,13 +107,6 @@ public class ProfileFormController implements Initializable {
             if (selectedStatusToggle == null) {
                 vboxStatus.getStyleClass().add("error-border");
             }
-
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("MISSING FIELDS!")
-                    .setContentText("Please fill in all required fields.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
             return;
         }
 
@@ -125,12 +118,6 @@ public class ProfileFormController implements Initializable {
             modelFacade.profileModel.createProfile(newProfile);
             currentStage.close();
         } catch (Exception e) {
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Could not create profile")
-                    .setContentText("Unable to create profile due to " + e.getMessage())
-                    .setType(AlertTypes.ERROR)
-                    .show();
             throw new RuntimeException(e);
         }
     }
@@ -156,13 +143,6 @@ public class ProfileFormController implements Initializable {
             if (selectedStatusToggle == null) {
                 vboxStatus.getStyleClass().add("error-border");
             }
-
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("MISSING FIELDS!")
-                    .setContentText("Please fill in all required fields.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
             return;
         }
 
@@ -180,12 +160,6 @@ public class ProfileFormController implements Initializable {
             currentStage.close();
         }
         catch (Exception e) {
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Could not update profile")
-                    .setContentText("Unable to update profile due to " + e.getMessage())
-                    .setType(AlertTypes.ERROR)
-                    .show();
             e.printStackTrace();
         }
 

@@ -134,26 +134,12 @@ public class UserFormController implements Initializable {
             if (selectedToggle == null)
                 vboxRole.getStyleClass().add("error-border");
 
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("MISSING FIELDS!")
-                    .setContentText("Please fill in all required fields.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
-
             return;
         }
 
         if (!password.equals(passwordConfirm) || !passwordConfirm.equals(password)) {
             passwordField.getStyleClass().add("error-border");
             confirmPasswordField.getStyleClass().add("error-border");
-
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Password Mismatch!")
-                    .setContentText("Make sure the passwords match in the password fields.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
             return;
         }
 
@@ -165,12 +151,7 @@ public class UserFormController implements Initializable {
             modelFacade.userModel.createUser(newUser);
             currentStage.close();
         } catch (Exception e) {
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Could not create user")
-                    .setContentText("Unable to create user due to " + e.getMessage())
-                    .setType(AlertTypes.ERROR)
-                    .show();
+            e.printStackTrace();
         }
     }
 
@@ -189,12 +170,6 @@ public class UserFormController implements Initializable {
             if (selectedToggle == null)
                 vboxRole.getStyleClass().add("error-border");
 
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("MISSING FIELDS!")
-                    .setContentText("Please fill in all required fields.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
             return;
         }
 
@@ -202,12 +177,6 @@ public class UserFormController implements Initializable {
             passwordField.getStyleClass().add("error-border");
             confirmPasswordField.getStyleClass().add("error-border");
 
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Password Mismatch!")
-                    .setContentText("Make sure the passwords match in the password fields.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
             return;
         }
 
@@ -223,12 +192,7 @@ public class UserFormController implements Initializable {
             modelFacade.userModel.updateUser(editingUser);
             currentStage.close();
         } catch (Exception e) {
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Could not update user")
-                    .setContentText("Unable to update user due to " + e.getMessage())
-                    .setType(AlertTypes.ERROR)
-                    .show();
+            e.printStackTrace();
         }
     }
 

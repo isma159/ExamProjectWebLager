@@ -87,12 +87,8 @@
                               <String fx:value="box-card" />
                            </styleClass>
                            <children>
-                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Full Name" HBox.hgrow="ALWAYS" />
-                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
                               <Label alignment="CENTER" layoutX="40.0" layoutY="17.0" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Username" HBox.hgrow="ALWAYS" />
                               <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
-                              <Label alignment="CENTER" layoutX="524.0" layoutY="17.0" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Email" HBox.hgrow="ALWAYS" />
-                              <Separator layoutX="933.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
                               <Label alignment="CENTER" layoutX="958.0" layoutY="17.0" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Role" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>

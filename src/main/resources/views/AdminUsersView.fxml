@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
    <children>
       <VBox prefHeight="200.0" prefWidth="1800.0">
          <children>
@@ -104,12 +104,8 @@
                         <String fx:value="box-card" />
                      </styleClass>
                      <children>
-                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Full Name" HBox.hgrow="ALWAYS" />
-                        <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
                         <Label alignment="CENTER" layoutX="40.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onUsernameClick" onMouseClicked="#onUsernameClick" prefWidth="210.0" styleClass="lbl" text="Username" HBox.hgrow="ALWAYS" />
                         <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
-                        <Label alignment="CENTER" layoutX="524.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Email" HBox.hgrow="ALWAYS" />
-                        <Separator layoutX="933.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
                         <Label alignment="CENTER" layoutX="958.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Role" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>

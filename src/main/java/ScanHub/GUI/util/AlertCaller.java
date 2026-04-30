@@ -9,8 +9,22 @@ import javafx.stage.Stage;
 
 public class AlertCaller {
 
-    public static AlertBuilder alert() {
-        return new AlertBuilder();
+    public static AlertBuilder showError(String title, String message) {
+
+        return new AlertBuilder().setType(AlertTypes.ERROR)
+                .setHeaderText(title)
+                .setContentText(message)
+                .setTitle(title);
+
+    }
+
+    public static AlertBuilder showWarning(String title, String message) {
+
+        return new AlertBuilder().setType(AlertTypes.ERROR)
+                .setHeaderText(title)
+                .setContentText(message)
+                .setTitle(title);
+
     }
 
 }

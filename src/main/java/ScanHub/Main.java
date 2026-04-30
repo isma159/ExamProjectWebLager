@@ -35,12 +35,7 @@ public class Main extends Application{
             stage.setScene(scene);
             stage.show();
         } catch (Exception e) {
-            AlertCaller.alert()
-                    .setTitle("ERROR")
-                    .setHeaderText("Application launch failed")
-                    .setContentText("Unexpected error due to " + e.getMessage() + ". Try Again.")
-                    .setType(AlertTypes.ERROR)
-                    .show();
+            e.printStackTrace();
         }
     }
 }
