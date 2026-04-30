@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminDashboardController">
+<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminDashboardController">
    <children>
       <VBox prefHeight="200.0" prefWidth="1550.0">
          <children>
@@ -72,13 +72,25 @@
                            </styleClass>
                            <children>
                               <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" selected="true" styleClass="filter-btn" text="All Users">
+                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" selected="true" text="All Users">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="userFilter" />
                                  </toggleGroup>
+                                 <styleClass>
+                                    <String fx:value="filter-btn" />
+                                    <String fx:value="lbl" />
+                                 </styleClass>
                               </ToggleButton>
-                              <ToggleButton layoutX="25.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Admins" toggleGroup="$userFilter" />
-                              <ToggleButton layoutX="100.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Users" toggleGroup="$userFilter" />
+                              <ToggleButton layoutX="25.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Admins" toggleGroup="$userFilter">
+                                 <styleClass>
+                                    <String fx:value="filter-btn" />
+                                    <String fx:value="lbl" />
+                                 </styleClass></ToggleButton>
+                              <ToggleButton layoutX="100.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Users" toggleGroup="$userFilter">
+                                 <styleClass>
+                                    <String fx:value="filter-btn" />
+                                    <String fx:value="lbl" />
+                                 </styleClass></ToggleButton>
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
@@ -103,7 +115,7 @@
                               <String fx:value="card-bg" />
                            </styleClass>
                            <children>
-                              <Pagination maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" />
+                              <Pagination maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" styleClass="lbl" />
                            </children>
                         </HBox>
                      </children>
@@ -128,13 +140,25 @@
                            </styleClass>
                            <children>
                               <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" selected="true" styleClass="filter-btn" text="All Profiles">
+                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" selected="true" text="All Profiles">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="profileFilter" />
                                  </toggleGroup>
+                                 <styleClass>
+                                    <String fx:value="filter-btn" />
+                                    <String fx:value="lbl" />
+                                 </styleClass>
                               </ToggleButton>
-                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" styleClass="filter-btn" text="Active" toggleGroup="$profileFilter" />
-                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" styleClass="filter-btn" text="Inactive" toggleGroup="$profileFilter" />
+                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Active" toggleGroup="$profileFilter">
+                                 <styleClass>
+                                    <String fx:value="filter-btn" />
+                                    <String fx:value="lbl" />
+                                 </styleClass></ToggleButton>
+                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Inactive" toggleGroup="$profileFilter">
+                                 <styleClass>
+                                    <String fx:value="filter-btn" />
+                                    <String fx:value="lbl" />
+                                 </styleClass></ToggleButton>
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
