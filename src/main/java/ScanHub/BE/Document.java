@@ -8,7 +8,6 @@ public class Document {
 
     private int documentId;
     private int boxId;
-    private Status status; // "IN_PROGRESS", "PENDING_QA", "QA_COMPLETED"
     private LocalDateTime createdAt;
     private List<File> files;
 
@@ -16,10 +15,9 @@ public class Document {
         this.files = new ArrayList<>();
     }
 
-    public Document(int documentId, int boxId, Status status, LocalDateTime createdAt) {
+    public Document(int documentId, int boxId, LocalDateTime createdAt) {
         this.documentId = documentId;
         this.boxId = boxId;
-        this.status = status;
         this.createdAt = createdAt;
         this.files = new ArrayList<>();
     }
@@ -29,9 +27,6 @@ public class Document {
     }
     public int getBoxId() {
         return boxId;
-    }
-    public Status getStatus() {
-        return status;
     }
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -45,9 +40,6 @@ public class Document {
     }
     public void setBoxId(int boxId) {
         this.boxId = boxId;
-    }
-    public void setStatus(Status status) {
-        this.status = status;
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;

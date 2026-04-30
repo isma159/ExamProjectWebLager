@@ -2,6 +2,7 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.BE.*;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertHelper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -54,20 +55,15 @@ public class ProfileFormController implements Initializable {
         }
 
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
-
             String result = newValue.replace(" ", "");
-
             exportPreviewLabel.setText(result + "_24");
-
         }));
-
     }
 
     /**
      * Pre-fills input fields when editing an existing Profile.
      */
     private void populateFields(Profile profile) {
-
         profileNameField.setText(profile.getProfileName());
 
         if (profile.getSplitBehavior() == SplitBehavior.BARCODE) { radioBARCODE.fire(); }
@@ -76,7 +72,6 @@ public class ProfileFormController implements Initializable {
 
         if (profile.getStatus() == ProfileStatus.Active) { radioACTIVE.fire(); }
         else radioINACTIVE.fire();
-
     }
 
     @FXML
@@ -89,13 +84,13 @@ public class ProfileFormController implements Initializable {
     }
 
     private void createProfile() {
-
         String profileName = profileNameField.getText();
         Toggle selectedSplitBehaviorToggle = toggleGroupSplitBehavior.getSelectedToggle();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
 
-        if (profileName.isBlank() || selectedSplitBehaviorToggle == null || selectedStatusToggle == null) {
+        clearError();
 
+        if (profileName.isBlank() || selectedSplitBehaviorToggle == null || selectedStatusToggle == null) {
             if (profileName.isBlank()) {
                 profileNameField.getStyleClass().add("error-border");
             }
@@ -105,8 +100,7 @@ public class ProfileFormController implements Initializable {
             if (selectedStatusToggle == null) {
                 vboxStatus.getStyleClass().add("error-border");
             }
-
-            // TODO add AlertView
+            AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
             return;
         }
 
@@ -118,8 +112,8 @@ public class ProfileFormController implements Initializable {
             modelFacade.profileModel.createProfile(newProfile);
             currentStage.close();
         } catch (Exception e) {
-            // TODO add the AlertView
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            AlertHelper.showError("Create Failed", "Failed to create profile. Please try again.");
         }
     }
 
@@ -127,14 +121,11 @@ public class ProfileFormController implements Initializable {
         String newProfileName = profileNameField.getText();
         Toggle selectedSplitToggle = toggleGroupSplitBehavior.getSelectedToggle();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
-        SplitBehavior newSplitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
-        ProfileStatus newStatus = (ProfileStatus) selectedStatusToggle.getUserData();
         String newExportLabel = exportPreviewLabel.getText();
 
         clearError();
 
         if (newProfileName.isBlank() || selectedSplitToggle == null || selectedStatusToggle == null) {
-
             if (newProfileName.isBlank()) {
                 profileNameField.getStyleClass().add("error-border");
             }
@@ -144,13 +135,12 @@ public class ProfileFormController implements Initializable {
             if (selectedStatusToggle == null) {
                 vboxStatus.getStyleClass().add("error-border");
             }
-
-            // TODO add AlertView
+            AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
             return;
         }
 
-        SplitBehavior splitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
-        ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
+        SplitBehavior newSplitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
+        ProfileStatus newStatus = (ProfileStatus) selectedStatusToggle.getUserData();
 
         editingProfile.setProfileName(newProfileName);
         editingProfile.setSplitBehavior(newSplitBehavior);
@@ -158,15 +148,12 @@ public class ProfileFormController implements Initializable {
         editingProfile.setExportLabel(newExportLabel);
 
         try {
-
             modelFacade.profileModel.updateProfile(editingProfile);
             currentStage.close();
-        }
-        catch (Exception e) {
-            // TODO add AlertView
+        } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Update Failed", "Failed to update profile. Please try again.");
         }
-
     }
 
     private void clearError() {

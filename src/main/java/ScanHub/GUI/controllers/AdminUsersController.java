@@ -3,6 +3,7 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -54,6 +55,7 @@ public class AdminUsersController implements Initializable {
 
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<User> users = modelFacade.userModel.getUsers();
+            currentUsers = new ArrayList<>(users);
             for (User user : users) {
                 HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
                     // clear highlight of previously selected row
@@ -76,6 +78,7 @@ public class AdminUsersController implements Initializable {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Load Error", "Failed to load users.");
         }
     }
 
@@ -86,19 +89,33 @@ public class AdminUsersController implements Initializable {
 
     @FXML
     private void onClickUpdateUser() {
-        if (selectedUser == null) return;
+        if (selectedUser == null) {
+            AlertHelper.showWarning("No Selection", "Please select a user to edit.");
+            return;
+        }
         openUserForm(selectedUser);
     }
 
     @FXML
     private void onClickDeleteUser(MouseEvent mouseEvent) {
-        if (selectedUser == null) return;
-        try {
-            modelFacade.userModel.deleteUser(selectedUser);
-            loadUsers();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (selectedUser == null) {
+            AlertHelper.showWarning("No Selection", "Please select a user to delete.");
+            return;
         }
+
+        AlertHelper.showConfirmation(
+                "Delete User",
+                "Are you sure you want to delete \"" + selectedUser.getUsername() + "\"? This action cannot be undone.",
+                () -> {
+                    try {
+                        modelFacade.userModel.deleteUser(selectedUser);
+                        loadUsers();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertHelper.showError("Delete Failed", "Failed to delete user. Please try again.");
+                    }
+                }
+        );
     }
 
     private void openUserForm(User user) {
@@ -114,9 +131,13 @@ public class AdminUsersController implements Initializable {
             stage.setScene(scene);
             stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.show();
+            stage.showAndWait();
+
+            // Refresh the list after the form closes
+            loadUsers();
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Error", "Failed to open the user form. Please try again.");
         }
     }
 

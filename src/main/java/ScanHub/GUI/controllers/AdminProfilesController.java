@@ -1,14 +1,13 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.Profile;
-import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -31,7 +30,7 @@ public class AdminProfilesController implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {loadProfiles();}
+    public void initialize(URL location, ResourceBundle resources) { loadProfiles(); }
 
     private void loadProfiles() {
         try {
@@ -40,7 +39,7 @@ public class AdminProfilesController implements Initializable {
             selectedProfile = null;
             selectedRow = null;
 
-            // sets up with all users by running a for-loop that makes an interactive HBox of every user
+            // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
             List<Profile> profiles = modelFacade.profileModel.getProfiles();
             for (Profile profile : profiles) {
                 HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
@@ -54,7 +53,7 @@ public class AdminProfilesController implements Initializable {
                         selectedRow = null;
                         return; // will reselect on the next line if not returning
                     }
-                    // select clicked row as selected user (with highlight to show)
+                    // select clicked row as selected profile (with highlight to show)
                     selectedProfile = clickedProfile;
                     selectedRow = rowHBox;
                     rowHBox.getStyleClass().add("row-selected");
@@ -63,6 +62,7 @@ public class AdminProfilesController implements Initializable {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Load Error", "Failed to load profiles.");
         }
     }
 
@@ -73,20 +73,33 @@ public class AdminProfilesController implements Initializable {
 
     @FXML
     private void onClickUpdateProfile() {
-        if (selectedProfile == null) return;
+        if (selectedProfile == null) {
+            AlertHelper.showWarning("No Selection", "Please select a profile to edit.");
+            return;
+        }
         openProfileForm(selectedProfile);
     }
 
     @FXML
     private void onClickDeleteProfile(MouseEvent mouseEvent) {
-        System.out.println("pressed delete");
-        if (selectedProfile == null) return;
-        try {
-            modelFacade.profileModel.deleteProfile(selectedProfile);
-            loadProfiles();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (selectedProfile == null) {
+            AlertHelper.showWarning("No Selection", "Please select a profile to delete.");
+            return;
         }
+
+        AlertHelper.showConfirmation(
+                "Delete Profile",
+                "Are you sure you want to delete the profile \"" + selectedProfile.getProfileName() + "\"? This action cannot be undone.",
+                () -> {
+                    try {
+                        modelFacade.profileModel.deleteProfile(selectedProfile);
+                        loadProfiles();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertHelper.showError("Delete Failed", "Failed to delete profile. Please try again.");
+                    }
+                }
+        );
     }
 
     private void openProfileForm(Profile profile) {
@@ -102,9 +115,13 @@ public class AdminProfilesController implements Initializable {
             stage.setScene(scene);
             stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.show();
+            stage.showAndWait();
+
+            // Refresh the list after the form closes
+            loadProfiles();
         } catch (Exception e) {
             e.printStackTrace();
+            AlertHelper.showError("Error", "Failed to open the profile form. Please try again.");
         }
     }
 }
