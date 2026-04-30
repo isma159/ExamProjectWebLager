@@ -106,6 +106,10 @@ public class UserFormController implements Initializable {
         }
     }
 
+    /**
+     * TODO compare usernames so no identical
+     * TODO minimum username/password length ?
+     */
     private void createUser() {
         String username = usernameField.getText();
         String password = passwordField.getText();
@@ -148,6 +152,9 @@ public class UserFormController implements Initializable {
         }
     }
 
+    /**
+     * TODO find out if a user should be be able to be updated to admin and vice versa
+     */
     private void updateUser() {
         String newUsername = usernameField.getText();
         String newPassword = passwordField.getText();

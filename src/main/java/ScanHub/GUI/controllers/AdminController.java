@@ -1,7 +1,5 @@
 package ScanHub.GUI.controllers;
 
-import ScanHub.BE.Profile;
-import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.Main;
@@ -14,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -84,10 +81,7 @@ public class AdminController implements Initializable {
     }
 
     public void onClickLogOut(ActionEvent actionEvent) {
-        AlertHelper.showConfirmation(
-                "Log Out",
-                "Are you sure you want to log out?",
-                () -> {
+        AlertHelper.showConfirmation("Log Out", "Are you sure you want to log out?", () -> {
                     try {
                         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
                         Scene scene = new Scene(fxmlLoader.load());

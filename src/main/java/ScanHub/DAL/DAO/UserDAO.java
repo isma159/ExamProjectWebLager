@@ -120,7 +120,7 @@ public class UserDAO implements IDataAccess<User> {
 
                     profiles.add(new Profile(rs2.getInt("profileId"),
                             rs2.getString("profileName"),
-                            SplitBehavior.valueOf(rs2.getString("splitBehaviour")),
+                            SplitBehavior.valueOf(rs2.getString("splitBehavior")),
                             ProfileStatus.valueOf(rs2.getString("status")),
                             rs2.getString("exportLabel")));
                 }

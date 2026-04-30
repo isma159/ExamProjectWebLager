@@ -56,7 +56,7 @@ public class ProfileFormController implements Initializable {
 
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
             String result = newValue.replace(" ", "");
-            exportPreviewLabel.setText(result + "_24");
+            exportPreviewLabel.setText(result + "_1");
         }));
     }
 
@@ -108,7 +108,7 @@ public class ProfileFormController implements Initializable {
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
 
         try {
-            Profile newProfile = new Profile(profileName, splitBehavior, status, exportPreviewLabel.getText());
+            Profile newProfile = new Profile(profileName, splitBehavior, status, exportPreviewLabel.getText().replace("1", ""));
             modelFacade.profileModel.createProfile(newProfile);
             currentStage.close();
         } catch (Exception e) {
@@ -121,7 +121,9 @@ public class ProfileFormController implements Initializable {
         String newProfileName = profileNameField.getText();
         Toggle selectedSplitToggle = toggleGroupSplitBehavior.getSelectedToggle();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
-        String newExportLabel = exportPreviewLabel.getText();
+        SplitBehavior newSplitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
+        ProfileStatus newStatus = (ProfileStatus) selectedStatusToggle.getUserData();
+        String newExportLabel = exportPreviewLabel.getText().replace("1", "");
 
         clearError();
 
@@ -139,8 +141,8 @@ public class ProfileFormController implements Initializable {
             return;
         }
 
-        SplitBehavior newSplitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
-        ProfileStatus newStatus = (ProfileStatus) selectedStatusToggle.getUserData();
+        SplitBehavior splitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
+        ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
 
         editingProfile.setProfileName(newProfileName);
         editingProfile.setSplitBehavior(newSplitBehavior);

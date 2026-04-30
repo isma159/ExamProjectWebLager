@@ -177,6 +177,42 @@
 
 }
 
+.destructive-btn {
+
+    -fx-text-fill: #ffffff;
+
+    -fx-background-color: #EF4444;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+}
+
+.tertiary-btn {
+
+    -fx-text-fill: #2d3d4f;
+
+    -fx-background-color: #f9f9f9;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+    -fx-border-color: #E2E4E8;
+
+}
+
+.tertiary-btn:hover {
+
+    -fx-background-color: #F1F5F9;
+
+}
+
+.destructive-btn:hover {
+
+
+
+}
+
 .primary-btn:hover {
 
     -fx-background-color: #1C252F;

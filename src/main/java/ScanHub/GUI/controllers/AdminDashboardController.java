@@ -7,6 +7,7 @@ import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -17,6 +18,8 @@ public class AdminDashboardController implements Initializable {
 
     @FXML private VBox userTableBox;
     @FXML private VBox profileTableBox;
+    @FXML private VBox statsBox;
+    @FXML private HBox logBox;
 
     private ModelFacade modelFacade;
 
@@ -42,5 +45,10 @@ public class AdminDashboardController implements Initializable {
             e.printStackTrace();
             AlertHelper.showError("Load Error", "Failed to load dashboard data.");
         }
+
+        statsBox.setVisible(false);
+        statsBox.setManaged(false);
+        logBox.setManaged(false);
+        logBox.setVisible(false);
     }
 }

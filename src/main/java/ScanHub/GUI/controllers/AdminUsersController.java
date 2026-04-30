@@ -56,7 +56,7 @@ public class AdminUsersController implements Initializable {
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<User> users = modelFacade.userModel.getUsers();
             currentUsers = new ArrayList<>(users);
-            for (User user : users) {
+            for (User user : currentUsers) {
                 HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
                     // clear highlight of previously selected row
                     if (selectedRow != null) {
@@ -133,7 +133,7 @@ public class AdminUsersController implements Initializable {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
 
-            // Refresh the list after the form closes
+            // refresh the list after the form closes
             loadUsers();
         } catch (Exception e) {
             e.printStackTrace();
@@ -159,17 +159,20 @@ public class AdminUsersController implements Initializable {
         }
     }
 
-    public void onTbAllUsersClick(ActionEvent actionEvent) {
+    @FXML
+    private void onTbAllUsersClick(ActionEvent actionEvent) {
         selectedRole = null;
         filterUsers(txtFldUserSearch.getText());
     }
 
-    public void onTbAdminsClick(ActionEvent actionEvent) {
+    @FXML
+    private void onTbAdminsClick(ActionEvent actionEvent) {
         selectedRole = Role.ADMIN;
         filterUsers(txtFldUserSearch.getText());
     }
 
-    public void onTbUsersClick(ActionEvent actionEvent) {
+    @FXML
+    private void onTbUsersClick(ActionEvent actionEvent) {
         selectedRole = Role.USER;
         filterUsers(txtFldUserSearch.getText());
     }

@@ -17,7 +17,7 @@
          <children>
             <HBox maxHeight="-Infinity" prefHeight="600.0" prefWidth="1550.0">
                <children>
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="210.0">
+                  <VBox fx:id="statsBox" alignment="CENTER" prefHeight="200.0" prefWidth="210.0">
                      <children>
                         <VBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="120.0" prefWidth="150.0">
                            <styleClass>
@@ -175,7 +175,7 @@
                </children>
             </HBox>
             <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" prefWidth="200.0" />
-            <HBox alignment="CENTER" maxHeight="-Infinity" prefHeight="600.0" prefWidth="1550.0">
+            <HBox fx:id="logBox" alignment="CENTER" maxHeight="-Infinity" prefHeight="600.0" prefWidth="1550.0">
                <children>
                   <VBox prefHeight="1200.0" prefWidth="1550.0" styleClass="shadow">
                      <children>
