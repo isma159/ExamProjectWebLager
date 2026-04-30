@@ -27,7 +27,7 @@
                      <children>
                         <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                         <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="60.0" styleClass="h2" text="Users" />
-                        <TextField fx:id="txtFldUserSearch" minWidth="-Infinity" prefWidth="150.0" />
+                        <TextField fx:id="txtFldUserSearch" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for specific user" styleClass="container" />
                         <Region prefHeight="56.0" prefWidth="1482.0" HBox.hgrow="ALWAYS" />
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                            <children>
