@@ -2,14 +2,14 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
-import ScanHub.Main;
+import ScanHub.GUI.util.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
@@ -20,7 +20,7 @@ import org.controlsfx.control.ToggleSwitch;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AdminController implements Initializable {
+public class AdminController implements IViewController, Initializable {
 
     @FXML private StackPane contentArea;
     @FXML private ToggleGroup sidebarBtns;
@@ -85,28 +85,19 @@ public class AdminController implements Initializable {
         }
     }
 
-    public void onClickLogOut(ActionEvent actionEvent) {
+    @FXML
+    private void onClickLogOut(ActionEvent actionEvent) {
         AlertHelper.showConfirmation("Log Out", "Are you sure you want to log out?", () -> {
-                    try {
-                        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
-                        Scene scene = new Scene(fxmlLoader.load());
-                        Stage stage = new Stage();
-
-                        LoginController loginController = fxmlLoader.getController();
-                        loginController.setModel(modelFacade, stage);
-
-                        stage.setResizable(false);
-                        stage.setTitle("Login");
-                        stage.setScene(scene);
-                        stage.show();
-
-                        currentStage.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        AlertHelper.showError("Logout Error", "Failed to log out. Please try again.");
-                    }
-                }
-        );
+            try {
+                ViewHandler handler = ViewHandler.LOGIN;
+                handler.reset();
+                handler.show(modelFacade);
+                currentStage.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertHelper.showError("Logout Error", "Failed to log out. Please try again.");
+            }
+        });
     }
 
     @FXML

@@ -34,15 +34,16 @@ public class ProfileDAO implements IDataAccess<Profile> {
             ps.setString(4, newProfile.getExportLabel());
             ps.executeUpdate();
 
-            ResultSet rs = ps.getGeneratedKeys();
             Profile createdProfile = null;
 
-            if (rs.next()) {
-                createdProfile = new Profile(rs.getInt(1),
-                        newProfile.getProfileName(),
-                        newProfile.getSplitBehavior(),
-                        newProfile.getStatus(),
-                        newProfile.getExportLabel());
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    createdProfile = new Profile(rs.getInt(1),
+                            newProfile.getProfileName(),
+                            newProfile.getSplitBehavior(),
+                            newProfile.getStatus(),
+                            newProfile.getExportLabel());
+                }
             }
 
             return createdProfile;
@@ -56,9 +57,11 @@ public class ProfileDAO implements IDataAccess<Profile> {
     public List<Profile> getData() throws Exception {
 
         List<Profile> profiles = new ArrayList<>();
-        try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement("SELECT profileId, profileName, splitBehavior, status, exportLabel FROM Profiles WHERE deleted_at IS NULL");
-            ResultSet rs = ps.executeQuery();
+        String sql = "SELECT profileId, profileName, splitBehavior, status, exportLabel FROM Profiles WHERE deleted_at IS NULL ORDER BY profileName";
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
@@ -106,15 +109,23 @@ public class ProfileDAO implements IDataAccess<Profile> {
         String sql = "UPDATE Profiles SET deleted_at = SYSDATETIME() WHERE profileId = ?";
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE profileId = ?";
 
-        try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql);
-             PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL)) {
+        try (Connection connection = dbConnector.getConnection()) {
+            connection.setAutoCommit(false);
 
-            ps.setInt(1, data.getProfileId());
-            ps.executeUpdate();
+            try (PreparedStatement ps = connection.prepareStatement(sql);
+                 PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL)) {
 
-            ps2.setInt(1, data.getProfileId());
-            ps2.executeUpdate();
+                ps.setInt(1, data.getProfileId());
+                ps.executeUpdate();
+
+                ps2.setInt(1, data.getProfileId());
+                ps2.executeUpdate();
+
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            }
 
         } catch (SQLException e) {
             throw new Exception("Could not delete user", e);

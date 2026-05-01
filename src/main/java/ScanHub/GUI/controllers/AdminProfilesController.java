@@ -2,20 +2,16 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.BE.Profile;
 import ScanHub.BE.ProfileStatus;
-import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
+import ScanHub.GUI.util.ViewHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -53,7 +49,7 @@ public class AdminProfilesController implements Initializable {
             selectedRow = null;
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
-            List<Profile> profiles = modelFacade.profileModel.getProfiles();
+            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
             currentProfiles = new ArrayList<>(profiles);
             for (Profile profile : currentProfiles) {
                 HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
@@ -104,7 +100,7 @@ public class AdminProfilesController implements Initializable {
 
         AlertHelper.showConfirmation("Delete Profile", "Are you sure you want to delete the profile \"" + selectedProfile.getProfileName() + "\"? This action cannot be undone.", () -> {
                     try {
-                        modelFacade.profileModel.deleteProfile(selectedProfile);
+                        modelFacade.getProfileModel().deleteProfile(selectedProfile);
                         loadProfiles();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -116,22 +112,15 @@ public class AdminProfilesController implements Initializable {
 
     private void openProfileForm(Profile profile) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ProfileFormView.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = new Stage();
-
-            stage.setTitle(profile == null ? "Create Profile" : "Edit Profile");
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-
-            ProfileFormController controller = loader.getController();
+            ViewHandler handler = profile == null ? ViewHandler.CREATE_PROFILE : ViewHandler.EDIT_PROFILE;
+            handler.reset();
+            handler.preLoad();
+            ProfileFormController controller = handler.getController();
+            Stage stage = handler.prepareStage();
             controller.setModel(stage, modelFacade, profile);
-
             stage.showAndWait();
 
-            // refresh the list after the form closes
-            loadProfiles();
+            loadProfiles(); // refresh the list after the form closes
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Error", "Failed to open the profile form. Please try again.");

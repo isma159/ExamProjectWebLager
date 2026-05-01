@@ -38,6 +38,7 @@ public class ProfileFormController implements Initializable {
         this.editingProfile = profile;
 
         if (editingProfile != null) {
+            formTitle.setText("Edit profile");
             populateFields(editingProfile);
         }
 
@@ -112,7 +113,7 @@ public class ProfileFormController implements Initializable {
 
         try {
             Profile newProfile = new Profile(profileName, splitBehavior, status, exportPreviewLabel.getText().replace("1", ""));
-            modelFacade.profileModel.createProfile(newProfile);
+            modelFacade.getProfileModel().createProfile(newProfile);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,7 +154,7 @@ public class ProfileFormController implements Initializable {
         editingProfile.setExportLabel(newExportLabel);
 
         try {
-            modelFacade.profileModel.updateProfile(editingProfile);
+            modelFacade.getProfileModel().updateProfile(editingProfile);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

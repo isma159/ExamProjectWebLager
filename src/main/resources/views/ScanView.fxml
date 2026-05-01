@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Root is a StackPane so the Session Startup popup can float above everything.
+    The popup overlay (sessionPopupOverlay) is hidden by default; the controller
+    toggles its visibility when the "Session Startup" button is pressed.
+-->
+
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         MAIN LAYOUT
+    ════════════════════════════════════════════════════════════════════════ -->
+    <BorderPane prefHeight="700.0" prefWidth="1280.0">
+
+        <!-- ── TOP: header card  +  main toolbar  +  sub-toolbar ── -->
+        <top>
+            <VBox>
+
+                <!-- ── Header (copied from UserView) ── -->
+                <HBox fx:id="hboxHeader" alignment="CENTER_LEFT" prefHeight="85.0" prefWidth="1280.0" spacing="12.0" styleClass="card,card-bg,shadow">
+                    <padding>
+                        <Insets bottom="14.0" left="18.0" right="18.0" top="14.0" />
+                    </padding>
+                    <children>
+                        <ImageView fitHeight="44.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/Green/LogoGreenH.png" />
+                            </image>
+                        </ImageView>
+                        <VBox spacing="4.0">
+                            <children>
+                                <Label styleClass="h1" text="Scanning Workspace" />
+                                <Label fx:id="sessionStatusLabel" styleClass="lbl" text="Select a profile and a box ID to begin." wrapText="true" />
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                            <children>
+                                <Label fx:id="currentUserLabel" styleClass="h3" text="Username" />
+                                <Label fx:id="scanSourceLabel" styleClass="lbl" text="Role: User/Admin" />
+                            </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="40.0" />
+                        <Button mnemonicParsing="false" onAction="#onLogout" prefHeight="33.0" styleClass="primary-btn" text="Log out" />
+                    </children>
+                </HBox>
+
+                <!-- ── Main Toolbar ── -->
+                <HBox fx:id="mainToolbar" alignment="CENTER_LEFT" spacing="4.0" styleClass="card,card-bg,shadow">
+                    <padding>
+                        <Insets bottom="6.0" left="10.0" right="10.0" top="6.0" />
+                    </padding>
+                    <children>
+
+                        <!-- Session Startup  (opens popup) -->
+                        <Button fx:id="btnSessionStartup" onAction="#onSessionStartup" prefHeight="32" styleClass="secondary-btn" text="⚙  Session Startup" />
+
+                        <Separator orientation="VERTICAL" prefHeight="28" />
+
+                        <!-- Scan -->
+                        <Button fx:id="btnScan" onAction="#onScan" prefHeight="32" styleClass="primary-btn" text="⬡  Scan" />
+
+                        <!-- Stop -->
+                        <Button fx:id="btnStop" onAction="#onStop" prefHeight="32" styleClass="secondary-btn" text="■  Stop" />
+
+                        <Separator orientation="VERTICAL" prefHeight="28" />
+
+                        <!-- Rotate Left / Right -->
+                        <Button fx:id="btnRotLeft" onAction="#onRotateLeft" prefHeight="32" styleClass="secondary-btn" text="↺  Rot L" />
+                        <Button fx:id="btnRotRight" onAction="#onRotateRight" prefHeight="32" styleClass="secondary-btn" text="↻  Rot R" />
+
+                        <Separator orientation="VERTICAL" prefHeight="28" />
+
+                        <!-- New Document / Delete / Undo -->
+                        <Button fx:id="btnNewDoc" onAction="#onNewDocument" prefHeight="32" styleClass="secondary-btn" text="📄  New Doc" />
+                        <Button fx:id="btnDelete" onAction="#onDeletePage" prefHeight="32" styleClass="secondary-btn" text="🗑  Delete" />
+                        <Button fx:id="btnUndo" onAction="#onUndo" prefHeight="32" styleClass="secondary-btn" text="↩  Undo" />
+
+                        <Separator orientation="VERTICAL" prefHeight="28" />
+
+                        <!-- Export -->
+                        <Button fx:id="btnExport" onAction="#onExport" prefHeight="32" styleClass="primary-btn" text="↓  Export" />
+                        <ComboBox fx:id="exportModeComboBox" prefHeight="28" prefWidth="130.0" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                    </children>
+                </HBox>
+
+                <!-- ── Sub-toolbar (viewer controls) ── -->
+                <HBox fx:id="subToolbar" alignment="CENTER_LEFT" spacing="6.0" styleClass="card,card-bg">
+                    <padding>
+                        <Insets bottom="4.0" left="10.0" right="10.0" top="4.0" />
+                    </padding>
+                    <children>
+
+                        <!-- Page Navigation -->
+                        <Button fx:id="btnNavFirst" onAction="#onNavFirst" prefHeight="26" prefWidth="28" styleClass="secondary-btn" text="⏮" />
+                        <Button fx:id="btnNavPrev" onAction="#onNavPrev" prefHeight="26" prefWidth="28" styleClass="secondary-btn" text="◀" />
+                        <Label fx:id="pageInfoLabel" alignment="CENTER" prefHeight="17.0" prefWidth="84.0" styleClass="lbl" text="0 / 0" textAlignment="CENTER" />
+                        <Button fx:id="btnNavNext" onAction="#onNavNext" prefHeight="26" prefWidth="28" styleClass="secondary-btn" text="▶" />
+                        <Button fx:id="btnNavLast" onAction="#onNavLast" prefHeight="26" prefWidth="28" styleClass="secondary-btn" text="⏭" />
+
+                        <Separator orientation="VERTICAL" prefHeight="20" />
+
+                        <!-- Zoom -->
+                        <Button fx:id="btnZoomOut" onAction="#onZoomOut" prefHeight="26" prefWidth="39.0" styleClass="secondary-btn" text="🔍−" />
+                        <Button fx:id="btnZoomIn" onAction="#onZoomIn" prefHeight="26" prefWidth="40.0" styleClass="secondary-btn" text="🔍+" />
+
+                        <Separator orientation="VERTICAL" prefHeight="20" />
+
+                        <!-- View mode -->
+                        <Label styleClass="lbl" text="View" />
+                        <ComboBox fx:id="gridModeComboBox" prefHeight="26" prefWidth="90" />
+
+                        <Separator orientation="VERTICAL" prefHeight="20" />
+
+                        <!-- Global Rotation -->
+                        <Label styleClass="lbl" text="Global rot" />
+                        <Spinner fx:id="globalRotSpinner" editable="true" prefHeight="26" prefWidth="70" />
+
+                        <Separator orientation="VERTICAL" prefHeight="20" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                    </children>
+                </HBox>
+
+            </VBox>
+        </top>
+
+        <!-- ── LEFT: Document tree sidebar ── -->
+        <left>
+            <VBox prefWidth="240.0" styleClass="card,card-bg,shadow">
+
+                <!-- Sidebar header -->
+                <HBox alignment="CENTER_LEFT" styleClass="card-bg">
+                    <padding>
+                        <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
+                    </padding>
+                    <children>
+                        <Label styleClass="lbl" text="Document tree" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="treeStatsLabel" styleClass="lbl" text="0 docs · 0 pages" />
+                    </children>
+                </HBox>
+
+                <!-- Document tree -->
+                <TreeView fx:id="documentTreeView" showRoot="false" styleClass="scan-list" VBox.vgrow="ALWAYS" />
+
+            </VBox>
+        </left>
+
+        <!-- ── CENTER: Page viewer grid ── -->
+        <center>
+            <StackPane styleClass="background">
+
+                <!-- Flash overlay -->
+                <Pane fx:id="flashOverlay" mouseTransparent="true" styleClass="flash-overlay" visible="false" />
+
+                <!-- Barcode toast -->
+                <Label fx:id="barcodeToast" styleClass="lbl" text="⬛  Barcode detected → new document" visible="false" StackPane.alignment="TOP_RIGHT">
+                    <StackPane.margin>
+                        <Insets right="12.0" top="12.0" />
+                    </StackPane.margin>
+                </Label>
+
+                <!-- Page grid scroll container -->
+                <ScrollPane fx:id="pageScrollPane" fitToHeight="false" fitToWidth="true" pannable="true">
+                    <content>
+                        <FlowPane fx:id="pageGrid" hgap="16" vgap="16">
+                            <padding>
+                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                            </padding>
+                        </FlowPane>
+                    </content>
+                </ScrollPane>
+
+                <!-- Empty state -->
+                <Label fx:id="emptyStateLabel" styleClass="lbl" text="No pages scanned yet. Press Space or click Scan" textAlignment="CENTER" visible="true" wrapText="true" />
+
+            </StackPane>
+        </center>
+
+        <!-- ── BOTTOM: Status bar ── -->
+        <bottom>
+            <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="card,card-bg,shadow">
+                <padding>
+                    <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
+                </padding>
+                <children>
+
+                    <Label fx:id="stDocsLabel" styleClass="lbl" text="Docs: 0" />
+                    <Label styleClass="lbl" text="·" />
+                    <Label fx:id="stPagesLabel" styleClass="lbl" text="Pages: 0" />
+                    <Label styleClass="lbl" text="·" />
+                    <Label fx:id="stCurrentLabel" styleClass="lbl" text="–" />
+                    <Label styleClass="lbl" text="·" />
+                    <Label fx:id="stExportLabel" styleClass="lbl" text="Export: –" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <!-- Keyboard shortcut hints -->
+                    <Label styleClass="lbl" text="Space scan" />
+                    <Label styleClass="lbl" text="←→ nav" />
+                    <Label styleClass="lbl" text="[] rotate" />
+                    <Label styleClass="lbl" text="Del delete" />
+                    <Label styleClass="lbl" text="Ctrl+E export" />
+                    <Label styleClass="lbl" text="Ctrl+Z undo" />
+
+                </children>
+            </HBox>
+        </bottom>
+
+    </BorderPane>
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SESSION STARTUP POPUP OVERLAY
+         Toggled visible/hidden by ScanController#onSessionStartup.
+         Uses the same vboxSessionSetup card as UserView.
+    ════════════════════════════════════════════════════════════════════════ -->
+    <StackPane fx:id="sessionPopupOverlay" onMouseClicked="#onSessionPopupBackdropClick" pickOnBounds="true" styleClass="modal-backdrop" visible="false">
+
+        <!-- Card — stop click propagation so backdrop click doesn't close it -->
+        <VBox fx:id="vboxSessionSetup" maxWidth="360.0" onMouseClicked="#onSessionPopupConsumeClick" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Label styleClass="h2" text="Session Setup" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#onSessionPopupClose" prefHeight="28.0" styleClass="secondary-btn" text="✕" />
+                    </children>
+                </HBox>
+
+                <Label styleClass="lbl" text="Choose the assigned profile, enter the box ID, and optionally set a rotation that should be applied to all newly scanned pages." wrapText="true" />
+
+                <!-- Profile -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label styleClass="h3" text="Profile" />
+                        <ComboBox fx:id="profileComboBox" prefWidth="320.0" />
+                    </children>
+                </VBox>
+
+                <!-- Box ID -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label styleClass="h3" text="Box ID" />
+                        <TextField fx:id="boxIdField" promptText="e.g. BOX-042" styleClass="container" />
+                    </children>
+                </VBox>
+
+                <!-- Global Rotation -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label styleClass="h3" text="Global Rotation" />
+                        <Spinner fx:id="rotationSpinner" editable="true" prefWidth="140.0" />
+                    </children>
+                </VBox>
+
+                <Button mnemonicParsing="false" onAction="#onStartSession" prefHeight="33.0" styleClass="primary-btn" text="Start Session" />
+
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <children>
+                        <Label fx:id="apiCountLabel" styleClass="lbl" text="API count unavailable" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#onRefreshApiCount" prefHeight="30.0" styleClass="secondary-btn" text="Refresh" />
+                    </children>
+                </HBox>
+
+                <Separator />
+
+                <Label styleClass="h3" text="Export" />
+                <ComboBox fx:id="popupExportModeComboBox" prefWidth="320.0" />
+                <Button mnemonicParsing="false" onAction="#onExport" prefHeight="33.0" styleClass="secondary-btn" text="Export TIFF Files" />
+
+            </children>
+        </VBox>
+    </StackPane>
+
+</StackPane>

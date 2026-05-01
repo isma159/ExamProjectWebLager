@@ -4,7 +4,6 @@ import ScanHub.BE.User;
 import ScanHub.DAL.DAO.UserDAO;
 import ScanHub.DAL.interfaces.IDataAccess;
 
-import java.util.Collections;
 import java.util.List;
 
 public class UserManager {

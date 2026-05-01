@@ -68,19 +68,22 @@ public class UserFormController implements Initializable {
     }
 
     private void loadProfiles() {
-        List<Profile> profiles = modelFacade.profileModel.getProfiles();
+        try {
+            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
 
-        for (Profile profile: profiles) {
-            vboxProfiles.getChildren().add(RowMaker.addProfileRowToForm(profile, editingUser, (selectedProfile, isChecked) -> {
-                if (isChecked) {
-                    selectedProfiles.add(profile);
-                }
-                else {
-                    selectedProfiles.remove(profile);
-                }
-
-                System.out.println(selectedProfiles);
-            }));
+            for (Profile profile: profiles) {
+                vboxProfiles.getChildren().add(RowMaker.addProfileRowToForm(profile, editingUser, (selectedProfile, isChecked) -> {
+                    if (isChecked) {
+                        selectedProfiles.add(profile);
+                    }
+                    else {
+                        selectedProfiles.remove(profile);
+                    }
+                }));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertHelper.showError("Load Error", "Failed to load profiles.");
         }
     }
 
@@ -146,7 +149,7 @@ public class UserFormController implements Initializable {
 
         try {
             User newUser = new User(username, hashedPassword, role, selectedProfiles);
-            modelFacade.userModel.createUser(newUser);
+            modelFacade.getUserModel().createUser(newUser);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -198,7 +201,7 @@ public class UserFormController implements Initializable {
         }
 
         try {
-            modelFacade.userModel.updateUser(editingUser);
+            modelFacade.getUserModel().updateUser(editingUser);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
