@@ -34,7 +34,6 @@ public class UserFormController implements Initializable {
     private Stage currentStage;
     private ModelFacade modelFacade;
     private User editingUser = null; // null means create mode, non-null means edit mode
-    private IPasswordEncrypter encrypter = new PasswordEncrypter();
     private List<Profile> selectedProfiles;
 
 
@@ -152,7 +151,7 @@ public class UserFormController implements Initializable {
             return;
         }
 
-        String hashedPassword = encrypter.hashedPassword(password);
+        String hashedPassword = modelFacade.getEncrypter().hashedPassword(password);
         Role role = (Role) selectedToggle.getUserData();
 
         try {
@@ -206,7 +205,7 @@ public class UserFormController implements Initializable {
 
         // only update password if user filled in a new one
         if (!newPassword.isBlank()) {
-            editingUser.setPasswordHash(encrypter.hashedPassword(newPassword));
+            editingUser.setPasswordHash(modelFacade.getEncrypter().hashedPassword(newPassword));
         }
 
         try {

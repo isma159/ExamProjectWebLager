@@ -56,7 +56,6 @@ public class ProfileFormController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         radioBARCODE.setUserData(SplitBehavior.BARCODE);
-        radioMANUAL.setUserData(SplitBehavior.MANUAL);
         radioNONE.setUserData(SplitBehavior.NONE);
 
         radioACTIVE.setUserData(ProfileStatus.Active);
@@ -100,12 +99,11 @@ public class ProfileFormController implements Initializable {
     private void populateFields(Profile profile) {
         profileNameField.setText(profile.getProfileName());
 
-        if (profile.getSplitBehavior() == SplitBehavior.BARCODE) { radioBARCODE.fire(); }
-        else if (profile.getSplitBehavior() == SplitBehavior.MANUAL) { radioMANUAL.fire(); }
-        else radioNONE.fire();
+        if (profile.getSplitBehavior() == SplitBehavior.BARCODE) { toggleGroupSplitBehavior.selectToggle(radioBARCODE); }
+        else toggleGroupSplitBehavior.selectToggle(radioNONE);
 
-        if (profile.getStatus() == ProfileStatus.Active) { radioACTIVE.fire(); }
-        else radioINACTIVE.fire();
+        if (profile.getStatus() == ProfileStatus.Active) { toggleGroupProfileStatus.selectToggle(radioACTIVE); }
+        else toggleGroupProfileStatus.selectToggle(radioINACTIVE);
     }
 
     @FXML

@@ -119,8 +119,7 @@ public class AdminController implements IViewController, Initializable {
         try {
             ViewHandler handler = ViewHandler.SCAN_VIEW;
             handler.reset();
-            Stage stage = new Stage();
-            handler.show(modelFacade, stage);
+            handler.show(modelFacade).setMaximized(true);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

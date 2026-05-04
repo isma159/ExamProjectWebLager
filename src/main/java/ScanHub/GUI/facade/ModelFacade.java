@@ -10,9 +10,9 @@ public class ModelFacade {
     private ProfileModel profileModel;
 
     public ModelFacade() throws Exception {
-        PasswordEncrypter encrypter = new PasswordEncrypter();
-        UserModel userModel = new UserModel();
-        ProfileModel profileModel = new ProfileModel();
+        encrypter = new PasswordEncrypter();
+        userModel = new UserModel();
+        profileModel = new ProfileModel();
     }
 
     public PasswordEncrypter getEncrypter() {
