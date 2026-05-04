@@ -1,5 +1,6 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.User;
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
@@ -10,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
@@ -28,6 +31,8 @@ public class AdminController implements IViewController, Initializable {
     @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, settingsBtn, shortcutsBtn;
     @FXML private HBox analyticsBox, metadataBox, systemBox, logBox, settingsBox, shortcutBox;
     @FXML private ToggleSwitch darkMode;
+    @FXML private Label lblUsername, lblRole;
+    private User currentUser;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -38,7 +43,11 @@ public class AdminController implements IViewController, Initializable {
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
         this.currentStage = currentStage;
+
         sidebarBtns.selectToggle(dashboardBtn);
+
+        /*lblUsername.setText(currentUser.getUsername());
+        lblRole.setText(currentUser.getRole().toString());*/
     }
 
     @Override

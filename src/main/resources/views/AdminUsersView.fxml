@@ -89,13 +89,25 @@
                      </styleClass>
                      <children>
                         <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                        <ToggleButton mnemonicParsing="false" onAction="#onTbAllUsersClick" prefHeight="30.0" prefWidth="75.0" selected="true" styleClass="filter-btn" text="All Users">
+                        <ToggleButton mnemonicParsing="false" onAction="#onTbAllUsersClick" prefHeight="30.0" prefWidth="75.0" selected="true" text="All Users">
                            <toggleGroup>
                               <ToggleGroup fx:id="userFilter" />
                            </toggleGroup>
+                           <styleClass>
+                              <String fx:value="filter-btn" />
+                              <String fx:value="lbl" />
+                           </styleClass>
                         </ToggleButton>
-                        <ToggleButton layoutX="25.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTbAdminsClick" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Admins" toggleGroup="$userFilter" />
-                        <ToggleButton layoutX="100.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTbUsersClick" prefHeight="30.0" prefWidth="75.0" styleClass="filter-btn" text="Users" toggleGroup="$userFilter" />
+                        <ToggleButton layoutX="25.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTbAdminsClick" prefHeight="30.0" prefWidth="75.0" text="Admins" toggleGroup="$userFilter">
+                           <styleClass>
+                              <String fx:value="filter-btn" />
+                              <String fx:value="lbl" />
+                           </styleClass></ToggleButton>
+                        <ToggleButton layoutX="100.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTbUsersClick" prefHeight="30.0" prefWidth="75.0" text="Users" toggleGroup="$userFilter">
+                           <styleClass>
+                              <String fx:value="filter-btn" />
+                              <String fx:value="lbl" />
+                           </styleClass></ToggleButton>
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">

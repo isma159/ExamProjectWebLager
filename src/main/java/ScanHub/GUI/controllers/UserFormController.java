@@ -109,6 +109,14 @@ public class UserFormController implements Initializable {
         } else {
             createUser();
         }
+
+        try {
+            modelFacade.userModel.refreshModel();
+            modelFacade.profileModel.refreshModel();
+        }
+        catch (Exception e) {
+            // TODO AlertView?
+        }
     }
 
     /**

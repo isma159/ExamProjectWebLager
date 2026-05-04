@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class AlertHelper {
 
             AlertController controller = loader.getController();
 
-            Stage stage = new Stage();
+            Stage stage = new Stage(StageStyle.UNDECORATED);
             stage.setTitle(title);
             stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);

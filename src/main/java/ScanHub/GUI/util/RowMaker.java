@@ -2,6 +2,7 @@ package ScanHub.GUI.util;
 
 import ScanHub.BE.Profile;
 import ScanHub.BE.ProfileStatus;
+import ScanHub.BE.Role;
 import ScanHub.BE.User;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
@@ -194,7 +195,7 @@ public class RowMaker {
         return outerHBox;
     }
 
-    public static HBox addProfileRowToForm(Profile profile, User user, BiConsumer<Profile, Boolean> onCheckChanged) {
+    public static HBox addProfileRowToForm(Profile profile, User user, BiConsumer<Profile, Boolean> onCheckChangedProfile) {
 
         // Outer HBox
         HBox outerHBox = new HBox();
@@ -307,12 +308,139 @@ public class RowMaker {
 
         checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
 
-            onCheckChanged.accept(profile, newValue);
+            onCheckChangedProfile.accept(profile, newValue);
 
         });
 
         if (user != null) {
             checkBox.setSelected(user.getProfiles().contains(profile));
+            System.out.println(user.getProfiles());
+        }
+
+        return outerHBox;
+    }
+
+    public static HBox addUserRowToForm(User user, Profile profile, BiConsumer<User, Boolean> onCheckChangedUser) {
+
+        // Outer HBox
+        HBox outerHBox = new HBox();
+        outerHBox.setAlignment(Pos.CENTER);
+        outerHBox.setMaxHeight(Double.NEGATIVE_INFINITY);
+        outerHBox.setMinHeight(Double.NEGATIVE_INFINITY);
+        outerHBox.setPrefHeight(45.0);
+        outerHBox.setPrefWidth(200.0);
+        outerHBox.getStyleClass().add("box-card");
+
+        // Left spacer
+        Region leftSpacer = new Region();
+        leftSpacer.setLayoutX(299.0);
+        leftSpacer.setLayoutY(10.0);
+        leftSpacer.setMaxWidth(Double.NEGATIVE_INFINITY);
+        leftSpacer.setMinWidth(Double.NEGATIVE_INFINITY);
+        leftSpacer.setPrefHeight(200.0);
+        leftSpacer.setPrefWidth(9.0);
+        HBox.setHgrow(leftSpacer, Priority.NEVER);
+
+        // Checkbox
+        CheckBox checkBox = new CheckBox();
+        checkBox.setMnemonicParsing(false);
+
+        // Spacer between checkbox and avatar
+        Region checkAvatarSpacer = new Region();
+        checkAvatarSpacer.setMaxWidth(Double.NEGATIVE_INFINITY);
+        checkAvatarSpacer.setMinWidth(Double.NEGATIVE_INFINITY);
+        checkAvatarSpacer.setPrefHeight(200.0);
+        checkAvatarSpacer.setPrefWidth(9.0);
+        HBox.setHgrow(checkAvatarSpacer, Priority.NEVER);
+
+        // Avatar pane
+        Pane avatar = new Pane();
+        avatar.setMaxHeight(Double.NEGATIVE_INFINITY);
+        avatar.setMaxWidth(Double.NEGATIVE_INFINITY);
+        avatar.setMinHeight(Double.NEGATIVE_INFINITY);
+        avatar.setMinWidth(Double.NEGATIVE_INFINITY);
+        avatar.setPrefHeight(30.0);
+        avatar.setPrefWidth(30.0);
+        avatar.getStyleClass().add("avatar-initial");
+
+        Label avatarLabel = new Label(user.getUsername().substring(0, 1));
+        avatarLabel.setAlignment(Pos.CENTER);
+        avatarLabel.setPrefHeight(30.0);
+        avatarLabel.setPrefWidth(30.0);
+        avatarLabel.getStyleClass().add("lbl");
+        avatarLabel.setTextFill(Paint.valueOf("WHITE"));
+        avatar.getChildren().add(avatarLabel);
+
+        // Spacer between avatar and name label
+        Region avatarLabelSpacer = new Region();
+        avatarLabelSpacer.setLayoutX(206.0);
+        avatarLabelSpacer.setLayoutY(10.0);
+        avatarLabelSpacer.setMaxWidth(Double.NEGATIVE_INFINITY);
+        avatarLabelSpacer.setMinWidth(Double.NEGATIVE_INFINITY);
+        avatarLabelSpacer.setPrefHeight(200.0);
+        avatarLabelSpacer.setPrefWidth(9.0);
+        HBox.setHgrow(avatarLabelSpacer, Priority.NEVER);
+
+        // Name label
+        Label nameLabel = new Label(user.getUsername());
+
+        // Growing spacer (pushes chip to the right)
+        Region growingSpacer = new Region();
+        growingSpacer.setLayoutX(186.0);
+        growingSpacer.setLayoutY(10.0);
+        growingSpacer.setPrefHeight(200.0);
+        growingSpacer.setPrefWidth(9.0);
+        HBox.setHgrow(growingSpacer, Priority.ALWAYS);
+
+        // Chip placeholder HBox
+        HBox chipPlaceholder = new HBox();
+        chipPlaceholder.setAlignment(Pos.CENTER);
+        chipPlaceholder.setMaxWidth(Double.NEGATIVE_INFINITY);
+        chipPlaceholder.setMinWidth(Double.NEGATIVE_INFINITY);
+        chipPlaceholder.setPrefHeight(100.0);
+        chipPlaceholder.setPrefWidth(90.0);
+        HBox.setHgrow(chipPlaceholder, Priority.NEVER);
+
+        HBox chip = null;
+        if (user.getRole() == Role.ADMIN) {
+            chip = ChipMaker.createChip(Role.ADMIN.toString(), "chip-color");
+        }
+        else {
+            chip = ChipMaker.createChip(Role.USER.toString(), "chip-color");
+        }
+
+        chipPlaceholder.getChildren().add(chip);
+
+        // Right spacer
+        Region rightSpacer = new Region();
+        rightSpacer.setLayoutX(77.0);
+        rightSpacer.setLayoutY(10.0);
+        rightSpacer.setMaxWidth(Double.NEGATIVE_INFINITY);
+        rightSpacer.setMinWidth(Double.NEGATIVE_INFINITY);
+        rightSpacer.setPrefHeight(200.0);
+        rightSpacer.setPrefWidth(9.0);
+
+        outerHBox.getChildren().addAll(
+                leftSpacer,
+                checkBox,
+                checkAvatarSpacer,
+                avatar,
+                avatarLabelSpacer,
+                nameLabel,
+                growingSpacer,
+                chipPlaceholder,
+                rightSpacer
+        );
+
+        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+
+            onCheckChangedUser.accept(user, newValue);
+
+        });
+
+        if (profile != null) {
+            checkBox.setSelected(profile.getUsers().contains(user));
+            System.out.println(profile.getUsers());
         }
 
         return outerHBox;

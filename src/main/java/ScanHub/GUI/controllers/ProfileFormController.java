@@ -4,6 +4,7 @@ import ScanHub.BE.*;
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
+import ScanHub.GUI.util.RowMaker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +13,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class ProfileFormController implements Initializable {
@@ -19,12 +22,14 @@ public class ProfileFormController implements Initializable {
     @FXML private ToggleGroup toggleGroupSplitBehavior, toggleGroupProfileStatus;
     @FXML private Label formTitle, profileIdLabel, nameError, exportPreviewLabel, usersError;
     @FXML private RadioButton radioBARCODE, radioMANUAL, radioNONE, radioACTIVE, radioINACTIVE;
-    @FXML private VBox userCheckboxList, vboxSplitBehavior, vboxStatus;
+    @FXML private VBox userCheckboxList, vboxSplitBehavior, vboxStatus, vboxUsers;
     @FXML private TextField profileNameField;
+    @FXML private Button saveButton;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
     private Profile editingProfile = null; // null means create mode, non-null means edit mode
+    private List<User> selectedUsers;
 
     /**
      * Receives the shared model and optionally a profile to edit.
@@ -38,11 +43,13 @@ public class ProfileFormController implements Initializable {
         this.editingProfile = profile;
 
         if (editingProfile != null) {
-            formTitle.setText("Edit profile");
+            formTitle.setText("Edit Profile");
+            saveButton.setText("Save Changes");
             populateFields(editingProfile);
         }
 
         ThemeManager.apply(currentStage.getScene());
+        loadUsers();
     }
 
     @Override
@@ -54,6 +61,8 @@ public class ProfileFormController implements Initializable {
         radioACTIVE.setUserData(ProfileStatus.Active);
         radioINACTIVE.setUserData(ProfileStatus.Inactive);
 
+        selectedUsers = new ArrayList<>();
+
         if (editingProfile != null) {
             formTitle.setText("Edit profile");
         }
@@ -62,6 +71,24 @@ public class ProfileFormController implements Initializable {
             String result = newValue.replace(" ", "");
             exportPreviewLabel.setText(result + "_1");
         }));
+    }
+
+    private void loadUsers() {
+
+        List<User> users = modelFacade.userModel.getUsers();
+
+        for (User user: users) {
+            vboxUsers.getChildren().add(RowMaker.addUserRowToForm(user, editingProfile, (selectedUser, isChecked) -> {
+                if (isChecked) {
+                    selectedUsers.add(user);
+                }
+                else {
+                    selectedUsers.remove(user);
+                }
+
+                System.out.println(selectedUser);
+            }));
+        }
     }
 
     /**
@@ -84,6 +111,14 @@ public class ProfileFormController implements Initializable {
             updateProfile();
         } else {
             createProfile();
+        }
+
+        try {
+            modelFacade.userModel.refreshModel();
+            modelFacade.profileModel.refreshModel();
+        }
+        catch (Exception e) {
+            // TODO AlertView?
         }
     }
 
@@ -113,6 +148,7 @@ public class ProfileFormController implements Initializable {
 
         try {
             Profile newProfile = new Profile(profileName, splitBehavior, status, exportPreviewLabel.getText().replace("1", ""));
+            newProfile.setUsers(selectedUsers);
             modelFacade.getProfileModel().createProfile(newProfile);
             currentStage.close();
         } catch (Exception e) {
@@ -125,8 +161,6 @@ public class ProfileFormController implements Initializable {
         String newProfileName = profileNameField.getText();
         Toggle selectedSplitToggle = toggleGroupSplitBehavior.getSelectedToggle();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
-        SplitBehavior newSplitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
-        ProfileStatus newStatus = (ProfileStatus) selectedStatusToggle.getUserData();
         String newExportLabel = exportPreviewLabel.getText().replace("1", "");
 
         clearError();
@@ -149,9 +183,10 @@ public class ProfileFormController implements Initializable {
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
 
         editingProfile.setProfileName(newProfileName);
-        editingProfile.setSplitBehavior(newSplitBehavior);
-        editingProfile.setStatus(newStatus);
+        editingProfile.setSplitBehavior(splitBehavior);
+        editingProfile.setStatus(status);
         editingProfile.setExportLabel(newExportLabel);
+        editingProfile.setUsers(selectedUsers);
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);
