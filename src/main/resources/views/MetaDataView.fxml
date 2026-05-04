@@ -93,7 +93,7 @@
                             <children>
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0"/>
                                 <ToggleButton mnemonicParsing="false" onAction="#onTbAllMetadataClick"
-                                             prefHeight="30.0" prefWidth="90.0" selected="true" text="All">
+                                              prefHeight="30.0" prefWidth="90.0" selected="true" text="All">
                                     <toggleGroup>
                                         <ToggleGroup fx:id="metadataFilter"/>
                                     </toggleGroup>
@@ -103,16 +103,16 @@
                                     </styleClass>
                                 </ToggleButton>
                                 <ToggleButton mnemonicParsing="false" onAction="#onTbWithMetadataClick"
-                                             prefHeight="30.0" prefWidth="120.0"
-                                             text="Has Metadata" toggleGroup="$metadataFilter">
+                                              prefHeight="30.0" prefWidth="120.0"
+                                              text="Has Metadata" toggleGroup="$metadataFilter">
                                     <styleClass>
                                         <String fx:value="filter-btn"/>
                                         <String fx:value="lbl"/>
                                     </styleClass>
                                 </ToggleButton>
                                 <ToggleButton mnemonicParsing="false" onAction="#onTbNoMetadataClick"
-                                             prefHeight="30.0" prefWidth="130.0"
-                                             text="Missing Metadata" toggleGroup="$metadataFilter">
+                                              prefHeight="30.0" prefWidth="130.0"
+                                              text="Missing Metadata" toggleGroup="$metadataFilter">
                                     <styleClass>
                                         <String fx:value="filter-btn"/>
                                         <String fx:value="lbl"/>

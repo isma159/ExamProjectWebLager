@@ -63,6 +63,9 @@ public class AdminController implements Initializable {
             } else if (newValue == profilesBtn) {
                 loadPage("/views/AdminProfilesView.fxml");
             }
+            else if ( newValue == metadataBtn) {
+                loadPage("/views/AdminMetadataView.fxml");
+            }
         });
     }
 
@@ -77,6 +80,9 @@ public class AdminController implements Initializable {
                     return new AdminUsersController(modelFacade);
                 } else if (controllerClass == AdminProfilesController.class) {
                     return new AdminProfilesController(modelFacade);
+                }
+                else  if (controllerClass == AdminMetadataController.class) {
+                    return new AdminMetadataController(modelFacade);
                 }
 
                 try {
