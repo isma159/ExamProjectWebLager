@@ -24,6 +24,10 @@ public class UserModel {
         return userObservableList;
     }
 
+    public void refreshModel() throws Exception {
+        userObservableList.setAll(userManager.getUsers());
+    }
+
     public User getUserFromUsername(String username) throws Exception {
         return userManager.getUserFromUsername(username);
     }
