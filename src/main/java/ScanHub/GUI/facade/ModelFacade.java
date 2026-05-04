@@ -9,24 +9,21 @@ public class ModelFacade {
     private UserModel userModel;
     private ProfileModel profileModel;
 
+    public ModelFacade() throws Exception {
+        PasswordEncrypter encrypter = new PasswordEncrypter();
+        UserModel userModel = new UserModel();
+        ProfileModel profileModel = new ProfileModel();
+    }
+
     public PasswordEncrypter getEncrypter() {
-        if (encrypter == null) {
-            encrypter = new PasswordEncrypter();
-        }
         return encrypter;
     }
 
-    public UserModel getUserModel() throws Exception {
-        if (userModel == null) {
-            userModel = new UserModel();
-        }
+    public UserModel getUserModel() {
         return userModel;
     }
 
-    public ProfileModel getProfileModel() throws Exception {
-        if (profileModel == null) {
-            profileModel = new ProfileModel();
-        }
+    public ProfileModel getProfileModel() {
         return profileModel;
     }
 }
