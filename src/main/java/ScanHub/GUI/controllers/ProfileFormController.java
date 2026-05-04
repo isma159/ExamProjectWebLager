@@ -75,7 +75,7 @@ public class ProfileFormController implements Initializable {
 
     private void loadUsers() {
 
-        List<User> users = modelFacade.userModel.getUsers();
+        List<User> users = modelFacade.getUserModel().getUsers();
 
         for (User user: users) {
             vboxUsers.getChildren().add(RowMaker.addUserRowToForm(user, editingProfile, (selectedUser, isChecked) -> {
@@ -114,8 +114,8 @@ public class ProfileFormController implements Initializable {
         }
 
         try {
-            modelFacade.userModel.refreshModel();
-            modelFacade.profileModel.refreshModel();
+            modelFacade.getUserModel().refreshModel();
+            modelFacade.getProfileModel().refreshModel();
         }
         catch (Exception e) {
             // TODO AlertView?

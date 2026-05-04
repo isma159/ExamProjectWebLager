@@ -5,6 +5,7 @@ import ScanHub.BE.Document;
 import ScanHub.BE.File;
 import ScanHub.BE.interfaces.TreeNode;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IViewController;
 import com.sun.source.tree.Tree;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,7 +18,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
-public class UserController implements Initializable {
+public class UserController implements Initializable, IViewController {
 
     @FXML private TreeView<TreeNode> boxTreeView;
 
@@ -34,6 +35,8 @@ public class UserController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        boxTreeView.getStyleClass().add("tree-view-scanner");
+
         TreeItem<TreeNode> root = new TreeItem<>(new Box(1, "Legal_Documents", 2, LocalDateTime.now(), LocalDateTime.now()));
 
         Box box = (Box) root.getValue();
@@ -43,6 +46,7 @@ public class UserController implements Initializable {
         Document document = (Document) parent.getValue();
 
         TreeItem<TreeNode> child = new TreeItem<>(new File(1, document.getDocumentId(), 1, 1, 1, LocalDateTime.now()));
+
         root.setExpanded(true);
 
         boxTreeView.setRoot(root);

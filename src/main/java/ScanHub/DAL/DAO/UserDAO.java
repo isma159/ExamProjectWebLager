@@ -90,8 +90,8 @@ public class UserDAO implements IDataAccess<User> {
                             userId,
                             rs.getString("username"),
                             rs.getString("passwordHash"),
-                            Role.valueOf(rs.getString("role")),
-                            new ArrayList<>());
+                            Role.valueOf(rs.getString("role"))
+                    );
                     usersById.put(userId, user);
                 }
 
@@ -134,8 +134,8 @@ public class UserDAO implements IDataAccess<User> {
                         user = new User(rs.getInt("userId"),
                                 rs.getString("username"),
                                 rs.getString("passwordHash"),
-                                Role.valueOf(rs.getString("role")),
-                                new ArrayList<>());
+                                Role.valueOf(rs.getString("role"))
+                        );
                     }
 
                     int profileId = rs.getInt("profileId");
