@@ -28,11 +28,12 @@
                         <Insets bottom="14.0" left="18.0" right="18.0" top="14.0" />
                     </padding>
                     <children>
-                        <ImageView fitHeight="44.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="73.0" fitWidth="222.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@../images/Green/LogoGreenH.png" />
+                                <Image url="@../images/Green/LogoGreen2H.png" />
                             </image>
                         </ImageView>
+                  <Region prefHeight="53.0" prefWidth="318.0" />
                         <VBox spacing="4.0">
                             <children>
                                 <Label styleClass="h1" text="Scanning Workspace" />
@@ -47,7 +48,7 @@
                             </children>
                         </VBox>
                         <Separator orientation="VERTICAL" prefHeight="40.0" />
-                        <Button mnemonicParsing="false" onAction="#onLogout" prefHeight="33.0" styleClass="primary-btn" text="Log out" />
+                        <Button mnemonicParsing="false" onAction="#onExit" prefHeight="33.0" prefWidth="48.0" styleClass="primary-btn" text="Exit" />
                     </children>
                 </HBox>
 
@@ -59,34 +60,34 @@
                     <children>
 
                         <!-- Session Startup  (opens popup) -->
-                        <Button fx:id="btnSessionStartup" onAction="#onSessionStartup" prefHeight="32" styleClass="secondary-btn" text="⚙  Session Startup" />
+                        <Button fx:id="btnSessionStartup" onAction="#onSessionStartup" prefHeight="33.0" styleClass="secondary-btn" text="⚙  Session Startup" />
 
                         <Separator orientation="VERTICAL" prefHeight="28" />
 
                         <!-- Scan -->
-                        <Button fx:id="btnScan" onAction="#onScan" prefHeight="32" styleClass="primary-btn" text="⬡  Scan" />
+                        <Button fx:id="btnScan" onAction="#onScan" prefHeight="33.0" styleClass="primary-btn" text="⬡  Scan" />
 
                         <!-- Stop -->
-                        <Button fx:id="btnStop" onAction="#onStop" prefHeight="32" styleClass="secondary-btn" text="■  Stop" />
+                        <Button fx:id="btnStop" onAction="#onStop" prefHeight="33.0" styleClass="secondary-btn" text="■  Stop" />
 
                         <Separator orientation="VERTICAL" prefHeight="28" />
 
                         <!-- Rotate Left / Right -->
-                        <Button fx:id="btnRotLeft" onAction="#onRotateLeft" prefHeight="32" styleClass="secondary-btn" text="↺  Rot L" />
-                        <Button fx:id="btnRotRight" onAction="#onRotateRight" prefHeight="32" styleClass="secondary-btn" text="↻  Rot R" />
+                        <Button fx:id="btnRotLeft" onAction="#onRotateLeft" prefHeight="33.0" styleClass="secondary-btn" text="↺  Rot L" />
+                        <Button fx:id="btnRotRight" onAction="#onRotateRight" prefHeight="33.0" styleClass="secondary-btn" text="↻  Rot R" />
 
                         <Separator orientation="VERTICAL" prefHeight="28" />
 
                         <!-- New Document / Delete / Undo -->
-                        <Button fx:id="btnNewDoc" onAction="#onNewDocument" prefHeight="32" styleClass="secondary-btn" text="📄  New Doc" />
-                        <Button fx:id="btnDelete" onAction="#onDeletePage" prefHeight="32" styleClass="secondary-btn" text="🗑  Delete" />
-                        <Button fx:id="btnUndo" onAction="#onUndo" prefHeight="32" styleClass="secondary-btn" text="↩  Undo" />
+                        <Button fx:id="btnNewDoc" onAction="#onNewDocument" prefHeight="33.0" styleClass="secondary-btn" text="📄  New Doc" />
+                        <Button fx:id="btnDelete" onAction="#onDeletePage" prefHeight="33.0" styleClass="secondary-btn" text="🗑  Delete" />
+                        <Button fx:id="btnUndo" onAction="#onUndo" prefHeight="33.0" styleClass="secondary-btn" text="↩  Undo" />
 
                         <Separator orientation="VERTICAL" prefHeight="28" />
 
                         <!-- Export -->
-                        <Button fx:id="btnExport" onAction="#onExport" prefHeight="32" styleClass="primary-btn" text="↓  Export" />
-                        <ComboBox fx:id="exportModeComboBox" prefHeight="28" prefWidth="130.0" />
+                        <Button fx:id="btnExport" onAction="#onExport" prefHeight="33.0" styleClass="primary-btn" text="↓  Export" />
+                        <ComboBox fx:id="exportModeComboBox" prefHeight="30.0" prefWidth="163.0" />
 
                         <Region HBox.hgrow="ALWAYS" />
 
@@ -147,7 +148,6 @@
                     <children>
                         <Label styleClass="lbl" text="Document tree" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="treeStatsLabel" styleClass="lbl" text="0 docs · 0 pages" />
                     </children>
                 </HBox>
 
@@ -226,7 +226,7 @@
          Toggled visible/hidden by ScanController#onSessionStartup.
          Uses the same vboxSessionSetup card as UserView.
     ════════════════════════════════════════════════════════════════════════ -->
-    <StackPane fx:id="sessionPopupOverlay" onMouseClicked="#onSessionPopupBackdropClick" pickOnBounds="true" styleClass="modal-backdrop" visible="false">
+    <StackPane fx:id="sessionPopupOverlay" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onSessionPopupBackdropClick" pickOnBounds="true" prefHeight="420.0" prefWidth="1280.0" styleClass="modal-backdrop" visible="false">
 
         <!-- Card — stop click propagation so backdrop click doesn't close it -->
         <VBox fx:id="vboxSessionSetup" maxWidth="360.0" onMouseClicked="#onSessionPopupConsumeClick" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
@@ -270,7 +270,6 @@
                 </VBox>
 
                 <Button mnemonicParsing="false" onAction="#onStartSession" prefHeight="33.0" styleClass="primary-btn" text="Start Session" />
-
                 <HBox alignment="CENTER_LEFT" spacing="8.0">
                     <children>
                         <Label fx:id="apiCountLabel" styleClass="lbl" text="API count unavailable" />
@@ -278,15 +277,8 @@
                         <Button mnemonicParsing="false" onAction="#onRefreshApiCount" prefHeight="30.0" styleClass="secondary-btn" text="Refresh" />
                     </children>
                 </HBox>
-
                 <Separator />
-
-                <Label styleClass="h3" text="Export" />
-                <ComboBox fx:id="popupExportModeComboBox" prefWidth="320.0" />
-                <Button mnemonicParsing="false" onAction="#onExport" prefHeight="33.0" styleClass="secondary-btn" text="Export TIFF Files" />
-
             </children>
         </VBox>
     </StackPane>
-
 </StackPane>

@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -86,7 +87,7 @@ public class AdminController implements IViewController, Initializable {
     }
 
     @FXML
-    private void onClickLogOut(ActionEvent actionEvent) {
+    private void onClickLogOut(ActionEvent actionEvent) { // TODO
         AlertHelper.showConfirmation("Log Out", "Are you sure you want to log out?", () -> {
             try {
                 ViewHandler handler = ViewHandler.LOGIN;
@@ -103,5 +104,18 @@ public class AdminController implements IViewController, Initializable {
     @FXML
     private void onDarkModeToggle() {
         ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());
+    }
+
+    public void onClickOpenScanView(MouseEvent mouseEvent) {
+        try {
+            ViewHandler handler = ViewHandler.SCAN_VIEW;
+            handler.reset();
+            Stage stage = new Stage();
+            handler.show(modelFacade, stage);
+            currentStage.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertHelper.showError("Scan Workshop Error", "Failed to open Scan Workshop. Please try again.");
+        }
     }
 }

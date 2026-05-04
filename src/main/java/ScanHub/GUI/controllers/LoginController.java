@@ -1,8 +1,6 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.User;
-import ScanHub.BLL.interfaces.IPasswordEncrypter;
-import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
@@ -29,7 +27,6 @@ public class LoginController implements IViewController, Initializable {
     @FXML private HBox hboxUser, hboxPass1, hboxPass2;
 
     private ModelFacade modelFacade;
-    private IPasswordEncrypter encrypter = new PasswordEncrypter();
     private Stage currentStage;
 
     public void setModel (ModelFacade modelFacade, Stage stage) {
@@ -88,7 +85,7 @@ public class LoginController implements IViewController, Initializable {
             return;
         }
 
-        if (user == null || !encrypter.verifyPassword(passFldPass.getText(), user.getPasswordHash())) {
+        if (user == null || !modelFacade.getEncrypter().verifyPassword(passFldPass.getText(), user.getPasswordHash())) {
             onLoginError();
             AlertHelper.showError("Login Failed", "Incorrect username or password.");
             return;

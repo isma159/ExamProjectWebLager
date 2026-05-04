@@ -1,5 +1,9 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IViewController;
+import ScanHub.GUI.util.AlertHelper;
+import ScanHub.GUI.util.ViewHandler;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -35,7 +40,7 @@ import java.util.*;
  *
  * TODOs are marked where real service / repository calls should go.
  */
-public class ScanController implements Initializable {
+public class ScanController implements Initializable, IViewController {
 
     // =========================================================================
     // FXML injections
@@ -88,11 +93,13 @@ public class ScanController implements Initializable {
     @FXML private TextField            boxIdField;
     @FXML private Spinner<Integer>     rotationSpinner;
     @FXML private Label                apiCountLabel;
-    @FXML private ComboBox<String>     popupExportModeComboBox;
 
     // =========================================================================
     // State
     // =========================================================================
+
+    private Stage currentStage;
+    private ModelFacade modelFacade;
 
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
 
@@ -114,6 +121,12 @@ public class ScanController implements Initializable {
      */
     private final Deque<Runnable> undoStack = new ArrayDeque<>();
     private static final int UNDO_MAX = 20;
+
+    @Override
+    public void setModel(ModelFacade model, Stage stage) {
+        this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
+    }
 
     // =========================================================================
     // Initializable
@@ -148,29 +161,18 @@ public class ScanController implements Initializable {
 
     private void initExportComboBoxes() {
         ObservableList<String> modes = FXCollections.observableArrayList(
-                "Single TIFF per document",
+                "Single-page TIFF",
                 "Multi-page TIFF",
                 "PDF per document",
                 "ZIP of TIFFs"
         );
         exportModeComboBox.setItems(modes);
         exportModeComboBox.getSelectionModel().selectFirst();
-
-        popupExportModeComboBox.setItems(modes);
-        popupExportModeComboBox.getSelectionModel().selectFirst();
-
-        // Keep the toolbar and popup pickers in sync
-        exportModeComboBox.getSelectionModel().selectedIndexProperty().addListener((obs, o, n) ->
-                        popupExportModeComboBox.getSelectionModel().select(n.intValue()));
-        popupExportModeComboBox.getSelectionModel().selectedIndexProperty().addListener((obs, o, n) ->
-                        exportModeComboBox.getSelectionModel().select(n.intValue()));
     }
 
     private void initGridModeComboBox() {
-        gridModeComboBox.setItems(FXCollections.observableArrayList(
-                "1 column", "2 columns", "3 columns", "4 columns"
-        ));
-        gridModeComboBox.getSelectionModel().select(1);   // default: 2 columns
+        gridModeComboBox.setItems(FXCollections.observableArrayList("1 column", "2 columns", "3 columns", "4 columns"));
+        gridModeComboBox.getSelectionModel().select(1);
         gridModeComboBox.getSelectionModel().selectedIndexProperty().addListener((obs, o, n) -> applyGridMode(n.intValue()));
     }
 
@@ -258,13 +260,11 @@ public class ScanController implements Initializable {
         String boxId       = boxIdField.getText().trim();
 
         if (profileName == null || profileName.isBlank()) {
-            showAlert(Alert.AlertType.WARNING, "Session Setup",
-                    "Please select a profile before starting.");
+            showAlert(Alert.AlertType.WARNING, "Session Setup", "Please select a profile before starting.");
             return;
         }
         if (boxId.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Session Setup",
-                    "Please enter a Box ID before starting.");
+            showAlert(Alert.AlertType.WARNING, "Session Setup", "Please enter a Box ID before starting.");
             return;
         }
 
@@ -274,8 +274,7 @@ public class ScanController implements Initializable {
         sessionActive = true;
         setSessionControlsDisabled(false);
 
-        sessionStatusLabel.setText(
-                "Session active  ·  Profile: " + profileName + "  ·  Box: " + boxId);
+        sessionStatusLabel.setText("Session active  ·  Profile: " + profileName + "  ·  Box: " + boxId);
         currentUserLabel.setText(profileName);   // TODO: use logged-in username
         scanSourceLabel.setText("Box: " + boxId);
 
@@ -296,9 +295,7 @@ public class ScanController implements Initializable {
             createNewDocumentInternal();
         }
 
-        ScanPage page   = new ScanPage(
-                "Page " + (totalPageCount() + 1),
-                globalRotSpinner.getValue());
+        ScanPage page = new ScanPage("Page " + (totalPageCount() + 1), globalRotSpinner.getValue());
         Document target = selectedDocument;
 
         target.getPages().add(page);
@@ -355,8 +352,8 @@ public class ScanController implements Initializable {
         int idx = selectedDocument.getPages().indexOf(selectedPage);
         if (idx < 0) return;
 
-        ScanPage removed    = selectedPage;
-        Document ownerDoc   = selectedDocument;
+        ScanPage removed = selectedPage;
+        Document ownerDoc = selectedDocument;
 
         ownerDoc.getPages().remove(idx);
         pushUndo(() -> {
@@ -369,7 +366,7 @@ public class ScanController implements Initializable {
             int next = Math.min(idx, ownerDoc.getPages().size() - 1);
             selectPage(ownerDoc, ownerDoc.getPages().get(next));
         } else {
-            selectedPage     = null;
+            selectedPage = null;
             currentPageIndex = -1;
         }
 
@@ -378,8 +375,8 @@ public class ScanController implements Initializable {
         if (totalPageCount() == 0) emptyStateLabel.setVisible(true);
     }
 
-    @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-90); }
-    @FXML private void onRotateRight(ActionEvent e) { rotatePage(90);  }
+    @FXML private void onRotateLeft(ActionEvent e) { rotatePage(-90); }
+    @FXML private void onRotateRight(ActionEvent e) { rotatePage(90); }
 
     private void rotatePage(int delta) {
         if (selectedPage == null) return;
@@ -402,7 +399,7 @@ public class ScanController implements Initializable {
         List<ScanPage> all = allPages();
         if (all.isEmpty()) return;
 
-        index        = Math.max(0, Math.min(index, all.size() - 1));
+        index = Math.max(0, Math.min(index, all.size() - 1));
         selectedPage = all.get(index);
         currentPageIndex = index;
 
@@ -441,12 +438,10 @@ public class ScanController implements Initializable {
             if (node instanceof VBox card) {
                 card.setPrefWidth(cardW);
                 card.setPrefHeight(cardH);
-                card.getChildren().stream()
-                        .filter(c -> c instanceof ImageView)
-                        .forEach(iv -> {
-                            ((ImageView) iv).setFitWidth(cardW - 8);
-                            ((ImageView) iv).setFitHeight(cardH - 40);
-                        });
+                card.getChildren().stream().filter(c -> c instanceof ImageView).forEach(iv -> {
+                    ((ImageView) iv).setFitWidth(cardW - 8);
+                    ((ImageView) iv).setFitHeight(cardH - 40);
+                });
             }
         }
     }
@@ -461,9 +456,9 @@ public class ScanController implements Initializable {
      */
     private void applyGridMode(int modeIndex) {
         // wrap = columns * (cardWidth + hgap)
-        double gap      = 16;
+        double gap = 16;
         double baseCard = 160 * zoomLevel;
-        int    cols     = modeIndex + 1;   // 0→1, 1→2, 2→3, 3→4
+        int cols = modeIndex + 1; // 0→1, 1→2, 2→3, 3→4
         pageGrid.setPrefWrapLength(cols * (baseCard + gap));
     }
 
@@ -474,8 +469,7 @@ public class ScanController implements Initializable {
     @FXML
     private void onExport(ActionEvent e) {
         if (documents.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "Export",
-                    "There are no documents to export yet.");
+            showAlert(Alert.AlertType.INFORMATION, "Export", "There are no document(s) to export.");
             return;
         }
         String mode = exportModeComboBox.getValue();
@@ -484,7 +478,7 @@ public class ScanController implements Initializable {
         // TODO: ExportService.export(documents, mode, boxId)
         showAlert(Alert.AlertType.INFORMATION, "Export",
                 "Export started:\n  Mode:  " + mode
-                        + "\n  Docs:  " + documents.size()
+                        + "\n  Documents:  " + documents.size()
                         + "\n  Pages: " + totalPageCount());
 
         stExportLabel.setText("Export: done");
@@ -524,9 +518,18 @@ public class ScanController implements Initializable {
     // =========================================================================
 
     @FXML
-    private void onLogout(ActionEvent e) {
-        // TODO: navigate back to the login / launcher screen
-        showAlert(Alert.AlertType.INFORMATION, "Log out", "Logging out…");
+    private void onExit(ActionEvent actionEvent) {
+        AlertHelper.showConfirmation("Exit Window", "Are you sure you want to exit?", () -> {
+            try {
+                ViewHandler handler = ViewHandler.LOGIN;
+                handler.reset();
+                handler.show(modelFacade);
+                currentStage.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertHelper.showError("Logout Error", "Failed to log out. Please try again.");
+            }
+        });
     }
 
     // =========================================================================
@@ -538,8 +541,7 @@ public class ScanController implements Initializable {
 
         TreeItem<String> treeRoot  = documentTreeView.getRoot();
         boolean isDocNode  = item.getParent() == treeRoot;
-        boolean isPageNode = !isDocNode
-                && item.getParent().getParent() == treeRoot;
+        boolean isPageNode = !isDocNode && item.getParent().getParent() == treeRoot;
 
         if (isDocNode) {
             documents.stream()
@@ -609,7 +611,7 @@ public class ScanController implements Initializable {
         card.getStyleClass().addAll("card", "card-bg", "shadow");
         card.setPadding(new Insets(4));
         card.setRotate(page.getRotation());
-        card.setUserData(page);    // used for selection highlighting
+        card.setUserData(page); // used for selection highlighting
 
         card.setOnMouseClicked(ev -> {
             selectPage(doc, page);
