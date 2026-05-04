@@ -1,5 +1,7 @@
 package ScanHub.BE;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Profile {
@@ -9,6 +11,7 @@ public class Profile {
     private SplitBehavior splitBehavior; // "NONE", "MANUAL", "BARCODE"
     private ProfileStatus status;
     private String exportLabel;
+    private List<User> users;
 
     public Profile(int profileId, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel) {
         this.profileId = profileId;
@@ -16,6 +19,7 @@ public class Profile {
         this.splitBehavior = splitBehavior;
         this.status = status;
         this.exportLabel = exportLabel;
+        this.users = new ArrayList<>();
     }
 
     public Profile(String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel) {
@@ -23,6 +27,7 @@ public class Profile {
         this.splitBehavior = splitBehavior;
         this.status = status;
         this.exportLabel = exportLabel;
+        this.users = new ArrayList<>();
     }
 
     public int getProfileId() {
@@ -36,6 +41,7 @@ public class Profile {
     }
     public ProfileStatus getStatus() {return status;}
     public String getExportLabel() {return exportLabel;}
+    public List<User> getUsers() {return users;}
 
     public void setProfileId(int profileId) {
         this.profileId = profileId;
@@ -50,6 +56,7 @@ public class Profile {
         this.status = status;
     }
     public void setExportLabel(String exportLabel) {this.exportLabel = exportLabel;}
+    public void setUsers(List<User> users) {this.users = users;}
 
     @Override
     public String toString() {
@@ -65,7 +72,7 @@ public class Profile {
     public boolean equals(Object o) {
         // if this (object) is equal to the object given as argument, then return true
         if (this == o) return true;
-        // if its not an instance of Profile class, then its not a profile and returns false
+        // if it's not an instance of Profile class, then it's not a profile and returns false
         if (!(o instanceof Profile)) return false;
         // if all else fails, converts given object to profile and compares with equals method from Objects class
         Profile other = (Profile) o;

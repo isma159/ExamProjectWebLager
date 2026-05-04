@@ -66,6 +66,18 @@
     -fx-text-fill: #ffffff;
 }
 
+.dark .bold-lbl {
+
+    -fx-text-fill: #ffffff;
+
+}
+
+.dark .helper-text {
+
+    -fx-text-fill: #ffffff;
+
+}
+
 /* ---------- Dark Navigation ---------- */
 .dark .primary-navigation-bg {
     -fx-background-color: #0094EA;
@@ -94,9 +106,16 @@
     -fx-background-color: #465160;
     -fx-border-radius: 6px;
     -fx-background-radius: 6px;
+
+    -fx-text-fill: #ffffff;
 }
 
 .dark .container .text-field {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: TRANSPARENT;
+}
+
+.dark .container .label {
     -fx-text-fill: #ffffff;
     -fx-background-color: TRANSPARENT;
 }

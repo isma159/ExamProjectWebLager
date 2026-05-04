@@ -12,8 +12,7 @@ public class UserController implements Initializable {
     private Stage currentStage;
     private ModelFacade modelFacade;
 
-    public UserController() throws Exception {
-    }
+    public UserController() {}
 
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;

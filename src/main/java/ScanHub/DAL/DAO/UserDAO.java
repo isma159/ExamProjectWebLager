@@ -24,30 +24,42 @@ public class UserDAO implements IDataAccess<User> {
         String sql = "INSERT INTO Users (username, passwordHash, role) VALUES (?, ?, ?)";
         String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
 
-        try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = dbConnector.getConnection()) {
 
-            ps.setString(1, newUser.getUsername());
-            ps.setString(2, newUser.getPasswordHash());
-            ps.setString(3, newUser.getRole().toString());
-            ps.executeUpdate();
+            connection.setAutoCommit(false);
 
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                newUser.setUserId(rs.getInt(1));
+            try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+                 PreparedStatement ps2 = connection.prepareStatement(insertJunctionSQL)) {
 
-                for (Profile profile: newUser.getProfiles()) {
+                ps.setString(1, newUser.getUsername());
+                ps.setString(2, newUser.getPasswordHash());
+                ps.setString(3, newUser.getRole().toString());
+                ps.executeUpdate();
 
-                    PreparedStatement ps2 = connection.prepareStatement(insertJunctionSQL);
-                    ps2.setInt(1, newUser.getUserId());
-                    ps2.setInt(2, profile.getProfileId());
-                    ps2.executeUpdate();
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    newUser.setUserId(rs.getInt(1));
 
+                    for (Profile profile : newUser.getProfiles()) {
+
+                        ps2.setInt(1, newUser.getUserId());
+                        ps2.setInt(2, profile.getProfileId());
+                        ps2.addBatch();
+
+                    }
+                    ps2.executeBatch();
                 }
+
+                connection.commit();
+                return newUser;
             }
-
-            return newUser;
-
+            catch (SQLException e) {
+                connection.rollback();
+                throw new Exception("Failed to create user in database", e);
+            }
+            finally {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             throw new Exception("Could not create user", e);
         }
@@ -86,7 +98,11 @@ public class UserDAO implements IDataAccess<User> {
                 String passwordHash = rs.getString("passwordHash");
                 Role role = Role.valueOf(rs.getString("role"));
 
-                users.add(new User(userId, username, passwordHash, role, profiles));
+                User newUser = new User(userId, username, passwordHash, role);
+                newUser.setProfiles(profiles);
+
+                users.add(newUser);
+
             }
         }
         catch (SQLException e) {
@@ -125,7 +141,8 @@ public class UserDAO implements IDataAccess<User> {
                             rs2.getString("exportLabel")));
                 }
 
-                user = new User(rs.getInt("userId"), rs.getString("username"), rs.getString("passwordHash"), Role.valueOf(rs.getString("role")), profiles);
+                user = new User(rs.getInt("userId"), rs.getString("username"), rs.getString("passwordHash"), Role.valueOf(rs.getString("role")));
+                user.setProfiles(profiles);
             }
 
             return user;
@@ -141,26 +158,40 @@ public class UserDAO implements IDataAccess<User> {
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
         String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
 
-        try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = dbConnector.getConnection()) {
 
-            ps.setString(1, updatedUser.getUsername());
-            ps.setString(2, updatedUser.getPasswordHash());
-            ps.setString(3, updatedUser.getRole().toString());
-            ps.setInt(4, updatedUser.getUserId());
-            ps.executeUpdate();
+            connection.setAutoCommit(false);
 
+            try (PreparedStatement ps = connection.prepareStatement(sql);
             PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL);
-            ps2.setInt(1, updatedUser.getUserId());
-            ps2.executeUpdate();
+            PreparedStatement ps3 = connection.prepareStatement(insertJunctionSQL)) {
 
-            for (Profile profile: updatedUser.getProfiles()) {
-                PreparedStatement ps3 = connection.prepareStatement(insertJunctionSQL);
-                ps3.setInt(1, updatedUser.getUserId());
-                ps3.setInt(2, profile.getProfileId());
-                ps3.executeUpdate();
+                ps.setString(1, updatedUser.getUsername());
+                ps.setString(2, updatedUser.getPasswordHash());
+                ps.setString(3, updatedUser.getRole().toString());
+                ps.setInt(4, updatedUser.getUserId());
+                ps.executeUpdate();
+
+                ps2.setInt(1, updatedUser.getUserId());
+                ps2.executeUpdate();
+
+                for (Profile profile : updatedUser.getProfiles()) {
+
+                    ps3.setInt(1, updatedUser.getUserId());
+                    ps3.setInt(2, profile.getProfileId());
+                    ps3.addBatch();
+                }
+                ps3.executeBatch();
+
+                connection.commit();
             }
-
+            catch (SQLException e) {
+                connection.rollback();
+                throw new Exception("Failed to update user in database");
+            }
+            finally {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             throw new Exception("Could not update user", e);
         }
@@ -171,16 +202,29 @@ public class UserDAO implements IDataAccess<User> {
         String sql = "UPDATE Users SET deleted_at = GETDATE() WHERE userId = ?";
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
 
-        try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = dbConnector.getConnection()) {
 
-            ps.setInt(1, selectedUser.getUserId());
-            ps.executeUpdate();
+            connection.setAutoCommit(false);
 
-            PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL);
-            ps2.setInt(1, selectedUser.getUserId());
-            ps2.executeUpdate();
+            try (PreparedStatement ps = connection.prepareStatement(sql);
+                 PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL)) {
 
+                ps.setInt(1, selectedUser.getUserId());
+                ps.executeUpdate();
+
+                ps2.setInt(1, selectedUser.getUserId());
+                ps2.executeUpdate();
+
+                connection.commit();
+
+            }
+            catch (SQLException e) {
+                connection.rollback();
+                throw new Exception("Failed to delete user from database", e);
+            }
+            finally {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             throw new Exception("Could not delete user", e);
         }

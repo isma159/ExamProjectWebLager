@@ -16,8 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.ToggleSwitch?>
 
-
-<HBox xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@../css/mainStyle.css" fx:controller="ScanHub.GUI.controllers.AdminController">
+<HBox stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminController">
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="600.0" prefWidth="1200.0" styleClass="background" HBox.hgrow="ALWAYS">
          <children>
@@ -171,14 +170,14 @@
                                     <Region prefHeight="200.0" prefWidth="15.0" />
                                     <Pane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="30.0" prefWidth="30.0" styleClass="avatar-initial">
                                        <children>
-                                          <Label alignment="CENTER" prefHeight="30.0" prefWidth="30.0" styleClass="lbl" text="JD" textFill="WHITE" />
+                                          <Label alignment="CENTER" prefHeight="30.0" prefWidth="30.0" styleClass="lbl" textFill="WHITE" />
                                        </children>
                                     </Pane>
                                     <Region layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
                                     <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="90.0">
                                        <children>
-                                          <Label styleClass="h3" text="John Doe" />
-                                          <Label layoutX="10.0" layoutY="33.0" styleClass="lbl" text="Administrator" />
+                                          <Label fx:id="lblUsername" styleClass="h3" text="John Doe" />
+                                          <Label fx:id="lblRole" layoutX="10.0" layoutY="33.0" styleClass="lbl" text="Administrator" />
                                        </children>
                                     </VBox>
                                     <Region layoutX="10.0" layoutY="10.0" prefHeight="60.0" prefWidth="48.0" />

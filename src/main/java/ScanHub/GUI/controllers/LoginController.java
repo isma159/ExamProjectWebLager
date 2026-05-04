@@ -112,7 +112,7 @@ public class LoginController implements Initializable {
 
             if (user.isAdmin()) {
                 AdminController adminController = fxmlLoader.getController();
-                adminController.setModel(modelFacade, stage);
+                adminController.setModel(modelFacade, stage, user);
             }
             else {
                 UserController userController = fxmlLoader.getController();

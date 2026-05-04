@@ -23,6 +23,10 @@ public class ProfileModel {
         return profileObservableList;
     }
 
+    public void refreshModel() throws Exception {
+        profileObservableList.setAll(profileManager.getProfiles());
+    }
+
     public void updateProfile(Profile updatedProfile) throws Exception {
         profileManager.updateProfile(updatedProfile);
         // Update the local observable list so the table refreshes automatically

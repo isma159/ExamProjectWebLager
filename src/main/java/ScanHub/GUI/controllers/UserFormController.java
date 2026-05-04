@@ -106,6 +106,14 @@ public class UserFormController implements Initializable {
         } else {
             createUser();
         }
+
+        try {
+            modelFacade.userModel.refreshModel();
+            modelFacade.profileModel.refreshModel();
+        }
+        catch (Exception e) {
+            // TODO AlertView?
+        }
     }
 
     /**
@@ -145,7 +153,9 @@ public class UserFormController implements Initializable {
         Role role = (Role) selectedToggle.getUserData();
 
         try {
-            User newUser = new User(username, hashedPassword, role, selectedProfiles);
+            User newUser = new User(username, hashedPassword, role);
+            newUser.setProfiles(selectedProfiles);
+
             modelFacade.userModel.createUser(newUser);
             currentStage.close();
         } catch (Exception e) {
