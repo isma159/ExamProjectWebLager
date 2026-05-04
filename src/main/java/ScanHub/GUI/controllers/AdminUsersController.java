@@ -5,17 +5,15 @@ import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
+import ScanHub.GUI.util.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -54,7 +52,7 @@ public class AdminUsersController implements Initializable {
             selectedRow = null;
 
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
-            List<User> users = modelFacade.userModel.getUsers();
+            List<User> users = modelFacade.getUserModel().getUsers();
             currentUsers = new ArrayList<>(users);
             for (User user : currentUsers) {
                 HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
@@ -103,39 +101,28 @@ public class AdminUsersController implements Initializable {
             return;
         }
 
-        AlertHelper.showConfirmation(
-                "Delete User",
-                "Are you sure you want to delete \"" + selectedUser.getUsername() + "\"? This action cannot be undone.",
-                () -> {
-                    try {
-                        modelFacade.userModel.deleteUser(selectedUser);
-                        loadUsers();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        AlertHelper.showError("Delete Failed", "Failed to delete user. Please try again.");
-                    }
-                }
-        );
+        AlertHelper.showConfirmation("Delete User", "Are you sure you want to delete \"" + selectedUser.getUsername() + "\"? This action cannot be undone.", () -> {
+            try {
+                modelFacade.getUserModel().deleteUser(selectedUser);
+                loadUsers();
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertHelper.showError("Delete Failed", "Failed to delete user. Please try again.");
+            }
+        });
     }
 
-    private void openUserForm(User user) {
+    private void openUserForm(User user) { // TODO
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/UserFormView.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = new Stage();
-
-            stage.setTitle(user == null ? "Create User" : "Edit User");
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-
-            UserFormController controller = loader.getController();
+            ViewHandler handler = user == null ? ViewHandler.CREATE_USER : ViewHandler.EDIT_USER;
+            handler.reset();
+            handler.preLoad();
+            UserFormController controller = handler.getController();
+            Stage stage = handler.prepareStage();
             controller.setModel(stage, modelFacade, user);
-
             stage.showAndWait();
 
-            // refresh the list after the form closes
-            loadUsers();
+            loadUsers(); // refresh the list after the form closes
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Error", "Failed to open the user form. Please try again.");

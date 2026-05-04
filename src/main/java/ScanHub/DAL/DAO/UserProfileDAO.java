@@ -54,16 +54,16 @@ public class UserProfileDAO implements IUserProfileDataAccess {
     public List<Integer> getProfileIdsForUser(int userId) throws Exception {
         List<Integer> profileIds = new ArrayList<>();
 
-        try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement("SELECT profileId FROM UserProfiles WHERE userId = ?");
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT profileId FROM UserProfiles WHERE userId = ?")) {
 
             ps.setInt(1, userId);
 
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                int profileId = rs.getInt("profileId");
-                profileIds.add(profileId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int profileId = rs.getInt("profileId");
+                    profileIds.add(profileId);
+                }
             }
 
         } catch (SQLException e) {

@@ -3,8 +3,9 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.User;
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
-import ScanHub.Main;
+import ScanHub.GUI.util.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -22,7 +24,7 @@ import org.controlsfx.control.ToggleSwitch;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AdminController implements Initializable {
+public class AdminController implements IViewController, Initializable {
 
     @FXML private StackPane contentArea;
     @FXML private ToggleGroup sidebarBtns;
@@ -38,15 +40,14 @@ public class AdminController implements Initializable {
     public AdminController() throws Exception {
     }
 
-    public void setModel(ModelFacade modelFacade, Stage currentStage, User currentUser) {
+    public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
         this.currentStage = currentStage;
-        this.currentUser = currentUser;
 
         sidebarBtns.selectToggle(dashboardBtn);
 
-        lblUsername.setText(currentUser.getUsername());
-        lblRole.setText(currentUser.getRole().toString());
+        /*lblUsername.setText(currentUser.getUsername());
+        lblRole.setText(currentUser.getRole().toString());*/
     }
 
     @Override
@@ -94,32 +95,36 @@ public class AdminController implements Initializable {
         }
     }
 
-    public void onClickLogOut(ActionEvent actionEvent) {
+    @FXML
+    private void onClickLogOut(ActionEvent actionEvent) { // TODO
         AlertHelper.showConfirmation("Log Out", "Are you sure you want to log out?", () -> {
-                    try {
-                        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/views/LoginView.fxml"));
-                        Scene scene = new Scene(fxmlLoader.load());
-                        Stage stage = new Stage();
-
-                        LoginController loginController = fxmlLoader.getController();
-                        loginController.setModel(modelFacade, stage);
-
-                        stage.setResizable(false);
-                        stage.setTitle("Login");
-                        stage.setScene(scene);
-                        stage.show();
-
-                        currentStage.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        AlertHelper.showError("Logout Error", "Failed to log out. Please try again.");
-                    }
-                }
-        );
+            try {
+                ViewHandler handler = ViewHandler.LOGIN;
+                handler.reset();
+                handler.show(modelFacade);
+                currentStage.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertHelper.showError("Logout Error", "Failed to log out. Please try again.");
+            }
+        });
     }
 
     @FXML
     private void onDarkModeToggle() {
         ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());
+    }
+
+    public void onClickOpenScanView(MouseEvent mouseEvent) {
+        try {
+            ViewHandler handler = ViewHandler.SCAN_VIEW;
+            handler.reset();
+            Stage stage = new Stage();
+            handler.show(modelFacade, stage);
+            currentStage.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertHelper.showError("Scan Workshop Error", "Failed to open Scan Workshop. Please try again.");
+        }
     }
 }

@@ -1,18 +1,15 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.User;
-import ScanHub.BLL.interfaces.IPasswordEncrypter;
-import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.TextFieldListeners;
-import ScanHub.Main;
+import ScanHub.GUI.util.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -20,10 +17,9 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
+public class LoginController implements IViewController, Initializable {
 
     @FXML private TextField txtFldUser, txtFldPass;
     @FXML private PasswordField passFldPass;
@@ -31,7 +27,6 @@ public class LoginController implements Initializable {
     @FXML private HBox hboxUser, hboxPass1, hboxPass2;
 
     private ModelFacade modelFacade;
-    private IPasswordEncrypter encrypter = new PasswordEncrypter();
     private Stage currentStage;
 
     public void setModel (ModelFacade modelFacade, Stage stage) {
@@ -65,13 +60,7 @@ public class LoginController implements Initializable {
         TextFieldListeners.addErrorListener(passFldPass, containers);
         TextFieldListeners.addErrorListener(txtFldPass, containers);
 
-        EventHandler<ActionEvent> signIn = event -> {
-            try {
-                onSignInBtnClick();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        };
+        EventHandler<ActionEvent> signIn = event -> onSignInBtnClick();
         txtFldUser.setOnAction(signIn);
         txtFldPass.setOnAction(signIn);
         passFldPass.setOnAction(signIn);
@@ -80,46 +69,32 @@ public class LoginController implements Initializable {
     // Admin            Username: admin     Password: admin123
     // User             Username: user      Password: user123
     @FXML
-    private void onSignInBtnClick() throws Exception {
+    private void onSignInBtnClick() {
         if (txtFldUser.getText().isBlank() || passFldPass.getText().isBlank()) {
             onLoginError();
             AlertHelper.showWarning("Missing Fields", "Please enter your username and password.");
             return;
         }
 
-        User user = modelFacade.userModel.getUserFromUsername(txtFldUser.getText().strip());
+        User user;
+        try {
+            user = modelFacade.getUserModel().getUserFromUsername(txtFldUser.getText().strip());
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertHelper.showError("Login Error", "Could not connect to the user database. Please try again.");
+            return;
+        }
 
-        if (user == null || !encrypter.verifyPassword(passFldPass.getText(), user.getPasswordHash())) {
+        if (user == null || !modelFacade.getEncrypter().verifyPassword(passFldPass.getText(), user.getPasswordHash())) {
             onLoginError();
             AlertHelper.showError("Login Failed", "Incorrect username or password.");
             return;
         }
 
         try {
-            String view = user.isAdmin() ? "/views/AdminView.fxml" : "/views/UserView.fxml";
-            String title = user.isAdmin() ? "Admin Panel" : "User Panel";
-
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource(view));
-            Scene scene = new Scene(fxmlLoader.load());
-            scene.getRoot().getStyleClass().add("dark");
-
-            Stage stage = new Stage();
-            stage.setMinWidth(1200);
-            stage.setMinHeight(600);
-            stage.setTitle(title);
-            stage.setScene(scene);
-            stage.setMaximized(true);
-
-            if (user.isAdmin()) {
-                AdminController adminController = fxmlLoader.getController();
-                adminController.setModel(modelFacade, stage, user);
-            }
-            else {
-                UserController userController = fxmlLoader.getController();
-                userController.setModel(modelFacade, stage);
-            }
-
-            stage.show();
+            ViewHandler handler = user.isAdmin() ? ViewHandler.ADMIN : ViewHandler.USER;
+            handler.reset();
+            handler.show(modelFacade);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

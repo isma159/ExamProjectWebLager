@@ -4,7 +4,6 @@ import ScanHub.BE.Profile;
 import ScanHub.DAL.DAO.ProfileDAO;
 import ScanHub.DAL.interfaces.IDataAccess;
 
-import java.util.Collections;
 import java.util.List;
 
 public class ProfileManager {

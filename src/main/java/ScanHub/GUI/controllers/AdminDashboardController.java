@@ -28,8 +28,8 @@ public class AdminDashboardController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            List<User> users = modelFacade.userModel.getUsers();
-            List<Profile> profiles = modelFacade.profileModel.getProfiles();
+            List<User> users = modelFacade.getUserModel().getUsers();
+            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
 
             for (User user : users) {
                 userTableBox.getChildren().add(RowMaker.addUserRow(user));

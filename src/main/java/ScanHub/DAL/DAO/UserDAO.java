@@ -10,7 +10,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserDAO implements IDataAccess<User> {
 
@@ -25,41 +27,38 @@ public class UserDAO implements IDataAccess<User> {
         String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
-
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-                 PreparedStatement ps2 = connection.prepareStatement(insertJunctionSQL)) {
+                 PreparedStatement profilePS = connection.prepareStatement(insertJunctionSQL)) {
 
                 ps.setString(1, newUser.getUsername());
                 ps.setString(2, newUser.getPasswordHash());
                 ps.setString(3, newUser.getRole().toString());
                 ps.executeUpdate();
 
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    newUser.setUserId(rs.getInt(1));
-
-                    for (Profile profile : newUser.getProfiles()) {
-
-                        ps2.setInt(1, newUser.getUserId());
-                        ps2.setInt(2, profile.getProfileId());
-                        ps2.addBatch();
-
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        newUser.setUserId(rs.getInt(1));
+                    } else {
+                        throw new SQLException("No generated userId returned");
                     }
-                    ps2.executeBatch();
                 }
 
+                for (Profile profile: newUser.getProfiles()) {
+                    profilePS.setInt(1, newUser.getUserId());
+                    profilePS.setInt(2, profile.getProfileId());
+                    profilePS.addBatch();
+                }
+                profilePS.executeBatch();
                 connection.commit();
-                return newUser;
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 connection.rollback();
-                throw new Exception("Failed to create user in database", e);
+                throw e;
             }
-            finally {
-                connection.setAutoCommit(true);
-            }
+
+            return newUser;
+
         } catch (SQLException e) {
             throw new Exception("Could not create user", e);
         }
@@ -67,85 +66,90 @@ public class UserDAO implements IDataAccess<User> {
 
     @Override
     public List<User> getData() throws Exception {
-        List<User> users = new ArrayList<>();
+        Map<Integer, User> usersById = new LinkedHashMap<>();
 
-        String sql = "SELECT userId, username, passwordHash, role FROM Users WHERE deleted_at IS NULL";
-        String selectProfilesSQL = "SELECT p.profileId, p.profileName, p.splitBehavior, p.exportLabel, p.status FROM Profiles p JOIN UserProfiles up ON p.profileId = up.profileId WHERE up.userId = ? AND p.deleted_at IS NULL";
+        String sql = """
+                SELECT u.userId, u.username, u.passwordHash, u.role,
+                       p.profileId, p.profileName, p.splitBehavior, p.exportLabel, p.status
+                FROM Users u
+                LEFT JOIN UserProfiles up ON u.userId = up.userId
+                LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
+                WHERE u.deleted_at IS NULL
+                ORDER BY u.username, p.profileName
+                """;
 
-        try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-
-                PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);
-                ps2.setInt(1, rs.getInt("userId"));
-                ResultSet rs2 = ps2.executeQuery();
-
-                List<Profile> profiles = new ArrayList<>();
-
-                while (rs2.next()) {
-
-                    profiles.add(new Profile(rs2.getInt("profileId"),
-                            rs2.getString("profileName"),
-                            SplitBehavior.valueOf(rs2.getString("splitBehavior")),
-                            ProfileStatus.valueOf(rs2.getString("status")),
-                            rs2.getString("exportLabel")));
+                int userId = rs.getInt("userId");
+                User user = usersById.get(userId);
+                if (user == null) {
+                    user = new User(
+                            userId,
+                            rs.getString("username"),
+                            rs.getString("passwordHash"),
+                            Role.valueOf(rs.getString("role")),
+                            new ArrayList<>());
+                    usersById.put(userId, user);
                 }
 
-                int userId = rs.getInt("userId");
-                String username = rs.getString("username");
-                String passwordHash = rs.getString("passwordHash");
-                Role role = Role.valueOf(rs.getString("role"));
-
-                User newUser = new User(userId, username, passwordHash, role);
-                newUser.setProfiles(profiles);
-
-                users.add(newUser);
-
+                int profileId = rs.getInt("profileId");
+                if (!rs.wasNull()) {
+                    user.getProfiles().add(new Profile(profileId,
+                            rs.getString("profileName"),
+                            SplitBehavior.valueOf(rs.getString("splitBehavior")),
+                            ProfileStatus.valueOf(rs.getString("status")),
+                            rs.getString("exportLabel")));
+                }
             }
         }
         catch (SQLException e) {
             throw new Exception("Could not get users", e);
         }
-        return users;
+        return new ArrayList<>(usersById.values());
     }
 
     public User getDataFromName(String name) throws Exception {
 
-        String sql = "SELECT * FROM Users WHERE username = ?";
-        String selectProfilesSQL = "SELECT p.profileId, p.profileName, p.splitBehavior, p.exportLabel, p.status FROM Profiles p JOIN UserProfiles up ON p.profileId = up.profileId WHERE up.userId = ? AND p.deleted_at IS NULL";
+        String sql = """
+                SELECT u.userId, u.username, u.passwordHash, u.role,
+                       p.profileId, p.profileName, p.splitBehavior, p.exportLabel, p.status
+                FROM Users u
+                LEFT JOIN UserProfiles up ON u.userId = up.userId
+                LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
+                WHERE u.username = ? AND u.deleted_at IS NULL
+                """;
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
+                User user = null;
 
-            User user = null;
+                while (rs.next()) {
+                    if (user == null) {
+                        user = new User(rs.getInt("userId"),
+                                rs.getString("username"),
+                                rs.getString("passwordHash"),
+                                Role.valueOf(rs.getString("role")),
+                                new ArrayList<>());
+                    }
 
-            if (rs.next()) {
-
-                PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);
-                ps2.setInt(1, rs.getInt("userId"));
-                ResultSet rs2 = ps2.executeQuery();
-
-                List<Profile> profiles = new ArrayList<>();
-
-                while (rs2.next()) {
-
-                    profiles.add(new Profile(rs2.getInt("profileId"),
-                            rs2.getString("profileName"),
-                            SplitBehavior.valueOf(rs2.getString("splitBehavior")),
-                            ProfileStatus.valueOf(rs2.getString("status")),
-                            rs2.getString("exportLabel")));
+                    int profileId = rs.getInt("profileId");
+                    if (!rs.wasNull()) {
+                        user.getProfiles().add(new Profile(profileId,
+                                rs.getString("profileName"),
+                                SplitBehavior.valueOf(rs.getString("splitBehavior")),
+                                ProfileStatus.valueOf(rs.getString("status")),
+                                rs.getString("exportLabel")));
+                    }
                 }
 
-                user = new User(rs.getInt("userId"), rs.getString("username"), rs.getString("passwordHash"), Role.valueOf(rs.getString("role")));
-                user.setProfiles(profiles);
+                return user;
             }
-
-            return user;
 
         } catch (SQLException e) {
             throw new Exception("Could not fetch user from username " + name, e);
@@ -159,12 +163,11 @@ public class UserDAO implements IDataAccess<User> {
         String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
-
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
-            PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL);
-            PreparedStatement ps3 = connection.prepareStatement(insertJunctionSQL)) {
+                 PreparedStatement deleteProfilesPS = connection.prepareStatement(deleteJunctionSQL);
+                 PreparedStatement insertProfilePS = connection.prepareStatement(insertJunctionSQL)) {
 
                 ps.setString(1, updatedUser.getUsername());
                 ps.setString(2, updatedUser.getPasswordHash());
@@ -172,26 +175,21 @@ public class UserDAO implements IDataAccess<User> {
                 ps.setInt(4, updatedUser.getUserId());
                 ps.executeUpdate();
 
-                ps2.setInt(1, updatedUser.getUserId());
-                ps2.executeUpdate();
+                deleteProfilesPS.setInt(1, updatedUser.getUserId());
+                deleteProfilesPS.executeUpdate();
 
-                for (Profile profile : updatedUser.getProfiles()) {
-
-                    ps3.setInt(1, updatedUser.getUserId());
-                    ps3.setInt(2, profile.getProfileId());
-                    ps3.addBatch();
+                for (Profile profile: updatedUser.getProfiles()) {
+                    insertProfilePS.setInt(1, updatedUser.getUserId());
+                    insertProfilePS.setInt(2, profile.getProfileId());
+                    insertProfilePS.addBatch();
                 }
-                ps3.executeBatch();
-
+                insertProfilePS.executeBatch();
                 connection.commit();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 connection.rollback();
-                throw new Exception("Failed to update user in database");
+                throw e;
             }
-            finally {
-                connection.setAutoCommit(true);
-            }
+
         } catch (SQLException e) {
             throw new Exception("Could not update user", e);
         }
@@ -203,28 +201,23 @@ public class UserDAO implements IDataAccess<User> {
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
 
         try (Connection connection = dbConnector.getConnection()) {
-
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
-                 PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL)) {
+                 PreparedStatement deleteProfilesPS = connection.prepareStatement(deleteJunctionSQL)) {
 
                 ps.setInt(1, selectedUser.getUserId());
                 ps.executeUpdate();
 
-                ps2.setInt(1, selectedUser.getUserId());
-                ps2.executeUpdate();
+                deleteProfilesPS.setInt(1, selectedUser.getUserId());
+                deleteProfilesPS.executeUpdate();
 
                 connection.commit();
-
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 connection.rollback();
-                throw new Exception("Failed to delete user from database", e);
+                throw e;
             }
-            finally {
-                connection.setAutoCommit(true);
-            }
+
         } catch (SQLException e) {
             throw new Exception("Could not delete user", e);
         }

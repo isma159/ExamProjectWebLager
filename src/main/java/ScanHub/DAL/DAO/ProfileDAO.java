@@ -155,23 +155,17 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 ps2.executeUpdate();
 
                 for (User user : newData.getUsers()) {
-
                     ps3.setInt(1, user.getUserId());
                     ps3.setInt(2, newData.getProfileId());
                     ps3.addBatch();
-
                 }
 
                 ps3.executeBatch();
-
                 connection.commit();
             }
             catch (SQLException e) {
                 connection.rollback();
-                throw new Exception("Failed to update profile in database", e);
-            }
-            finally {
-                connection.setAutoCommit(true);
+                throw e;
             }
         } catch (SQLException e) {
             throw new Exception("Could not update profile", e);
@@ -184,7 +178,6 @@ public class ProfileDAO implements IDataAccess<Profile> {
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE profileId = ?";
 
         try (Connection connection = dbConnector.getConnection()) {
-
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -197,15 +190,11 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 ps2.executeUpdate();
 
                 connection.commit();
-
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 connection.rollback();
-                throw new Exception("Failed to delete profile", e);
+                throw e;
             }
-            finally {
-                connection.setAutoCommit(true);
-            }
+
         } catch (SQLException e) {
             throw new Exception("Could not delete profile", e);
         }

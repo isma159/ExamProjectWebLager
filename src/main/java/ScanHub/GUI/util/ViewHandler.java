@@ -1,6 +1,8 @@
 package ScanHub.GUI.util;
 
 //java imports
+import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IViewController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -34,10 +36,29 @@ public enum ViewHandler {
         this.modality = modality;
     }
 
+    private Stage getOrCreateStage() throws IOException {
+        if (stage == null) {
+            stage = configureStage(new Stage(), true);
+        }
+        return stage;
+    }
+
+    private Stage configureStage(Stage stage, boolean applyModality) throws IOException {
+        this.stage = stage;
+        stage.setTitle(title);
+        stage.setScene(loadScene());
+        if (applyModality) {
+            stage.initModality(modality);
+        }
+        stage.setResizable(resizable);
+        return stage;
+    }
+
     private Scene loadScene() throws IOException {
         if(scene == null) {
             loader = new FXMLLoader(getClass().getResource(path));
             scene = new Scene(loader.load());
+            scene.getRoot().getStyleClass().add("dark"); // lets us apply dark mode
         }
         return scene;
     }
@@ -57,41 +78,41 @@ public enum ViewHandler {
         }
     }
 
-    public Stage show() {
-        try {
-            Stage stage = getOrCreateStage();
-            stage.show();
-            return stage;
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to open: " + title);
-            e.printStackTrace();
-            return null;
-        }
+    public Stage prepareStage() throws IOException {
+        return getOrCreateStage();
     }
 
-    public void showAndWait() {
-        try {
-            getOrCreateStage().showAndWait();
-        } catch (IOException e) {
-            AlertHelper.showError("Error", "Could not open " + title);
-            e.printStackTrace();
+    public Stage prepareStage(Stage stage) throws IOException {
+        if (this.stage == null) {
+            return configureStage(stage, false);
         }
+        return this.stage;
+    }
+
+    public Stage show(ModelFacade model) throws IOException {
+        Stage stage = prepareStage();
+        initController(model, stage);
+        stage.show();
+        return stage;
+    }
+
+    public Stage show(ModelFacade model, Stage stage) throws IOException {
+        Stage preparedStage = prepareStage(stage);
+        initController(model, preparedStage);
+        preparedStage.show();
+        return preparedStage;
+    }
+
+    public Stage showAndWait(ModelFacade model) throws IOException {
+        Stage stage = prepareStage();
+        initController(model, stage);
+        stage.showAndWait();
+        return stage;
     }
 
     public Parent getRoot() throws IOException {
         if (scene == null) loadScene();
         return (Parent) scene.getRoot();
-    }
-
-    private Stage getOrCreateStage() throws IOException {
-        if (stage == null) {
-            stage = new Stage();
-            stage.setTitle(title);
-            stage.setScene(loadScene());
-            stage.initModality(modality);
-            stage.setResizable(resizable);
-        }
-        return stage;
     }
 
     /**
@@ -106,9 +127,20 @@ public enum ViewHandler {
         }
         return (T) loader.getController();
     }
+
     public void close() {
         if (stage != null) {
             stage.close();
         }
+    }
+
+    /**
+     *
+     * @param model
+     * @param stage
+     */
+    public void initController(ModelFacade model, Stage stage) {
+        IViewController controller = getController();
+        controller.setModel(model, stage);
     }
 }
