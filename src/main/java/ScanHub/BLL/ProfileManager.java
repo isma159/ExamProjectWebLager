@@ -1,9 +1,11 @@
 package ScanHub.BLL;
 
+// project imports
 import ScanHub.BE.Profile;
 import ScanHub.DAL.DAO.ProfileDAO;
 import ScanHub.DAL.interfaces.IDataAccess;
 
+// java imports
 import java.util.Collections;
 import java.util.List;
 

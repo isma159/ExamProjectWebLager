@@ -1,23 +1,23 @@
 package ScanHub.GUI.controllers;
 
+// project imports
 import ScanHub.BE.Profile;
 import ScanHub.BE.ProfileStatus;
-import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
+
+// java imports
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,11 +29,11 @@ public class AdminProfilesController implements Initializable {
     @FXML private VBox profileTableBox;
     @FXML private TextField txtFldSearchProfiles;
     private List<Profile> currentProfiles = new ArrayList<>();
-    private boolean ascending;
+    private boolean profileAscending;
     private ModelFacade modelFacade;
     private Profile selectedProfile = null;
     private ProfileStatus selectedStatus = null;
-    private HBox selectedRow;
+    private HBox selectedProfileRow;
 
     public AdminProfilesController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
@@ -50,7 +50,7 @@ public class AdminProfilesController implements Initializable {
             // resets
             profileTableBox.getChildren().clear();
             selectedProfile = null;
-            selectedRow = null;
+            selectedProfileRow = null;
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
             List<Profile> profiles = modelFacade.profileModel.getProfiles();
@@ -58,18 +58,18 @@ public class AdminProfilesController implements Initializable {
             for (Profile profile : currentProfiles) {
                 HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
                     // clear highlight of previously selected row
-                    if (selectedRow != null) {
-                        selectedRow.getStyleClass().remove("row-selected");
+                    if (selectedProfileRow != null) {
+                        selectedProfileRow.getStyleClass().remove("row-selected");
                     }
                     // remove selected row if clicked on again
                     if (selectedProfile == clickedProfile) {
                         selectedProfile = null;
-                        selectedRow = null;
+                        selectedProfileRow = null;
                         return; // will reselect on the next line if not returning
                     }
                     // select clicked row as selected profile (with highlight to show)
                     selectedProfile = clickedProfile;
-                    selectedRow = rowHBox;
+                    selectedProfileRow = rowHBox;
                     rowHBox.getStyleClass().add("row-selected");
                 });
                 row.setUserData(profile);
@@ -173,42 +173,44 @@ public class AdminProfilesController implements Initializable {
     @FXML
     private void onProfileNameClick() {
         // toggle ascending and descending order
-        ascending = !ascending;
+        profileAscending = !profileAscending;
         // sorting the profile names on the direction
-        currentProfiles.sort(ascending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
+        currentProfiles.sort(profileAscending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
         profileTableBox.getChildren().clear();
 
         for (Profile profile : currentProfiles) {
             HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
-                if (selectedProfile != null) selectedRow.getStyleClass().remove("row-selected");
-                if (selectedProfile == clickedProfile) { selectedProfile = null; selectedRow = null; return;}
+                if (selectedProfile != null) selectedProfileRow.getStyleClass().remove("row-selected");
+                if (selectedProfile == clickedProfile) { selectedProfile = null; selectedProfileRow = null; return;}
                 selectedProfile = clickedProfile;
-                selectedRow = rowHBox;
+                selectedProfileRow = rowHBox;
                 rowHBox.getStyleClass().add("row-selected");
             });
             row.setUserData(profile);
             profileTableBox.getChildren().add(row);
         }
+        filterProfiles(txtFldSearchProfiles.getText());
     }
 
     @FXML
     private void onSplitBehaviorClick() {
         // toggle ascending and descending order
-        ascending = !ascending;
-        // sorting the profile names on the direction
-        currentProfiles.sort(ascending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
+        profileAscending = !profileAscending;
+
+        currentProfiles.sort(profileAscending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
         profileTableBox.getChildren().clear();
 
         for (Profile profile : currentProfiles) {
             HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
-                if (selectedProfile != null) selectedRow.getStyleClass().remove("row-selected");
-                if (selectedProfile == clickedProfile) { selectedProfile = null; selectedRow = null; return;}
+                if (selectedProfile != null) selectedProfileRow.getStyleClass().remove("row-selected");
+                if (selectedProfile == clickedProfile) { selectedProfile = null; selectedProfileRow = null; return;}
                 selectedProfile = clickedProfile;
-                selectedRow = rowHBox;
+                selectedProfileRow = rowHBox;
                 rowHBox.getStyleClass().add("row-selected");
             });
             row.setUserData(profile);
             profileTableBox.getChildren().add(row);
         }
+        filterProfiles(txtFldSearchProfiles.getText());
     }
 }

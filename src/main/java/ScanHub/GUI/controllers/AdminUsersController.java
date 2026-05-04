@@ -1,11 +1,14 @@
 package ScanHub.GUI.controllers;
 
+// project imports
 import ScanHub.BE.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import javafx.event.ActionEvent;
+
+// java imports
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +20,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,11 +31,11 @@ public class AdminUsersController implements Initializable {
     @FXML private VBox userTableBox;
     @FXML private TextField txtFldUserSearch;
     private List<User> currentUsers = new ArrayList<>();
-    private boolean ascending = true;
+    private boolean userAscending = true;
 
     private ModelFacade modelFacade;
     private User selectedUser = null;
-    private HBox selectedRow = null;
+    private HBox selectedUserRow = null;
     private Role selectedRole = null;
 
     public AdminUsersController(ModelFacade modelFacade) {
@@ -51,7 +53,7 @@ public class AdminUsersController implements Initializable {
             // resets
             userTableBox.getChildren().clear();
             selectedUser = null;
-            selectedRow = null;
+            selectedUserRow = null;
 
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<User> users = modelFacade.userModel.getUsers();
@@ -59,18 +61,18 @@ public class AdminUsersController implements Initializable {
             for (User user : currentUsers) {
                 HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
                     // clear highlight of previously selected row
-                    if (selectedRow != null) {
-                        selectedRow.getStyleClass().remove("row-selected");
+                    if (selectedUserRow != null) {
+                        selectedUserRow.getStyleClass().remove("row-selected");
                     }
                     // remove selected row if clicked on again
                     if (selectedUser == clickedUser) {
                         selectedUser = null;
-                        selectedRow = null;
+                        selectedUserRow = null;
                         return; // will reselect on the next line if not returning
                     }
                     // select clicked row as selected user (with highlight to show)
                     selectedUser = clickedUser;
-                    selectedRow = rowHBox;
+                    selectedUserRow = rowHBox;
                     rowHBox.getStyleClass().add("row-selected");
                 });
                 row.setUserData(user);
@@ -181,21 +183,22 @@ public class AdminUsersController implements Initializable {
     @FXML
     private void onUsernameClick(Event event) {
         // toggle ascending and descending order
-        ascending = !ascending;
+        userAscending = !userAscending;
         // sorting the usernames on the direction
-        currentUsers.sort(ascending ? Comparator.comparing(User::getUsername) : Comparator.comparing(User::getUsername).reversed());
+        currentUsers.sort(userAscending ? Comparator.comparing(User::getUsername) : Comparator.comparing(User::getUsername).reversed());
         userTableBox.getChildren().clear();
 
         for (User user : currentUsers) {
             HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
-                if (selectedUser != null) selectedRow.getStyleClass().remove("row-selected");
-                if (selectedUser == clickedUser) { selectedUser = null; selectedRow = null; return;}
+                if (selectedUser != null) selectedUserRow.getStyleClass().remove("row-selected");
+                if (selectedUser == clickedUser) { selectedUser = null; selectedUserRow = null; return;}
                 selectedUser = clickedUser;
-                selectedRow = rowHBox;
+                selectedUserRow = rowHBox;
                 rowHBox.getStyleClass().add("row-selected");
             });
             row.setUserData(user);
             userTableBox.getChildren().add(row);
         }
+        filterUsers(txtFldUserSearch.getText());
     }
 }

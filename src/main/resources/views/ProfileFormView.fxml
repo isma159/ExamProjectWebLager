@@ -14,8 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
 
-
-<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="780.0" styleClass="dark" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="780.0" styleClass="dark" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
    <children>
       <VBox prefHeight="750.0" prefWidth="750.0" styleClass="background" HBox.hgrow="ALWAYS">
           <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12.0" styleClass="primary-navigation-bg" VBox.vgrow="ALWAYS">
@@ -103,7 +102,7 @@
                               <children>
                                   <Label layoutX="35.0" layoutY="108.0" styleClass="bold-lbl" text="Profile Status" />
                                   <Region layoutX="35.0" layoutY="123.0" prefHeight="4" />
-                                  <Label layoutX="35.0" layoutY="127.0" text="Defines the state the profile is currently in." />
+                                  <Label layoutX="35.0" layoutY="127.0" styleClass="lbl" text="Defines the state the profile is currently in." />
                                   <Region layoutX="35.0" layoutY="141.0" prefHeight="8" />
                                   <VBox fx:id="vboxStatus" layoutX="35.0" layoutY="149.0" spacing="8">
                                       <padding>

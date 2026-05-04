@@ -1,6 +1,9 @@
 package ScanHub.GUI.controllers;
 
+// project imports
 import ScanHub.GUI.util.AlertTypes;
+
+// java imports
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

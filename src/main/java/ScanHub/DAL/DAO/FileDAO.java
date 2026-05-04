@@ -1,9 +1,11 @@
 package ScanHub.DAL.DAO;
 
+// project imports
 import ScanHub.BE.File;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
+// java imports
 import java.io.IOException;
 import java.util.List;
 
