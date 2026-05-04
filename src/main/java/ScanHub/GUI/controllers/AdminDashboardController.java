@@ -120,6 +120,7 @@ public class AdminDashboardController implements Initializable {
             row.setUserData(user);
             userTableBox.getChildren().add(row);
         }
+        filterUsers();
     }
 
     @FXML
@@ -169,6 +170,7 @@ public class AdminDashboardController implements Initializable {
             row.setUserData(profile);
             profileTableBox.getChildren().add(row);
         }
+        filterProfiles();
     }
 
     @FXML
@@ -192,5 +194,6 @@ public class AdminDashboardController implements Initializable {
             row.setUserData(profile);
             profileTableBox.getChildren().add(row);
         }
+        filterProfiles();
     }
 }
