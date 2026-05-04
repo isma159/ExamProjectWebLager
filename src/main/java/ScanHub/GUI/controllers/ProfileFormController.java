@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,19 +76,21 @@ public class ProfileFormController implements Initializable {
 
     private void loadUsers() {
 
-        List<User> users = modelFacade.getUserModel().getUsers();
+        try {
+            List<User> users = modelFacade.getUserModel().getUsers();
 
-        for (User user: users) {
-            vboxUsers.getChildren().add(RowMaker.addUserRowToForm(user, editingProfile, (selectedUser, isChecked) -> {
-                if (isChecked) {
-                    selectedUsers.add(user);
-                }
-                else {
-                    selectedUsers.remove(user);
-                }
-
-                System.out.println(selectedUser);
-            }));
+            for (User user : users) {
+                vboxUsers.getChildren().add(RowMaker.addUserRowToForm(user, editingProfile, (selectedUser, isChecked) -> {
+                    if (isChecked) {
+                        selectedUsers.add(user);
+                    } else {
+                        selectedUsers.remove(user);
+                    }
+                }));
+            }
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Could not load users");
+            e.printStackTrace();
         }
     }
 
@@ -118,7 +121,7 @@ public class ProfileFormController implements Initializable {
             modelFacade.getProfileModel().refreshModel();
         }
         catch (Exception e) {
-            // TODO AlertView?
+            AlertHelper.showError("Error", "Could not save changes. Please try again.");
         }
     }
 

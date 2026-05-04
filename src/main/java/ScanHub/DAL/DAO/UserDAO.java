@@ -86,8 +86,7 @@ public class UserDAO implements IDataAccess<User> {
                 int userId = rs.getInt("userId");
                 User user = usersById.get(userId);
                 if (user == null) {
-                    user = new User(
-                            userId,
+                    user = new User(userId,
                             rs.getString("username"),
                             rs.getString("passwordHash"),
                             Role.valueOf(rs.getString("role"))
