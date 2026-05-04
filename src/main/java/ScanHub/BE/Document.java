@@ -1,10 +1,12 @@
 package ScanHub.BE;
 
+import ScanHub.BE.interfaces.TreeNode;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Document {
+public class Document implements TreeNode {
 
     private int documentId;
     private int boxId;
@@ -48,10 +50,17 @@ public class Document {
         this.files = files;
     }
 
+    public void addFile(File file) {this.files.add(file);}
+
     //public void addFile(File file) {this.files.add(file);}
 
     @Override
     public String toString() {
-        return "Document #" + this.documentId;
+        return getDisplayName();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "\uE963" + " " + "Document #" + this.documentId;
     }
 }

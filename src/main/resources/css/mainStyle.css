@@ -202,6 +202,50 @@
 
 }
 
+.destructive-btn:hover {
+
+    -fx-background-color: #DC2626;
+
+}
+
+.tree-view {
+
+    -fx-border-width: 0;
+
+    -fx-background-color: TRANSPARENT;
+
+}
+
+.tree-item-file {
+
+    -fx-background-color: TRANSPARENT;
+    -fx-background-radius: 3px;
+
+    transition: -fx-background-color 300ms ease-out, -fx-text-fill 300ms ease-out
+
+}
+
+.tree-item-file:hover {
+
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 3px;
+
+}
+
+.tree-item-file:selected {
+
+    -fx-background-color: #2D3D4F;
+    -fx-background-radius: 3px;
+    -fx-text-fill: #ffffff;
+
+}
+
+.tree-item-file .tree-disclosure-node .arrow {
+
+    -fx-background-color: #ffffff;
+
+}
+
 .tertiary-btn {
 
     -fx-text-fill: #2d3d4f;

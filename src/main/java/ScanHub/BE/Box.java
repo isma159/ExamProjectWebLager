@@ -1,10 +1,12 @@
 package ScanHub.BE;
 
+import ScanHub.BE.interfaces.TreeNode;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Box {
+public class Box implements TreeNode {
 
     private int boxId;
     private String boxName;
@@ -75,6 +77,11 @@ public class Box {
 
     @Override
     public String toString() {
-        return this.boxName;
+        return getDisplayName();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "\uE9D9" + " " + boxName;
     }
 }

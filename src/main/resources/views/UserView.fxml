@@ -1,14 +1,234 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ScanHub.GUI.controllers.UserController"
-            prefHeight="600.0" prefWidth="1200.0">
-
-</AnchorPane>
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserController">
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" StackPane.alignment="CENTER">
+         <children>
+            <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="9.0" prefWidth="200.0" />
+            <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="114.0" prefWidth="200.0">
+               <children>
+                  <VBox prefHeight="102.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets bottom="6.0" left="9.0" right="9.0" top="6.0" />
+                     </HBox.margin>
+                     <styleClass>
+                        <String fx:value="card" />
+                        <String fx:value="card-bg" />
+                        <String fx:value="shadow" />
+                     </styleClass>
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Region layoutX="43.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" HBox.hgrow="ALWAYS" />
+                              <Separator maxHeight="-Infinity" minHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" prefWidth="6.0" styleClass="grey-separator" />
+                              <Region layoutX="879.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="primary-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                 </children>
+                              </HBox>
+                              <Region prefHeight="200.0" prefWidth="9.0" />
+                           </children></HBox>
+                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="3.0">
+                           <children>
+                              <Region layoutX="879.0" layoutY="10.0" prefHeight="200.0" prefWidth="15.0" />
+                              <Separator maxHeight="-Infinity" minHeight="-Infinity" prefHeight="3.0" prefWidth="200.0" styleClass="grey-separator" HBox.hgrow="ALWAYS" />
+                              <Region prefHeight="200.0" prefWidth="15.0" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="12.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                           <children>
+                              <Region prefHeight="200.0" prefWidth="9.0" HBox.hgrow="NEVER" />
+                              <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                    <Label alignment="CENTER" styleClass="bold-lbl" text="Scan" textFill="WHITE">
+                                       <font>
+                                          <Font size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <Region layoutX="407.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <HBox alignment="CENTER" layoutX="412.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                    <Label alignment="CENTER" styleClass="bold-lbl" text="Stop" textFill="WHITE">
+                                       <font>
+                                          <Font size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <Region layoutX="94.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <Label alignment="CENTER_RIGHT" minWidth="-Infinity" prefHeight="30.0" prefWidth="45.0" styleClass="lbl" text="Profile:" />
+                              <Region layoutX="542.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <ChoiceBox maxWidth="-Infinity" prefHeight="30.0" prefWidth="150.0" styleClass="container" HBox.hgrow="ALWAYS" />
+                              <Region layoutX="533.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <HBox alignment="CENTER" layoutX="454.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                 </children>
+                              </HBox>
+                              <Region prefHeight="200.0" prefWidth="9.0" />
+                              <HBox alignment="CENTER" layoutX="187.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                 </children>
+                              </HBox>
+                              <Region layoutX="217.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <Label alignment="CENTER" minWidth="-Infinity" prefHeight="30.0" prefWidth="150.0" text="Doc 1 · Page 999 of 999">
+                                 <styleClass>
+                                    <String fx:value="bold-lbl" />
+                                    <String fx:value="container" />
+                                 </styleClass>
+                              </Label>
+                              <Region layoutX="834.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <HBox alignment="CENTER" layoutX="795.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                 </children>
+                              </HBox>
+                              <Region layoutX="473.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <HBox alignment="CENTER" layoutX="518.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                 </children>
+                              </HBox>
+                              <Region layoutX="480.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <Label alignment="CENTER_RIGHT" layoutX="213.0" layoutY="19.0" minWidth="-Infinity" prefHeight="30.0" prefWidth="30.0" styleClass="lbl" text="Box:" />
+                              <Region layoutX="205.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <ChoiceBox layoutX="258.0" layoutY="19.0" maxWidth="-Infinity" prefHeight="30.0" prefWidth="150.0" styleClass="container" HBox.hgrow="ALWAYS" />
+                              <Region layoutX="256.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <HBox alignment="CENTER" layoutX="19.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="105.0" styleClass="destructive-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                    <Label alignment="CENTER" styleClass="bold-lbl" text="Close Box" textFill="WHITE">
+                                       <font>
+                                          <Font size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <Region layoutX="557.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                              <HBox alignment="CENTER" layoutX="804.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
+                                 <children>
+                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefHeight="200.0" prefWidth="3.0" />
+                                    <Label alignment="CENTER" styleClass="bold-lbl" text="Export" textFill="WHITE">
+                                       <font>
+                                          <Font size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <Region layoutX="515.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox fx:id="vboxBoxContent" maxWidth="300.0" prefHeight="200.0" prefWidth="180.0" HBox.hgrow="ALWAYS">
+                     <styleClass>
+                        <String fx:value="card" />
+                        <String fx:value="card-bg" />
+                        <String fx:value="shadow" />
+                     </styleClass>
+                     <HBox.margin>
+                        <Insets bottom="9.0" left="9.0" right="6.0" top="6.0" />
+                     </HBox.margin>
+                     <padding>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                     </padding>
+                     <children>
+                        <TreeView fx:id="boxTreeView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox layoutX="19.0" layoutY="16.0" prefHeight="200.0" prefWidth="600.0" HBox.hgrow="ALWAYS">
+                     <styleClass>
+                        <String fx:value="card" />
+                        <String fx:value="second-card-bg" />
+                        <String fx:value="shadow" />
+                     </styleClass>
+                     <HBox.margin>
+                        <Insets bottom="9.0" left="6.0" right="6.0" top="6.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <VBox fx:id="vboxBoxContent1" layoutX="19.0" layoutY="16.0" maxWidth="300.0" prefHeight="200.0" prefWidth="180.0" HBox.hgrow="ALWAYS">
+                     <styleClass>
+                        <String fx:value="card" />
+                        <String fx:value="card-bg" />
+                        <String fx:value="shadow" />
+                     </styleClass>
+                     <padding>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                     </padding>
+                     <HBox.margin>
+                        <Insets bottom="9.0" left="6.0" right="9.0" top="6.0" />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</StackPane>
