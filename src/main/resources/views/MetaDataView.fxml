@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ScanHub.GUI.controllers.AdminMetadataController">
+    <children>
+        <VBox prefHeight="200.0" prefWidth="1800.0">
+            <children>
+                <VBox prefHeight="1200.0" prefWidth="1371.0" styleClass="shadow">
+                    <children>
+
+                        <!-- ── Top bar: title + search + action buttons ── -->
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity"
+                              prefHeight="45.0" prefWidth="510.0">
+                            <styleClass>
+                                <String fx:value="half-card"/>
+                                <String fx:value="card-bg"/>
+                            </styleClass>
+                            <children>
+                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0"/>
+                                <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="100.0"
+                                       styleClass="h2" text="Metadata"/>
+                                <TextField fx:id="txtFldSearchMetadata" minWidth="-Infinity" prefHeight="30.0"
+                                           prefWidth="200.0" promptText="Search metadata" styleClass="container"/>
+                                <Region prefHeight="56.0" prefWidth="1482.0" HBox.hgrow="ALWAYS"/>
+
+                                <!-- Edit button -->
+                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity"
+                                      minHeight="-Infinity" minWidth="-Infinity"
+                                      onMouseClicked="#onClickEditMetadata"
+                                      prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                                    <children>
+                                        <Region prefHeight="200.0" prefWidth="6.0"/>
+                                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
+                                               minHeight="-Infinity" minWidth="-Infinity"
+                                               prefHeight="24.0" prefWidth="24.0"
+                                               styleClass="white-icon" text="&#xf044;">
+                                            <font><Font size="16.0"/></font>
+                                        </Label>
+                                        <Region prefHeight="200.0" prefWidth="6.0"/>
+                                        <Label alignment="CENTER" styleClass="lbl" text="Edit" textFill="WHITE">
+                                            <font><Font size="12.0"/></font>
+                                        </Label>
+                                    </children>
+                                </HBox>
+
+                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0"/>
+
+                                <!-- Delete button -->
+                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity"
+                                      minHeight="-Infinity" minWidth="-Infinity"
+                                      onMouseClicked="#onClickDeleteMetadata"
+                                      prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                                    <children>
+                                        <Region prefHeight="200.0" prefWidth="6.0"/>
+                                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
+                                               minHeight="-Infinity" minWidth="-Infinity"
+                                               prefHeight="24.0" prefWidth="24.0"
+                                               styleClass="white-icon" text="&#xf1f8;">
+                                            <font><Font size="16.0"/></font>
+                                        </Label>
+                                        <Region prefHeight="200.0" prefWidth="6.0"/>
+                                        <Label alignment="CENTER" styleClass="lbl" text="Delete" textFill="WHITE">
+                                            <font><Font size="12.0"/></font>
+                                        </Label>
+                                    </children>
+                                </HBox>
+
+                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0"/>
+                            </children>
+                        </HBox>
+
+                        <!-- ── Filter toggle bar ── -->
+                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                            <styleClass>
+                                <String fx:value="box-card"/>
+                                <String fx:value="second-card-bg"/>
+                            </styleClass>
+                            <children>
+                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0"/>
+                                <ToggleButton mnemonicParsing="false" onAction="#onTbAllMetadataClick"
+                                              prefHeight="30.0" prefWidth="90.0" selected="true" text="All">
+                                    <toggleGroup>
+                                        <ToggleGroup fx:id="metadataFilter"/>
+                                    </toggleGroup>
+                                    <styleClass>
+                                        <String fx:value="filter-btn"/>
+                                        <String fx:value="lbl"/>
+                                    </styleClass>
+                                </ToggleButton>
+                                <ToggleButton mnemonicParsing="false" onAction="#onTbWithMetadataClick"
+                                              prefHeight="30.0" prefWidth="120.0"
+                                              text="Has Metadata" toggleGroup="$metadataFilter">
+                                    <styleClass>
+                                        <String fx:value="filter-btn"/>
+                                        <String fx:value="lbl"/>
+                                    </styleClass>
+                                </ToggleButton>
+                                <ToggleButton mnemonicParsing="false" onAction="#onTbNoMetadataClick"
+                                              prefHeight="30.0" prefWidth="130.0"
+                                              text="Missing Metadata" toggleGroup="$metadataFilter">
+                                    <styleClass>
+                                        <String fx:value="filter-btn"/>
+                                        <String fx:value="lbl"/>
+                                    </styleClass>
+                                </ToggleButton>
+                            </children>
+                        </HBox>
+
+                        <!-- ── Column headers ── -->
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity"
+                              prefHeight="30.0" prefWidth="200.0">
+                            <styleClass>
+                                <String fx:value="second-card-bg"/>
+                                <String fx:value="box-card"/>
+                            </styleClass>
+                            <children>
+                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity"
+                                       onMouseClicked="#onDocumentIdClick"
+                                       prefWidth="120.0" styleClass="lbl" text="Document ID"
+                                       HBox.hgrow="ALWAYS"/>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0"/>
+                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity"
+                                       onMouseClicked="#onTitleClick"
+                                       prefWidth="210.0" styleClass="lbl" text="Title"
+                                       HBox.hgrow="ALWAYS"/>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0"/>
+                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity"
+                                       onMouseClicked="#onDocumentTypeClick"
+                                       prefWidth="160.0" styleClass="lbl" text="Type"
+                                       HBox.hgrow="ALWAYS"/>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0"/>
+                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity"
+                                       onMouseClicked="#onAuthorClick"
+                                       prefWidth="180.0" styleClass="lbl" text="Author"
+                                       HBox.hgrow="ALWAYS"/>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0"/>
+                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity"
+                                       onMouseClicked="#onReferenceNumberClick"
+                                       prefWidth="160.0" styleClass="lbl" text="Reference No."
+                                       HBox.hgrow="ALWAYS"/>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0"/>
+                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity"
+                                       onMouseClicked="#onDocumentDateClick"
+                                       prefWidth="160.0" styleClass="lbl" text="Document Date"
+                                       HBox.hgrow="ALWAYS"/>
+                            </children>
+                        </HBox>
+
+                        <!-- ── Scrollable row list ── -->
+                        <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
+                            <content>
+                                <VBox fx:id="metadataTableBox" prefHeight="100.0" prefWidth="100.0"/>
+                            </content>
+                        </ScrollPane>
+
+                        <!-- ── Pagination footer ── -->
+                        <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity"
+                              prefHeight="45.0" prefWidth="200.0">
+                            <styleClass>
+                                <String fx:value="half-card-bottom"/>
+                                <String fx:value="card-bg"/>
+                            </styleClass>
+                            <children>
+                                <Pagination fx:id="metadataPagination" maxPageIndicatorCount="5"
+                                            prefHeight="45.0" prefWidth="538.0"/>
+                            </children>
+                        </HBox>
+
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</HBox>
