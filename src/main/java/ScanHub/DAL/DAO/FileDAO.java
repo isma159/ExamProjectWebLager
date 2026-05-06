@@ -1,8 +1,10 @@
 package ScanHub.DAL.DAO;
 
+// project imports
 import ScanHub.BE.File;
 import ScanHub.DAL.DB.DBConnector;
 
+// java imports
 import java.io.IOException;
 import java.sql.*;
 

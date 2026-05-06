@@ -1,7 +1,10 @@
 package ScanHub.GUI.models;
 
+// project imports
 import ScanHub.BE.Profile;
 import ScanHub.BLL.ProfileManager;
+
+// java imports
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

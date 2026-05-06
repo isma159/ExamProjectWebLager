@@ -1,7 +1,7 @@
 package ScanHub.BLL;
 
+// java imports
 import javafx.scene.Scene;
-
 import java.util.Objects;
 
 public class ThemeManager { // TODO Placeholder / Hook it up

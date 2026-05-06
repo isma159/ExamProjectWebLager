@@ -1,9 +1,12 @@
 package ScanHub.GUI.util;
 
+// project imports
 import ScanHub.BE.Profile;
 import ScanHub.BE.ProfileStatus;
 import ScanHub.BE.Role;
 import ScanHub.BE.User;
+
+// java imports
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -14,7 +17,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Paint;
-
 import java.util.function.BiConsumer;
 
 /**
@@ -258,6 +260,7 @@ public class RowMaker {
 
         // Name label
         Label nameLabel = new Label(profile.getProfileName());
+        nameLabel.getStyleClass().add("lbl");
 
         // Growing spacer (pushes chip to the right)
         Region growingSpacer = new Region();
@@ -383,6 +386,7 @@ public class RowMaker {
 
         // Name label
         Label nameLabel = new Label(user.getUsername());
+        nameLabel.getStyleClass().add("lbl");
 
         // Growing spacer (pushes chip to the right)
         Region growingSpacer = new Region();

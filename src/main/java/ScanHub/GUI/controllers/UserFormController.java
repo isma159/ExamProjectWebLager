@@ -1,5 +1,6 @@
 package ScanHub.GUI.controllers;
 
+// project imports
 import ScanHub.BE.Profile;
 import ScanHub.BE.Role;
 import ScanHub.BE.User;
@@ -9,13 +10,14 @@ import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
+
+// java imports
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
