@@ -86,7 +86,6 @@ public class AdminController implements IViewController, Initializable {
                 } else if  (controllerClass == AdminMetadataController.class) {
                     return new AdminMetadataController(modelFacade);
                 }
-
                 try {
                     return controllerClass.getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
@@ -95,6 +94,13 @@ public class AdminController implements IViewController, Initializable {
             });
 
             Node page = loader.load();
+
+            // TODO (remove later mb?)
+            Object ctrl = loader.getController();
+            if (ctrl instanceof AdminMetadataController metaCtrl) {
+                metaCtrl.setModel(modelFacade);
+            }
+
             contentArea.getChildren().setAll(page);
         } catch (Exception e) {
             e.printStackTrace();
