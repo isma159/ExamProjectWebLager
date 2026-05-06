@@ -1,8 +1,10 @@
 package ScanHub.DAL.DAO;
 
+// project imports
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IUserProfileDataAccess;
 
+// java imports
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

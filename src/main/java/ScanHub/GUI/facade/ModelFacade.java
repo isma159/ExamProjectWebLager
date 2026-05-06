@@ -1,6 +1,6 @@
 package ScanHub.GUI.facade;
 
-import ScanHub.BLL.util.PasswordEncrypter;
+// project imports
 import ScanHub.GUI.models.ProfileModel;
 import ScanHub.GUI.models.UserModel;
 

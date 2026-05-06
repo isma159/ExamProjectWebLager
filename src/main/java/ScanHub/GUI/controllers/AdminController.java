@@ -1,11 +1,14 @@
 package ScanHub.GUI.controllers;
 
+// project imports
 import ScanHub.BE.User;
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
-import ScanHub.GUI.util.ViewHandler;
+import ScanHub.Main;
+
+// java imports
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,7 +23,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
-
 import java.net.URL;
 import java.util.ResourceBundle;
 

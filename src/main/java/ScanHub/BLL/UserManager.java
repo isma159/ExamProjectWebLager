@@ -1,9 +1,12 @@
 package ScanHub.BLL;
 
+// project imports
 import ScanHub.BE.User;
 import ScanHub.DAL.DAO.UserDAO;
 import ScanHub.DAL.interfaces.IDataAccess;
 
+//java imports
+import java.util.Collections;
 import java.util.List;
 
 public class UserManager {
