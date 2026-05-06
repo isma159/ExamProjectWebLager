@@ -12,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +57,8 @@ public class ProfileFormController implements Initializable {
         radioBARCODE.setUserData(SplitBehavior.BARCODE);
         radioNONE.setUserData(SplitBehavior.NONE);
 
-        radioACTIVE.setUserData(ProfileStatus.Active);
-        radioINACTIVE.setUserData(ProfileStatus.Inactive);
+        radioACTIVE.setUserData(ProfileStatus.ACTIVE);
+        radioINACTIVE.setUserData(ProfileStatus.INACTIVE);
 
         selectedUsers = new ArrayList<>();
 
@@ -102,7 +101,7 @@ public class ProfileFormController implements Initializable {
         if (profile.getSplitBehavior() == SplitBehavior.BARCODE) { toggleGroupSplitBehavior.selectToggle(radioBARCODE); }
         else toggleGroupSplitBehavior.selectToggle(radioNONE);
 
-        if (profile.getStatus() == ProfileStatus.Active) { toggleGroupProfileStatus.selectToggle(radioACTIVE); }
+        if (profile.getStatus() == ProfileStatus.ACTIVE) { toggleGroupProfileStatus.selectToggle(radioACTIVE); }
         else toggleGroupProfileStatus.selectToggle(radioINACTIVE);
     }
 
