@@ -181,15 +181,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
             return profile.getClient().getClientId();
         }
 
-        String sql = "SELECT TOP 1 clientId FROM Clients WHERE deleted_at IS NULL ORDER BY clientName, clientId";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("clientId");
-            }
-        }
-
-        throw new SQLException("Profile requires a clientId, but no active clients exist");
+        throw new SQLException("Profile requires a selected clientId");
     }
 
     private Client loadClient(Connection connection, int clientId) throws SQLException {

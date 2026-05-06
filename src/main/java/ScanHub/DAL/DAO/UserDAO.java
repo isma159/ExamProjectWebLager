@@ -12,9 +12,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class UserDAO implements IDataAccess<User> {
 
@@ -27,12 +29,14 @@ public class UserDAO implements IDataAccess<User> {
     public User createData(User newUser) throws Exception {
         String sql = "INSERT INTO Users (username, passwordHash, role) VALUES (?, ?, ?)";
         String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
+        String insertUserClientSQL = "INSERT INTO UserClients (userId, clientId) VALUES (?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-                 PreparedStatement profilePS = connection.prepareStatement(insertJunctionSQL)) {
+                 PreparedStatement profilePS = connection.prepareStatement(insertJunctionSQL);
+                 PreparedStatement clientPS = connection.prepareStatement(insertUserClientSQL)) {
 
                 ps.setString(1, newUser.getUsername());
                 ps.setString(2, newUser.getPasswordHash());
@@ -53,6 +57,7 @@ public class UserDAO implements IDataAccess<User> {
                     profilePS.addBatch();
                 }
                 profilePS.executeBatch();
+                insertUserClients(newUser, clientPS);
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
@@ -176,13 +181,17 @@ public class UserDAO implements IDataAccess<User> {
         String sql = "UPDATE Users SET username = ?, passwordHash = ?, role = ? WHERE userId = ?";
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
         String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
+        String deleteUserClientsSQL = "DELETE FROM UserClients WHERE userId = ?";
+        String insertUserClientSQL = "INSERT INTO UserClients (userId, clientId) VALUES (?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
                  PreparedStatement deleteProfilesPS = connection.prepareStatement(deleteJunctionSQL);
-                 PreparedStatement insertProfilePS = connection.prepareStatement(insertJunctionSQL)) {
+                 PreparedStatement insertProfilePS = connection.prepareStatement(insertJunctionSQL);
+                 PreparedStatement deleteUserClientsPS = connection.prepareStatement(deleteUserClientsSQL);
+                 PreparedStatement insertUserClientPS = connection.prepareStatement(insertUserClientSQL)) {
 
                 ps.setString(1, updatedUser.getUsername());
                 ps.setString(2, updatedUser.getPasswordHash());
@@ -193,12 +202,16 @@ public class UserDAO implements IDataAccess<User> {
                 deleteProfilesPS.setInt(1, updatedUser.getUserId());
                 deleteProfilesPS.executeUpdate();
 
+                deleteUserClientsPS.setInt(1, updatedUser.getUserId());
+                deleteUserClientsPS.executeUpdate();
+
                 for (Profile profile: updatedUser.getProfiles()) {
                     insertProfilePS.setInt(1, updatedUser.getUserId());
                     insertProfilePS.setInt(2, profile.getProfileId());
                     insertProfilePS.addBatch();
                 }
                 insertProfilePS.executeBatch();
+                insertUserClients(updatedUser, insertUserClientPS);
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
@@ -214,18 +227,23 @@ public class UserDAO implements IDataAccess<User> {
     public void deleteData(User selectedUser) throws Exception {
         String sql = "UPDATE Users SET deleted_at = GETDATE() WHERE userId = ?";
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
+        String deleteUserClientsSQL = "DELETE FROM UserClients WHERE userId = ?";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
-                 PreparedStatement deleteProfilesPS = connection.prepareStatement(deleteJunctionSQL)) {
+                 PreparedStatement deleteProfilesPS = connection.prepareStatement(deleteJunctionSQL);
+                 PreparedStatement deleteUserClientsPS = connection.prepareStatement(deleteUserClientsSQL)) {
 
                 ps.setInt(1, selectedUser.getUserId());
                 ps.executeUpdate();
 
                 deleteProfilesPS.setInt(1, selectedUser.getUserId());
                 deleteProfilesPS.executeUpdate();
+
+                deleteUserClientsPS.setInt(1, selectedUser.getUserId());
+                deleteUserClientsPS.executeUpdate();
 
                 connection.commit();
             } catch (SQLException e) {
@@ -236,6 +254,22 @@ public class UserDAO implements IDataAccess<User> {
         } catch (SQLException e) {
             throw new Exception("Could not delete user", e);
         }
+    }
+
+    private void insertUserClients(User user, PreparedStatement ps) throws SQLException {
+        Set<Integer> clientIds = new LinkedHashSet<>();
+        for (Profile profile : user.getProfiles()) {
+            if (profile.getClientId() > 0) {
+                clientIds.add(profile.getClientId());
+            }
+        }
+
+        for (Integer clientId : clientIds) {
+            ps.setInt(1, user.getUserId());
+            ps.setInt(2, clientId);
+            ps.addBatch();
+        }
+        ps.executeBatch();
     }
 }
 
