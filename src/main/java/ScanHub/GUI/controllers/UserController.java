@@ -1,10 +1,12 @@
 package ScanHub.GUI.controllers;
 
+// project imports
 import ScanHub.GUI.facade.ModelFacade;
+
+// java imports
 import ScanHub.GUI.interfaces.IViewController;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
-
 import java.net.URL;
 import java.util.ResourceBundle;
 

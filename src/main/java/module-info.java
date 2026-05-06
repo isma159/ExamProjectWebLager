@@ -10,6 +10,7 @@ module scanhub {
     requires java.desktop;
     requires java.net.http;
     requires org.controlsfx.controls;
+    requires javafx.base;
 
     exports ScanHub.GUI.controllers;
     opens ScanHub.GUI.controllers to javafx.fxml;
