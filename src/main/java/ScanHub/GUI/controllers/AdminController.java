@@ -84,11 +84,9 @@ public class AdminController implements IViewController, Initializable {
                     return new AdminUsersController(modelFacade);
                 } else if (controllerClass == AdminProfilesController.class) {
                     return new AdminProfilesController(modelFacade);
-                }
-                else if  (controllerClass == AdminMetadataController.class) {
+                } else if (controllerClass == AdminMetadataController.class) {
                     return new AdminMetadataController(modelFacade);
                 }
-
                 try {
                     return controllerClass.getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
@@ -97,6 +95,12 @@ public class AdminController implements IViewController, Initializable {
             });
 
             Node page = loader.load();
+
+            Object ctrl = loader.getController();
+            if (ctrl instanceof AdminMetadataController metaCtrl) {
+                metaCtrl.setModel(modelFacade);
+            }
+
             contentArea.getChildren().setAll(page);
         } catch (Exception e) {
             e.printStackTrace();
