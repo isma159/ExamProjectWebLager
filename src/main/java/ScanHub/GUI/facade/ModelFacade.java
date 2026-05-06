@@ -1,6 +1,8 @@
 package ScanHub.GUI.facade;
 
 // project imports
+import ScanHub.BLL.DocumentMetadataManager;
+import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.models.ProfileModel;
 import ScanHub.GUI.models.UserModel;
 
@@ -8,11 +10,13 @@ public class ModelFacade {
     private PasswordEncrypter encrypter;
     private UserModel userModel;
     private ProfileModel profileModel;
+    private DocumentMetadataManager metadataManager;
 
     public ModelFacade() throws Exception {
         encrypter = new PasswordEncrypter();
         userModel = new UserModel();
         profileModel = new ProfileModel();
+        metadataManager = new DocumentMetadataManager();
     }
 
     public PasswordEncrypter getEncrypter() {
@@ -25,5 +29,9 @@ public class ModelFacade {
 
     public ProfileModel getProfileModel() {
         return profileModel;
+    }
+
+    public DocumentMetadataManager getMetadataManager() {
+        return metadataManager;
     }
 }

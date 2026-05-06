@@ -8,6 +8,7 @@ import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 
 // java imports
+import ScanHub.GUI.util.ViewHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
