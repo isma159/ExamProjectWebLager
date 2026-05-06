@@ -1,6 +1,7 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.User;
+import ScanHub.BLL.SessionManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
@@ -28,6 +29,7 @@ public class LoginController implements IViewController, Initializable {
 
     private ModelFacade modelFacade;
     private Stage currentStage;
+    private SessionManager sessionManager = SessionManager.getInstance();
 
     public void setModel (ModelFacade modelFacade, Stage stage) {
         this.modelFacade = modelFacade;
@@ -92,10 +94,13 @@ public class LoginController implements IViewController, Initializable {
         }
 
         try {
-            ViewHandler handler = user.isAdmin() ? ViewHandler.ADMIN : ViewHandler.USER;
-            handler.reset();
-            handler.show(modelFacade);
-            currentStage.close();
+            // checks to see if an active session is already active. if no session is active then user can log in.
+            if (sessionManager.login(user)) {
+                ViewHandler handler = user.isAdmin() ? ViewHandler.ADMIN : ViewHandler.USER;
+                handler.reset();
+                handler.show(modelFacade);
+                currentStage.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Login Error", "Failed to open panel. Please try again.");

@@ -1,6 +1,7 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.User;
+import ScanHub.BLL.SessionManager;
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
@@ -36,6 +37,7 @@ public class AdminController implements IViewController, Initializable {
 
     private Stage currentStage;
     private ModelFacade modelFacade;
+    private SessionManager sessionManager = SessionManager.getInstance();
 
     public AdminController() throws Exception {
     }
@@ -65,6 +67,9 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/AdminProfilesView.fxml");
             }
         });
+
+        lblUsername.setText(sessionManager.getCurrentUser().getUsername());
+        lblRole.setText(sessionManager.getCurrentUser().getRole().toString());
     }
 
     private void loadPage(String fxml) {
@@ -102,6 +107,7 @@ public class AdminController implements IViewController, Initializable {
                 ViewHandler handler = ViewHandler.LOGIN;
                 handler.reset();
                 handler.show(modelFacade);
+                sessionManager.logout();
                 currentStage.close();
             } catch (Exception e) {
                 e.printStackTrace();
