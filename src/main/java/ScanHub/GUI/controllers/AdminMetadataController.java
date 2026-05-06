@@ -43,7 +43,7 @@ public class AdminMetadataController implements Initializable {
             List<DocumentMetadata> list = modelFacade.getMetadataModel().getAllMetadata();
 
             for (DocumentMetadata m : list) {
-                Label row = new Label("Doc #" + m.getDocumentId() + "  |  " + m.getTitle() + "  |  " + m.getAuthor());
+                Label row = new Label("Box #" + m.getBoxId() + "  |  " + m.getBoxName() + "  |  " + m.getProfileName());
                 row.getStyleClass().addAll("lbl", "box-card", "user-row");
                 row.setMaxWidth(Double.MAX_VALUE);
                 row.setPrefHeight(45);
@@ -68,25 +68,30 @@ public class AdminMetadataController implements Initializable {
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
 
-        TextField title  = new TextField(selected.getTitle() != null ? selected.getTitle() : "");
-        TextField type   = new TextField(selected.getDocumentType() != null ? selected.getDocumentType() : "");
-        TextField author = new TextField(selected.getAuthor() != null ? selected.getAuthor() : "");
-        TextField ref    = new TextField(selected.getReferenceNumber() != null ? selected.getReferenceNumber() : "");
+        TextField profileName   = new TextField(selected.getProfileName() != null ? selected.getProfileName() : "");
+        TextField boxName       = new TextField(selected.getBoxName() != null ? selected.getBoxName() : "");
+        TextField documentCount = new TextField(String.valueOf(selected.getDocumentCount()));
+        TextField fileCount     = new TextField(String.valueOf(selected.getFileCount()));
 
-        grid.addRow(0, new Label("Title:"),  title);
-        grid.addRow(1, new Label("Type:"),   type);
-        grid.addRow(2, new Label("Author:"), author);
-        grid.addRow(3, new Label("Ref No:"), ref);
+        grid.addRow(0, new Label("Profile Name:"),   profileName);
+        grid.addRow(1, new Label("Box Name:"),       boxName);
+        grid.addRow(2, new Label("Document Count:"), documentCount);
+        grid.addRow(3, new Label("File Count:"),     fileCount);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
-                selected.setTitle(title.getText());
-                selected.setDocumentType(type.getText());
-                selected.setAuthor(author.getText());
-                selected.setReferenceNumber(ref.getText());
+                selected.setProfileName(profileName.getText());
+                selected.setBoxName(boxName.getText());
+                try {
+                    selected.setDocumentCount(Integer.parseInt(documentCount.getText()));
+                    selected.setFileCount(Integer.parseInt(fileCount.getText()));
+                } catch (NumberFormatException ex) {
+                    AlertHelper.showError("Invalid Input", "Document count and file count must be numbers.");
+                    return;
+                }
                 try {
                     modelFacade.getMetadataModel().updateMetadata(selected);
                     load();
@@ -101,7 +106,7 @@ public class AdminMetadataController implements Initializable {
     @FXML
     private void onClickDeleteMetadata() {
         if (selected == null) { AlertHelper.showWarning("No Selection", "Select a row first."); return; }
-        AlertHelper.showConfirmation("Delete", "Delete metadata for Doc #" + selected.getDocumentId() + "?", () -> {
+        AlertHelper.showConfirmation("Delete", "Delete metadata for Box #" + selected.getBoxId() + "?", () -> {
             try {
                 modelFacade.getMetadataModel().deleteMetadata(selected);
                 load();

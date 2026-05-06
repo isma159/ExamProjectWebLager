@@ -6,7 +6,6 @@ import ScanHub.DAL.interfaces.IMetadataDataAccess;
 
 import java.io.IOException;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,21 +18,19 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
     @Override
     public DocumentMetadata createData(DocumentMetadata metadata) throws Exception {
         String sql = """
-                INSERT INTO DocumentMetadata
-                    (documentId, title, documentType, referenceNumber, author, notes, documentDate, createdAt, updatedAt)
-                VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())
+                INSERT INTO BoxMetadata
+                    (boxId, profileName, boxName, documentCount, fileCount, boxCreatedAt)
+                VALUES (?, ?, ?, ?, ?, GETDATE())
                 """;
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            ps.setInt(1, metadata.getDocumentId());
-            ps.setString(2, metadata.getTitle());
-            ps.setString(3, metadata.getDocumentType());
-            ps.setString(4, metadata.getReferenceNumber());
-            ps.setString(5, metadata.getAuthor());
-            ps.setString(6, metadata.getNotes());
-            ps.setObject(7, metadata.getDocumentDate());
+            ps.setInt(1, metadata.getBoxId());
+            ps.setString(2, metadata.getProfileName());
+            ps.setString(3, metadata.getBoxName());
+            ps.setInt(4, metadata.getDocumentCount());
+            ps.setInt(5, metadata.getFileCount());
 
             ps.executeUpdate();
 
@@ -54,9 +51,8 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
         List<DocumentMetadata> metadataList = new ArrayList<>();
 
         String sql = """
-                SELECT metadataId, documentId, title, documentType, referenceNumber,
-                       author, notes, documentDate, createdAt, updatedAt
-                FROM DocumentMetadata
+                SELECT metadataId, boxId, profileName, boxName, documentCount, fileCount, boxCreatedAt
+                FROM BoxMetadata
                 WHERE deleted_at IS NULL
                 """;
 
@@ -78,9 +74,8 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
     @Override
     public DocumentMetadata getDataFromId(int metadataId) throws Exception {
         String sql = """
-                SELECT metadataId, documentId, title, documentType, referenceNumber,
-                       author, notes, documentDate, createdAt, updatedAt
-                FROM DocumentMetadata
+                SELECT metadataId, boxId, profileName, boxName, documentCount, fileCount, boxCreatedAt
+                FROM BoxMetadata
                 WHERE metadataId = ? AND deleted_at IS NULL
                 """;
 
@@ -104,10 +99,9 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
     @Override
     public DocumentMetadata getDataByDocumentId(int documentId) throws Exception {
         String sql = """
-                SELECT metadataId, documentId, title, documentType, referenceNumber,
-                       author, notes, documentDate, createdAt, updatedAt
-                FROM DocumentMetadata
-                WHERE documentId = ? AND deleted_at IS NULL
+                SELECT metadataId, boxId, profileName, boxName, documentCount, fileCount, boxCreatedAt
+                FROM BoxMetadata
+                WHERE boxId = ? AND deleted_at IS NULL
                 """;
 
         try (Connection connection = dbConnector.getConnection();
@@ -123,29 +117,26 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
             return null;
 
         } catch (SQLException e) {
-            throw new Exception("Could not fetch metadata for documentId " + documentId, e);
+            throw new Exception("Could not fetch metadata for boxId " + documentId, e);
         }
     }
 
     @Override
     public void updateData(DocumentMetadata metadata) throws Exception {
         String sql = """
-                UPDATE DocumentMetadata
-                SET title = ?, documentType = ?, referenceNumber = ?,
-                    author = ?, notes = ?, documentDate = ?, updatedAt = GETDATE()
+                UPDATE BoxMetadata
+                SET profileName = ?, boxName = ?, documentCount = ?, fileCount = ?
                 WHERE metadataId = ? AND deleted_at IS NULL
                 """;
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setString(1, metadata.getTitle());
-            ps.setString(2, metadata.getDocumentType());
-            ps.setString(3, metadata.getReferenceNumber());
-            ps.setString(4, metadata.getAuthor());
-            ps.setString(5, metadata.getNotes());
-            ps.setObject(6, metadata.getDocumentDate());
-            ps.setInt(7, metadata.getMetadataId());
+            ps.setString(1, metadata.getProfileName());
+            ps.setString(2, metadata.getBoxName());
+            ps.setInt(3, metadata.getDocumentCount());
+            ps.setInt(4, metadata.getFileCount());
+            ps.setInt(5, metadata.getMetadataId());
 
             ps.executeUpdate();
 
@@ -156,7 +147,7 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
 
     @Override
     public void deleteData(DocumentMetadata metadata) throws Exception {
-        String sql = "UPDATE DocumentMetadata SET deleted_at = GETDATE() WHERE metadataId = ?";
+        String sql = "UPDATE BoxMetadata SET deleted_at = GETDATE() WHERE metadataId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -169,23 +160,17 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
         }
     }
 
-
     private DocumentMetadata mapRow(ResultSet rs) throws SQLException {
-        Timestamp docDate  = rs.getTimestamp("documentDate");
-        Timestamp created  = rs.getTimestamp("createdAt");
-        Timestamp updated  = rs.getTimestamp("updatedAt");
+        Timestamp created = rs.getTimestamp("boxCreatedAt");
 
         return new DocumentMetadata(
                 rs.getInt("metadataId"),
-                rs.getInt("documentId"),
-                rs.getString("title"),
-                rs.getString("documentType"),
-                rs.getString("referenceNumber"),
-                rs.getString("author"),
-                rs.getString("notes"),
-                docDate  != null ? docDate.toLocalDateTime()  : null,
-                created  != null ? created.toLocalDateTime()  : null,
-                updated  != null ? updated.toLocalDateTime()  : null
+                rs.getInt("boxId"),
+                rs.getString("profileName"),
+                rs.getString("boxName"),
+                rs.getInt("documentCount"),
+                rs.getInt("fileCount"),
+                created != null ? created.toLocalDateTime() : null
         );
     }
 }
