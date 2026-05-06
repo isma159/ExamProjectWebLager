@@ -66,9 +66,8 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/AdminUsersView.fxml");
             } else if (newValue == profilesBtn) {
                 loadPage("/views/AdminProfilesView.fxml");
-            }
-            else if (newValue == metadataBtn) {
-                loadPage("/views/MetadataView.fxml");
+            } else if (newValue == metadataBtn) {
+                loadPage("/views/AdminMetadataView.fxml");
             }
         });
     }
@@ -84,7 +83,7 @@ public class AdminController implements IViewController, Initializable {
                     return new AdminUsersController(modelFacade);
                 } else if (controllerClass == AdminProfilesController.class) {
                     return new AdminProfilesController(modelFacade);
-                } else if (controllerClass == AdminMetadataController.class) {
+                } else if  (controllerClass == AdminMetadataController.class) {
                     return new AdminMetadataController(modelFacade);
                 }
                 try {
@@ -96,6 +95,7 @@ public class AdminController implements IViewController, Initializable {
 
             Node page = loader.load();
 
+            // TODO (remove later mb?)
             Object ctrl = loader.getController();
             if (ctrl instanceof AdminMetadataController metaCtrl) {
                 metaCtrl.setModel(modelFacade);
@@ -132,8 +132,7 @@ public class AdminController implements IViewController, Initializable {
         try {
             ViewHandler handler = ViewHandler.SCAN_VIEW;
             handler.reset();
-            Stage stage = new Stage();
-            handler.show(modelFacade, stage);
+            handler.show(modelFacade).setMaximized(true);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

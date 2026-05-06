@@ -9,7 +9,7 @@ public class Profile {
 
     private int profileId;
     private String profileName;
-    private SplitBehavior splitBehavior; // "NONE", "MANUAL", "BARCODE"
+    private SplitBehavior splitBehavior;
     private ProfileStatus status;
     private String exportLabel;
     private List<User> users;

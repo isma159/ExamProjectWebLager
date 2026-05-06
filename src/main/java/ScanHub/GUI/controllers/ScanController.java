@@ -42,22 +42,18 @@ import java.util.*;
  */
 public class ScanController implements Initializable, IViewController {
 
-    // =========================================================================
-    // FXML injections
-    // =========================================================================
-
-    // — Header —
+    // Header
     @FXML private HBox  hboxHeader;
     @FXML private Label sessionStatusLabel;
     @FXML private Label currentUserLabel;
     @FXML private Label scanSourceLabel;
 
-    // — Main toolbar —
+    // Main toolbar
     @FXML private HBox mainToolbar;
     @FXML private Button btnSessionStartup, btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport;
     @FXML private ComboBox<String>  exportModeComboBox;
 
-    // — Sub-toolbar —
+    // Sub-toolbar
     @FXML private HBox              subToolbar;
     @FXML private Button            btnNavFirst;
     @FXML private Button            btnNavPrev;
@@ -69,24 +65,24 @@ public class ScanController implements Initializable, IViewController {
     @FXML private ComboBox<String>  gridModeComboBox;
     @FXML private Spinner<Integer>  globalRotSpinner;
 
-    // — Left sidebar —
+    // Left sidebar
     @FXML private Label                treeStatsLabel;
     @FXML private TreeView<String>     documentTreeView;
 
-    // — Center —
+    // Center
     @FXML private Pane       flashOverlay;
     @FXML private Label      barcodeToast;
     @FXML private ScrollPane pageScrollPane;
     @FXML private FlowPane   pageGrid;
     @FXML private Label      emptyStateLabel;
 
-    // — Status bar —
+    // Status bar
     @FXML private Label stDocsLabel;
     @FXML private Label stPagesLabel;
     @FXML private Label stCurrentLabel;
     @FXML private Label stExportLabel;
 
-    // — Session popup —
+    // Session popup
     @FXML private StackPane            sessionPopupOverlay;
     @FXML private VBox                 vboxSessionSetup;
     @FXML private ComboBox<String>     profileComboBox;
@@ -94,26 +90,19 @@ public class ScanController implements Initializable, IViewController {
     @FXML private Spinner<Integer>     rotationSpinner;
     @FXML private Label                apiCountLabel;
 
-    // =========================================================================
-    // State
-    // =========================================================================
-
     private Stage currentStage;
     private ModelFacade modelFacade;
-
-    private final ObservableList<Document> documents = FXCollections.observableArrayList();
-
-    private Document selectedDocument  = null;
-    private ScanPage selectedPage      = null;
-    private int      currentPageIndex  = -1;
-
+    private ObservableList<Document> documents = FXCollections.observableArrayList();
+    private Document selectedDocument = null;
+    private ScanPage selectedPage = null;
+    private int currentPageIndex = -1;
     private boolean sessionActive = false;
 
     /** Zoom multiplier applied to all page cards in the FlowPane. */
-    private double zoomLevel = 1.0;
-    private static final double ZOOM_STEP = 0.15;
-    private static final double ZOOM_MIN  = 0.40;
-    private static final double ZOOM_MAX  = 3.00;
+    private double zoomLevel = 1.0; // default
+    private static double ZOOM_STEP = 0.15;
+    private static double ZOOM_MIN = 0.40;
+    private static double ZOOM_MAX = 3.00;
 
     /**
      * Undo stack — each entry is a {@link Runnable} that reverses the
@@ -127,10 +116,6 @@ public class ScanController implements Initializable, IViewController {
         this.modelFacade = modelFacade;
         this.currentStage = currentStage;
     }
-
-    // =========================================================================
-    // Initializable
-    // =========================================================================
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -146,10 +131,6 @@ public class ScanController implements Initializable, IViewController {
         refreshStatusBar();
         updatePageInfoLabel();
     }
-
-    // =========================================================================
-    // Init helpers
-    // =========================================================================
 
     private void initProfileComboBox() {
         // TODO: replace with ProfileRepository.findAll() or equivalent service call
@@ -219,10 +200,6 @@ public class ScanController implements Initializable, IViewController {
         });
     }
 
-    // =========================================================================
-    // Session popup
-    // =========================================================================
-
     /** Opens the Session Startup popup (⚙ button in main toolbar). */
     @FXML
     private void onSessionStartup(ActionEvent e) {
@@ -257,14 +234,14 @@ public class ScanController implements Initializable, IViewController {
     @FXML
     private void onStartSession(ActionEvent e) {
         String profileName = profileComboBox.getValue();
-        String boxId       = boxIdField.getText().trim();
+        String boxId = boxIdField.getText().trim();
 
         if (profileName == null || profileName.isBlank()) {
-            showAlert(Alert.AlertType.WARNING, "Session Setup", "Please select a profile before starting.");
+            AlertHelper.showError("Session Setup","Please select a profile before starting.");
             return;
         }
         if (boxId.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Session Setup", "Please enter a Box ID before starting.");
+            AlertHelper.showError("Session Setup", "Please enter a Box ID before starting.");
             return;
         }
 
@@ -281,10 +258,6 @@ public class ScanController implements Initializable, IViewController {
         sessionPopupOverlay.setVisible(false);
         refreshStatusBar();
     }
-
-    // =========================================================================
-    // Scanning
-    // =========================================================================
 
     @FXML
     private void onScan(ActionEvent e) {
