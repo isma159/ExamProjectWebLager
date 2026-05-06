@@ -2,6 +2,7 @@ package ScanHub.BE;
 
 import ScanHub.BE.interfaces.TreeNode;
 
+// java imports
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class Document implements TreeNode {
 
     @Override
     public String toString() {
-        return getDisplayName();
+        return "Document #" + this.documentId;
     }
 
     @Override

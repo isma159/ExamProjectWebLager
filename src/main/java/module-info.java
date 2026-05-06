@@ -11,6 +11,7 @@ module scanhub {
     requires java.net.http;
     requires org.controlsfx.controls;
     requires jdk.compiler;
+    requires javafx.base;
 
     exports ScanHub.GUI.controllers;
     opens ScanHub.GUI.controllers to javafx.fxml;

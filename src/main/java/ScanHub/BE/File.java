@@ -2,6 +2,7 @@ package ScanHub.BE;
 
 import ScanHub.BE.interfaces.TreeNode;
 
+// java imports
 import java.time.LocalDateTime;
 
 public class File implements TreeNode {
@@ -73,7 +74,7 @@ public class File implements TreeNode {
     // TODO: find out what to say
     @Override
     public String toString() {
-        return getDisplayName();
+        return "File #" + this.referenceId;
     }
 
     @Override

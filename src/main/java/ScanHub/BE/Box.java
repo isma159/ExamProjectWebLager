@@ -2,6 +2,7 @@ package ScanHub.BE;
 
 import ScanHub.BE.interfaces.TreeNode;
 
+// java imports
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class Box implements TreeNode {
 
     @Override
     public String toString() {
-        return getDisplayName();
+        return this.boxName;
     }
 
     @Override
