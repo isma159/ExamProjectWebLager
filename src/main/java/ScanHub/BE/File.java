@@ -71,6 +71,6 @@ public class File {
     // TODO: find out what to say
     @Override
     public String toString() {
-        return "File #" + this.referenceId;
+        return "File " + this.referenceId;
     }
 }

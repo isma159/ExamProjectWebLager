@@ -19,12 +19,9 @@ public class ScanApiClient implements IScanSource {
     @Override
     public ScanResult fetchNextScan() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getRandomFile"))
-                .GET()
-                .build();
+                .uri(URI.create(BASE_URL + "/getRandomFile")).GET().build();
 
-        HttpResponse<byte[]> response = httpClient.send(request,
-                HttpResponse.BodyHandlers.ofByteArray());
+        HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
         return new ScanResult(response.body(), false); // isBarcode always false here cause it is detected later
     }
@@ -36,9 +33,7 @@ public class ScanApiClient implements IScanSource {
      */
     public byte[] fetchById(int id) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getById/" + id))
-                .GET()
-                .build();
+                .uri(URI.create(BASE_URL + "/getById/" + id)).GET().build();
 
         return httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray()).body();
     }
@@ -48,9 +43,7 @@ public class ScanApiClient implements IScanSource {
      */
     public int fetchCount() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getCount"))
-                .GET()
-                .build();
+                .uri(URI.create(BASE_URL + "/getCount")).GET().build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 

@@ -23,7 +23,7 @@ public class ProfileModel {
         return profileObservableList;
     }
 
-    public void refreshModel() throws Exception {
+    public void refreshProfiles() throws Exception {
         profileObservableList.setAll(profileManager.getProfiles());
     }
 

@@ -110,11 +110,11 @@ public class UserFormController implements Initializable {
         }
 
         try {
-            modelFacade.getUserModel().refreshModel();
-            modelFacade.getProfileModel().refreshModel();
+            modelFacade.getUserModel().refreshUsers();
+            modelFacade.getProfileModel().refreshProfiles();
         }
         catch (Exception e) {
-            // TODO AlertView?
+            AlertHelper.showError("Refreshing users", "Could not refresh list of users. Please try saving again.");
         }
     }
 
