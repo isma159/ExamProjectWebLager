@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class UserController implements Initializable {
+public class UserController implements IViewController, Initializable {
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -25,6 +25,4 @@ public class UserController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
     }
-
-
 }
