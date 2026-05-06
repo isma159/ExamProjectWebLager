@@ -315,7 +315,6 @@ public class RowMaker {
 
         if (user != null) {
             checkBox.setSelected(user.getProfiles().contains(profile));
-            System.out.println(user.getProfiles());
         }
 
         return outerHBox;
@@ -441,8 +440,7 @@ public class RowMaker {
         });
 
         if (profile != null) {
-            checkBox.setSelected(profile.getUsers().contains(user));
-            System.out.println(profile.getUsers());
+            checkBox.setSelected(user.getProfiles().contains(profile));
         }
 
         return outerHBox;

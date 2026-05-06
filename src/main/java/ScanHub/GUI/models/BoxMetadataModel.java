@@ -1,41 +1,40 @@
 package ScanHub.GUI.models;
 
-import ScanHub.BE.DocumentMetadata;
-import ScanHub.BLL.DocumentMetadataManager;
+import ScanHub.BE.BoxMetadata;
+import ScanHub.BLL.BoxMetadataManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class DocumentMetadataModel {
+public class BoxMetadataModel {
 
-    private ObservableList<DocumentMetadata> metadataObservableList;
-    private final DocumentMetadataManager manager;
+    private ObservableList<BoxMetadata> metadataObservableList;
+    private final BoxMetadataManager manager;
 
-    public DocumentMetadataModel() throws Exception {
-        manager = new DocumentMetadataManager();
+    public BoxMetadataModel() throws Exception {
+        manager = new BoxMetadataManager();
         metadataObservableList = FXCollections.observableArrayList();
         metadataObservableList.setAll(manager.getAllMetadata());
     }
 
-    public void createMetadata(DocumentMetadata metadata) throws Exception {
-        DocumentMetadata created = manager.createMetadata(metadata);
+    public void createMetadata(BoxMetadata metadata) throws Exception {
+        BoxMetadata created = manager.createMetadata(metadata);
         metadataObservableList.add(created);
     }
 
-    public ObservableList<DocumentMetadata> getAllMetadata() {
+    public ObservableList<BoxMetadata> getAllMetadata() {
         return metadataObservableList;
     }
 
-    public DocumentMetadata getMetadataByDocumentId(int documentId) throws Exception {
-        return manager.getMetadataByDocumentId(documentId);
+    public BoxMetadata getMetadataByBoxId(int boxId) throws Exception {
+        return manager.getMetadataByBoxId(boxId);
     }
 
     public void refreshModel() throws Exception {
         metadataObservableList.setAll(manager.getAllMetadata());
     }
 
-    public void updateMetadata(DocumentMetadata metadata) throws Exception {
+    public void updateMetadata(BoxMetadata metadata) throws Exception {
         manager.updateMetadata(metadata);
-        // Refresh the matching entry in the observable list so the table updates automatically
         int index = -1;
         for (int i = 0; i < metadataObservableList.size(); i++) {
             if (metadataObservableList.get(i).getMetadataId() == metadata.getMetadataId()) {
@@ -48,7 +47,7 @@ public class DocumentMetadataModel {
         }
     }
 
-    public void deleteMetadata(DocumentMetadata metadata) throws Exception {
+    public void deleteMetadata(BoxMetadata metadata) throws Exception {
         manager.deleteMetadata(metadata);
         metadataObservableList.remove(metadata);
     }

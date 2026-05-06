@@ -56,6 +56,9 @@ public class ProfileFormController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         radioBARCODE.setUserData(SplitBehavior.BARCODE);
         radioNONE.setUserData(SplitBehavior.NONE);
+        radioMANUAL.setDisable(true);
+        radioMANUAL.setVisible(false);
+        radioMANUAL.setManaged(false);
 
         radioACTIVE.setUserData(ProfileStatus.ACTIVE);
         radioINACTIVE.setUserData(ProfileStatus.INACTIVE);
@@ -67,22 +70,23 @@ public class ProfileFormController implements Initializable {
         }
 
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
-            String result = newValue.replace(" ", "");
-            exportPreviewLabel.setText(result + "_1");
+            exportPreviewLabel.setText(buildExportLabel(newValue) + "1");
         }));
     }
 
     private void loadUsers() {
 
         try {
+            selectedUsers.clear();
+            vboxUsers.getChildren().clear();
             List<User> users = modelFacade.getUserModel().getUsers();
 
             for (User user : users) {
                 vboxUsers.getChildren().add(RowMaker.addUserRowToForm(user, editingProfile, (selectedUser, isChecked) -> {
-                    if (isChecked) {
-                        selectedUsers.add(user);
-                    } else {
-                        selectedUsers.remove(user);
+                    if (isChecked && !selectedUsers.contains(selectedUser)) {
+                        selectedUsers.add(selectedUser);
+                    } else if (!isChecked) {
+                        selectedUsers.remove(selectedUser);
                     }
                 }));
             }
@@ -147,9 +151,9 @@ public class ProfileFormController implements Initializable {
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
 
         try {
-            Profile newProfile = new Profile(profileName, splitBehavior, status, exportPreviewLabel.getText().replace("1", ""));
-            newProfile.setUsers(selectedUsers);
-            modelFacade.getProfileModel().createProfile(newProfile);
+            Profile newProfile = new Profile(0, profileName, splitBehavior, status, buildExportLabel(profileName));
+            Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
+            syncUserAssignments(createdProfile);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -161,7 +165,7 @@ public class ProfileFormController implements Initializable {
         String newProfileName = profileNameField.getText();
         Toggle selectedSplitToggle = toggleGroupSplitBehavior.getSelectedToggle();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
-        String newExportLabel = exportPreviewLabel.getText().replace("1", "");
+        String newExportLabel = buildExportLabel(newProfileName);
 
         clearError();
 
@@ -186,10 +190,10 @@ public class ProfileFormController implements Initializable {
         editingProfile.setSplitBehavior(splitBehavior);
         editingProfile.setStatus(status);
         editingProfile.setExportLabel(newExportLabel);
-        editingProfile.setUsers(selectedUsers);
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);
+            syncUserAssignments(editingProfile);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -201,6 +205,26 @@ public class ProfileFormController implements Initializable {
         profileNameField.getStyleClass().remove("error-border");
         vboxSplitBehavior.getStyleClass().remove("error-border");
         vboxStatus.getStyleClass().remove("error-border");
+    }
+
+    private String buildExportLabel(String profileName) {
+        return profileName.replace(" ", "") + "_";
+    }
+
+    private void syncUserAssignments(Profile profile) throws Exception {
+        for (User user : new ArrayList<>(modelFacade.getUserModel().getUsers())) {
+            boolean shouldHaveProfile = selectedUsers.contains(user);
+            boolean changed = user.getProfiles().removeIf(p -> p.getProfileId() == profile.getProfileId());
+
+            if (shouldHaveProfile) {
+                user.getProfiles().add(profile);
+                changed = true;
+            }
+
+            if (changed) {
+                modelFacade.getUserModel().updateUser(user);
+            }
+        }
     }
 
     @FXML

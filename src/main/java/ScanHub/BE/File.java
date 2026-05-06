@@ -25,49 +25,21 @@ public class File {
         this.createdAt = createdAt;
     }
 
-    public int getFileId() {
-        return fileId;
-    }
-    public int getDocumentId() {
-        return documentId;
-    }
-    public int getReferenceId() {
-        return referenceId;
-    }
-    public int getSortId() {
-        return sortId;
-    }
-    public byte[] getImageData() {
-        return imageData;
-    }
-    public int getFileSizeBytes() {
-        return fileSizeBytes;
-    }
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public int getFileId() { return fileId; }
+    public int getDocumentId() { return documentId; }
+    public int getReferenceId() { return referenceId; }
+    public int getSortId() { return sortId; }
+    public byte[] getImageData() { return imageData; }
+    public int getFileSizeBytes() { return fileSizeBytes; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public void setFileId(int fileId) {
-        this.fileId = fileId;
-    }
-    public void setDocumentId(int documentId) {
-        this.documentId = documentId;
-    }
-    public void setReferenceId(int referenceId) {
-        this.referenceId = referenceId;
-    }
-    public void setSortId(int sortId) {
-        this.sortId = sortId;
-    }
-    public void setImageData(byte[] imageData) {
-        this.imageData = imageData;
-    }
-    public void setFileSizeBytes(int fileSizeBytes) {
-        this.fileSizeBytes = fileSizeBytes;
-    }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public void setFileId(int fileId) { this.fileId = fileId; }
+    public void setDocumentId(int documentId) { this.documentId = documentId; }
+    public void setReferenceId(int referenceId) { this.referenceId = referenceId; }
+    public void setSortId(int sortId) { this.sortId = sortId; }
+    public void setImageData(byte[] imageData) { this.imageData = imageData; }
+    public void setFileSizeBytes(int fileSizeBytes) { this.fileSizeBytes = fileSizeBytes; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     // TODO: find out what to say
     @Override

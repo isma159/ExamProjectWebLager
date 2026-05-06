@@ -5,7 +5,6 @@ import ScanHub.BE.*;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
-// java imports
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,48 +21,33 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public Profile createData(Profile newProfile) throws Exception {
-        String sql = "INSERT INTO Profiles (profileName, splitBehavior, status, exportLabel) VALUES (?, ?, ?, ?)";
-        String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
+        String sql = "INSERT INTO Profiles (clientId, profileName, splitBehavior, status, exportLabel) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
-
             connection.setAutoCommit(false);
 
-            try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            PreparedStatement ps2 = connection.prepareStatement(insertJunctionSQL)) {
+            try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                int clientId = resolveClientId(connection, newProfile);
 
-                ps.setString(1, newProfile.getProfileName());
-                ps.setString(2, newProfile.getSplitBehavior().toString());
-                ps.setString(3, newProfile.getStatus().toString());
-                ps.setString(4, newProfile.getExportLabel());
+                ps.setInt(1, clientId);
+                ps.setString(2, newProfile.getProfileName());
+                ps.setString(3, newProfile.getSplitBehavior().toString());
+                ps.setString(4, newProfile.getStatus().toString());
+                ps.setString(5, newProfile.getExportLabel());
                 ps.executeUpdate();
 
-                ResultSet rs = ps.getGeneratedKeys();
-                Profile createdProfile = null;
-
-                if (rs.next()) {
-
-                    for (User user: newProfile.getUsers()) {
-
-                        ps2.setInt(1, user.getUserId());
-                        ps2.setInt(2, rs.getInt(1));
-                        ps2.addBatch();
-
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        newProfile.setProfileId(rs.getInt(1));
+                    } else {
+                        throw new SQLException("No generated profileId returned");
                     }
-
-                    ps2.executeBatch();
-
-                    createdProfile = new Profile(rs.getInt(1),
-                            newProfile.getProfileName(),
-                            newProfile.getSplitBehavior(),
-                            newProfile.getStatus(),
-                            newProfile.getExportLabel());
-
-                    createdProfile.setUsers(newProfile.getUsers());
                 }
 
+                newProfile.setClientId(clientId);
+                newProfile.setClient(loadClient(connection, clientId));
                 connection.commit();
-                return createdProfile;
+                return newProfile;
             }
             catch (SQLException e) {
                 connection.rollback();
@@ -83,42 +67,21 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
         List<Profile> profiles = new ArrayList<>();
 
-        String selectProfileSQL = "SELECT profileId, profileName, splitBehavior, status, exportLabel FROM Profiles WHERE deleted_at IS NULL";
-        String selectUsersSQL = "SELECT u.userId, u.username, u.passwordHash, u.role FROM Users u JOIN UserProfiles up ON u.userId = up.userId WHERE up.profileId = ? AND u.deleted_at IS NULL";
+        String selectProfileSQL = """
+                SELECT p.profileId, p.clientId, c.clientName, p.profileName,
+                       p.splitBehavior, p.status, p.exportLabel
+                FROM Profiles p
+                LEFT JOIN Clients c ON p.clientId = c.clientId
+                WHERE p.deleted_at IS NULL
+                ORDER BY c.clientName, p.profileName
+                """;
 
-        try (Connection connection = dbConnector.getConnection()) {
-
-            PreparedStatement ps = connection.prepareStatement(selectProfileSQL);
-            PreparedStatement ps2 = connection.prepareStatement(selectUsersSQL);
-            ResultSet rs = ps.executeQuery();
-
-            List<User> users = new ArrayList<>();
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(selectProfileSQL);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-
-                ps2.setInt(1, rs.getInt(1));
-                ResultSet rs2 = ps2.executeQuery();
-
-                while (rs2.next()) {
-
-                    users.add(new User(rs2.getInt("userId"),
-                            rs2.getString("username"),
-                            rs2.getString("passwordHash"),
-                            Role.valueOf(rs2.getString("role"))));
-
-                }
-
-                int profileId = rs.getInt("profileId");
-                String profileName = rs.getString("profileName");
-                SplitBehavior splitBehavior = SplitBehavior.valueOf(rs.getString("splitBehavior"));
-                ProfileStatus status = ProfileStatus.valueOf(rs.getString("status"));
-                String exportLabel = rs.getString("exportLabel");
-
-                Profile profile = new Profile(profileId, profileName, splitBehavior, status, exportLabel);
-                profile.setUsers(users);
-
-                profiles.add(profile);
-
+                profiles.add(mapRow(rs));
             }
         } catch (SQLException e) {
             throw new Exception("Could not get profiles", e);
@@ -129,40 +92,47 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public Profile getDataFromName(String name) throws Exception {
-        return null;
+        String sql = """
+                SELECT p.profileId, p.clientId, c.clientName, p.profileName,
+                       p.splitBehavior, p.status, p.exportLabel
+                FROM Profiles p
+                LEFT JOIN Clients c ON p.clientId = c.clientId
+                WHERE p.profileName = ? AND p.deleted_at IS NULL
+                """;
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapRow(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new Exception("Could not fetch profile from name " + name, e);
+        }
     }
 
     @Override
     public void updateData(Profile newData) throws Exception {
-        String sql = "UPDATE Profiles SET profileName = ?, splitBehavior = ?, status = ?, exportLabel = ? WHERE profileId = ?";
-        String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE profileId = ?";
-        String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
+        String sql = "UPDATE Profiles SET clientId = ?, profileName = ?, splitBehavior = ?, status = ?, exportLabel = ? WHERE profileId = ?";
 
         try (Connection connection = dbConnector.getConnection()) {
-
             connection.setAutoCommit(false);
 
-            try (PreparedStatement ps = connection.prepareStatement(sql);
-            PreparedStatement ps2 = connection.prepareStatement(deleteJunctionSQL);
-            PreparedStatement ps3 = connection.prepareStatement(insertJunctionSQL)) {
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                int clientId = resolveClientId(connection, newData);
 
-                ps.setString(1, newData.getProfileName());
-                ps.setString(2, newData.getSplitBehavior().toString());
-                ps.setString(3, newData.getStatus().toString());
-                ps.setString(4, newData.getExportLabel());
-                ps.setInt(5, newData.getProfileId());
+                ps.setInt(1, clientId);
+                ps.setString(2, newData.getProfileName());
+                ps.setString(3, newData.getSplitBehavior().toString());
+                ps.setString(4, newData.getStatus().toString());
+                ps.setString(5, newData.getExportLabel());
+                ps.setInt(6, newData.getProfileId());
                 ps.executeUpdate();
 
-                ps2.setInt(1, newData.getProfileId());
-                ps2.executeUpdate();
-
-                for (User user : newData.getUsers()) {
-                    ps3.setInt(1, user.getUserId());
-                    ps3.setInt(2, newData.getProfileId());
-                    ps3.addBatch();
-                }
-
-                ps3.executeBatch();
+                newData.setClientId(clientId);
+                newData.setClient(loadClient(connection, clientId));
                 connection.commit();
             }
             catch (SQLException e) {
@@ -200,5 +170,57 @@ public class ProfileDAO implements IDataAccess<Profile> {
         } catch (SQLException e) {
             throw new Exception("Could not delete profile", e);
         }
+    }
+
+    private int resolveClientId(Connection connection, Profile profile) throws SQLException {
+        if (profile.getClientId() > 0) {
+            return profile.getClientId();
+        }
+
+        if (profile.getClient() != null && profile.getClient().getClientId() > 0) {
+            return profile.getClient().getClientId();
+        }
+
+        String sql = "SELECT TOP 1 clientId FROM Clients WHERE deleted_at IS NULL ORDER BY clientName, clientId";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("clientId");
+            }
+        }
+
+        throw new SQLException("Profile requires a clientId, but no active clients exist");
+    }
+
+    private Client loadClient(Connection connection, int clientId) throws SQLException {
+        String sql = "SELECT clientId, clientName FROM Clients WHERE clientId = ? AND deleted_at IS NULL";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, clientId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Client(rs.getInt("clientId"), rs.getString("clientName"));
+                }
+            }
+        }
+        return null;
+    }
+
+    private Profile mapRow(ResultSet rs) throws SQLException {
+        Profile profile = new Profile(
+                rs.getInt("profileId"),
+                rs.getInt("clientId"),
+                rs.getString("profileName"),
+                SplitBehavior.valueOf(rs.getString("splitBehavior")),
+                ProfileStatus.valueOf(rs.getString("status")),
+                rs.getString("exportLabel")
+        );
+
+        int clientId = rs.getInt("clientId");
+        String clientName = rs.getString("clientName");
+        if (!rs.wasNull() && clientName != null) {
+            profile.setClient(new Client(clientId, clientName));
+        }
+
+        return profile;
     }
 }

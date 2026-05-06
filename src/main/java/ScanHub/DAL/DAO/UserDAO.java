@@ -72,10 +72,12 @@ public class UserDAO implements IDataAccess<User> {
 
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
-                       p.profileId, p.profileName, p.splitBehavior, p.exportLabel, p.status
+                       p.profileId, p.clientId, c.clientName, p.profileName,
+                       p.splitBehavior, p.exportLabel, p.status
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
+                LEFT JOIN Clients c ON p.clientId = c.clientId
                 WHERE u.deleted_at IS NULL
                 ORDER BY u.username, p.profileName
                 """;
@@ -97,11 +99,17 @@ public class UserDAO implements IDataAccess<User> {
 
                 int profileId = rs.getInt("profileId");
                 if (!rs.wasNull()) {
-                    user.getProfiles().add(new Profile(profileId,
+                    Profile profile = new Profile(profileId,
+                            rs.getInt("clientId"),
                             rs.getString("profileName"),
                             SplitBehavior.valueOf(rs.getString("splitBehavior")),
                             ProfileStatus.valueOf(rs.getString("status")),
-                            rs.getString("exportLabel")));
+                            rs.getString("exportLabel"));
+                    String clientName = rs.getString("clientName");
+                    if (clientName != null) {
+                        profile.setClient(new Client(profile.getClientId(), clientName));
+                    }
+                    user.getProfiles().add(profile);
                 }
             }
         }
@@ -115,10 +123,12 @@ public class UserDAO implements IDataAccess<User> {
 
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
-                       p.profileId, p.profileName, p.splitBehavior, p.exportLabel, p.status
+                       p.profileId, p.clientId, c.clientName, p.profileName,
+                       p.splitBehavior, p.exportLabel, p.status
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
+                LEFT JOIN Clients c ON p.clientId = c.clientId
                 WHERE u.username = ? AND u.deleted_at IS NULL
                 """;
 
@@ -139,11 +149,17 @@ public class UserDAO implements IDataAccess<User> {
 
                     int profileId = rs.getInt("profileId");
                     if (!rs.wasNull()) {
-                        user.getProfiles().add(new Profile(profileId,
+                        Profile profile = new Profile(profileId,
+                                rs.getInt("clientId"),
                                 rs.getString("profileName"),
                                 SplitBehavior.valueOf(rs.getString("splitBehavior")),
                                 ProfileStatus.valueOf(rs.getString("status")),
-                                rs.getString("exportLabel")));
+                                rs.getString("exportLabel"));
+                        String clientName = rs.getString("clientName");
+                        if (clientName != null) {
+                            profile.setClient(new Client(profile.getClientId(), clientName));
+                        }
+                        user.getProfiles().add(profile);
                     }
                 }
 
