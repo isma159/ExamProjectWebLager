@@ -105,11 +105,11 @@
                             </styleClass>
                             <children>
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onProfileNameClick" onMouseClicked="#onProfileNameClick" prefWidth="210.0" styleClass="lbl" text="Profile Name" HBox.hgrow="ALWAYS" />
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                                 <Label alignment="CENTER" layoutX="40.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onSplitBehaviorClick" onMouseClicked="#onSplitBehaviorClick" prefWidth="210.0" styleClass="lbl" text="Split Behaviour" HBox.hgrow="ALWAYS" />
-                                <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                                <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                                 <Label alignment="CENTER" layoutX="958.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Export Label" HBox.hgrow="ALWAYS" />
-                        <Separator layoutX="1360.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                        <Separator layoutX="1360.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                         <Label alignment="CENTER" layoutX="1362.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Status" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>

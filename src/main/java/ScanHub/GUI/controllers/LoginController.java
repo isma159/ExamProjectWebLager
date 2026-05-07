@@ -98,7 +98,7 @@ public class LoginController implements IViewController, Initializable {
             if (sessionManager.login(user)) {
                 ViewHandler handler = user.isAdmin() ? ViewHandler.ADMIN : ViewHandler.USER;
                 handler.reset();
-                handler.show(modelFacade);
+                handler.show(modelFacade).setMaximized(true);
                 currentStage.close();
             }
         } catch (Exception e) {

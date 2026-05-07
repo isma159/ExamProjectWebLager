@@ -70,7 +70,7 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/AdminProfilesView.fxml");
             }
             else if (newValue == metadataBtn) {
-                loadPage("/views/MetadataView.fxml");
+                loadPage("/views/MetaDataView.fxml");
             }
         });
 

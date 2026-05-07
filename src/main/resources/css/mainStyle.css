@@ -246,6 +246,24 @@
 
 }
 
+.tree-cell-box {
+
+    -fx-text-fill: #FFAC1C;
+
+}
+
+.tree-cell-doc {
+
+    -fx-text-fill: #87CEEB;
+
+}
+
+.tree-cell-file {
+
+    -fx-text-fill: #FFEA00;
+
+}
+
 .tertiary-btn {
 
     -fx-text-fill: #2d3d4f;
@@ -425,6 +443,14 @@
     -fx-background-size: 33px 33px;
     -fx-background-color: TRANSPARENT;
 
+}
+
+.pagination .number-button:selected {
+    -fx-background-color: #2D3D4F;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-text-fill: #ffffff;
 }
 
 .grey-separator .line {
