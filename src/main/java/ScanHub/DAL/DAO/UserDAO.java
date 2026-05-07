@@ -22,8 +22,7 @@ public class UserDAO implements IDataAccess<User> {
 
     DBConnector dbConnector = new DBConnector();
 
-    public UserDAO() throws IOException {
-    }
+    public UserDAO() throws IOException {}
 
     @Override
     public User createData(User newUser) throws Exception {
