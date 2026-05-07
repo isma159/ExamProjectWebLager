@@ -15,9 +15,9 @@
 
 <HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
     <children>
-        <VBox prefHeight="200.0" prefWidth="1800.0">
+        <VBox HBox.hgrow="ALWAYS">
             <children>
-                <VBox prefHeight="1200.0" prefWidth="1371.0" styleClass="shadow">
+                <VBox styleClass="shadow" VBox.vgrow="ALWAYS">
                     <children>
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0">
                             <styleClass>
@@ -32,7 +32,7 @@
                               <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateProfile" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                                   <children>
                                       <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
+                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
                                       <Region prefHeight="200.0" prefWidth="6.0" />
                                       <Label alignment="CENTER" styleClass="lbl" text="Add" textFill="WHITE">
                                           <font>
@@ -45,7 +45,7 @@
                               <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickUpdateProfile" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                                   <children>
                                       <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
+                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
                                       <Region prefHeight="200.0" prefWidth="6.0" />
                                       <Label alignment="CENTER" styleClass="lbl" text="Edit" textFill="WHITE">
                                           <font>
@@ -55,10 +55,10 @@
                                   </children>
                               </HBox>
                               <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                              <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteProfile" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                              <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteProfile" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
                                   <children>
                                       <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
+                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
                                       <Region prefHeight="200.0" prefWidth="6.0" />
                                       <Label alignment="CENTER" styleClass="lbl" text="Delete" textFill="WHITE">
                                           <font>
@@ -105,15 +105,15 @@
                             </styleClass>
                             <children>
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onProfileNameClick" onMouseClicked="#onProfileNameClick" prefWidth="210.0" styleClass="lbl" text="Profile Name" HBox.hgrow="ALWAYS" />
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                                 <Label alignment="CENTER" layoutX="40.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onSplitBehaviorClick" onMouseClicked="#onSplitBehaviorClick" prefWidth="210.0" styleClass="lbl" text="Split Behaviour" HBox.hgrow="ALWAYS" />
-                                <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                                <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                                 <Label alignment="CENTER" layoutX="958.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Export Label" HBox.hgrow="ALWAYS" />
-                        <Separator layoutX="1360.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                        <Separator layoutX="1360.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                         <Label alignment="CENTER" layoutX="1362.0" layoutY="17.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Status" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>
-                        <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
+                        <ScrollPane fitToWidth="true" styleClass="box-card" VBox.vgrow="ALWAYS">
                             <content>
                                 <VBox fx:id="profileTableBox" prefHeight="100.0" prefWidth="100.0" />
                             </content>

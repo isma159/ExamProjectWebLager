@@ -1,9 +1,11 @@
 package ScanHub.BE;
 
+import ScanHub.BE.interfaces.TreeNode;
+
 // java imports
 import java.time.LocalDateTime;
 
-public class File {
+public class File implements TreeNode {
 
     private int fileId;
     private int documentId;
@@ -48,5 +50,10 @@ public class File {
     @Override
     public String toString() {
         return "File " + this.referenceId;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "\uE958" + " " + "File #" + this.referenceId;
     }
 }

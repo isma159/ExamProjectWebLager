@@ -1,8 +1,10 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.BoxMetadata;
+import ScanHub.BE.Profile;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
+import ScanHub.GUI.util.RowMaker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -11,6 +13,7 @@ import javafx.scene.layout.*;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -22,41 +25,43 @@ public class AdminMetadataController implements Initializable {
 
     private ModelFacade modelFacade;
     private BoxMetadata selected = null;
-
-    public AdminMetadataController() {}
+    private HBox selectedRow = null;
+    private List<BoxMetadata> currentMetadata;
 
     public AdminMetadataController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {}
-
-    public void setModel(ModelFacade modelFacade) {
-        this.modelFacade = modelFacade;
-        load();
+    public void initialize(URL location, ResourceBundle resources) {
+        loadMetadata();
     }
 
-    private void load() {
+    private void loadMetadata() {
         try {
+            // resets
             metadataTableBox.getChildren().clear();
             selected = null;
+            selectedRow = null;
 
-            List<BoxMetadata> list = modelFacade.getMetadataModel().getAllMetadata();
-
-            for (BoxMetadata m : list) {
-                Label row = new Label("Box #" + m.getBoxId()
-                        + "  |  " + m.getProfileName()
-                        + "  |  " + m.getBoxName()
-                        + "  |  Docs: " + m.getDocumentCount()
-                        + "  |  Files: " + m.getFileCount());
-                row.getStyleClass().addAll("lbl", "box-card", "user-row");
-                row.setMaxWidth(Double.MAX_VALUE);
-                row.setPrefHeight(45);
-                row.setOnMouseClicked(e -> {
-                    selected = m;
-                    row.getStyleClass().add("row-selected");
+            // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
+            List<BoxMetadata> metadata = modelFacade.getMetadataModel().getAllMetadata();
+            currentMetadata = new ArrayList<>(metadata);
+            for (BoxMetadata boxMetadata : currentMetadata) {
+                HBox row = RowMaker.addMetadataRow(boxMetadata, (clickedMetadata, rowHBox) -> {
+                    if (selectedRow != null) {
+                        selectedRow.getStyleClass().remove("row-selected");
+                    }
+                    if (selected == clickedMetadata) {
+                        selected = null;
+                        selectedRow = null;
+                        return;
+                    }
+                    selected = clickedMetadata;
+                    selectedRow = rowHBox;
+                    rowHBox.getStyleClass().add("row-selected");
                 });
+                row.setUserData(boxMetadata);
                 metadataTableBox.getChildren().add(row);
             }
         } catch (Exception e) {
@@ -65,6 +70,7 @@ public class AdminMetadataController implements Initializable {
         }
     }
 
+    // TODO: find out if editing metadata manually is necessary?? it should update when you scan no?
     @FXML
     private void onClickEditMetadata() {
         if (selected == null) { AlertHelper.showWarning("No Selection", "Select a row first."); return; }
@@ -98,7 +104,7 @@ public class AdminMetadataController implements Initializable {
                     selected.setFileCount(Integer.parseInt(fileCount.getText()));
                     selected.setBoxCreatedAt(LocalDateTime.parse(boxCreatedAt.getText()));
                     modelFacade.getMetadataModel().updateMetadata(selected);
-                    load();
+                    loadMetadata();
                 } catch (NumberFormatException | DateTimeParseException e) {
                     AlertHelper.showWarning("Invalid Values", "Counts must be numbers and created at must use ISO date-time format.");
                 } catch (Exception e) {
@@ -115,7 +121,7 @@ public class AdminMetadataController implements Initializable {
         AlertHelper.showConfirmation("Delete", "Delete metadata for Box #" + selected.getBoxId() + "?", () -> {
             try {
                 modelFacade.getMetadataModel().deleteMetadata(selected);
-                load();
+                loadMetadata();
             } catch (Exception e) {
                 e.printStackTrace();
                 AlertHelper.showError("Delete Failed", "Failed to delete.");
@@ -123,7 +129,7 @@ public class AdminMetadataController implements Initializable {
         });
     }
 
-    @FXML private void onTbAllMetadataClick()   { load(); }
+    @FXML private void onTbAllMetadataClick()   { loadMetadata(); }
     @FXML private void onTbWithMetadataClick()  {}
     @FXML private void onTbNoMetadataClick()    {}
     @FXML private void onDocumentIdClick()      {}

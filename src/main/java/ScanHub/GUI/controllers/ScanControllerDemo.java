@@ -15,7 +15,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
@@ -25,7 +24,7 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Controller for ScanView.fxml.
+ * Controller for ScanViewDemo.fxml.
  *
  * Responsibilities
  * ─────────────────
@@ -40,7 +39,7 @@ import java.util.*;
  *
  * TODOs are marked where real service / repository calls should go.
  */
-public class ScanController implements Initializable, IViewController {
+public class ScanControllerDemo implements Initializable, IViewController {
 
     // Header
     @FXML private HBox  hboxHeader;

@@ -202,6 +202,74 @@
 
 }
 
+.destructive-btn:hover {
+
+    -fx-background-color: #DC2626;
+
+}
+
+.green-logo-h {
+
+    -fx-image: url("../images/Green/LogoGreen2H.png");
+
+}
+
+.tree-view-scanner {
+
+    -fx-border-width: 0;
+
+    -fx-background-color: TRANSPARENT;
+
+    transition: -fx-background-color 300ms ease-out, -fx-text-fill 300ms ease-out
+
+}
+
+.tree-view-scanner .tree-cell {
+
+    -fx-background-color: TRANSPARENT;
+    -fx-background-radius: 3px;
+
+}
+
+.tree-view-scanner .tree-cell:hover {
+
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 3px;
+
+}
+
+.tree-view-scanner .tree-cell:selected {
+
+    -fx-background-color: #2D3D4F;
+    -fx-background-radius: 3px;
+    -fx-text-fill: #ffffff;
+
+}
+
+.tree-view-scanner .tree-cell .tree-disclosure-node .arrow {
+
+    /*-fx-background-color: #ffffff;*/
+
+}
+
+.tree-cell-box {
+
+    -fx-text-fill: #FFAC1C;
+
+}
+
+.tree-cell-doc {
+
+    -fx-text-fill: #87CEEB;
+
+}
+
+.tree-cell-file {
+
+    -fx-text-fill: #FFEA00;
+
+}
+
 .tertiary-btn {
 
     -fx-text-fill: #2d3d4f;
@@ -381,6 +449,14 @@
     -fx-background-size: 33px 33px;
     -fx-background-color: TRANSPARENT;
 
+}
+
+.pagination .number-button:selected {
+    -fx-background-color: #2D3D4F;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-text-fill: #ffffff;
 }
 
 .grey-separator .line {

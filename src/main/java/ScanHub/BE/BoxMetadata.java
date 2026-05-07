@@ -14,14 +14,17 @@ public class BoxMetadata {
 
     public BoxMetadata() {}
 
-    public BoxMetadata(int metadataId, int boxId, String profileName, String boxName, int documentCount, int fileCount, LocalDateTime boxCreatedAt) {
+    public BoxMetadata(int metadataId, int boxId, String profileName, int documentCount, int fileCount, LocalDateTime boxCreatedAt) {
         this.metadataId = metadataId;
         this.boxId = boxId;
         this.profileName = profileName;
-        this.boxName = boxName;
         this.documentCount = documentCount;
         this.fileCount = fileCount;
         this.boxCreatedAt = boxCreatedAt;
+
+        String newProfileName = profileName.replace(" ", "");
+
+        this.boxName = newProfileName + "_" + this.boxId;
     }
 
     public int getMetadataId() { return metadataId; }
