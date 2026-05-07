@@ -1,44 +1,35 @@
 package ScanHub.GUI.facade;
 
 // project imports
-import ScanHub.BLL.DocumentMetadataManager;
 import ScanHub.BLL.util.PasswordEncrypter;
-import ScanHub.GUI.models.DocumentMetadataModel;
-import ScanHub.GUI.models.ProfileModel;
-import ScanHub.GUI.models.UserModel;
+import ScanHub.GUI.models.*;
 
 public class ModelFacade {
     private PasswordEncrypter encrypter;
     private UserModel userModel;
     private ProfileModel profileModel;
-    private DocumentMetadataManager metadataManager;
-    private DocumentMetadataModel metadataModel;
+    private BoxModel boxModel;
+    private BoxMetadataModel metadataModel;
+    private ClientModel clientModel;
 
     public ModelFacade() throws Exception {
         encrypter = new PasswordEncrypter();
+        clientModel = new ClientModel();
         userModel = new UserModel();
         profileModel = new ProfileModel();
-        metadataManager = new DocumentMetadataManager();
-        metadataModel = new DocumentMetadataModel();
-
+        metadataModel = new BoxMetadataModel();
+        boxModel = new BoxModel();
     }
 
-    public PasswordEncrypter getEncrypter() {
-        return encrypter;
-    }
+    public PasswordEncrypter getEncrypter() { return encrypter; }
 
-    public UserModel getUserModel() {
-        return userModel;
-    }
+    public UserModel getUserModel() { return userModel; }
 
-    public ProfileModel getProfileModel() {
-        return profileModel;
-    }
+    public ProfileModel getProfileModel() { return profileModel; }
 
-    public DocumentMetadataManager getMetadataManager() {
-        return metadataManager;
-    }
-    public DocumentMetadataModel getMetadataModel() {
-        return metadataModel;
-    }
+    public BoxModel getBoxModel() { return boxModel; }
+
+    public BoxMetadataModel getMetadataModel() { return metadataModel; }
+
+    public ClientModel getClientModel() { return clientModel; }
 }

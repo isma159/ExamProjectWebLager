@@ -17,16 +17,17 @@ public class ProfileModel {
         profileObservableList.setAll(profileManager.getProfiles());
     }
 
-    public void createProfile(Profile newProfile) throws Exception {
+    public Profile createProfile(Profile newProfile) throws Exception {
         Profile createdProfile = profileManager.createProfile(newProfile);
         profileObservableList.add(createdProfile);
+        return createdProfile;
     }
 
     public ObservableList<Profile> getProfiles() {
         return profileObservableList;
     }
 
-    public void refreshModel() throws Exception {
+    public void refreshProfiles() throws Exception {
         profileObservableList.setAll(profileManager.getProfiles());
     }
 

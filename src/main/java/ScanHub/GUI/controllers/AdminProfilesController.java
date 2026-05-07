@@ -11,7 +11,6 @@ import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -151,14 +150,14 @@ public class AdminProfilesController implements Initializable {
 
     @FXML
     private void onTbActiveClick(){
-        selectedStatus = ProfileStatus.Active;
+        selectedStatus = ProfileStatus.ACTIVE;
         filterProfiles(txtFldSearchProfiles.getText());
     }
 
 
     @FXML
     private void onTbInactiveClick()
-    { selectedStatus = ProfileStatus.Inactive;
+    { selectedStatus = ProfileStatus.INACTIVE;
         filterProfiles(txtFldSearchProfiles.getText());
     }
 

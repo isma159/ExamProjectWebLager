@@ -131,14 +131,14 @@ public class AdminDashboardController implements Initializable {
 
     @FXML
     private void onTbActiveClick(){
-        selectedStatus = ProfileStatus.Active;
+        selectedStatus = ProfileStatus.ACTIVE;
         filterProfiles();
     }
 
 
     @FXML
     private void onTbInactiveClick()
-    { selectedStatus = ProfileStatus.Inactive;
+    { selectedStatus = ProfileStatus.INACTIVE;
         filterProfiles();
     }
 

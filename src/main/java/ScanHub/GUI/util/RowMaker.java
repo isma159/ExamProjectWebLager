@@ -10,8 +10,6 @@ import ScanHub.BE.User;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.geometry.Orientation;
-import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -179,7 +177,7 @@ public class RowMaker {
         // Chip
 
         HBox chip = null;
-        if (profile.getStatus() == ProfileStatus.Active) {
+        if (profile.getStatus() == ProfileStatus.ACTIVE) {
             chip = ChipMaker.createChip("Active", "chip-color-success");
         }
         else {
@@ -280,7 +278,7 @@ public class RowMaker {
         HBox.setHgrow(chipPlaceholder, Priority.NEVER);
 
         HBox chip = null;
-        if (profile.getStatus() == ProfileStatus.Active) {
+        if (profile.getStatus() == ProfileStatus.ACTIVE) {
             chip = ChipMaker.createChip("Active", "chip-color-success");
         }
         else {
@@ -317,7 +315,6 @@ public class RowMaker {
 
         if (user != null) {
             checkBox.setSelected(user.getProfiles().contains(profile));
-            System.out.println(user.getProfiles());
         }
 
         return outerHBox;
@@ -443,8 +440,7 @@ public class RowMaker {
         });
 
         if (profile != null) {
-            checkBox.setSelected(profile.getUsers().contains(user));
-            System.out.println(profile.getUsers());
+            checkBox.setSelected(user.getProfiles().contains(profile));
         }
 
         return outerHBox;

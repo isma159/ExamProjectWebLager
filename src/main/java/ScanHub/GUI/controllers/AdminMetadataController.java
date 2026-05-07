@@ -1,6 +1,6 @@
 package ScanHub.GUI.controllers;
 
-import ScanHub.BE.DocumentMetadata;
+import ScanHub.BE.BoxMetadata;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import javafx.fxml.FXML;
@@ -9,6 +9,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -19,7 +21,7 @@ public class AdminMetadataController implements Initializable {
     @FXML private Pagination metadataPagination;
 
     private ModelFacade modelFacade;
-    private DocumentMetadata selected = null;
+    private BoxMetadata selected = null;
 
     public AdminMetadataController() {}
 
@@ -40,10 +42,14 @@ public class AdminMetadataController implements Initializable {
             metadataTableBox.getChildren().clear();
             selected = null;
 
-            List<DocumentMetadata> list = modelFacade.getMetadataModel().getAllMetadata();
+            List<BoxMetadata> list = modelFacade.getMetadataModel().getAllMetadata();
 
-            for (DocumentMetadata m : list) {
-                Label row = new Label("Doc #" + m.getDocumentId() + "  |  " + m.getTitle() + "  |  " + m.getAuthor());
+            for (BoxMetadata m : list) {
+                Label row = new Label("Box #" + m.getBoxId()
+                        + "  |  " + m.getProfileName()
+                        + "  |  " + m.getBoxName()
+                        + "  |  Docs: " + m.getDocumentCount()
+                        + "  |  Files: " + m.getFileCount());
                 row.getStyleClass().addAll("lbl", "box-card", "user-row");
                 row.setMaxWidth(Double.MAX_VALUE);
                 row.setPrefHeight(45);
@@ -68,28 +74,33 @@ public class AdminMetadataController implements Initializable {
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
 
-        TextField title  = new TextField(selected.getTitle() != null ? selected.getTitle() : "");
-        TextField type   = new TextField(selected.getDocumentType() != null ? selected.getDocumentType() : "");
-        TextField author = new TextField(selected.getAuthor() != null ? selected.getAuthor() : "");
-        TextField ref    = new TextField(selected.getReferenceNumber() != null ? selected.getReferenceNumber() : "");
+        TextField profileName = new TextField(selected.getProfileName() != null ? selected.getProfileName() : "");
+        TextField boxName = new TextField(selected.getBoxName() != null ? selected.getBoxName() : "");
+        TextField documentCount = new TextField(String.valueOf(selected.getDocumentCount()));
+        TextField fileCount = new TextField(String.valueOf(selected.getFileCount()));
+        TextField boxCreatedAt = new TextField(selected.getBoxCreatedAt() != null ? selected.getBoxCreatedAt().toString() : "");
 
-        grid.addRow(0, new Label("Title:"),  title);
-        grid.addRow(1, new Label("Type:"),   type);
-        grid.addRow(2, new Label("Author:"), author);
-        grid.addRow(3, new Label("Ref No:"), ref);
+        grid.addRow(0, new Label("Profile:"), profileName);
+        grid.addRow(1, new Label("Box:"), boxName);
+        grid.addRow(2, new Label("Documents:"), documentCount);
+        grid.addRow(3, new Label("Files:"), fileCount);
+        grid.addRow(4, new Label("Created at:"), boxCreatedAt);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
-                selected.setTitle(title.getText());
-                selected.setDocumentType(type.getText());
-                selected.setAuthor(author.getText());
-                selected.setReferenceNumber(ref.getText());
                 try {
+                    selected.setProfileName(profileName.getText());
+                    selected.setBoxName(boxName.getText());
+                    selected.setDocumentCount(Integer.parseInt(documentCount.getText()));
+                    selected.setFileCount(Integer.parseInt(fileCount.getText()));
+                    selected.setBoxCreatedAt(LocalDateTime.parse(boxCreatedAt.getText()));
                     modelFacade.getMetadataModel().updateMetadata(selected);
                     load();
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    AlertHelper.showWarning("Invalid Values", "Counts must be numbers and created at must use ISO date-time format.");
                 } catch (Exception e) {
                     e.printStackTrace();
                     AlertHelper.showError("Update Failed", "Failed to update.");
@@ -101,7 +112,7 @@ public class AdminMetadataController implements Initializable {
     @FXML
     private void onClickDeleteMetadata() {
         if (selected == null) { AlertHelper.showWarning("No Selection", "Select a row first."); return; }
-        AlertHelper.showConfirmation("Delete", "Delete metadata for Doc #" + selected.getDocumentId() + "?", () -> {
+        AlertHelper.showConfirmation("Delete", "Delete metadata for Box #" + selected.getBoxId() + "?", () -> {
             try {
                 modelFacade.getMetadataModel().deleteMetadata(selected);
                 load();

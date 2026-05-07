@@ -68,9 +68,8 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/AdminUsersView.fxml");
             } else if (newValue == profilesBtn) {
                 loadPage("/views/AdminProfilesView.fxml");
-            }
-            else if (newValue == metadataBtn) {
-                loadPage("/views/MetaDataView.fxml");
+            } else if (newValue == metadataBtn) {
+                loadPage("/views/AdminMetadataView.fxml");
             }
         });
 
@@ -101,6 +100,7 @@ public class AdminController implements IViewController, Initializable {
 
             Node page = loader.load();
 
+            // TODO (remove later mb?)
             Object ctrl = loader.getController();
             if (ctrl instanceof AdminMetadataController metaCtrl) {
                 metaCtrl.setModel(modelFacade);
@@ -114,7 +114,7 @@ public class AdminController implements IViewController, Initializable {
     }
 
     @FXML
-    private void onClickLogOut(ActionEvent actionEvent) { // TODO
+    private void onClickLogOut(ActionEvent actionEvent) {
         AlertHelper.showConfirmation("Log Out", "Are you sure you want to log out?", () -> {
             try {
                 ViewHandler handler = ViewHandler.LOGIN;
@@ -138,8 +138,7 @@ public class AdminController implements IViewController, Initializable {
         try {
             ViewHandler handler = ViewHandler.SCAN_VIEW;
             handler.reset();
-            Stage stage = new Stage();
-            handler.show(modelFacade, stage);
+            handler.show(modelFacade).setMaximized(true);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

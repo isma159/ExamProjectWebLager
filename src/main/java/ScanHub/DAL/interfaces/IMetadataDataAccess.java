@@ -1,14 +1,14 @@
 package ScanHub.DAL.interfaces;
 
-import ScanHub.BE.DocumentMetadata;
+import ScanHub.BE.BoxMetadata;
 import java.util.List;
 
 public interface IMetadataDataAccess {
 
-    DocumentMetadata createData(DocumentMetadata metadata) throws Exception;
-    List<DocumentMetadata> getData() throws Exception;
-    DocumentMetadata getDataFromId(int metadataId) throws Exception;
-    DocumentMetadata getDataByDocumentId(int documentId) throws Exception;
-    void updateData(DocumentMetadata metadata) throws Exception;
-    void deleteData(DocumentMetadata metadata) throws Exception;
+    BoxMetadata createData(BoxMetadata metadata) throws Exception;
+    List<BoxMetadata> getData() throws Exception;
+    BoxMetadata getDataFromId(int metadataId) throws Exception;
+    BoxMetadata getDataByBoxId(int boxId) throws Exception;
+    void updateData(BoxMetadata metadata) throws Exception;
+    void deleteData(BoxMetadata metadata) throws Exception;
 }

@@ -1,6 +1,6 @@
 package ScanHub.BE;
 
 public enum ProfileStatus {
-    Active,
-    Inactive
+    ACTIVE,
+    INACTIVE
 }
