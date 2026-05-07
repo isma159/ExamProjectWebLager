@@ -32,7 +32,7 @@
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                            <children>
                               <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="&#xe90d;">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -49,7 +49,7 @@
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickUpdateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                            <children>
                               <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="&#xe942;">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -63,10 +63,10 @@
                            </children>
                         </HBox>
                         <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteUser" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
                            <children>
                               <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="&#xe90f;">
                                  <font>
                                     <Font size="16.0" />
                                  </font>

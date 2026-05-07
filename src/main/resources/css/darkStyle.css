@@ -300,6 +300,10 @@
     -fx-background-radius: 6px;
 }
 
+.dark .green-logo-h {
+    -fx-image: url("../images/Green/LogoGreenH.png");
+}
+
 /* ---------- Dark Pagination ---------- */
 .dark .pagination .number-button,
 .dark .pagination .left-arrow-button,

@@ -208,6 +208,12 @@
 
 }
 
+.green-logo-h {
+
+    -fx-image: url("../images/Green/LogoGreen2H.png");
+
+}
+
 .tree-view-scanner {
 
     -fx-border-width: 0;

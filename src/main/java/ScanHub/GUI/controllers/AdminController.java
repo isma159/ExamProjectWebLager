@@ -99,13 +99,6 @@ public class AdminController implements IViewController, Initializable {
             });
 
             Node page = loader.load();
-
-            // TODO (remove later mb?)
-            Object ctrl = loader.getController();
-            if (ctrl instanceof AdminMetadataController metaCtrl) {
-                metaCtrl.setModel(modelFacade);
-            }
-
             contentArea.getChildren().setAll(page);
         } catch (Exception e) {
             e.printStackTrace();

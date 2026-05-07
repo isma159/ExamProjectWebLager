@@ -1,10 +1,7 @@
 package ScanHub.GUI.util;
 
 // project imports
-import ScanHub.BE.Profile;
-import ScanHub.BE.ProfileStatus;
-import ScanHub.BE.Role;
-import ScanHub.BE.User;
+import ScanHub.BE.*;
 
 // java imports
 import javafx.geometry.Pos;
@@ -15,6 +12,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Paint;
+
+import java.time.format.DateTimeFormatter;
 import java.util.function.BiConsumer;
 
 /**
@@ -56,16 +55,6 @@ public class RowMaker {
         usernameLabel.setPrefWidth(210);
         usernameLabel.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(usernameLabel, Priority.ALWAYS);
-
-        /* Separator 2
-        Separator sep2 = new Separator(Orientation.VERTICAL);
-        sep2.setPrefHeight(30);
-        sep2.setMaxHeight(Separator.USE_PREF_SIZE);*/
-
-        /* Separator 3
-        Separator sep3 = new Separator(Orientation.VERTICAL);
-        sep3.setPrefHeight(30);
-        sep3.setMaxHeight(Separator.USE_PREF_SIZE);*/
 
         // Role chip
         HBox chip = ChipMaker.createChip(user.getRole().toString(), "chip-color");
@@ -190,6 +179,115 @@ public class RowMaker {
 
         if (onSelect != null) {
             outerHBox.setOnMouseClicked(e -> onSelect.accept(profile, outerHBox));
+        }
+
+        return outerHBox;
+    }
+
+    public static HBox addMetadataRow(BoxMetadata metadata, BiConsumer<BoxMetadata, HBox> onSelect) {
+
+        // Outer HBox
+        HBox outerHBox = new HBox();
+        outerHBox.setAlignment(Pos.CENTER_LEFT);
+        outerHBox.setMaxWidth(Double.MAX_VALUE);
+        outerHBox.setMinHeight(Region.USE_PREF_SIZE);
+        outerHBox.setPrefHeight(45.0);
+        outerHBox.setPrefWidth(200.0);
+        outerHBox.getStyleClass().add("box-card");
+        outerHBox.getStyleClass().add("user-row");
+
+        // --- Column 1: Box ID ---
+        HBox col1 = new HBox();
+        col1.setAlignment(Pos.CENTER);
+        col1.setPrefHeight(100.0);
+        col1.setPrefWidth(200.0);
+        HBox.setHgrow(col1, Priority.ALWAYS);
+
+        Label boxIdLabel = new Label("Box #" + metadata.getBoxId());
+        boxIdLabel.setAlignment(Pos.CENTER);
+        boxIdLabel.getStyleClass().add("lbl");
+        HBox.setHgrow(boxIdLabel, Priority.ALWAYS);
+        col1.getChildren().addAll(boxIdLabel);
+
+        // --- Column 2: Profile Name
+        HBox col2 = new HBox();
+        col2.setAlignment(Pos.CENTER);
+        col2.setLayoutX(10.0);
+        col2.setLayoutY(10.0);
+        col2.setPrefHeight(100.0);
+        col2.setPrefWidth(200.0);
+        HBox.setHgrow(col2, Priority.ALWAYS);
+
+        Label profileNameLabel = new Label(metadata.getProfileName());
+        profileNameLabel.setAlignment(Pos.CENTER);
+        profileNameLabel.getStyleClass().add("lbl");
+        HBox.setHgrow(profileNameLabel, Priority.ALWAYS);
+        col2.getChildren().add(profileNameLabel);
+
+        // --- Column 3: Box Name
+        HBox col3 = new HBox();
+        col3.setAlignment(Pos.CENTER);
+        col3.setLayoutX(1608.0);
+        col3.setLayoutY(10.0);
+        col3.setPrefHeight(100.0);
+        col3.setPrefWidth(200.0);
+        HBox.setHgrow(col3, Priority.ALWAYS);
+
+        Label boxNameLabel = new Label(metadata.getBoxName());
+        boxNameLabel.setAlignment(Pos.CENTER);
+        boxNameLabel.getStyleClass().add("lbl");
+        HBox.setHgrow(boxNameLabel, Priority.ALWAYS);
+        col3.getChildren().add(boxNameLabel);
+
+        // --- Column 4: Document Count ---
+        HBox col4 = new HBox();
+        col4.setAlignment(Pos.CENTER);
+        col4.setLayoutX(1608.0);
+        col4.setLayoutY(10.0);
+        col4.setPrefHeight(100.0);
+        col4.setPrefWidth(200.0);
+        HBox.setHgrow(col4, Priority.ALWAYS);
+
+        Label documentCountLabel = new Label("Docs: " + metadata.getDocumentCount());
+        documentCountLabel.setAlignment(Pos.CENTER);
+        documentCountLabel.getStyleClass().add("lbl");
+        HBox.setHgrow(documentCountLabel, Priority.ALWAYS);
+        col4.getChildren().add(documentCountLabel);
+
+        // --- Column 5: File Count ---
+        HBox col5 = new HBox();
+        col5.setAlignment(Pos.CENTER);
+        col5.setLayoutX(1608.0);
+        col5.setLayoutY(10.0);
+        col5.setPrefHeight(100.0);
+        col5.setPrefWidth(200.0);
+        HBox.setHgrow(col5, Priority.ALWAYS);
+
+        Label fileCountLabel = new Label("Files: " + metadata.getFileCount());
+        fileCountLabel.setAlignment(Pos.CENTER);
+        fileCountLabel.getStyleClass().add("lbl");
+        HBox.setHgrow(fileCountLabel, Priority.ALWAYS);
+        col5.getChildren().add(fileCountLabel);
+
+        // --- Column 6: Created At ---
+        HBox col6 = new HBox();
+        col6.setAlignment(Pos.CENTER);
+        col6.setLayoutX(1608.0);
+        col6.setLayoutY(10.0);
+        col6.setPrefHeight(100.0);
+        col6.setPrefWidth(200.0);
+        HBox.setHgrow(col6, Priority.ALWAYS);
+
+        Label createdAtLabel = new Label(metadata.getBoxCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+        createdAtLabel.setAlignment(Pos.CENTER);
+        createdAtLabel.getStyleClass().add("lbl");
+        HBox.setHgrow(createdAtLabel, Priority.ALWAYS);
+        col6.getChildren().add(createdAtLabel);
+
+        outerHBox.getChildren().addAll(col1, col2, col3, col4, col5, col6);
+
+        if (onSelect != null) {
+            outerHBox.setOnMouseClicked(e -> onSelect.accept(metadata, outerHBox));
         }
 
         return outerHBox;
