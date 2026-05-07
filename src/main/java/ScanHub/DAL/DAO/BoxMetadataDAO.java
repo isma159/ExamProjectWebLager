@@ -1,6 +1,6 @@
 package ScanHub.DAL.DAO;
 
-import ScanHub.BE.DocumentMetadata;
+import ScanHub.BE.BoxMetadata;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IMetadataDataAccess;
 
@@ -9,18 +9,18 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DocumentMetadataDAO implements IMetadataDataAccess {
+public class BoxMetadataDAO implements IMetadataDataAccess {
 
     DBConnector dbConnector = new DBConnector();
 
-    public DocumentMetadataDAO() throws IOException {}
+    public BoxMetadataDAO() throws IOException {}
 
     @Override
-    public DocumentMetadata createData(DocumentMetadata metadata) throws Exception {
+    public BoxMetadata createData(BoxMetadata metadata) throws Exception {
         String sql = """
                 INSERT INTO BoxMetadata
                     (boxId, profileName, boxName, documentCount, fileCount, boxCreatedAt)
-                VALUES (?, ?, ?, ?, ?, GETDATE())
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection connection = dbConnector.getConnection();
@@ -31,6 +31,7 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
             ps.setString(3, metadata.getBoxName());
             ps.setInt(4, metadata.getDocumentCount());
             ps.setInt(5, metadata.getFileCount());
+            ps.setObject(6, metadata.getBoxCreatedAt());
 
             ps.executeUpdate();
 
@@ -42,16 +43,17 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
             return metadata;
 
         } catch (SQLException e) {
-            throw new Exception("Could not create document metadata", e);
+            throw new Exception("Could not create box metadata", e);
         }
     }
 
     @Override
-    public List<DocumentMetadata> getData() throws Exception {
-        List<DocumentMetadata> metadataList = new ArrayList<>();
+    public List<BoxMetadata> getData() throws Exception {
+        List<BoxMetadata> metadataList = new ArrayList<>();
 
         String sql = """
-                SELECT metadataId, boxId, profileName, boxName, documentCount, fileCount, boxCreatedAt
+                SELECT metadataId, boxId, profileName, boxName,
+                       documentCount, fileCount, boxCreatedAt
                 FROM BoxMetadata
                 WHERE deleted_at IS NULL
                 """;
@@ -65,16 +67,17 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
             }
 
         } catch (SQLException e) {
-            throw new Exception("Could not retrieve document metadata list", e);
+            throw new Exception("Could not retrieve box metadata list", e);
         }
 
         return metadataList;
     }
 
     @Override
-    public DocumentMetadata getDataFromId(int metadataId) throws Exception {
+    public BoxMetadata getDataFromId(int metadataId) throws Exception {
         String sql = """
-                SELECT metadataId, boxId, profileName, boxName, documentCount, fileCount, boxCreatedAt
+                SELECT metadataId, boxId, profileName, boxName,
+                       documentCount, fileCount, boxCreatedAt
                 FROM BoxMetadata
                 WHERE metadataId = ? AND deleted_at IS NULL
                 """;
@@ -97,9 +100,10 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
     }
 
     @Override
-    public DocumentMetadata getDataByDocumentId(int documentId) throws Exception {
+    public BoxMetadata getDataByBoxId(int boxId) throws Exception {
         String sql = """
-                SELECT metadataId, boxId, profileName, boxName, documentCount, fileCount, boxCreatedAt
+                SELECT metadataId, boxId, profileName, boxName,
+                       documentCount, fileCount, boxCreatedAt
                 FROM BoxMetadata
                 WHERE boxId = ? AND deleted_at IS NULL
                 """;
@@ -107,7 +111,7 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setInt(1, documentId);
+            ps.setInt(1, boxId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -117,15 +121,16 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
             return null;
 
         } catch (SQLException e) {
-            throw new Exception("Could not fetch metadata for boxId " + documentId, e);
+            throw new Exception("Could not fetch metadata for boxId " + boxId, e);
         }
     }
 
     @Override
-    public void updateData(DocumentMetadata metadata) throws Exception {
+    public void updateData(BoxMetadata metadata) throws Exception {
         String sql = """
                 UPDATE BoxMetadata
-                SET profileName = ?, boxName = ?, documentCount = ?, fileCount = ?
+                SET profileName = ?, boxName = ?, documentCount = ?,
+                    fileCount = ?, boxCreatedAt = ?
                 WHERE metadataId = ? AND deleted_at IS NULL
                 """;
 
@@ -136,7 +141,8 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
             ps.setString(2, metadata.getBoxName());
             ps.setInt(3, metadata.getDocumentCount());
             ps.setInt(4, metadata.getFileCount());
-            ps.setInt(5, metadata.getMetadataId());
+            ps.setObject(5, metadata.getBoxCreatedAt());
+            ps.setInt(6, metadata.getMetadataId());
 
             ps.executeUpdate();
 
@@ -146,8 +152,8 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
     }
 
     @Override
-    public void deleteData(DocumentMetadata metadata) throws Exception {
-        String sql = "UPDATE BoxMetadata SET deleted_at = GETDATE() WHERE metadataId = ?";
+    public void deleteData(BoxMetadata metadata) throws Exception {
+        String sql = "UPDATE BoxMetadata SET deleted_at = SYSDATETIME() WHERE metadataId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -160,17 +166,18 @@ public class DocumentMetadataDAO implements IMetadataDataAccess {
         }
     }
 
-    private DocumentMetadata mapRow(ResultSet rs) throws SQLException {
-        Timestamp created = rs.getTimestamp("boxCreatedAt");
 
-        return new DocumentMetadata(
+    private BoxMetadata mapRow(ResultSet rs) throws SQLException {
+        Timestamp boxCreatedAt = rs.getTimestamp("boxCreatedAt");
+
+        return new BoxMetadata(
                 rs.getInt("metadataId"),
                 rs.getInt("boxId"),
                 rs.getString("profileName"),
                 rs.getString("boxName"),
                 rs.getInt("documentCount"),
                 rs.getInt("fileCount"),
-                created != null ? created.toLocalDateTime() : null
+                boxCreatedAt != null ? boxCreatedAt.toLocalDateTime() : null
         );
     }
 }

@@ -109,7 +109,7 @@ public class AdminController implements IViewController, Initializable {
     }
 
     @FXML
-    private void onClickLogOut(ActionEvent actionEvent) { // TODO
+    private void onClickLogOut(ActionEvent actionEvent) {
         AlertHelper.showConfirmation("Log Out", "Are you sure you want to log out?", () -> {
             try {
                 ViewHandler handler = ViewHandler.LOGIN;

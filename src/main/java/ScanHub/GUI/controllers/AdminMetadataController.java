@@ -1,6 +1,6 @@
 package ScanHub.GUI.controllers;
 
-import ScanHub.BE.DocumentMetadata;
+import ScanHub.BE.BoxMetadata;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import javafx.fxml.FXML;
@@ -9,6 +9,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -19,7 +21,7 @@ public class AdminMetadataController implements Initializable {
     @FXML private Pagination metadataPagination;
 
     private ModelFacade modelFacade;
-    private DocumentMetadata selected = null;
+    private BoxMetadata selected = null;
 
     public AdminMetadataController() {}
 
@@ -40,10 +42,14 @@ public class AdminMetadataController implements Initializable {
             metadataTableBox.getChildren().clear();
             selected = null;
 
-            List<DocumentMetadata> list = modelFacade.getMetadataModel().getAllMetadata();
+            List<BoxMetadata> list = modelFacade.getMetadataModel().getAllMetadata();
 
-            for (DocumentMetadata m : list) {
-                Label row = new Label("Box #" + m.getBoxId() + "  |  " + m.getBoxName() + "  |  " + m.getProfileName());
+            for (BoxMetadata m : list) {
+                Label row = new Label("Box #" + m.getBoxId()
+                        + "  |  " + m.getProfileName()
+                        + "  |  " + m.getBoxName()
+                        + "  |  Docs: " + m.getDocumentCount()
+                        + "  |  Files: " + m.getFileCount());
                 row.getStyleClass().addAll("lbl", "box-card", "user-row");
                 row.setMaxWidth(Double.MAX_VALUE);
                 row.setPrefHeight(45);
@@ -68,33 +74,33 @@ public class AdminMetadataController implements Initializable {
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
 
-        TextField profileName   = new TextField(selected.getProfileName() != null ? selected.getProfileName() : "");
-        TextField boxName       = new TextField(selected.getBoxName() != null ? selected.getBoxName() : "");
+        TextField profileName = new TextField(selected.getProfileName() != null ? selected.getProfileName() : "");
+        TextField boxName = new TextField(selected.getBoxName() != null ? selected.getBoxName() : "");
         TextField documentCount = new TextField(String.valueOf(selected.getDocumentCount()));
-        TextField fileCount     = new TextField(String.valueOf(selected.getFileCount()));
+        TextField fileCount = new TextField(String.valueOf(selected.getFileCount()));
+        TextField boxCreatedAt = new TextField(selected.getBoxCreatedAt() != null ? selected.getBoxCreatedAt().toString() : "");
 
-        grid.addRow(0, new Label("Profile Name:"),   profileName);
-        grid.addRow(1, new Label("Box Name:"),       boxName);
-        grid.addRow(2, new Label("Document Count:"), documentCount);
-        grid.addRow(3, new Label("File Count:"),     fileCount);
+        grid.addRow(0, new Label("Profile:"), profileName);
+        grid.addRow(1, new Label("Box:"), boxName);
+        grid.addRow(2, new Label("Documents:"), documentCount);
+        grid.addRow(3, new Label("Files:"), fileCount);
+        grid.addRow(4, new Label("Created at:"), boxCreatedAt);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
-                selected.setProfileName(profileName.getText());
-                selected.setBoxName(boxName.getText());
                 try {
+                    selected.setProfileName(profileName.getText());
+                    selected.setBoxName(boxName.getText());
                     selected.setDocumentCount(Integer.parseInt(documentCount.getText()));
                     selected.setFileCount(Integer.parseInt(fileCount.getText()));
-                } catch (NumberFormatException ex) {
-                    AlertHelper.showError("Invalid Input", "Document count and file count must be numbers.");
-                    return;
-                }
-                try {
+                    selected.setBoxCreatedAt(LocalDateTime.parse(boxCreatedAt.getText()));
                     modelFacade.getMetadataModel().updateMetadata(selected);
                     load();
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    AlertHelper.showWarning("Invalid Values", "Counts must be numbers and created at must use ISO date-time format.");
                 } catch (Exception e) {
                     e.printStackTrace();
                     AlertHelper.showError("Update Failed", "Failed to update.");
