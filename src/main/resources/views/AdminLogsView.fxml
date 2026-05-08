@@ -1,14 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ScanHub.GUI.controllers.AdminLogsController"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ScanHub.GUI.controllers.AdminLogsController">
 
-</AnchorPane>
+    <!-- ── Header bar ── -->
+    <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="1800.0" spacing="12.0">
+        <styleClass>
+            <String fx:value="half-card"/>
+            <String fx:value="card-bg"/>
+        </styleClass>
+        <Region prefWidth="18.0"/>
+        <Label styleClass="h2" text="Logs"/>
+        <TextField fx:id="txtFldSearchLogs"
+                   prefHeight="30.0" prefWidth="220.0"
+                   promptText="Search logs…" styleClass="container"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Region prefWidth="18.0"/>
+    </HBox>
+
+    <!-- ── Filter row ── -->
+    <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="1800.0" spacing="9.0">
+        <styleClass>
+            <String fx:value="second-card-bg"/>
+            <String fx:value="box-card"/>
+        </styleClass>
+        <Region prefWidth="15.0"/>
+
+        <!-- Action type toggles -->
+        <ToggleButton mnemonicParsing="false" onAction="#onTbAllLogsClick"
+                      prefHeight="30.0" prefWidth="60.0" selected="true" text="All">
+            <toggleGroup><ToggleGroup fx:id="logsFilter"/></toggleGroup>
+            <styleClass><String fx:value="filter-btn"/><String fx:value="lbl"/></styleClass>
+        </ToggleButton>
+        <ToggleButton mnemonicParsing="false" onAction="#onTbCreateLogsClick"
+                      prefHeight="30.0" prefWidth="110.0" text="File Created"
+                      toggleGroup="$logsFilter">
+            <styleClass><String fx:value="filter-btn"/><String fx:value="lbl"/></styleClass>
+        </ToggleButton>
+        <ToggleButton mnemonicParsing="false" onAction="#onTbDeleteLogsClick"
+                      prefHeight="30.0" prefWidth="110.0" text="File Deleted"
+                      toggleGroup="$logsFilter">
+            <styleClass><String fx:value="filter-btn"/><String fx:value="lbl"/></styleClass>
+        </ToggleButton>
+
+        <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="24.0"/>
+
+        <!-- Text filters -->
+        <TextField fx:id="txtFldFilterUser"
+                   prefHeight="30.0" prefWidth="160.0"
+                   promptText="User" styleClass="container"/>
+        <TextField fx:id="txtFldFilterDocument"
+                   prefHeight="30.0" prefWidth="160.0"
+                   promptText="Document" styleClass="container"/>
+        <TextField fx:id="txtFldFilterDateFrom"
+                   prefHeight="30.0" prefWidth="130.0"
+                   promptText="From DD/MM/YYYY" styleClass="container"/>
+        <TextField fx:id="txtFldFilterDateTo"
+                   prefHeight="30.0" prefWidth="130.0"
+                   promptText="To DD/MM/YYYY" styleClass="container"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+        <Region prefWidth="15.0"/>
+    </HBox>
+
+    <!-- ── Column headers ── -->
+    <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="1800.0">
+        <styleClass>
+            <String fx:value="second-card-bg"/>
+            <String fx:value="box-card"/>
+        </styleClass>
+        <Label alignment="CENTER" prefWidth="80.0" styleClass="lbl"
+               text="Log ID" onMouseClicked="#onLogIdClick" HBox.hgrow="ALWAYS"/>
+        <Separator orientation="VERTICAL" prefHeight="33.0"/>
+        <Label alignment="CENTER" prefWidth="200.0" styleClass="lbl"
+               text="Username" onMouseClicked="#onUsernameClick" HBox.hgrow="ALWAYS"/>
+        <Separator orientation="VERTICAL" prefHeight="33.0"/>
+        <Label alignment="CENTER" prefWidth="260.0" styleClass="lbl"
+               text="Action" onMouseClicked="#onActionClick" HBox.hgrow="ALWAYS"/>
+        <Separator orientation="VERTICAL" prefHeight="33.0"/>
+        <Label alignment="CENTER" prefWidth="120.0" styleClass="lbl"
+               text="File ID" onMouseClicked="#onFileIdClick" HBox.hgrow="ALWAYS"/>
+        <Separator orientation="VERTICAL" prefHeight="33.0"/>
+        <Label alignment="CENTER" prefWidth="200.0" styleClass="lbl"
+               text="Timestamp" onMouseClicked="#onTimestampClick" HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <!-- ── Rows ── -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="box-card">
+        <content>
+            <VBox fx:id="logsTableBox"/>
+        </content>
+    </ScrollPane>
+
+    <!-- ── Pagination ── -->
+    <HBox alignment="CENTER" prefHeight="45.0" prefWidth="1800.0">
+        <styleClass>
+            <String fx:value="half-card-bottom"/>
+            <String fx:value="card-bg"/>
+        </styleClass>
+        <Pagination fx:id="logsPagination" maxPageIndicatorCount="5"
+                    prefHeight="45.0" prefWidth="538.0"/>
+    </HBox>
+
+</VBox>

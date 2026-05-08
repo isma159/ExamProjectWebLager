@@ -13,16 +13,20 @@ public class ScanManager {
     private final IScanSource scanSource;
     private final DocumentDAO documentDAO;
     private final FileDAO fileDAO;
+    private final LogManager logManager;
 
     private Document currentDocument;
     private final Box targetBox;
+    private final int userId;
     private int referenceCounter = 0;
 
-    public ScanManager(IScanSource scanSource, Box targetBox) throws Exception {
+    public ScanManager(IScanSource scanSource, Box targetBox, int userId) throws Exception {
         this.scanSource = scanSource;
         this.targetBox = targetBox;
+        this.userId = userId;
         this.documentDAO = new DocumentDAO();
         this.fileDAO = new FileDAO();
+        this.logManager = new LogManager();
         this.currentDocument = documentDAO.createDocument(targetBox.getBoxId());
     }
 
@@ -32,19 +36,19 @@ public class ScanManager {
 
         SplitBehavior behavior = targetBox.getProfile().getSplitBehavior();
 
-        // Barcode detection happens here, after the fetch
         if (behavior == SplitBehavior.BARCODE && BarcodeDetector.containsBarcode(result.data())) {
             currentDocument = documentDAO.createDocument(targetBox.getBoxId());
-            return null; // signals a split to the caller, barcode page is not saved
+            return null;
         }
 
-        return fileDAO.createFile(currentDocument.getDocumentId(), referenceCounter, result.data());
+        File savedFile = fileDAO.createFile(currentDocument.getDocumentId(), referenceCounter, result.data());
+
+        // Log the file creation
+        logManager.createLog(userId, savedFile.getFileId(), currentDocument.getDocumentId(), "FILE_CREATED");
+
+        return savedFile;
     }
 
-    /**
-     * For MANUAL split behavior — called when the user clicks a
-     * "New Document" button in the UI.
-     */
     public void manualSplit() throws Exception {
         currentDocument = documentDAO.createDocument(targetBox.getBoxId());
     }
