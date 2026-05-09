@@ -21,7 +21,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public Profile createData(Profile newProfile) throws Exception {
-        String sql = "INSERT INTO Profiles (clientId, profileName, splitBehavior, status, exportLabel) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Profiles (clientId, profileName, splitBehavior, status, exportLabel, brightness, contrast) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
@@ -34,6 +34,8 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 ps.setString(3, newProfile.getSplitBehavior().toString());
                 ps.setString(4, newProfile.getStatus().toString());
                 ps.setString(5, newProfile.getExportLabel());
+                ps.setInt(6, newProfile.getBrightness());
+                ps.setInt(7, newProfile.getContrast());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -69,7 +71,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
         String selectProfileSQL = """
                 SELECT p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.splitBehavior, p.status, p.exportLabel
+                       p.splitBehavior, p.status, p.exportLabel, p.brightness, p.contrast
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 WHERE p.deleted_at IS NULL
@@ -94,7 +96,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
     public Profile getDataFromName(String name) throws Exception {
         String sql = """
                 SELECT p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.splitBehavior, p.status, p.exportLabel
+                       p.splitBehavior, p.status, p.exportLabel, p.brightness, p.contrast
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 WHERE p.profileName = ? AND p.deleted_at IS NULL
@@ -115,7 +117,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public void updateData(Profile newData) throws Exception {
-        String sql = "UPDATE Profiles SET clientId = ?, profileName = ?, splitBehavior = ?, status = ?, exportLabel = ? WHERE profileId = ?";
+        String sql = "UPDATE Profiles SET clientId = ?, profileName = ?, splitBehavior = ?, status = ?, exportLabel = ?, brightness = ?, contrast = ? WHERE profileId = ?";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
@@ -128,7 +130,9 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 ps.setString(3, newData.getSplitBehavior().toString());
                 ps.setString(4, newData.getStatus().toString());
                 ps.setString(5, newData.getExportLabel());
-                ps.setInt(6, newData.getProfileId());
+                ps.setInt(6, newData.getBrightness());
+                ps.setInt(7, newData.getContrast());
+                ps.setInt(8, newData.getProfileId());
                 ps.executeUpdate();
 
                 newData.setClientId(clientId);
@@ -204,7 +208,9 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 rs.getString("profileName"),
                 SplitBehavior.valueOf(rs.getString("splitBehavior")),
                 ProfileStatus.valueOf(rs.getString("status")),
-                rs.getString("exportLabel")
+                rs.getString("exportLabel"),
+                rs.getInt("brightness"),
+                rs.getInt("contrast")
         );
 
         int clientId = rs.getInt("clientId");

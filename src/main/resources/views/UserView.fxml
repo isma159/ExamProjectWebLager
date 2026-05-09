@@ -1,14 +1,444 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ScanHub.GUI.controllers.UserController"
-            prefHeight="600.0" prefWidth="1200.0">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserController">
+   <BorderPane prefHeight="700.0" prefWidth="1280.0" styleClass="background">
+      <top>
+         <VBox>
+            <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="75.0" prefWidth="1280.0" spacing="12.0" styleClass="card,card-bg,shadow">
+               <padding>
+                  <Insets bottom="14.0" left="18.0" right="18.0" top="14.0" />
+               </padding>
+               <children>
+                  <ImageView fitHeight="60.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" styleClass="green-logo-h">
+                     <image>
+                        <Image url="@../images/Green/LogoGreen2H.png" />
+                     </image>
+                  </ImageView>
+                  <Region HBox.hgrow="ALWAYS" />
+                  <VBox alignment="CENTER" spacing="4.0">
+                     <children>
+                        <Label styleClass="h1" text="Scanning Workspace" />
+                     </children>
+                  </VBox>
+                  <Region HBox.hgrow="ALWAYS" />
+                  <ToggleSwitch fx:id="darkMode" onMouseClicked="#onDarkModeToggle" prefHeight="30.0" prefWidth="60.0" scaleX="1.25" scaleY="1.25" scaleZ="1.25" text="Dark Mode ">
+                     <HBox.margin>
+                        <Insets right="12.0" />
+                     </HBox.margin>
+                  </ToggleSwitch>
+                  <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                     <children>
+                        <Label fx:id="lblUsername" styleClass="h3" text="Username" />
+                        <Label fx:id="lblRole" styleClass="lbl" text="Role: User/Admin" />
+                     </children>
+                  </VBox>
+                  <Separator orientation="VERTICAL" prefHeight="40.0" styleClass="grey-separator" />
+                  <Button mnemonicParsing="false" onAction="#onClickLogOut" prefHeight="33.0" prefWidth="33.0" styleClass="primary-btn">
+                     <graphic>
+                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                           <font><Font size="16.0" /></font>
+                        </Label>
+                     </graphic>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </VBox.margin>
+            </HBox>
+         </VBox>
+      </top>
 
-</AnchorPane>
+      <!-- ── LEFT: Document tree sidebar ── -->
+      <left>
+         <VBox prefWidth="240.0" styleClass="card,card-bg,shadow">
+            <HBox alignment="CENTER_LEFT">
+               <padding>
+                  <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
+               </padding>
+               <children>
+                  <Label prefHeight="27.0" styleClass="lbl" text="Box Content" HBox.hgrow="ALWAYS" />
+               </children>
+               <styleClass>
+                  <String fx:value="card-bg" />
+                  <String fx:value="half-card" />
+               </styleClass>
+            </HBox>
+            <Separator prefWidth="200.0" styleClass="grey-separator" />
+            <TreeView fx:id="boxTreeView" VBox.vgrow="ALWAYS">
+               <styleClass>
+                  <String fx:value="scan-list" />
+                  <String fx:value="tree-view-scanner" />
+               </styleClass>
+               <VBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" />
+               </VBox.margin>
+            </TreeView>
+            <BorderPane.margin>
+               <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+            </BorderPane.margin>
+         </VBox>
+      </left>
+
+      <!-- ── CENTER: Page viewer grid ── -->
+      <center>
+         <VBox>
+            <children>
+               <VBox alignment="CENTER">
+                  <children>
+                     <!-- ── Main Toolbar ── -->
+                     <HBox alignment="CENTER" prefHeight="45.0" spacing="4.0">
+                        <padding>
+                           <Insets bottom="6.0" left="10.0" right="10.0" top="6.0" />
+                        </padding>
+                        <children>
+
+                           <!-- Session Startup -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="135.0" styleClass="secondary-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Session Startup" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+
+                           <!-- Scan -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Scan" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <!-- Stop -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Stop" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+
+                           <!-- Rotate L -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Rotate L" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <!-- Rotate R -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Rotate R" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+
+                           <!-- New Doc -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="New Doc" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <!-- Delete -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Delete" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <!-- Undo -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="75.0" styleClass="secondary-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Undo" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+
+                           <!-- Export -->
+                           <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Export" textFill="WHITE">
+                                          <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+
+                           <ComboBox prefHeight="30.0" prefWidth="163.0" styleClass="container" />
+
+                        </children>
+                        <VBox.margin>
+                           <Insets />
+                        </VBox.margin>
+                     </HBox>
+                  </children>
+                  <styleClass>
+                     <String fx:value="card-bg" />
+                     <String fx:value="half-card" />
+                  </styleClass>
+                  <VBox.margin>
+                     <Insets right="3.0" top="3.0" />
+                  </VBox.margin>
+               </VBox>
+
+               <StackPane styleClass="background" VBox.vgrow="ALWAYS">
+                  <Pane mouseTransparent="true" styleClass="flash-overlay" visible="false" StackPane.alignment="CENTER" />
+                  <Label styleClass="lbl" text="⬛  Barcode detected → new document" visible="false" StackPane.alignment="TOP_RIGHT">
+                     <StackPane.margin>
+                        <Insets right="12.0" top="12.0" />
+                     </StackPane.margin>
+                  </Label>
+                  <ScrollPane fitToHeight="false" fitToWidth="true" pannable="true" styleClass="v-card">
+                     <content>
+                        <FlowPane hgap="16" vgap="16">
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </FlowPane>
+                     </content>
+                     <StackPane.margin>
+                        <Insets right="3.0" top="3.0" />
+                     </StackPane.margin>
+                  </ScrollPane>
+                  <Label styleClass="lbl" text="No pages scanned yet. Press Space or click Scan" textAlignment="CENTER" visible="true" wrapText="true" />
+               </StackPane>
+
+               <!-- ── Bottom bar ── -->
+               <HBox alignment="CENTER" maxHeight="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                  <styleClass>
+                     <String fx:value="half-card-bottom" />
+                     <String fx:value="card-bg" />
+                  </styleClass>
+                  <children>
+
+                     <!-- Zoom out -->
+                     <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                        <graphic>
+                           <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                              <font><Font size="16.0" /></font>
+                           </Label>
+                        </graphic>
+                        <HBox.margin><Insets left="3.0" right="3.0" /></HBox.margin>
+                     </Button>
+
+                     <!-- Zoom in -->
+                     <Button mnemonicParsing="false" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                        <graphic>
+                           <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                              <font><Font size="16.0" /></font>
+                           </Label>
+                        </graphic>
+                        <HBox.margin><Insets left="3.0" right="3.0" /></HBox.margin>
+                     </Button>
+
+                     <Separator maxHeight="-Infinity" minHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator">
+                        <HBox.margin><Insets left="3.0" right="3.0" /></HBox.margin>
+                     </Separator>
+                     <Label styleClass="lbl" text="View">
+                        <HBox.margin><Insets left="3.0" right="3.0" /></HBox.margin>
+                     </Label>
+                     <ComboBox prefHeight="26" prefWidth="90" styleClass="container">
+                        <HBox.margin><Insets left="3.0" right="3.0" /></HBox.margin>
+                     </ComboBox>
+                     <Separator maxHeight="-Infinity" minHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator">
+                        <HBox.margin><Insets left="3.0" right="3.0" /></HBox.margin>
+                     </Separator>
+                     <Label styleClass="lbl" text="Global rotation">
+                        <HBox.margin><Insets left="3.0" right="3.0" /></HBox.margin>
+                     </Label>
+                     <Spinner editable="true" prefHeight="26" prefWidth="70" styleClass="arrowless-spinner">
+                        <HBox.margin><Insets left="3.0" right="3.0" /></HBox.margin>
+                     </Spinner>
+                  </children>
+                  <VBox.margin>
+                     <Insets bottom="3.0" right="3.0" />
+                  </VBox.margin>
+               </HBox>
+
+            </children>
+            <BorderPane.margin>
+               <Insets top="3.0" />
+            </BorderPane.margin>
+         </VBox>
+      </center>
+
+      <!-- ── BOTTOM: Status bar ── -->
+      <bottom>
+         <HBox alignment="CENTER_LEFT" spacing="16.0">
+            <padding>
+               <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
+            </padding>
+            <children>
+               <Label styleClass="lbl" text="Docs: 0" />
+               <Label styleClass="lbl" text="·" />
+               <Label styleClass="lbl" text="Pages: 0" />
+               <Label styleClass="lbl" text="·" />
+               <Label styleClass="lbl" text="–" />
+               <Label styleClass="lbl" text="·" />
+               <Label styleClass="lbl" text="Export: –" />
+               <Region HBox.hgrow="ALWAYS" />
+               <Label styleClass="lbl" text="Space scan" />
+               <Label styleClass="lbl" text="←→ nav" />
+               <Label styleClass="lbl" text="[] rotate" />
+               <Label styleClass="lbl" text="Del delete" />
+               <Label styleClass="lbl" text="Ctrl+E export" />
+               <Label styleClass="lbl" text="Ctrl+Z undo" />
+            </children>
+            <BorderPane.margin>
+               <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+            </BorderPane.margin>
+            <styleClass>
+               <String fx:value="box-card" />
+               <String fx:value="card-bg" />
+               <String fx:value="shadow" />
+            </styleClass>
+         </HBox>
+      </bottom>
+
+   </BorderPane>
+
+   <!-- ═══════════════════════════════════════════════════════════════════
+        SESSION STARTUP POPUP OVERLAY
+   ════════════════════════════════════════════════════════════════════════ -->
+   <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="true" prefHeight="420.0" prefWidth="1280.0" styleClass="modal-backdrop" visible="false">
+      <VBox maxWidth="360.0" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         <children>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label styleClass="h2" text="Session Setup" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" prefHeight="28.0" styleClass="secondary-btn" text="✕" />
+               </children>
+            </HBox>
+            <Label styleClass="lbl" text="Choose the assigned profile, enter the box ID, and optionally set a rotation that should be applied to all newly scanned pages." wrapText="true" />
+            <VBox spacing="6.0">
+               <children>
+                  <Label styleClass="h3" text="Profile" />
+                  <ComboBox prefWidth="320.0" />
+               </children>
+            </VBox>
+            <VBox spacing="6.0">
+               <children>
+                  <Label styleClass="h3" text="Box ID" />
+                  <TextField promptText="e.g. BOX-042" styleClass="container" />
+               </children>
+            </VBox>
+            <VBox spacing="6.0">
+               <children>
+                  <Label styleClass="h3" text="Global Rotation" />
+                  <Spinner editable="true" prefWidth="140.0" />
+               </children>
+            </VBox>
+            <Button mnemonicParsing="false" prefHeight="33.0" styleClass="primary-btn" text="Start Session" />
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+               <children>
+                  <Label styleClass="lbl" text="API count unavailable" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" prefHeight="30.0" styleClass="secondary-btn" text="Refresh" />
+               </children>
+            </HBox>
+            <Separator />
+         </children>
+      </VBox>
+   </StackPane>
+</StackPane>

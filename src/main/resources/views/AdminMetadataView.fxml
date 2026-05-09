@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminMetadataController">
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminMetadataController">
     <children>
-        <VBox prefHeight="200.0" prefWidth="1800.0">
+        <VBox prefHeight="200.0" prefWidth="1800.0" HBox.hgrow="ALWAYS">
             <children>
                 <VBox prefHeight="1200.0" prefWidth="1371.0" styleClass="shadow">
                     <children>
@@ -28,7 +36,7 @@
                                 <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickEditMetadata" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                                     <children>
                                         <Region prefHeight="200.0" prefWidth="6.0" />
-                                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
                                             <font><Font size="16.0" /></font>
                                         </Label>
                                         <Region prefHeight="200.0" prefWidth="6.0" />
@@ -41,10 +49,10 @@
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
 
                                 <!-- Delete button -->
-                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteMetadata" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteMetadata" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
                                     <children>
                                         <Region prefHeight="200.0" prefWidth="6.0" />
-                                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
                                             <font><Font size="16.0" /></font>
                                         </Label>
                                         <Region prefHeight="200.0" prefWidth="6.0" />
@@ -97,17 +105,41 @@
                                 <String fx:value="box-card" />
                             </styleClass>
                             <children>
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#onDocumentIdClick" prefWidth="120.0" styleClass="lbl" text="Box ID" HBox.hgrow="ALWAYS" />
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#onTitleClick" prefWidth="210.0" styleClass="lbl" text="Profile" HBox.hgrow="ALWAYS" />
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#onDocumentTypeClick" prefWidth="160.0" styleClass="lbl" text="Box Name" HBox.hgrow="ALWAYS" />
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#onAuthorClick" prefWidth="180.0" styleClass="lbl" text="Documents" HBox.hgrow="ALWAYS" />
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#onReferenceNumberClick" prefWidth="160.0" styleClass="lbl" text="Files" HBox.hgrow="ALWAYS" />
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#onDocumentDateClick" prefWidth="160.0" styleClass="lbl" text="Created At" HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                           <children>
+                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onDocumentIdClick" styleClass="lbl" text="Box ID" />
+                           </children>
+                        </HBox>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                           <children>
+                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onTitleClick" styleClass="lbl" text="Profile" />
+                           </children>
+                        </HBox>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                           <children>
+                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onDocumentTypeClick" styleClass="lbl" text="Box Name" />
+                           </children>
+                        </HBox>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                           <children>
+                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onAuthorClick" styleClass="lbl" text="Documents" />
+                           </children>
+                        </HBox>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                           <children>
+                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onReferenceNumberClick" styleClass="lbl" text="Files" />
+                           </children>
+                        </HBox>
+                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                           <children>
+                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onDocumentDateClick" styleClass="lbl" text="Created At" />
+                           </children>
+                        </HBox>
                             </children>
                         </HBox>
 

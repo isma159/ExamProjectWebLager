@@ -11,24 +11,30 @@ public class Profile {
     private SplitBehavior splitBehavior;
     private ProfileStatus status;
     private String exportLabel;
+    private int brightness;
+    private int contrast;
 
     public Profile() {}
 
-    public Profile(int profileId, int clientId, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel) {
+    public Profile(int profileId, int clientId, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel, int brightness, int contrast) {
         this.profileId = profileId;
         this.clientId = clientId;
         this.profileName = profileName;
         this.splitBehavior = splitBehavior;
         this.status = status;
         this.exportLabel = exportLabel;
+        this.brightness = brightness;
+        this.contrast = contrast;
     }
 
-    public Profile(int clientId, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel) {
+    public Profile(int clientId, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel, int brightness, int contrast) {
         this.clientId = clientId;
         this.profileName = profileName;
         this.splitBehavior = splitBehavior;
         this.status = status;
         this.exportLabel = exportLabel;
+        this.brightness = brightness;
+        this.contrast = contrast;
     }
 
     public int getProfileId() { return profileId; }
@@ -38,6 +44,8 @@ public class Profile {
     public SplitBehavior getSplitBehavior() { return splitBehavior; }
     public ProfileStatus getStatus() { return status; }
     public String getExportLabel() { return exportLabel; }
+    public int getBrightness() { return brightness; }
+    public int getContrast() { return contrast; }
 
     public void setProfileId(int profileId) { this.profileId = profileId; }
     public void setClientId(int clientId) { this.clientId = clientId; }
@@ -46,6 +54,8 @@ public class Profile {
     public void setSplitBehavior(SplitBehavior splitBehavior) { this.splitBehavior = splitBehavior; }
     public void setStatus(ProfileStatus status) { this.status = status; }
     public void setExportLabel(String exportLabel) { this.exportLabel = exportLabel; }
+    public void setBrightness(int brightness) { this.brightness = brightness; }
+    public void setContrast(int contrast) { this.contrast = contrast; }
 
     @Override
     public String toString() { return this.profileName; }

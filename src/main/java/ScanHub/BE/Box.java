@@ -1,11 +1,13 @@
 package ScanHub.BE;
 
+import ScanHub.BE.interfaces.TreeNode;
+
 // java imports
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Box {
+public class Box implements TreeNode {
 
     private int boxId;
     private String boxName;
@@ -48,5 +50,12 @@ public class Box {
     public int getFileCount() { return documents.stream().mapToInt(d -> d.getFiles().size()).sum(); }
 
     @Override
-    public String toString() { return this.boxName; }
+    public String toString() {
+        return this.boxName;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "\uE9D9" + " " + boxName;
+    }
 }

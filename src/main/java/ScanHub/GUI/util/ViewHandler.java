@@ -14,7 +14,7 @@ public enum ViewHandler {
     LOGIN("/views/LoginView.fxml", "Login", false, Modality.APPLICATION_MODAL),
     ADMIN("/views/AdminView.fxml", "Admin Panel", true, Modality.WINDOW_MODAL),
     USER("/views/UserView.fxml", "User Panel", true, Modality.WINDOW_MODAL),
-    SCAN_VIEW("/views/ScanView.fxml", "Scanning Workspace", true, Modality.WINDOW_MODAL),
+    SCAN_VIEW("/views/ScanViewDemo.fxml", "Scanning Workspace", true, Modality.WINDOW_MODAL),
     CREATE_USER("/views/UserFormView.fxml", "Create User", false, Modality.APPLICATION_MODAL),
     EDIT_USER("/views/UserFormView.fxml", "Edit User", false, Modality.APPLICATION_MODAL),
     CREATE_PROFILE("/views/ProfileFormView.fxml", "Create Profile", false, Modality.APPLICATION_MODAL),

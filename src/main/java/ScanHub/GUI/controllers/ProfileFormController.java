@@ -22,23 +22,19 @@ public class ProfileFormController implements Initializable {
 
     @FXML private ToggleGroup toggleGroupSplitBehavior, toggleGroupProfileStatus;
     @FXML private Label formTitle, profileIdLabel, nameError, exportPreviewLabel, usersError;
+    @FXML private Label lblBrightnessValue, lblContrastValue;
     @FXML private RadioButton radioBARCODE, radioNONE, radioACTIVE, radioINACTIVE;
     @FXML private VBox userCheckboxList, vboxSplitBehavior, vboxStatus, vboxUsers;
     @FXML private TextField profileNameField;
     @FXML private SearchableComboBox<Client> searchableComboBoxClient;
+    @FXML private Slider sliderBrightness, sliderContrast;
     @FXML private Button saveButton;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
-    private Profile editingProfile = null; // null means create mode, non-null means edit mode
+    private Profile editingProfile = null;
     private List<User> selectedUsers;
 
-    /**
-     * Receives the shared model and optionally a profile to edit.
-     * Called before the window is shown, so it can access FXML fields here.
-     * @param modelFacade the shared model instance from AdminController
-     * @param profile the Profile to edit, or null if creating a new one
-     */
     public void setModel(Stage currentStage, ModelFacade modelFacade, Profile profile) {
         this.currentStage = currentStage;
         this.modelFacade = modelFacade;
@@ -66,13 +62,18 @@ public class ProfileFormController implements Initializable {
 
         selectedUsers = new ArrayList<>();
 
-        if (editingProfile != null) {
-            formTitle.setText("Edit profile");
-        }
-
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
             exportPreviewLabel.setText(buildExportLabel(newValue) + "1");
         }));
+
+        // Wire sliders to their value labels
+        sliderBrightness.valueProperty().addListener((obs, oldVal, newVal) -> {
+            lblBrightnessValue.setText(String.valueOf(newVal.intValue()));
+        });
+
+        sliderContrast.valueProperty().addListener((obs, oldVal, newVal) -> {
+            lblContrastValue.setText(String.valueOf(newVal.intValue()));
+        });
     }
 
     private void loadClients() {
@@ -94,7 +95,6 @@ public class ProfileFormController implements Initializable {
     }
 
     private void loadUsers() {
-
         try {
             selectedUsers.clear();
             vboxUsers.getChildren().clear();
@@ -115,9 +115,6 @@ public class ProfileFormController implements Initializable {
         }
     }
 
-    /**
-     * Pre-fills input fields when editing an existing Profile.
-     */
     private void populateFields(Profile profile) {
         profileNameField.setText(profile.getProfileName());
 
@@ -126,6 +123,12 @@ public class ProfileFormController implements Initializable {
 
         if (profile.getStatus() == ProfileStatus.ACTIVE) { toggleGroupProfileStatus.selectToggle(radioACTIVE); }
         else toggleGroupProfileStatus.selectToggle(radioINACTIVE);
+
+        // Populate slider values from existing profile
+        sliderBrightness.setValue(profile.getBrightness());
+        sliderContrast.setValue(profile.getContrast());
+        lblBrightnessValue.setText(String.valueOf(profile.getBrightness()));
+        lblContrastValue.setText(String.valueOf(profile.getContrast()));
     }
 
     @FXML
@@ -139,8 +142,7 @@ public class ProfileFormController implements Initializable {
         try {
             modelFacade.getUserModel().refreshUsers();
             modelFacade.getProfileModel().refreshProfiles();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             AlertHelper.showError("Error", "Could not save changes. Please try again.");
         }
     }
@@ -154,27 +156,21 @@ public class ProfileFormController implements Initializable {
         clearError();
 
         if (profileName.isBlank() || selectedClient == null || selectedSplitBehaviorToggle == null || selectedStatusToggle == null) {
-            if (profileName.isBlank()) {
-                profileNameField.getStyleClass().add("error-border");
-            }
-            if (selectedClient == null) {
-                searchableComboBoxClient.getStyleClass().add("error-border");
-            }
-            if (selectedSplitBehaviorToggle == null) {
-                vboxSplitBehavior.getStyleClass().add("error-border");
-            }
-            if (selectedStatusToggle == null) {
-                vboxStatus.getStyleClass().add("error-border");
-            }
+            if (profileName.isBlank()) profileNameField.getStyleClass().add("error-border");
+            if (selectedClient == null) searchableComboBoxClient.getStyleClass().add("error-border");
+            if (selectedSplitBehaviorToggle == null) vboxSplitBehavior.getStyleClass().add("error-border");
+            if (selectedStatusToggle == null) vboxStatus.getStyleClass().add("error-border");
             AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
             return;
         }
 
         SplitBehavior splitBehavior = (SplitBehavior) selectedSplitBehaviorToggle.getUserData();
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
+        int brightness = (int) sliderBrightness.getValue();
+        int contrast = (int) sliderContrast.getValue();
 
         try {
-            Profile newProfile = new Profile(selectedClient.getClientId(), profileName, splitBehavior, status, buildExportLabel(profileName));
+            Profile newProfile = new Profile(selectedClient.getClientId(), profileName, splitBehavior, status, buildExportLabel(profileName), brightness, contrast);
             newProfile.setClient(selectedClient);
             Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
             syncUserAssignments(createdProfile);
@@ -195,18 +191,10 @@ public class ProfileFormController implements Initializable {
         clearError();
 
         if (newProfileName.isBlank() || selectedClient == null || selectedSplitToggle == null || selectedStatusToggle == null) {
-            if (newProfileName.isBlank()) {
-                profileNameField.getStyleClass().add("error-border");
-            }
-            if (selectedClient == null) {
-                searchableComboBoxClient.getStyleClass().add("error-border");
-            }
-            if (selectedSplitToggle == null) {
-                vboxSplitBehavior.getStyleClass().add("error-border");
-            }
-            if (selectedStatusToggle == null) {
-                vboxStatus.getStyleClass().add("error-border");
-            }
+            if (newProfileName.isBlank()) profileNameField.getStyleClass().add("error-border");
+            if (selectedClient == null) searchableComboBoxClient.getStyleClass().add("error-border");
+            if (selectedSplitToggle == null) vboxSplitBehavior.getStyleClass().add("error-border");
+            if (selectedStatusToggle == null) vboxStatus.getStyleClass().add("error-border");
             AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
             return;
         }
@@ -220,6 +208,8 @@ public class ProfileFormController implements Initializable {
         editingProfile.setSplitBehavior(splitBehavior);
         editingProfile.setStatus(status);
         editingProfile.setExportLabel(newExportLabel);
+        editingProfile.setBrightness((int) sliderBrightness.getValue());
+        editingProfile.setContrast((int) sliderContrast.getValue());
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);

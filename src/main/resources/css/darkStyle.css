@@ -67,15 +67,11 @@
 }
 
 .dark .bold-lbl {
-
     -fx-text-fill: #ffffff;
-
 }
 
 .dark .helper-text {
-
     -fx-text-fill: #ffffff;
-
 }
 
 /* ---------- Dark Navigation ---------- */
@@ -106,7 +102,6 @@
     -fx-background-color: #465160;
     -fx-border-radius: 6px;
     -fx-background-radius: 6px;
-
     -fx-text-fill: #ffffff;
 }
 
@@ -130,6 +125,21 @@
 
 .dark .container.success-border {
     -fx-border-color: #4CD07D;
+}
+
+/* ---------- Dark Spinner ---------- */
+.dark .arrowless-spinner {
+    -fx-border-color: #2B3B4C;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+    -fx-background-color: #465160;
+    -fx-background-radius: 6px;
+}
+
+.dark .arrowless-spinner .text-field {
+    -fx-border-width: 0;
+    -fx-background-color: TRANSPARENT;
+    -fx-text-fill: #ffffff;
 }
 
 /* ---------- Dark Buttons ---------- */
@@ -161,6 +171,8 @@
 .dark .tertiary-btn {
     -fx-background-color: #4B5563;
     -fx-border-color: #2B3B4C;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
     -fx-text-fill: #ffffff;
 }
 
@@ -171,6 +183,10 @@
 .dark .destructive-btn {
     -fx-background-color: #EF4444;
     -fx-text-fill: #ffffff;
+}
+
+.dark .destructive-btn:hover {
+    -fx-background-color: #DC2626;
 }
 
 .dark .clear-btn {
@@ -196,6 +212,7 @@
     -fx-border-color: #008FF7;
     -fx-border-width: 0 0 2 0;
     -fx-border-insets: 2;
+    -fx-font-family: "Montserrat SemiBold";
 }
 
 /* ---------- Dark State & Feedback ---------- */
@@ -208,8 +225,13 @@
 }
 
 /* ---------- Dark Separators ---------- */
-.dark .separator .line {
+.dark .grey-separator .line {
     -fx-border-color: #2B3B4C;
+    -fx-border-width: 0.8;
+}
+
+.dark .dark-separator .line {
+    -fx-border-color: #ffffff;
     -fx-border-width: 0.8;
 }
 
@@ -219,15 +241,33 @@
 }
 
 .dark .scroll-pane .viewport {
+    -fx-border-color: TRANSPARENT;
     -fx-background-color: TRANSPARENT;
 }
 
 .dark .scroll-pane .scroll-bar {
     -fx-background-color: TRANSPARENT;
+    -fx-pref-width: 18;
 }
 
 .dark .scroll-pane .scroll-bar .thumb {
     -fx-background-color: #2B3B4C;
+}
+
+.dark .scroll-pane .scroll-bar .increment-button,
+.dark .scroll-pane .scroll-bar .decrement-button {
+    -fx-padding: 0;
+    -fx-shape: null;
+    visibility: hidden;
+    -fx-text-fill: TRANSPARENT;
+}
+
+.dark .scroll-pane .scroll-bar .increment-button .increment-arrow,
+.dark .scroll-pane .scroll-bar .decrement-button .decrement-arrow {
+    -fx-padding: 0;
+    -fx-shape: null;
+    visibility: hidden;
+    -fx-text-fill: TRANSPARENT;
 }
 
 /* ---------- Dark Chip ---------- */
@@ -238,20 +278,30 @@
 
 .dark .chip-color {
     -fx-background-color: #008FF7;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
 }
 
 .dark .chip-color-success {
     -fx-background-color: #4CD07D;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
 }
 
 .dark .chip-color-error {
     -fx-background-color: #FF3D32;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
 }
 
 /* ---------- Dark Avatar ---------- */
 .dark .avatar-initial {
     -fx-background-color: #008FF7;
     -fx-background-radius: 6px;
+}
+
+.dark .green-logo-h {
+    -fx-image: url("../images/Green/LogoGreenH.png");
 }
 
 /* ---------- Dark Pagination ---------- */
@@ -262,6 +312,13 @@
     -fx-border-color: #2B3B4C;
     -fx-border-radius: 6px;
     -fx-border-width: 2;
+    -fx-text-fill: #ffffff;
+}
+
+.dark .pagination .number-button:selected {
+    -fx-background-color: #008FF7;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
 
     -fx-text-fill: #ffffff;
 }
@@ -281,9 +338,12 @@
     -fx-background-size: 33px 33px;
     -fx-background-color: TRANSPARENT;
 }
+
 /* ---------- Dark Checkbox ---------- */
 .dark .check-box .box {
     -fx-background-color: TRANSPARENT;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
     -fx-border-color: #2B3B4C;
     -fx-border-width: 2;
     -fx-border-radius: 3px;
@@ -319,8 +379,30 @@
     -fx-text-fill: #ffffff;
 }
 
-
 .dark .toggle-switch .thumb {
     -fx-background-color: #ffffff;
     -fx-background-radius: 50px;
+}
+
+/* ---------- Dark Tree View ---------- */
+.dark .tree-view-scanner {
+    -fx-border-width: 0;
+    -fx-background-color: TRANSPARENT;
+}
+
+.dark .tree-view-scanner .tree-cell {
+    -fx-background-color: TRANSPARENT;
+    -fx-background-radius: 3px;
+    -fx-text-fill: #ffffff;
+}
+
+.dark .tree-view-scanner .tree-cell:hover {
+    -fx-background-color: #2B3B4C;
+    -fx-background-radius: 3px;
+}
+
+.dark .tree-view-scanner .tree-cell:selected {
+    -fx-background-color: #008FF7;
+    -fx-background-radius: 3px;
+    -fx-text-fill: #ffffff;
 }

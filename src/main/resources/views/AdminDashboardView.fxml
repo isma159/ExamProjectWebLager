@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminDashboardController">
+<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminDashboardController">
    <children>
       <VBox prefHeight="200.0" prefWidth="1550.0">
          <children>
@@ -100,7 +100,7 @@
                            </styleClass>
                            <children>
                               <Label alignment="CENTER" layoutX="40.0" layoutY="17.0" maxWidth="1.7976931348623157E308" onKeyPressed="#onUsernameClick" onMouseClicked="#onUsernameClick" prefWidth="210.0" styleClass="lbl" text="Username" HBox.hgrow="ALWAYS" />
-                              <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                              <Separator layoutX="471.0" layoutY="10.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                               <Label alignment="CENTER" layoutX="958.0" layoutY="17.0" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Role" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>
@@ -168,11 +168,11 @@
                            </styleClass>
                            <children>
                               <Label alignment="CENTER" maxWidth="1.7976931348623157E308" onKeyPressed="#onProfileNameClick" onMouseClicked="#onProfileNameClick" prefWidth="210.0" styleClass="lbl" text="Profile Name" />
-                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                               <Label alignment="CENTER" maxWidth="1.7976931348623157E308" onKeyPressed="#onSplitBehaviorClick" onMouseClicked="#onSplitBehaviorClick" prefWidth="210.0" styleClass="lbl" text="Split Behaviour" />
-                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                               <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Export Label" />
-                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" />
+                              <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                               <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefWidth="210.0" styleClass="lbl" text="Status" />
                            </children>
                         </HBox>
