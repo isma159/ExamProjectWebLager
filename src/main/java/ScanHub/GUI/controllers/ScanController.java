@@ -1,5 +1,12 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.Box;
+import ScanHub.BE.Document;
+import ScanHub.BE.File;
+import ScanHub.BE.Profile;
+import ScanHub.BLL.BoxManager;
+import ScanHub.BLL.ScanManager;
+import ScanHub.DAL.ApiClient.ScanApiClient;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
@@ -13,113 +20,87 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
-/**
- * Controller for ScanView.fxml.
- *
- * Responsibilities
- * ─────────────────
- *  • Session startup popup (profile, box ID, global rotation)
- *  • Scan / stop / undo
- *  • Document + page management (create, delete, reorder, rotate)
- *  • Page grid (FlowPane) with card rendering and zoom
- *  • Document tree (left sidebar)
- *  • Keyboard shortcuts
- *  • Status bar + page-info label
- *  • Export
- *
- * TODOs are marked where real service / repository calls should go.
- */
 public class ScanController implements Initializable, IViewController {
 
-    // Header
-    @FXML private HBox  hboxHeader;
     @FXML private Label sessionStatusLabel;
     @FXML private Label currentUserLabel;
     @FXML private Label scanSourceLabel;
-
-    // Main toolbar
-    @FXML private HBox mainToolbar;
-    @FXML private Button btnSessionStartup, btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport;
-    @FXML private ComboBox<String>  exportModeComboBox;
-
-    // Sub-toolbar
-    @FXML private HBox              subToolbar;
-    @FXML private Button            btnNavFirst;
-    @FXML private Button            btnNavPrev;
-    @FXML private Label             pageInfoLabel;
-    @FXML private Button            btnNavNext;
-    @FXML private Button            btnNavLast;
-    @FXML private Button            btnZoomOut;
-    @FXML private Button            btnZoomIn;
-    @FXML private ComboBox<String>  gridModeComboBox;
-    @FXML private Spinner<Integer>  globalRotSpinner;
-
-    // Left sidebar
-    @FXML private Label                treeStatsLabel;
-    @FXML private TreeView<String>     documentTreeView;
-
-    // Center
-    @FXML private Pane       flashOverlay;
-    @FXML private Label      barcodeToast;
+    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport;
+    @FXML private ComboBox<String> exportModeComboBox;
+    @FXML private Label pageInfoLabel;
+    @FXML private ComboBox<String> gridModeComboBox;
+    @FXML private Spinner<Integer> globalRotSpinner;
+    @FXML private TreeView<String> documentTreeView;
+    @FXML private Pane flashOverlay;
+    @FXML private Label barcodeToast;
     @FXML private ScrollPane pageScrollPane;
-    @FXML private FlowPane   pageGrid;
-    @FXML private Label      emptyStateLabel;
-
-    // Status bar
+    @FXML private FlowPane pageGrid;
+    @FXML private Label emptyStateLabel;
     @FXML private Label stDocsLabel;
     @FXML private Label stPagesLabel;
     @FXML private Label stCurrentLabel;
     @FXML private Label stExportLabel;
-
-    // Session popup
-    @FXML private StackPane            sessionPopupOverlay;
-    @FXML private VBox                 vboxSessionSetup;
-    @FXML private ComboBox<String>     profileComboBox;
-    @FXML private TextField            boxIdField;
-    @FXML private Spinner<Integer>     rotationSpinner;
-    @FXML private Label                apiCountLabel;
+    @FXML private StackPane sessionPopupOverlay;
+    @FXML private ComboBox<Profile> profileComboBox;
+    @FXML private TextField boxIdField;
+    @FXML private Spinner<Integer> rotationSpinner;
+    @FXML private Label apiCountLabel;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
-    private ObservableList<Document> documents = FXCollections.observableArrayList();
-    private Document selectedDocument = null;
-    private ScanPage selectedPage = null;
+    private final ObservableList<Document> documents = FXCollections.observableArrayList();
+    private Document selectedDocument;
+    private File selectedPage;
+    private ScanManager scanManager;
+    private Box activeBox;
+    private boolean sessionActive;
     private int currentPageIndex = -1;
-    private boolean sessionActive = false;
+    private double zoomLevel = 1.0;
 
-    /** Zoom multiplier applied to all page cards in the FlowPane. */
-    private double zoomLevel = 1.0; // default
-    private static double ZOOM_STEP = 0.15;
-    private static double ZOOM_MIN = 0.40;
-    private static double ZOOM_MAX = 3.00;
-
-    /**
-     * Undo stack — each entry is a {@link Runnable} that reverses the
-     * most recently committed action.  Max depth: {@value #UNDO_MAX}.
-     */
-    private final Deque<Runnable> undoStack = new ArrayDeque<>();
-    private static final int UNDO_MAX = 20;
+    private static final double ZOOM_STEP = 0.15;
+    private static final double ZOOM_MIN = 0.40;
+    private static final double ZOOM_MAX = 3.00;
 
     @Override
     public void setModel(ModelFacade model, Stage stage) {
-        this.modelFacade = modelFacade;
-        this.currentStage = currentStage;
+        this.modelFacade = model;
+        this.currentStage = stage;
+        initProfileComboBox();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initProfileComboBox();
         initExportComboBoxes();
         initGridModeComboBox();
         initSpinners();
@@ -127,34 +108,31 @@ public class ScanController implements Initializable, IViewController {
         initKeyboardShortcuts();
 
         setSessionControlsDisabled(true);
-        sessionStatusLabel.setText("Press ⚙ Session Startup to configure and begin.");
+        sessionStatusLabel.setText("Press Session Startup to configure and begin.");
         refreshStatusBar();
         updatePageInfoLabel();
     }
 
     private void initProfileComboBox() {
-        // TODO: replace with ProfileRepository.findAll() or equivalent service call
-        profileComboBox.setItems(FXCollections.observableArrayList(
-                "Default Profile", "Archive A4", "Archive Legal", "Scan-To-Text"
-        ));
-        profileComboBox.getSelectionModel().selectFirst();
+        if (modelFacade == null) {
+            return;
+        }
+
+        profileComboBox.setItems(modelFacade.getProfileModel().getProfiles());
+        if (!profileComboBox.getItems().isEmpty()) {
+            profileComboBox.getSelectionModel().selectFirst();
+        }
     }
 
     private void initExportComboBoxes() {
-        ObservableList<String> modes = FXCollections.observableArrayList(
-                "Single-page TIFF",
-                "Multi-page TIFF",
-                "PDF per document",
-                "ZIP of TIFFs"
-        );
-        exportModeComboBox.setItems(modes);
+        exportModeComboBox.setItems(FXCollections.observableArrayList("Single-page TIFF", "Multi-page TIFF"));
         exportModeComboBox.getSelectionModel().selectFirst();
     }
 
     private void initGridModeComboBox() {
         gridModeComboBox.setItems(FXCollections.observableArrayList("1 column", "2 columns", "3 columns", "4 columns"));
         gridModeComboBox.getSelectionModel().select(1);
-        gridModeComboBox.getSelectionModel().selectedIndexProperty().addListener((obs, o, n) -> applyGridMode(n.intValue()));
+        gridModeComboBox.getSelectionModel().selectedIndexProperty().addListener((obs, oldValue, newValue) -> applyGridMode(newValue.intValue()));
     }
 
     private void initSpinners() {
@@ -165,203 +143,301 @@ public class ScanController implements Initializable, IViewController {
     private void initDocumentTree() {
         TreeItem<String> root = new TreeItem<>("root");
         documentTreeView.setRoot(root);
-        documentTreeView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> onTreeSelectionChanged(newVal));
+        documentTreeView.setShowRoot(false);
+        documentTreeView.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldValue, newValue) -> onTreeSelectionChanged(newValue));
+
+        documentTreeView.setCellFactory(tv -> new javafx.scene.control.TreeCell<>() {
+            {
+                setOnDragDetected(event -> {
+                    TreeItem<String> item = getTreeItem();
+                    if (item == null || item == documentTreeView.getRoot()) return;
+
+                    Dragboard db = startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(item.getValue());
+                    db.setContent(content);
+                    event.consume();
+                });
+
+                setOnDragOver(event -> {
+                    if (event.getGestureSource() != this && event.getDragboard().hasString()) {
+                        event.acceptTransferModes(TransferMode.MOVE);
+                    }
+                    event.consume();
+                });
+
+                setOnDragEntered(event -> {
+                    if (event.getGestureSource() != this && event.getDragboard().hasString()) {
+                        setOpacity(0.6);
+                    }
+                });
+
+                setOnDragExited(event -> setOpacity(1.0));
+
+                setOnDragDropped(event -> {
+                    Dragboard db = event.getDragboard();
+                    if (!db.hasString()) return;
+
+                    String draggedLabel = db.getString();
+                    TreeItem<String> targetItem = getTreeItem();
+                    if (targetItem == null) return;
+
+                    boolean success = false;
+
+                    if (draggedLabel.startsWith("File #") && targetItem.getValue().startsWith("Document #")) {
+                        // File → Document: move file into this document
+                        success = moveFileToDococument(draggedLabel, targetItem.getValue());
+
+                    } else if (draggedLabel.startsWith("File #") && targetItem.getValue().startsWith("File #")) {
+                        // File → File: move file before the target file's position
+                        success = moveFileBefore(draggedLabel, targetItem.getValue());
+
+                    } else if (draggedLabel.startsWith("Document #") && targetItem.getValue().startsWith("Document #")) {
+                        // Document → Document: reorder
+                        success = reorderDocument(draggedLabel, targetItem.getValue());
+                    }
+
+                    event.setDropCompleted(success);
+                    event.consume();
+                    if (success) rebuild();
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item);
+            }
+        });
     }
 
-    /**
-     * Keyboard shortcuts are registered on the Scene once it becomes
-     * available (not yet at {@code initialize()} time).
-     */
+// --- Drag-and-drop logic ---
+
+    private boolean moveFileToDococument(String fileLabel, String docLabel) {
+        File file = findFileByLabel(fileLabel);
+        Document target = findDocumentByLabel(docLabel);
+        if (file == null || target == null) return false;
+
+        Document source = findOwnerDocument(file);
+        if (source == null || source == target) return false;
+
+        source.getFiles().remove(file);
+        target.getFiles().add(file);
+        persistFileMoved(file, target);
+        return true;
+    }
+
+    private boolean moveFileBefore(String draggedLabel, String targetLabel) {
+        File dragged = findFileByLabel(draggedLabel);
+        File targetFile = findFileByLabel(targetLabel);
+        if (dragged == null || targetFile == null || dragged == targetFile) return false;
+
+        Document draggedOwner = findOwnerDocument(dragged);
+        Document targetOwner = findOwnerDocument(targetFile);
+        if (draggedOwner == null || targetOwner == null) return false;
+
+        draggedOwner.getFiles().remove(dragged);
+        int insertIndex = targetOwner.getFiles().indexOf(targetFile);
+        targetOwner.getFiles().add(insertIndex, dragged);
+        persistFileMoved(dragged, targetOwner);
+        return true;
+    }
+
+    private boolean reorderDocument(String draggedLabel, String targetLabel) {
+        Document dragged = findDocumentByLabel(draggedLabel);
+        Document target = findDocumentByLabel(targetLabel);
+        if (dragged == null || target == null || dragged == target) return false;
+
+        documents.remove(dragged);
+        int insertIndex = documents.indexOf(target);
+        documents.add(insertIndex, dragged);
+        return true;
+    }
+
+    private void persistFileMoved(File file, Document newOwner) {
+        try {
+            modelFacade.getFileModel().moveFile(file, newOwner.getDocumentId());
+        } catch (Exception e) {
+            AlertHelper.showError("Move Failed", "Could not persist file move: " + e.getMessage());
+        }
+    }
+
+    private File findFileByLabel(String label) {
+        int id = parseTrailingId(label);
+        return documents.stream()
+                .flatMap(d -> d.getFiles().stream())
+                .filter(f -> f.getFileId() == id)
+                .findFirst().orElse(null);
+    }
+
+    private Document findDocumentByLabel(String label) {
+        int id = parseTrailingId(label);
+        return documents.stream()
+                .filter(d -> d.getDocumentId() == id)
+                .findFirst().orElse(null);
+    }
+
+    private Document findOwnerDocument(File file) {
+        return documents.stream()
+                .filter(d -> d.getFiles().contains(file))
+                .findFirst().orElse(null);
+    }
+
     private void initKeyboardShortcuts() {
         pageGrid.sceneProperty().addListener((obs, oldScene, scene) -> {
             if (scene == null) return;
             scene.setOnKeyPressed(e -> {
-                switch (e.getCode()) {
-                    case SPACE            -> { onScan(null);         e.consume(); }
-                    case LEFT             -> { onNavPrev(null);      e.consume(); }
-                    case RIGHT            -> { onNavNext(null);      e.consume(); }
-                    case HOME             -> { onNavFirst(null);     e.consume(); }
-                    case END              -> { onNavLast(null);      e.consume(); }
-                    case OPEN_BRACKET     -> { onRotateLeft(null);   e.consume(); }
-                    case CLOSE_BRACKET    -> { onRotateRight(null);  e.consume(); }
-                    case DELETE           -> { onDeletePage(null);   e.consume(); }
-                    case N -> {
-                        if (!e.isControlDown()) { onNewDocument(null); e.consume(); }
-                    }
-                    case Z -> {
-                        if (e.isControlDown()) { onUndo(null); e.consume(); }
-                    }
-                    case E -> {
-                        if (e.isControlDown()) { onExport(null); e.consume(); }
-                    }
-                    default -> { /* ignored */ }
-                }
+                KeyCode code = e.getCode();
+                if (code == KeyCode.SPACE) { onScan(null); e.consume(); }
+                else if (code == KeyCode.LEFT) { onNavPrev(null); e.consume(); }
+                else if (code == KeyCode.RIGHT) { onNavNext(null); e.consume(); }
+                else if (code == KeyCode.HOME) { onNavFirst(null); e.consume(); }
+                else if (code == KeyCode.END) { onNavLast(null); e.consume(); }
+                else if (code == KeyCode.OPEN_BRACKET) { onRotateLeft(null); e.consume(); }
+                else if (code == KeyCode.CLOSE_BRACKET) { onRotateRight(null); e.consume(); }
+                else if (code == KeyCode.DELETE) { onDeletePage(null); e.consume(); }
+                else if (code == KeyCode.N && !e.isControlDown()) { onNewDocument(null); e.consume(); }
+                else if (code == KeyCode.E && e.isControlDown()) { onExport(null); e.consume(); }
             });
         });
     }
 
-    /** Opens the Session Startup popup (⚙ button in main toolbar). */
     @FXML
     private void onSessionStartup(ActionEvent e) {
+        initProfileComboBox();
         sessionPopupOverlay.setVisible(true);
     }
 
-    /** ✕ close button inside the popup card. */
     @FXML
     private void onSessionPopupClose(ActionEvent e) {
         sessionPopupOverlay.setVisible(false);
     }
 
-    /** Click on the semi-transparent backdrop closes the popup. */
     @FXML
     private void onSessionPopupBackdropClick(MouseEvent e) {
         sessionPopupOverlay.setVisible(false);
     }
 
-    /**
-     * Click anywhere inside the card is consumed so it does NOT bubble
-     * up to the backdrop handler and accidentally close the popup.
-     */
     @FXML
     private void onSessionPopupConsumeClick(MouseEvent e) {
         e.consume();
     }
 
-    // =========================================================================
-    // Session start
-    // =========================================================================
-
     @FXML
     private void onStartSession(ActionEvent e) {
-        String profileName = profileComboBox.getValue();
-        String boxId = boxIdField.getText().trim();
+        Profile profile = profileComboBox.getValue();
+        String boxInput = boxIdField.getText().trim();
 
-        if (profileName == null || profileName.isBlank()) {
-            AlertHelper.showError("Session Setup","Please select a profile before starting.");
+        if (profile == null) {
+            AlertHelper.showError("Session Setup", "Please select a profile before starting.");
             return;
         }
-        if (boxId.isEmpty()) {
+        if (boxInput.isEmpty()) {
             AlertHelper.showError("Session Setup", "Please enter a Box ID before starting.");
             return;
         }
 
-        // Mirror popup rotation spinner → sub-toolbar spinner
-        globalRotSpinner.getValueFactory().setValue(rotationSpinner.getValue());
+        try {
+            BoxManager boxManager = new BoxManager();
+            activeBox = boxManager.getOrCreateSessionBox(boxInput, profile);
+            scanManager = new ScanManager(new ScanApiClient(), activeBox);
+            syncDocumentsFromManager();
 
-        sessionActive = true;
-        setSessionControlsDisabled(false);
+            globalRotSpinner.getValueFactory().setValue(rotationSpinner.getValue());
+            sessionActive = true;
+            selectedDocument = null;
+            selectedPage = null;
 
-        sessionStatusLabel.setText("Session active  ·  Profile: " + profileName + "  ·  Box: " + boxId);
-        currentUserLabel.setText(profileName);   // TODO: use logged-in username
-        scanSourceLabel.setText("Box: " + boxId);
-
-        sessionPopupOverlay.setVisible(false);
-        refreshStatusBar();
+            setSessionControlsDisabled(false);
+            sessionStatusLabel.setText("Session active - Profile: " + profile.getProfileName() + " - Box: " + activeBox.getBoxName());
+            currentUserLabel.setText(profile.getProfileName());
+            scanSourceLabel.setText("Box #" + activeBox.getBoxId());
+            sessionPopupOverlay.setVisible(false);
+            rebuild();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Session Setup", "Could not start scan session.");
+        }
     }
 
     @FXML
     private void onScan(ActionEvent e) {
-        if (!sessionActive) return;
+        if (!sessionActive || scanManager == null) return;
 
-        // TODO: replace with real ScanService.acquirePage() call
-        if (documents.isEmpty() || selectedDocument == null) {
-            createNewDocumentInternal();
-        }
+        try {
+            ScanManager.StoredScan result = scanManager.fetchAndStore(globalRotSpinner.getValue());
+            syncDocumentsFromManager();
 
-        ScanPage page = new ScanPage("Page " + (totalPageCount() + 1), globalRotSpinner.getValue());
-        Document target = selectedDocument;
+            if (result.barcodeSplit()) {
+                selectedDocument = result.document();
+                selectedPage = null;
+                showBarcodeToast();
+                rebuild();
+                return;
+            }
 
-        target.getPages().add(page);
-        pushUndo(() -> {
-            target.getPages().remove(page);
+            selectPage(result.document(), result.file());
             rebuild();
-        });
-
-        selectPage(target, page);
-        rebuild();
-        playFlashAnimation();
+            playFlashAnimation();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Scan Failed", "Could not scan and store the next page.");
+        }
     }
 
     @FXML
     private void onStop(ActionEvent e) {
-        // TODO: ScanService.stop()
         sessionStatusLabel.setText("Scanning stopped.");
     }
 
-    // =========================================================================
-    // Document management
-    // =========================================================================
-
     @FXML
     private void onNewDocument(ActionEvent e) {
-        if (!sessionActive) return;
-        createNewDocumentInternal();
-        rebuild();
-    }
+        if (!sessionActive || scanManager == null) return;
 
-    private void createNewDocumentInternal() {
-        Document doc = new Document("Document " + (documents.size() + 1));
-        documents.add(doc);
-        selectedDocument = doc;
-        pushUndo(() -> {
-            documents.remove(doc);
-            if (selectedDocument == doc) {
-                selectedDocument = documents.isEmpty()
-                        ? null
-                        : documents.get(documents.size() - 1);
-            }
+        try {
+            selectedDocument = scanManager.manualSplit();
+            selectedPage = null;
+            syncDocumentsFromManager();
             rebuild();
-        });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("New Document Failed", "Could not create a new document.");
+        }
     }
-
-    // =========================================================================
-    // Page actions
-    // =========================================================================
 
     @FXML
     private void onDeletePage(ActionEvent e) {
-        if (selectedDocument == null || selectedPage == null) return;
+        if (selectedDocument == null || selectedPage == null || scanManager == null) return;
 
-        int idx = selectedDocument.getPages().indexOf(selectedPage);
-        if (idx < 0) return;
-
-        ScanPage removed = selectedPage;
-        Document ownerDoc = selectedDocument;
-
-        ownerDoc.getPages().remove(idx);
-        pushUndo(() -> {
-            ownerDoc.getPages().add(Math.min(idx, ownerDoc.getPages().size()), removed);
-            rebuild();
-        });
-
-        // Select the nearest remaining page
-        if (!ownerDoc.getPages().isEmpty()) {
-            int next = Math.min(idx, ownerDoc.getPages().size() - 1);
-            selectPage(ownerDoc, ownerDoc.getPages().get(next));
-        } else {
+        try {
+            File removed = selectedPage;
+            scanManager.deleteFile(removed);
+            selectedDocument.getFiles().removeIf(file -> file.getFileId() == removed.getFileId());
             selectedPage = null;
-            currentPageIndex = -1;
+            syncDocumentsFromManager();
+            rebuild();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Delete Failed", "Could not delete the selected page.");
         }
-
-        rebuild();
-
-        if (totalPageCount() == 0) emptyStateLabel.setVisible(true);
     }
 
     @FXML private void onRotateLeft(ActionEvent e) { rotatePage(-90); }
     @FXML private void onRotateRight(ActionEvent e) { rotatePage(90); }
 
     private void rotatePage(int delta) {
-        if (selectedPage == null) return;
-        int prev = selectedPage.getRotation();
-        selectedPage.setRotation((prev + delta + 360) % 360);
-        pushUndo(() -> { selectedPage.setRotation(prev); rebuildPageGrid(); });
-        rebuildPageGrid();
-    }
+        if (selectedPage == null || scanManager == null) return;
 
-    // =========================================================================
-    // Navigation
-    // =========================================================================
+        int rotation = normalizeRotation(selectedPage.getRotation() + delta);
+        try {
+            scanManager.updateFileRotation(selectedPage, rotation);
+            rebuildPageGrid();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Rotation Failed", "Could not update page rotation.");
+        }
+    }
 
     @FXML private void onNavFirst(ActionEvent e) { navigateTo(0); }
     @FXML private void onNavPrev(ActionEvent e)  { navigateTo(currentPageIndex - 1); }
@@ -369,126 +445,61 @@ public class ScanController implements Initializable, IViewController {
     @FXML private void onNavLast(ActionEvent e)  { navigateTo(allPages().size() - 1); }
 
     private void navigateTo(int index) {
-        List<ScanPage> all = allPages();
+        List<File> all = allPages();
         if (all.isEmpty()) return;
 
         index = Math.max(0, Math.min(index, all.size() - 1));
         selectedPage = all.get(index);
         currentPageIndex = index;
 
-        // Find the owning document
-        for (Document doc : documents) {
-            if (doc.getPages().contains(selectedPage)) {
-                selectedDocument = doc;
+        for (Document document : documents) {
+            if (document.getFiles().contains(selectedPage)) {
+                selectedDocument = document;
                 break;
             }
         }
 
-        highlightSelectedCard();
-        updatePageInfoLabel();
+        rebuildPageGrid();
     }
-
-    // =========================================================================
-    // Zoom
-    // =========================================================================
 
     @FXML
     private void onZoomIn(ActionEvent e) {
         zoomLevel = Math.min(zoomLevel + ZOOM_STEP, ZOOM_MAX);
-        applyZoom();
+        rebuildPageGrid();
     }
 
     @FXML
     private void onZoomOut(ActionEvent e) {
         zoomLevel = Math.max(zoomLevel - ZOOM_STEP, ZOOM_MIN);
-        applyZoom();
+        rebuildPageGrid();
     }
 
-    private void applyZoom() {
-        double cardW = cardWidth();
-        double cardH = cardHeight();
-        for (Node node : pageGrid.getChildren()) {
-            if (node instanceof VBox card) {
-                card.setPrefWidth(cardW);
-                card.setPrefHeight(cardH);
-                card.getChildren().stream().filter(c -> c instanceof ImageView).forEach(iv -> {
-                    ((ImageView) iv).setFitWidth(cardW - 8);
-                    ((ImageView) iv).setFitHeight(cardH - 40);
-                });
-            }
-        }
-    }
-
-    // =========================================================================
-    // Grid mode (column count)
-    // =========================================================================
-
-    /**
-     * Controls FlowPane wrap width to simulate a fixed column count.
-     * Cards are ~160 px wide with a 16 px gap.
-     */
     private void applyGridMode(int modeIndex) {
-        // wrap = columns * (cardWidth + hgap)
         double gap = 16;
         double baseCard = 160 * zoomLevel;
-        int cols = modeIndex + 1; // 0→1, 1→2, 2→3, 3→4
-        pageGrid.setPrefWrapLength(cols * (baseCard + gap));
+        int columns = modeIndex + 1;
+        pageGrid.setPrefWrapLength(columns * (baseCard + gap));
     }
-
-    // =========================================================================
-    // Export
-    // =========================================================================
 
     @FXML
     private void onExport(ActionEvent e) {
-        if (documents.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "Export", "There are no document(s) to export.");
+        if (documents.isEmpty() || totalPageCount() == 0) {
+            AlertHelper.showError("Export", "There are no document to export.");
             return;
         }
-        String mode = exportModeComboBox.getValue();
-        stExportLabel.setText("Export: running…");
 
-        // TODO: ExportService.export(documents, mode, boxId)
-        showAlert(Alert.AlertType.INFORMATION, "Export",
-                "Export started:\n  Mode:  " + mode
-                        + "\n  Documents:  " + documents.size()
-                        + "\n  Pages: " + totalPageCount());
-
-        stExportLabel.setText("Export: done");
+        // TODO: make exporting
     }
 
-    // =========================================================================
-    // API count
-    // =========================================================================
-
-    @FXML
+    @FXML // TODO: Delete
     private void onRefreshApiCount(ActionEvent e) {
-        // TODO: ApiUsageService.getRemainingCount() and update the label
-        apiCountLabel.setText("API calls: — (not connected)");
+        apiCountLabel.setText("API calls: connected on scan");
     }
-
-    // =========================================================================
-    // Undo
-    // =========================================================================
 
     @FXML
-    private void onUndo(ActionEvent e) {
-        if (!undoStack.isEmpty()) {
-            undoStack.pop().run();
-        }
-    }
+    private void onUndo(ActionEvent e) { // TODO make undo
 
-    private void pushUndo(Runnable reversal) {
-        undoStack.push(reversal);
-        // Cap depth to avoid unbounded growth
-        while (undoStack.size() > UNDO_MAX) {
-            undoStack.pollLast();
-        }
     }
-
-    // =========================================================================
-    // Logout
-    // =========================================================================
 
     @FXML
     private void onExit(ActionEvent actionEvent) {
@@ -500,94 +511,86 @@ public class ScanController implements Initializable, IViewController {
                 currentStage.close();
             } catch (Exception e) {
                 e.printStackTrace();
-                AlertHelper.showError("Logout Error", "Failed to log out. Please try again.");
+                AlertHelper.showError("Exit Error", "Failed to exit window. Please try again.");
             }
         });
     }
 
-    // =========================================================================
-    // Document tree selection
-    // =========================================================================
-
     private void onTreeSelectionChanged(TreeItem<String> item) {
         if (item == null || item.getParent() == null) return;
 
-        TreeItem<String> treeRoot  = documentTreeView.getRoot();
-        boolean isDocNode  = item.getParent() == treeRoot;
-        boolean isPageNode = !isDocNode && item.getParent().getParent() == treeRoot;
-
-        if (isDocNode) {
+        String value = item.getValue();
+        if (value.startsWith("Document #")) {
+            int documentId = parseTrailingId(value);
             documents.stream()
-                    .filter(d -> d.getName().equals(item.getValue()))
+                    .filter(document -> document.getDocumentId() == documentId)
                     .findFirst()
-                    .ifPresent(d -> {
-                        selectedDocument = d;
-                        if (!d.getPages().isEmpty())
-                            selectPage(d, d.getPages().get(0));
+                    .ifPresent(document -> {
+                        selectedDocument = document;
+                        selectedPage = document.getFiles().isEmpty() ? null : document.getFiles().get(0);
                     });
-        } else if (isPageNode) {
-            String docName  = item.getParent().getValue();
-            String pageName = item.getValue();
-            documents.stream()
-                    .filter(d -> d.getName().equals(docName))
-                    .findFirst()
-                    .ifPresent(d -> d.getPages().stream()
-                            .filter(p -> p.getName().equals(pageName))
-                            .findFirst()
-                            .ifPresent(p -> selectPage(d, p)));
+        } else if (value.startsWith("File #")) {
+            int fileId = parseTrailingId(value);
+            for (Document document : documents) {
+                for (File file : document.getFiles()) {
+                    if (file.getFileId() == fileId) {
+                        selectPage(document, file);
+                        break;
+                    }
+                }
+            }
         }
 
-        highlightSelectedCard();
-        updatePageInfoLabel();
+        rebuildPageGrid();
     }
-
-    // =========================================================================
-    // Page grid (FlowPane)
-    // =========================================================================
 
     private void rebuildPageGrid() {
         pageGrid.getChildren().clear();
-        for (Document doc : documents) {
-            for (ScanPage page : doc.getPages()) {
-                pageGrid.getChildren().add(buildPageCard(doc, page));
-            }
+
+        if (selectedDocument != null && selectedPage != null) {
+            pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedPage));
         }
+
+        applyGridMode(gridModeComboBox.getSelectionModel().getSelectedIndex());
         highlightSelectedCard();
         updatePageInfoLabel();
-        emptyStateLabel.setVisible(totalPageCount() == 0);
+        emptyStateLabel.setVisible(selectedPage == null);
     }
 
-    private VBox buildPageCard(Document doc, ScanPage page) {
+    private VBox buildPageCard(Document document, File file) {
         double cw = cardWidth();
         double ch = cardHeight();
 
-        // Thumbnail — replace placeholder with real image loading
         ImageView thumb = new ImageView();
-        // TODO: thumb.setImage(new Image(page.getThumbnailPath()));
+        if (file.getImageData() != null) {
+            Image image = createPreviewImage(file.getImageData(), cw - 8, ch - 44);
+            if (!image.isError()) {
+                thumb.setImage(image);
+            }
+        }
         thumb.setFitWidth(cw - 8);
         thumb.setFitHeight(ch - 44);
         thumb.setPreserveRatio(true);
 
-        Label nameLbl = new Label(page.getName());
-        nameLbl.getStyleClass().add("lbl");
-        nameLbl.setMaxWidth(cw - 8);
+        Label nameLabel = new Label(fileLabel(file));
+        nameLabel.getStyleClass().add("lbl");
+        nameLabel.setMaxWidth(cw - 8);
 
-        Label docLbl = new Label(doc.getName());
-        docLbl.getStyleClass().add("lbl");
-        docLbl.setMaxWidth(cw - 8);
-        docLbl.setStyle("-fx-font-size:9;");
+        Label docLabel = new Label(documentLabel(document));
+        docLabel.getStyleClass().add("lbl");
+        docLabel.setMaxWidth(cw - 8);
+        docLabel.setStyle("-fx-font-size:9;");
 
-        VBox card = new VBox(4, thumb, nameLbl, docLbl);
+        VBox card = new VBox(4, thumb, nameLabel, docLabel);
         card.setPrefWidth(cw);
         card.setPrefHeight(ch);
         card.setAlignment(Pos.CENTER);
         card.getStyleClass().addAll("card", "card-bg", "shadow");
         card.setPadding(new Insets(4));
-        card.setRotate(page.getRotation());
-        card.setUserData(page); // used for selection highlighting
-
-        card.setOnMouseClicked(ev -> {
-            selectPage(doc, page);
+        card.setRotate(file.getRotation());
+        card.setUserData(file);
+        card.setOnMouseClicked(event -> {
+            selectPage(document, file);
             highlightSelectedCard();
             updatePageInfoLabel();
         });
@@ -595,86 +598,107 @@ public class ScanController implements Initializable, IViewController {
         return card;
     }
 
-    private void highlightSelectedCard() {
-        for (Node node : pageGrid.getChildren()) {
-            if (node instanceof VBox card) {
-                boolean sel = card.getUserData() == selectedPage;
-                card.setStyle(sel ? "-fx-border-color:#4a9eff; -fx-border-width:2; -fx-border-radius:4;" : "");
+    private Image createPreviewImage(byte[] imageData, double width, double height) {
+        try {
+            ImageIO.scanForPlugins();
+            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
+            if (bufferedImage != null) {
+                ByteArrayOutputStream pngOut = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "png", pngOut);
+                return new Image(new ByteArrayInputStream(pngOut.toByteArray()), width, height, true, true);
             }
+        } catch (Exception ignored) {
         }
-    }
 
-    // =========================================================================
-    // Document tree (left sidebar)
-    // =========================================================================
+        return new Image(new ByteArrayInputStream(imageData), width, height, true, true);
+    }
 
     private void refreshTree() {
         TreeItem<String> root = documentTreeView.getRoot();
         root.getChildren().clear();
 
-        for (Document doc : documents) {
-            TreeItem<String> docItem = new TreeItem<>(doc.getName());
+        for (Document document : documents) {
+            TreeItem<String> docItem = new TreeItem<>(documentLabel(document));
             docItem.setExpanded(true);
-            for (ScanPage page : doc.getPages()) {
-                docItem.getChildren().add(new TreeItem<>(page.getName()));
+            for (File file : document.getFiles()) {
+                docItem.getChildren().add(makeDraggableFileItem(file, document));
             }
-            root.getChildren().add(docItem);
+            root.getChildren().add(makeDraggableDocItem(docItem, document));
         }
-
-        treeStatsLabel.setText(documents.size() + " docs · " + totalPageCount() + " pages");
     }
 
-    // =========================================================================
-    // Status bar + page label
-    // =========================================================================
+    private TreeItem<String> makeDraggableDocItem(TreeItem<String> docItem, Document document) {
+        // We use a custom cell factory below — the drag source/target logic lives there
+        return docItem;
+    }
+
+    private TreeItem<String> makeDraggableFileItem(File file, Document ownerDocument) {
+        return new TreeItem<>(fileLabel(file));
+    }
 
     private void refreshStatusBar() {
         stDocsLabel.setText("Docs: " + documents.size());
         stPagesLabel.setText("Pages: " + totalPageCount());
-        stCurrentLabel.setText(selectedDocument != null ? selectedDocument.getName() : "–");
+        stCurrentLabel.setText(selectedDocument != null ? documentLabel(selectedDocument) : "-");
     }
 
     private void updatePageInfoLabel() {
-        List<ScanPage> all = allPages();
+        List<File> all = allPages();
         if (all.isEmpty()) {
             pageInfoLabel.setText("0 / 0");
             currentPageIndex = -1;
             return;
         }
-        currentPageIndex = (selectedPage != null) ? all.indexOf(selectedPage) : 0;
+        currentPageIndex = selectedPage != null ? all.indexOf(selectedPage) : 0;
+        if (currentPageIndex < 0) currentPageIndex = 0;
         pageInfoLabel.setText((currentPageIndex + 1) + " / " + all.size());
     }
 
-    // =========================================================================
-    // Misc helpers
-    // =========================================================================
-
-    /** Rebuilds the grid, tree, and status bar in one call. */
     private void rebuild() {
         rebuildPageGrid();
         refreshTree();
         refreshStatusBar();
     }
 
-    private void selectPage(Document doc, ScanPage page) {
-        selectedDocument = doc;
-        selectedPage     = page;
-        currentPageIndex = allPages().indexOf(page);
-        stCurrentLabel.setText(doc.getName() + "  ·  " + page.getName());
+    private void selectPage(Document document, File file) {
+        selectedDocument = document;
+        selectedPage = file;
+        currentPageIndex = allPages().indexOf(file);
+        stCurrentLabel.setText(documentLabel(document) + " - " + fileLabel(file));
     }
 
-    private List<ScanPage> allPages() {
-        List<ScanPage> all = new ArrayList<>();
-        for (Document doc : documents) all.addAll(doc.getPages());
-        return all;
+    private void syncDocumentsFromManager() {
+        documents.setAll(scanManager.getTargetBox().getDocuments());
+    }
+
+    private List<File> allPages() {
+        List<File> files = new ArrayList<>();
+        for (Document document : documents) {
+            files.addAll(document.getFiles());
+        }
+        return files;
     }
 
     private int totalPageCount() {
-        return documents.stream().mapToInt(d -> d.getPages().size()).sum();
+        return documents.stream().mapToInt(document -> document.getFiles().size()).sum();
     }
 
-    private double cardWidth()  { return 160 * zoomLevel; }
-    private double cardHeight() { return 220 * zoomLevel; }
+    private void highlightSelectedCard() {
+        for (Node node : pageGrid.getChildren()) {
+            if (node instanceof VBox card) {
+                boolean selected = card.getUserData() == selectedPage;
+                card.setStyle(selected ? "-fx-border-color:#4a9eff; -fx-border-width:2; -fx-border-radius:4;" : "");
+            }
+        }
+    }
+
+    private double cardWidth() {
+        return 520 * zoomLevel;
+    }
+
+    private double cardHeight() {
+        return 700 * zoomLevel;
+    }
 
     private void setSessionControlsDisabled(boolean disabled) {
         btnScan.setDisable(disabled);
@@ -692,7 +716,19 @@ public class ScanController implements Initializable, IViewController {
         FadeTransition fade = new FadeTransition(Duration.millis(400), flashOverlay);
         fade.setFromValue(1.0);
         fade.setToValue(0.0);
-        fade.setOnFinished(ev -> flashOverlay.setVisible(false));
+        fade.setOnFinished(event -> flashOverlay.setVisible(false));
+        fade.play();
+    }
+
+    private void showBarcodeToast() {
+        barcodeToast.setVisible(true);
+        FadeTransition fade = new FadeTransition(Duration.millis(1400), barcodeToast);
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+        fade.setOnFinished(event -> {
+            barcodeToast.setOpacity(1.0);
+            barcodeToast.setVisible(false);
+        });
         fade.play();
     }
 
@@ -703,35 +739,31 @@ public class ScanController implements Initializable, IViewController {
         alert.showAndWait();
     }
 
-    // =========================================================================
-    // Inner model classes
-    // Replace these with your actual domain model package once it exists.
-    // =========================================================================
-
-    /** Represents a single logical document made up of zero or more pages. */
-    public static class Document {
-        private String name;
-        private final List<ScanPage> pages = new ArrayList<>();
-
-        public Document(String name)          { this.name = name; }
-        public String getName()               { return name; }
-        public void   setName(String name)    { this.name = name; }
-        public List<ScanPage> getPages()      { return pages; }
+    private String documentLabel(Document document) {
+        return "Document #" + document.getDocumentId();
     }
 
-    /** Represents a single scanned page (image + rotation metadata). */
-    public static class ScanPage {
-        private String name;
-        private int    rotation;
-        // TODO: add String filePath / Image thumbnail fields
+    private String fileLabel(File file) {
+        return "File #" + file.getFileId();
+    }
 
-        public ScanPage(String name, int rotation) {
-            this.name     = name;
-            this.rotation = rotation;
+    private int parseTrailingId(String text) {
+        int index = text.lastIndexOf('#');
+        if (index < 0 || index + 1 >= text.length()) {
+            return -1;
         }
-        public String getName()              { return name; }
-        public void   setName(String n)      { this.name = n; }
-        public int    getRotation()          { return rotation; }
-        public void   setRotation(int r)     { this.rotation = r; }
+        try {
+            return Integer.parseInt(text.substring(index + 1).trim());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private int normalizeRotation(int rotation) {
+        int normalized = ((rotation % 360) + 360) % 360;
+        return switch (normalized) {
+            case 90, 180, 270 -> normalized;
+            default -> 0;
+        };
     }
 }

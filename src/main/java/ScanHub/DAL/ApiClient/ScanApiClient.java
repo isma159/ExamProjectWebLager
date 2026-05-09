@@ -2,10 +2,13 @@ package ScanHub.DAL.ApiClient;
 
 import ScanHub.DAL.interfaces.IScanSource;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ScanApiClient implements IScanSource {
 
@@ -23,30 +26,17 @@ public class ScanApiClient implements IScanSource {
 
         HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-        return new ScanResult(response.body(), false); // isBarcode always false here cause it is detected later
+        byte[] tiffBytes = extractTiffFromZip(response.body());
+        return new ScanResult(tiffBytes, false);
     }
 
-    /**
-     * GET /getById/{id} - for reloading a specific file
-     * when displaying/exporting from DB, to bypass storing
-     * the full blob locally during a session.
-     */
-    public byte[] fetchById(int id) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getById/" + id)).GET().build();
-
-        return httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray()).body();
-    }
-
-    /**
-     * GET /getCount if we wanted to know how many TIFFs the API has available.
-     */
-    public int fetchCount() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getCount")).GET().build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        return Integer.parseInt(response.body().trim());
+    private byte[] extractTiffFromZip(byte[] zipBytes) throws Exception {
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+            ZipEntry entry = zis.getNextEntry();
+            if (entry == null) {
+                throw new Exception("API zip response contained no files");
+            }
+            return zis.readAllBytes();
+        }
     }
 }

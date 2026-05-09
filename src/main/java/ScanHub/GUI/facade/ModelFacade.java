@@ -2,10 +2,8 @@ package ScanHub.GUI.facade;
 
 // project imports
 import ScanHub.BLL.util.PasswordEncrypter;
-import ScanHub.GUI.models.BoxMetadataModel;
-import ScanHub.GUI.models.ClientModel;
-import ScanHub.GUI.models.ProfileModel;
-import ScanHub.GUI.models.UserModel;
+import ScanHub.DAL.DAO.FileDAO;
+import ScanHub.GUI.models.*;
 
 public class ModelFacade {
     private PasswordEncrypter encrypter;
@@ -13,6 +11,7 @@ public class ModelFacade {
     private ProfileModel profileModel;
     private BoxMetadataModel metadataModel;
     private ClientModel clientModel;
+    private FileModel fileModel;
 
     public ModelFacade() throws Exception {
         encrypter = new PasswordEncrypter();
@@ -20,6 +19,7 @@ public class ModelFacade {
         userModel = new UserModel();
         profileModel = new ProfileModel();
         metadataModel = new BoxMetadataModel();
+        fileModel = new FileModel();
     }
 
     public PasswordEncrypter getEncrypter() {
@@ -40,5 +40,9 @@ public class ModelFacade {
 
     public ClientModel getClientModel() {
         return clientModel;
+    }
+
+    public FileModel getFileModel() {
+        return fileModel;
     }
 }
