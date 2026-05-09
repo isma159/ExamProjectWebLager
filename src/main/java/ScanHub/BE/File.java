@@ -15,6 +15,8 @@ public class File implements TreeNode {
     private int fileSizeBytes;
     private LocalDateTime createdAt;
     private int rotation;
+    private int brightness;
+    private int contrast;
 
     public File() {
     }
@@ -26,6 +28,8 @@ public class File implements TreeNode {
         this.sortId = sortId;
         this.fileSizeBytes = fileSizeBytes;
         this.createdAt = createdAt;
+        this.brightness = brightness;
+        this.contrast = contrast;
     }
 
     public int getFileId() { return fileId; }
@@ -36,6 +40,8 @@ public class File implements TreeNode {
     public int getFileSizeBytes() { return fileSizeBytes; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public int getRotation() { return rotation; }
+    public int getBrightness() { return brightness; }
+    public int getContrast() { return contrast; }
 
     public void setFileId(int fileId) { this.fileId = fileId; }
     public void setDocumentId(int documentId) { this.documentId = documentId; }
@@ -45,6 +51,8 @@ public class File implements TreeNode {
     public void setFileSizeBytes(int fileSizeBytes) { this.fileSizeBytes = fileSizeBytes; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setRotation(int rotation) { this.rotation = rotation; }
+    public void setBrightness(int brightness) { this.brightness = brightness; }
+    public void setContrast(int contrast) { this.contrast = contrast; }
 
     // TODO: find out what to say
     @Override

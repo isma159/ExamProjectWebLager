@@ -74,10 +74,12 @@ public class UserDAO implements IDataAccess<User> {
     public List<User> getData() throws Exception {
         Map<Integer, User> usersById = new LinkedHashMap<>();
 
+        // 1. Added brightness and contrast to SELECT
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
                        p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.splitBehavior, p.exportLabel, p.status
+                       p.splitBehavior, p.exportLabel, p.status,
+                       p.brightness, p.contrast
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
@@ -104,12 +106,17 @@ public class UserDAO implements IDataAccess<User> {
 
                 int profileId = rs.getInt("profileId");
                 if (!rs.wasNull()) {
-                    Profile profile = new Profile(profileId,
+                    // 2. Updated constructor call with 8 arguments
+                    Profile profile = new Profile(
+                            profileId,
                             rs.getInt("clientId"),
                             rs.getString("profileName"),
                             SplitBehavior.valueOf(rs.getString("splitBehavior")),
                             ProfileStatus.valueOf(rs.getString("status")),
-                            rs.getString("exportLabel"));
+                            rs.getString("exportLabel"),
+                            rs.getInt("brightness"),
+                            rs.getInt("contrast")
+                    );
                     String clientName = rs.getString("clientName");
                     if (clientName != null) {
                         profile.setClient(new Client(profile.getClientId(), clientName));
@@ -117,19 +124,19 @@ public class UserDAO implements IDataAccess<User> {
                     user.getProfiles().add(profile);
                 }
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new Exception("Could not get users", e);
         }
         return new ArrayList<>(usersById.values());
     }
 
     public User getDataFromName(String name) throws Exception {
-
+        // 1. Added brightness and contrast to SELECT
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
                        p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.splitBehavior, p.exportLabel, p.status
+                       p.splitBehavior, p.exportLabel, p.status,
+                       p.brightness, p.contrast
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
@@ -155,12 +162,17 @@ public class UserDAO implements IDataAccess<User> {
 
                     int profileId = rs.getInt("profileId");
                     if (!rs.wasNull()) {
-                        Profile profile = new Profile(profileId,
+                        // 2. Updated constructor call with 8 arguments
+                        Profile profile = new Profile(
+                                profileId,
                                 rs.getInt("clientId"),
                                 rs.getString("profileName"),
                                 SplitBehavior.valueOf(rs.getString("splitBehavior")),
                                 ProfileStatus.valueOf(rs.getString("status")),
-                                rs.getString("exportLabel"));
+                                rs.getString("exportLabel"),
+                                rs.getInt("brightness"),
+                                rs.getInt("contrast")
+                        );
                         String clientName = rs.getString("clientName");
                         if (clientName != null) {
                             profile.setClient(new Client(profile.getClientId(), clientName));
@@ -168,10 +180,8 @@ public class UserDAO implements IDataAccess<User> {
                         user.getProfiles().add(profile);
                     }
                 }
-
                 return user;
             }
-
         } catch (SQLException e) {
             throw new Exception("Could not fetch user from username " + name, e);
         }
