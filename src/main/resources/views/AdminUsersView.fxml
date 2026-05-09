@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Pagination?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
    <children>
       <VBox prefHeight="200.0" prefWidth="1800.0">
          <children>
@@ -32,7 +24,7 @@
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                            <children>
                               <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="&#xe90d;">
+                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -49,7 +41,7 @@
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickUpdateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
                            <children>
                               <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="&#xe942;">
+                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -66,7 +58,7 @@
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteUser" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
                            <children>
                               <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="&#xe90f;">
+                              <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
@@ -132,7 +124,7 @@
                         <String fx:value="card-bg" />
                      </styleClass>
                      <children>
-                        <Pagination maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
+                        <Pagination fx:id="pgUsers" maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
                      </children>
                   </HBox>
                </children>

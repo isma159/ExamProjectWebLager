@@ -11,6 +11,7 @@ import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -26,12 +27,15 @@ public class AdminProfilesController implements Initializable {
 
     @FXML private VBox profileTableBox;
     @FXML private TextField txtFldSearchProfiles;
+    @FXML private Pagination pgProfiles;
     private List<Profile> currentProfiles = new ArrayList<>();
     private boolean profileAscending;
     private ModelFacade modelFacade;
     private Profile selectedProfile = null;
     private ProfileStatus selectedStatus = null;
     private HBox selectedProfileRow;
+
+    private final int TOTAL_TABLE_SIZE = 15;
 
     public AdminProfilesController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
@@ -41,6 +45,9 @@ public class AdminProfilesController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         loadProfiles();
         txtFldSearchProfiles.textProperty().addListener((observable, oldValue, newValue) -> filterProfiles(newValue));
+        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            loadProfiles();
+        }));
     }
 
     private void loadProfiles() {
@@ -52,7 +59,13 @@ public class AdminProfilesController implements Initializable {
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
             List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
-            currentProfiles = new ArrayList<>(profiles);
+
+            pgProfiles.setPageCount(Math.ceilDiv(profiles.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = pgProfiles.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, profiles.size());
+
+            currentProfiles = new ArrayList<>(profiles.subList(startIndex, endIndex));
             for (Profile profile : currentProfiles) {
                 HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
                     // clear highlight of previously selected row

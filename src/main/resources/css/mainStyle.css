@@ -503,6 +503,32 @@
 
 }
 
+.arrow-spinner {
+
+    -fx-border-radius: 6px;
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 2;
+
+    -fx-background-color: WHITE;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+}
+
+.arrow-spinner .text-field {
+
+    -fx-border-width: 0;
+
+    -fx-background-color: TRANSPARENT;
+
+}
+
+.arrow-spinner .increment-arrow-button,
+.arrow-spinner .decrement-arrow-button {
+
+    -fx-background-color: TRANSPARENT;
+
+}
+
 .check-box .box {
 
     -fx-background-color: TRANSPARENT;

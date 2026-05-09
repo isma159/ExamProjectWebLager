@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Pagination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.net.URL;
@@ -26,6 +27,7 @@ public class AdminDashboardController implements Initializable {
 
     @FXML private VBox userTableBox;
     @FXML private VBox profileTableBox;
+    @FXML private Pagination pgUsers, pgProfiles;
 
     private boolean userAscending;
     private boolean profileAscending;
@@ -41,6 +43,7 @@ public class AdminDashboardController implements Initializable {
     private HBox selectedProfileRow = null;
     private ProfileStatus selectedStatus = null;
 
+    private final int TOTAL_TABLE_SIZE = 6;
 
     public AdminDashboardController(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;
@@ -48,19 +51,52 @@ public class AdminDashboardController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        loadUsers();
+        loadProfiles();
+
+        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            loadUsers();
+        }));
+
+        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            loadProfiles();
+        }));
+    }
+
+    private void loadUsers() {
+        userTableBox.getChildren().clear();
         try {
             List<User> users = modelFacade.getUserModel().getUsers();
-            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
 
-            currentUsers = new ArrayList<>(users);
-            for (User user : users) {
+            pgUsers.setPageCount(Math.ceilDiv(users.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = pgUsers.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, users.size());
+
+            currentUsers = new ArrayList<>(users.subList(startIndex, endIndex));
+            for (User user : currentUsers) {
                 HBox row = RowMaker.addUserRow(user);
                 row.setUserData(user);
                 userTableBox.getChildren().add(row);
             }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            currentProfiles = new ArrayList<>(profiles);
-            for (Profile profile: profiles) {
+    private void loadProfiles() {
+        profileTableBox.getChildren().clear();
+        try {
+            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
+
+            pgProfiles.setPageCount(Math.ceilDiv(profiles.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = pgProfiles.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, profiles.size());
+
+            currentProfiles = new ArrayList<>(profiles.subList(startIndex, endIndex));
+            for (Profile profile: currentProfiles) {
                 HBox row = RowMaker.addProfileRow(profile);
                 row.setUserData(profile);
                 profileTableBox.getChildren().add(row);

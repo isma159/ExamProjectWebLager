@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Pagination?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminDashboardController">
+<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminDashboardController">
    <children>
       <VBox prefHeight="200.0" prefWidth="1550.0">
          <children>
@@ -115,7 +108,7 @@
                               <String fx:value="card-bg" />
                            </styleClass>
                            <children>
-                              <Pagination maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" styleClass="lbl" />
+                              <Pagination fx:id="pgUsers" maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" styleClass="lbl" />
                            </children>
                         </HBox>
                      </children>
@@ -187,7 +180,7 @@
                               <String fx:value="card-bg" />
                            </styleClass>
                            <children>
-                              <Pagination maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" />
+                              <Pagination fx:id="pgProfiles" maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" />
                            </children>
                         </HBox>
                      </children>

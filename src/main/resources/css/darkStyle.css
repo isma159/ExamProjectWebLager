@@ -142,6 +142,25 @@
     -fx-text-fill: #ffffff;
 }
 
+.dark .arrow-spinner {
+
+    -fx-border-color: #2B3B4C;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+    -fx-background-color: #465160;
+    -fx-background-radius: 6px;
+}
+
+.dark .arrow-spinner .text-field {
+
+    -fx-border-width: 0;
+
+    -fx-background-color: TRANSPARENT;
+
+    -fx-text-fill: #ffffff;
+
+}
+
 /* ---------- Dark Buttons ---------- */
 .dark .primary-btn {
     -fx-background-color: #008FF7;
