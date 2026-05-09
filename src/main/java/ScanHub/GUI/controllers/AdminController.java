@@ -70,6 +70,8 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/AdminProfilesView.fxml");
             } else if (newValue == metadataBtn) {
                 loadPage("/views/AdminMetadataView.fxml");
+            } else if (newValue == logsBtn) {
+                loadPage("/views/AdminLogsView.fxml");
             }
         });
 
@@ -90,6 +92,8 @@ public class AdminController implements IViewController, Initializable {
                     return new AdminProfilesController(modelFacade);
                 } else if (controllerClass == AdminMetadataController.class) {
                     return new AdminMetadataController(modelFacade);
+                } else if (controllerClass == AdminLogsController.class) {
+                    return new AdminLogsController(modelFacade);
                 }
                 try {
                     return controllerClass.getDeclaredConstructor().newInstance();

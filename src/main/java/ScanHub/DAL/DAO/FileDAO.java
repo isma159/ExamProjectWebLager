@@ -23,19 +23,24 @@ public class FileDAO {
      * Inserts a new scanned TIFF file into the Files table.
      * sortId is initially set equal to referenceId — users can reorder later.
      */
-    public File createFile(int documentId, int referenceId, byte[] imageData) throws SQLException {
-        String sql = "INSERT INTO Files (documentId, referenceId, sortId, imageData, fileSizeBytes) " +
+    public File createFile(int documentId, int referenceId, byte[] imageData, int brightness, int contrast) throws SQLException {
+        // Apply brightness and contrast before saving
+        imageData = applyAdjustments(imageData, brightness, contrast);
+
+        String sql = "INSERT INTO Files (documentId, referenceId, sortId, imageData, fileSizeBytes, brightness, contrast) " +
                 "OUTPUT INSERTED.fileId, INSERTED.createdAt " +
-                "VALUES (?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, documentId);
             ps.setInt(2, referenceId);
-            ps.setInt(3, referenceId); // default sortId = arrival order
+            ps.setInt(3, referenceId);
             ps.setBytes(4, imageData);
             ps.setInt(5, imageData.length);
+            ps.setInt(6, brightness);
+            ps.setInt(7, contrast);
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -47,9 +52,41 @@ public class FileDAO {
                 file.setImageData(imageData);
                 file.setFileSizeBytes(imageData.length);
                 file.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
+                file.setBrightness(brightness);
+                file.setContrast(contrast);
                 return file;
             }
             throw new SQLException("Insert returned no fileId");
+        }
+    }
+
+    private byte[] applyAdjustments(byte[] imageData, int brightness, int contrast) {
+        try {
+            // Read image from bytes
+            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(
+                    new java.io.ByteArrayInputStream(imageData));
+
+            if (img == null) return imageData; // not a readable image format, skip
+
+            // Apply brightness and contrast via RescaleOp
+            // contrast: factor around 1.0 (0 = no change, mapped from -100..100)
+            // brightness: offset added to each pixel (-100..100 mapped to -255..255)
+            float contrastFactor = 1.0f + (contrast / 100.0f);
+            float brightnessOffset = brightness * 2.55f;
+
+            java.awt.image.RescaleOp op = new java.awt.image.RescaleOp(
+                    contrastFactor, brightnessOffset, null);
+            img = op.filter(img, null);
+
+            // Write back to bytes as TIFF
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            javax.imageio.ImageIO.write(img, "TIFF", out);
+            return out.toByteArray();
+
+        } catch (Exception e) {
+            // If adjustment fails for any reason, return original data untouched
+            e.printStackTrace();
+            return imageData;
         }
     }
 
