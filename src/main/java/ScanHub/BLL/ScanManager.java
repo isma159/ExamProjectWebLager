@@ -40,8 +40,17 @@ public class ScanManager {
             currentDocument = documentDAO.createDocument(targetBox.getBoxId());
             return null;
         }
+        System.out.println(">>> DEBUG: Using Profile: " + targetBox.getProfile().getProfileName());
+        System.out.println(">>> DEBUG: Brightness: " + targetBox.getProfile().getBrightness());
+        System.out.println(">>> DEBUG: Contrast: " + targetBox.getProfile().getContrast());
 
-        File savedFile = fileDAO.createFile(currentDocument.getDocumentId(), referenceCounter, result.data());
+        File savedFile = fileDAO.createFile(
+                currentDocument.getDocumentId(),
+                referenceCounter,
+                result.data(),
+                targetBox.getProfile().getBrightness(),
+                targetBox.getProfile().getContrast()
+        );
 
         // Log the file creation
         logManager.createLog(userId, savedFile.getFileId(), currentDocument.getDocumentId(), "FILE_CREATED");
