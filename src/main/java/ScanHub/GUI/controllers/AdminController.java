@@ -36,7 +36,6 @@ public class AdminController implements IViewController, Initializable {
     @FXML private HBox analyticsBox, metadataBox, systemBox, logBox, settingsBox, shortcutBox;
     @FXML private ToggleSwitch darkMode;
     @FXML private Label lblUsername, lblRole;
-    private User currentUser;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -50,9 +49,6 @@ public class AdminController implements IViewController, Initializable {
         this.currentStage = currentStage;
 
         sidebarBtns.selectToggle(dashboardBtn);
-
-        /*lblUsername.setText(currentUser.getUsername());
-        lblRole.setText(currentUser.getRole().toString());*/
     }
 
     @Override
@@ -85,15 +81,15 @@ public class AdminController implements IViewController, Initializable {
 
             loader.setControllerFactory(controllerClass -> {
                 if (controllerClass == AdminDashboardController.class) {
-                    return new AdminDashboardController(modelFacade);
+                    return new AdminDashboardController(modelFacade, currentStage);
                 } else if (controllerClass == AdminUsersController.class) {
-                    return new AdminUsersController(modelFacade);
+                    return new AdminUsersController(modelFacade, currentStage);
                 } else if (controllerClass == AdminProfilesController.class) {
-                    return new AdminProfilesController(modelFacade);
+                    return new AdminProfilesController(modelFacade, currentStage);
                 } else if (controllerClass == AdminMetadataController.class) {
-                    return new AdminMetadataController(modelFacade);
+                    return new AdminMetadataController(modelFacade, currentStage);
                 } else if (controllerClass == AdminLogsController.class) {
-                    return new AdminLogsController(modelFacade);
+                    return new AdminLogsController(modelFacade, currentStage);
                 }
                 try {
                     return controllerClass.getDeclaredConstructor().newInstance();

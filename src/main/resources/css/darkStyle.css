@@ -323,6 +323,24 @@
     -fx-image: url("../images/Green/LogoGreenH.png");
 }
 
+.dark .avatar-login {
+
+    -fx-background-color: #008FF7;
+
+}
+
+.dark .avatar-create {
+
+    -fx-background-color: #008FF7;
+
+}
+
+.dark .avatar-export {
+
+    -fx-background-color: #008FF7;
+
+}
+
 /* ---------- Dark Pagination ---------- */
 .dark .pagination .number-button,
 .dark .pagination .left-arrow-button,

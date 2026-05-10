@@ -1,6 +1,7 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.*;
+import ScanHub.BLL.SessionManager;
 import ScanHub.BLL.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 import org.controlsfx.control.SearchableComboBox;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -34,6 +36,7 @@ public class ProfileFormController implements Initializable {
     private ModelFacade modelFacade;
     private Profile editingProfile = null;
     private List<User> selectedUsers;
+    private SessionManager sessionManager = SessionManager.getInstance();
 
     public void setModel(Stage currentStage, ModelFacade modelFacade, Profile profile) {
         this.currentStage = currentStage;
@@ -173,6 +176,7 @@ public class ProfileFormController implements Initializable {
             Profile newProfile = new Profile(selectedClient.getClientId(), profileName, splitBehavior, status, buildExportLabel(profileName), brightness, contrast);
             newProfile.setClient(selectedClient);
             Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
+            modelFacade.getLogModel().createLog(new Log(sessionManager.getCurrentUser(), createdProfile.getProfileId(), EntityType.PROFILE, LogAction.CREATE, LocalDateTime.now()));
             syncUserAssignments(createdProfile);
             currentStage.close();
         } catch (Exception e) {

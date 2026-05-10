@@ -1,6 +1,6 @@
 package ScanHub.BE;
 
-public enum LogType {
+public enum LogAction {
     CREATE,
     DELETE,
     SCAN,

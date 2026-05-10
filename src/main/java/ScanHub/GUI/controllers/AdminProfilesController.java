@@ -1,8 +1,8 @@
 package ScanHub.GUI.controllers;
 
 // project imports
-import ScanHub.BE.Profile;
-import ScanHub.BE.ProfileStatus;
+import ScanHub.BE.*;
+import ScanHub.BLL.SessionManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
@@ -18,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -34,11 +35,14 @@ public class AdminProfilesController implements Initializable {
     private Profile selectedProfile = null;
     private ProfileStatus selectedStatus = null;
     private HBox selectedProfileRow;
+    private SessionManager sessionManager = SessionManager.getInstance();
+    private Stage currentStage;
 
     private final int TOTAL_TABLE_SIZE = 15;
 
-    public AdminProfilesController(ModelFacade modelFacade) {
+    public AdminProfilesController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override
@@ -116,6 +120,7 @@ public class AdminProfilesController implements Initializable {
         AlertHelper.showConfirmation("Delete Profile", "Are you sure you want to delete the profile \"" + selectedProfile.getProfileName() + "\"? This action cannot be undone.", () -> {
                     try {
                         modelFacade.getProfileModel().deleteProfile(selectedProfile);
+                        modelFacade.getLogModel().createLog(new Log(sessionManager.getCurrentUser(), selectedProfile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
                         loadProfiles();
                     } catch (Exception e) {
                         e.printStackTrace();

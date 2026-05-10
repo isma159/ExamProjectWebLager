@@ -37,11 +37,13 @@ public class AdminUsersController implements Initializable {
     private User selectedUser = null;
     private HBox selectedUserRow = null;
     private Role selectedRole = null;
+    private Stage currentStage;
 
     private final int TOTAL_TABLE_SIZE = 15;
 
-    public AdminUsersController(ModelFacade modelFacade) {
+    public AdminUsersController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override

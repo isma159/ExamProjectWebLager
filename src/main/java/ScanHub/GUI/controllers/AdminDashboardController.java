@@ -17,6 +17,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Pagination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,11 +44,13 @@ public class AdminDashboardController implements Initializable {
     private Profile selectedProfile = null;
     private HBox selectedProfileRow = null;
     private ProfileStatus selectedStatus = null;
+    private Stage currentStage;
 
     private final int TOTAL_TABLE_SIZE = 6;
 
-    public AdminDashboardController(ModelFacade modelFacade) {
+    public AdminDashboardController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override
