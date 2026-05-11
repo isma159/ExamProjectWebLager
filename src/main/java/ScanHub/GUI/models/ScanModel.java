@@ -24,36 +24,32 @@ public class ScanModel {
      * @param rotation initial rotation in degrees (0, 90, 180, 270)
      * @return a StoredScan record containing the saved File, its Document, and a flag indicating whether a barcode split was triggered
      */
-    public ScanManager.StoredScan fetchScan(int rotation) throws Exception {
-        return scanManager.fetchScan(rotation);
-    }
+    public ScanManager.StoredScan fetchScan(int rotation) throws Exception { return scanManager.fetchScan(rotation); }
 
     /** Persists all staged documents and files in one pass, then refreshes metadata. */
-    public void save() throws Exception {
-        scanManager.commitAll();
-    }
+    public void save() throws Exception { scanManager.commitAll(); }
 
     /** Creates a new empty staged Document in the current Box (manual split). */
-    public Document manualSplit() {
-        return scanManager.manualSplit();
-    }
+    public Document manualSplit() { return scanManager.manualSplit(); }
 
     /**
      * Persists a rotation change for the given File if not staged,
      * else only updates the in-memory File.
      */
-    public void updateFileRotation(File file, int rotation) throws Exception {
-        scanManager.updateFileRotation(file, rotation);
-    }
+    public void updateFileRotation(File file, int rotation) throws Exception { scanManager.updateFileRotation(file, rotation); }
 
     /**
      * Soft-deletes the given File from the DB if it is not staged,
      * else removes it from the in-memory box.
      * Also refreshes box metadata counts.
      */
-    public void deleteFile(File file) throws Exception {
-        scanManager.deleteFile(file);
-    }
+    public void deleteFile(File file) throws Exception { scanManager.deleteFile(file); }
+
+    /**
+     * Deletes an entire document and all its files.
+     * Persisted files are soft-deleted in the DB.
+     */
+    public void deleteDocument(Document document) throws Exception { scanManager.deleteDocument(document); }
 
     public Document getCurrentDocument() { return scanManager.getCurrentDocument(); }
 

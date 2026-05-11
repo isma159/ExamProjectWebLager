@@ -13,6 +13,7 @@ import ScanHub.DAL.DAO.FileDAO;
 import ScanHub.DAL.interfaces.IScanSource;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,9 +32,6 @@ public class ScanManager {
 
     /**
      *
-     * @param file
-     * @param document
-     * @param barcodeSplit
      */
     public record StoredScan(File file, Document document, boolean barcodeSplit) {}
 
@@ -131,18 +129,38 @@ public class ScanManager {
     }
 
     /**
-     * Deletes a file.
-     * Staged files are removed from memory only, while persisted files are soft-deleted in the database
-     * and metadata is refreshed.
+     * Deletes a single file.
+     * Staged files are removed from memory only
+     * Persisted files are soft-deleted in the DB and metadata is refreshed.
      */
     public void deleteFile(File file) throws Exception {
         if (!file.isStaged()) {
             fileDAO.softDelete(file.getFileId());
         }
-        for (Document doc : targetBox.getDocuments()) {
-            doc.getFiles().removeIf(f -> f.getFileId() == file.getFileId());
+        for (Document document : targetBox.getDocuments()) {
+            document.getFiles().removeIf(f -> file.isStaged() ? f == file : f.getFileId() == file.getFileId());
         }
         if (!file.isStaged()) {
+            refreshMetadata();
+        }
+    }
+
+    /**
+     * Deletes an entire document and all its files.
+     * Persisted files are soft-deleted in the DB.
+     * The document is removed from the in-memory box.
+     */
+    public void deleteDocument(Document document) throws Exception {
+        boolean hadPersistedFiles = false;
+        for (File file : new ArrayList<>(document.getFiles())) {
+            if (!file.isStaged()) {
+                fileDAO.softDelete(file.getFileId());
+                hadPersistedFiles = true;
+            }
+        }
+        document.getFiles().clear();
+        targetBox.getDocuments().remove(document);
+        if (hadPersistedFiles) {
             refreshMetadata();
         }
     }

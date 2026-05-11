@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 public class AlertController {
 
     @FXML private Label lblHeader, lblContent;
-    @FXML private Button btnCancel, btnConfirm, btnExit;
+    @FXML private Button btnCancel, btnConfirm;
 
     private Stage stage;
     private Runnable onConfirm;

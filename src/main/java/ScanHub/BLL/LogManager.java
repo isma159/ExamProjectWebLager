@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class LogManager {
+
     private final LogDAO logDAO;
 
     public LogManager() throws Exception {

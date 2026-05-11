@@ -33,7 +33,7 @@ public class AdminUsersController implements Initializable {
     private List<User> currentUsers = new ArrayList<>();
     private boolean userAscending = true;
 
-    private ModelFacade modelFacade;
+    private final ModelFacade modelFacade;
     private User selectedUser = null;
     private HBox selectedUserRow = null;
     private Role selectedRole = null;

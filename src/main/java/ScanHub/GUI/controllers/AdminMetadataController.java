@@ -24,10 +24,9 @@ public class AdminMetadataController implements Initializable {
     @FXML private TextField txtFldSearchMetadata;
     @FXML private Pagination metadataPagination;
 
-    private ModelFacade modelFacade;
+    private final ModelFacade modelFacade;
     private BoxMetadata selected = null;
     private HBox selectedRow = null;
-    private List<BoxMetadata> currentMetadata;
     private Stage currentStage;
 
     public AdminMetadataController(ModelFacade modelFacade, Stage currentStage) {
@@ -48,8 +47,7 @@ public class AdminMetadataController implements Initializable {
             selectedRow = null;
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
-            List<BoxMetadata> metadata = modelFacade.getMetadataModel().getAllMetadata();
-            currentMetadata = new ArrayList<>(metadata);
+            List<BoxMetadata> currentMetadata = new ArrayList<>(modelFacade.getMetadataModel().getAllMetadata());
             for (BoxMetadata boxMetadata : currentMetadata) {
                 HBox row = RowMaker.addMetadataRow(boxMetadata, (clickedMetadata, rowHBox) -> {
                     if (selectedRow != null) {

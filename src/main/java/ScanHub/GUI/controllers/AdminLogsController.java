@@ -40,9 +40,9 @@ public class AdminLogsController implements Initializable {
     @FXML private VBox logsTableBox;
     @FXML private Pagination logsPagination;
 
-    private ModelFacade modelFacade;
+    private final ModelFacade modelFacade;
+    private final Stage currentStage;
     private String activeAction = null;
-    private Stage currentStage;
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

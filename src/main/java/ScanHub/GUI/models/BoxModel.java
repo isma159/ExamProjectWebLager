@@ -39,7 +39,7 @@ public class BoxModel {
         boolean alreadyTracked = boxObservableList.stream()
                 .anyMatch(b -> b.getBoxId() == box.getBoxId());
         if (!alreadyTracked) {
-            boxObservableList.add(0, box); // newest first, matching DAO order
+            boxObservableList.addFirst(box); // newest first, matching DAO order
         }
 
         return box;

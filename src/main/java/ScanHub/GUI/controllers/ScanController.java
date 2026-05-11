@@ -6,14 +6,12 @@ import ScanHub.BE.File;
 import ScanHub.BE.Profile;
 import ScanHub.BE.interfaces.TreeNode;
 import ScanHub.BLL.ScanManager;
-import ScanHub.BLL.SessionManager;
-import ScanHub.BLL.ThemeManager;
+import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,9 +31,8 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.ToggleSwitch;
 
 import javax.imageio.ImageIO;
@@ -51,28 +48,25 @@ public class ScanController implements Initializable, IViewController {
 
     @FXML private Label lblUsername, lblRole, lblEmptyState;
     @FXML private ToggleSwitch darkMode;
-    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport;
+    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport, btnZoomOut, btnZoomIn;
     @FXML private ComboBox<String> comboBoxExport;
-    @FXML private Label lblBarcodeDetected;
     @FXML private FlowPane pageGrid;
     @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel; // status bar down left
     @FXML private TreeView<TreeNode> boxTreeView;
 
     // Session startup popup
     @FXML private StackPane sessionPopupOverlay;
-    @FXML private ComboBox<Profile> comboBoxProfiles;
+    @FXML private SearchableComboBox<Profile> comboBoxProfiles;
     @FXML private TextField txtFldBoxId;
     @FXML private Spinner<Integer> spinnerGlobalRotation;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
     private ScanModel scanModel;
-    private final SessionManager sessionManager = SessionManager.getInstance();
 
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
     private Document selectedDocument;
-    private File selectedPage;
-    private Box activeBox;
+    private File selectedFile;
 
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop - see the initalizeTreeView())
     private Thread scanThread; // scan loop is controlled by the volatile boolean 'scanning', not thread interruption
@@ -87,9 +81,12 @@ public class ScanController implements Initializable, IViewController {
 
     @Override
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
-        this.modelFacade   = modelFacade;
-        this.currentStage  = currentStage;
+        this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
         initializeProfileComboBox();
+
+        lblUsername.setText(modelFacade.getSessionModel().getCurrentUser().getUsername());
+        lblRole.setText("Role: " + modelFacade.getSessionModel().getCurrentUser().getRole().toString());
     }
 
     @Override
@@ -98,9 +95,6 @@ public class ScanController implements Initializable, IViewController {
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
         spinnerGlobalRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 90));
-
-        lblUsername.setText(sessionManager.getCurrentUser().getUsername());
-        lblRole.setText("Role: " + sessionManager.getCurrentUser().getRole().toString());
 
         setSessionControlsDisabled(true);
         lblSessionStatus.setText("Press Session Startup to configure and begin.");
@@ -201,26 +195,16 @@ public class ScanController implements Initializable, IViewController {
                 Label icon = new Label();
                 icon.getStyleClass().add("icon");
 
-                switch (object) {
-                    case Box box -> {
-                        icon.setText("\ue9d9");
-                        icon.getStyleClass().add("tree-cell-box");
-                        setText(box.getBoxName());
-                        setStyle("");
-                    }
-                    case Document document -> {
-                        icon.setText("\ue963");
-                        icon.getStyleClass().add("tree-cell-doc");
-                        setText(documentLabel(document));
-                        setStyle(document.isStaged() ? "-fx-font-weight: bold;" : ""); // Different format for whether they are staged or persisted
-                    }
-                    case File file -> {
-                        icon.setText("\ue958");
-                        icon.getStyleClass().add("tree-cell-file");
-                        setText(fileLabel(file));
-                        setStyle(file.isStaged() ? "-fx-font-weight: bold;" : ""); // Different format for whether they are staged or persisted
-                    }
-                    default -> setStyle("");
+                if (object instanceof Document document) {
+                    icon.setText("\ue963");
+                    icon.getStyleClass().add("tree-cell-doc");
+                    setText(documentLabel(document));
+                    setStyle(document.isStaged() || document.isModified() ? "-fx-font-weight: bold;" : ""); // styling of text for whether they are staged, modified or persisted
+                } else if (object instanceof File file) {
+                    icon.setText("\ue958");
+                    icon.getStyleClass().add("tree-cell-file");
+                    setText(fileLabel(file));
+                    setStyle(file.isStaged() ? "-fx-font-weight: bold;" : ""); // styling of text for whether they are staged or persisted
                 }
 
                 setGraphic(icon);
@@ -259,7 +243,7 @@ public class ScanController implements Initializable, IViewController {
                 else if (code == KeyCode.END)           { onNavLast(null);               e.consume(); }
                 else if (code == KeyCode.OPEN_BRACKET)  { onRotateLeft(null);            e.consume(); }
                 else if (code == KeyCode.CLOSE_BRACKET) { onRotateRight(null);           e.consume(); }
-                else if (code == KeyCode.DELETE)        { onDeletePage(null);            e.consume(); }
+                else if (code == KeyCode.DELETE)        { onDeleteFileOrDocument(null);            e.consume(); }
                 else if (code == KeyCode.N && !e.isControlDown()) { onNewDocument(null); e.consume(); }
                 else if (code == KeyCode.E && e.isControlDown())  { onExport(null);      e.consume(); }
             });
@@ -292,13 +276,13 @@ public class ScanController implements Initializable, IViewController {
         }
 
         try {
-            activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
+            Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
             scanModel = new ScanModel(activeBox);
             syncDocumentsFromModel();
 
             sessionActive = true;
             selectedDocument = null;
-            selectedPage = null;
+            selectedFile = null;
 
             setSessionControlsDisabled(false);
             lblSessionStatus.setText("Profile: " + profile.getProfileName() + " – Box: " + activeBox.getBoxName());
@@ -314,7 +298,7 @@ public class ScanController implements Initializable, IViewController {
      * TODO: explain
      */
     @FXML
-    private void onScan(ActionEvent e) {
+    private void onScan(ActionEvent e) { //
         if (!sessionActive || scanModel == null || scanning) return;
 
         scanning = true;
@@ -333,8 +317,7 @@ public class ScanController implements Initializable, IViewController {
                         syncDocumentsFromModel();
                         if (result.barcodeSplit()) {
                             selectedDocument = result.document();
-                            selectedPage = null;
-                            showBarcodeToast();
+                            selectedFile = null;
                         } else {
                             selectPage(result.document(), result.file());
                         }
@@ -378,7 +361,7 @@ public class ScanController implements Initializable, IViewController {
 
         try {
             selectedDocument = scanModel.manualSplit();
-            selectedPage = null;
+            selectedFile = null;
             syncDocumentsFromModel();
             rebuild();
         } catch (Exception ex) {
@@ -388,30 +371,41 @@ public class ScanController implements Initializable, IViewController {
     }
 
     @FXML
-    private void onDeletePage(ActionEvent e) {
-        if (selectedDocument == null || selectedPage == null || scanModel == null) return; // TODO keep scanModel == null until I make sure the shortcuts dont bypass disabled buttons
+    private void onDeleteFileOrDocument(ActionEvent e) {
+        if (scanModel == null || !sessionActive) return; // TODO keep scanModel == null until I make sure the shortcuts dont bypass disabled buttons
 
         try {
-            File removed = selectedPage;
-            scanModel.deleteFile(removed);
-            selectedDocument.getFiles().removeIf(file -> file.getFileId() == removed.getFileId());
+            if (selectedFile != null) {
+                int deletedIndex = currentPageIndex();
+                Document ownerDocument = findOwnerDocument(selectedFile);
+                scanModel.deleteFile(selectedFile);
 
-            // Select nearest page, or clear selection if nothing left
-            List<File> remaining = allPages();
-            if (remaining.isEmpty()) {
+                if (ownerDocument != null && !ownerDocument.isStaged()) { ownerDocument.setModified(true); } // document has been changed
+
+                documents.removeIf(document -> document.getFiles().isEmpty()); // removes document if it is empty
+
+                // Select nearest page, or clear selection if nothing left
+                List<File> remaining = allPages();
+                if (remaining.isEmpty()) {
+                    selectedDocument = null;
+                    selectedFile = null;
+                } else {
+                    int next = Math.min(deletedIndex, remaining.size() - 1);
+                    selectedFile = remaining.get(Math.max(next, 0));
+                    selectedDocument = findOwnerDocument(selectedFile);
+                }
+            } else if (selectedDocument != null) {
+                scanModel.deleteDocument(selectedDocument);
+                documents.remove(selectedDocument);
                 selectedDocument = null;
-                selectedPage = null;
-            } else {
-                int next = Math.min(currentPageIndex(), remaining.size() - 1);
-                selectedPage = remaining.get(Math.max(next, 0));
-                selectedDocument = findOwnerDocument(selectedPage);
-            }
+                selectedFile = null;
+            } else return;
 
-            syncDocumentsFromModel();
             rebuild();
         } catch (Exception ex) {
             ex.printStackTrace();
-            AlertHelper.showError("Delete Failed", "Could not delete the selected page. Please try again.");
+            AlertHelper.showError("Delete Failed", "Could not delete the selected "
+                    + (selectedFile != null ? "page." : "document.") + " Please try again.");
         }
     }
 
@@ -419,11 +413,11 @@ public class ScanController implements Initializable, IViewController {
     @FXML private void onRotateRight(ActionEvent e) { rotatePage(90); }
 
     private void rotatePage(int degrees) {
-        if (selectedPage == null || scanModel == null) return; // TODO keep scanModel == null until I make sure the shortcuts dont bypass disabled buttons
+        if (selectedFile == null || scanModel == null) return; // TODO keep scanModel == null until I make sure the shortcuts dont bypass disabled buttons
 
-        int rotation = normaliseRotation(selectedPage.getRotation() + degrees);
+        int rotation = normaliseRotation(selectedFile.getRotation() + degrees);
         try {
-            scanModel.updateFileRotation(selectedPage, rotation);
+            scanModel.updateFileRotation(selectedFile, rotation);
             rebuildPreviewCard();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -517,7 +511,7 @@ public class ScanController implements Initializable, IViewController {
                 ViewHandler handler = ViewHandler.LOGIN;
                 handler.reset();
                 handler.show(modelFacade);
-                SessionManager.getInstance().logout();
+                modelFacade.getSessionModel().logout();
                 currentStage.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -533,7 +527,7 @@ public class ScanController implements Initializable, IViewController {
         TreeNode value = item.getValue();
         if (value instanceof Document document) {
             selectedDocument = document;
-            selectedPage = document.getFiles().isEmpty() ? null : document.getFiles().get(0);
+            selectedFile = null;
         } else if (value instanceof File file) {
             for (Document document : documents) {
                 if (document.getFiles().contains(file)) {
@@ -620,12 +614,15 @@ public class ScanController implements Initializable, IViewController {
     private void rebuildPreviewCard() {
         pageGrid.getChildren().clear();
 
-        if (selectedDocument != null && selectedPage != null) {
-            pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedPage));
+        File previewFile = (selectedFile == null && selectedDocument != null && !selectedDocument.getFiles().isEmpty())
+                ? selectedDocument.getFiles().getFirst() : selectedFile;
+
+        if (selectedDocument != null && previewFile != null) {
+            pageGrid.getChildren().add(buildPageCard(selectedDocument, previewFile));
         }
 
         updatePageInfoLabel();
-        lblEmptyState.setVisible(selectedPage == null);
+        lblEmptyState.setVisible(previewFile == null);
     }
 
     /**
@@ -732,7 +729,7 @@ public class ScanController implements Initializable, IViewController {
 
     private void selectPage(Document document, File file) {
         selectedDocument = document;
-        selectedPage = file;
+        selectedFile = file;
     }
 
     /**  Syncs the observable list(documents) from the model's in-memory box state  */
@@ -757,18 +754,8 @@ public class ScanController implements Initializable, IViewController {
         btnDelete.setDisable(disabled);
         btnUndo.setDisable(disabled);
         btnExport.setDisable(disabled);
-    }
-
-    private void showBarcodeToast() {
-        lblBarcodeDetected.setVisible(true);
-        FadeTransition fade = new FadeTransition(Duration.millis(1400), lblBarcodeDetected);
-        fade.setFromValue(1.0);
-        fade.setToValue(0.0);
-        fade.setOnFinished(event -> {
-            lblBarcodeDetected.setOpacity(1.0);
-            lblBarcodeDetected.setVisible(false);
-        });
-        fade.play();
+        btnZoomOut.setDisable(disabled);
+        btnZoomIn.setDisable(disabled);
     }
 
     /** Labels documents */
@@ -793,8 +780,8 @@ public class ScanController implements Initializable, IViewController {
      * @return
      */
     private int currentPageIndex() {
-        if (selectedPage == null) return -1;
-        return allPages().indexOf(selectedPage);
+        if (selectedFile == null) return -1;
+        return allPages().indexOf(selectedFile);
     }
 
     /**

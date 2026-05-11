@@ -29,7 +29,7 @@ public class AdminDashboardController implements Initializable {
 
     private boolean userAscending;
     private boolean profileAscending;
-    private ModelFacade modelFacade;
+    private final ModelFacade modelFacade;
 
     private List<User> currentUsers =  new ArrayList<>();
     private User selectedUser = null;
@@ -41,8 +41,7 @@ public class AdminDashboardController implements Initializable {
     private HBox selectedProfileRow = null;
     private ProfileStatus selectedStatus = null;
 
-    private List<Log> currentLogs = new ArrayList<>();
-    private Stage currentStage;
+    private final Stage currentStage;
 
     private final int TOTAL_TABLE_SIZE = 6;
 
@@ -57,17 +56,9 @@ public class AdminDashboardController implements Initializable {
         loadProfiles();
         loadLogs();
 
-        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            loadUsers();
-        }));
-
-        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            loadProfiles();
-        }));
-
-        pgLogs.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            loadLogs();
-        }));
+        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { loadUsers(); }));
+        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { loadProfiles(); }));
+        pgLogs.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { loadLogs(); }));
     }
 
     private void loadUsers() {
@@ -125,7 +116,7 @@ public class AdminDashboardController implements Initializable {
             int startIndex = pgLogs.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
             int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, logs.size());
 
-            currentLogs = new ArrayList<>(logs.subList(startIndex, endIndex));
+            List<Log> currentLogs = new ArrayList<>(logs.subList(startIndex, endIndex));
             for (Log log: currentLogs) {
                 HBox row = RowMaker.addLogRow(log);
                 row.setUserData(log);

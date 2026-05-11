@@ -7,7 +7,7 @@ import javafx.collections.ObservableList;
 
 public class BoxMetadataModel {
 
-    private ObservableList<BoxMetadata> metadataObservableList;
+    private final ObservableList<BoxMetadata> metadataObservableList;
     private final BoxMetadataManager manager;
 
     public BoxMetadataModel() throws Exception {
@@ -27,9 +27,7 @@ public class BoxMetadataModel {
         return manager.getMetadataByBoxId(boxId);
     }
 
-    public void refreshMetadataModel() throws Exception {
-        metadataObservableList.setAll(manager.getAllMetadata());
-    }
+    public void refreshMetadataModel() throws Exception { metadataObservableList.setAll(manager.getAllMetadata()); }
 
     public void updateMetadata(BoxMetadata metadata) throws Exception {
         manager.updateMetadata(metadata);
