@@ -33,6 +33,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.ToggleSwitch;
@@ -320,6 +321,7 @@ public class ScanController implements Initializable, IViewController {
         btnScan.setDisable(true);
         btnStop.setDisable(false);
 
+        // TODO move global rotation in profile default, not on session start
         int rotation = spinnerGlobalRotation.getValue(); // gets and uses the rotation for the duration of the loop
 
         scanThread = new Thread(() -> {
@@ -480,8 +482,14 @@ public class ScanController implements Initializable, IViewController {
 
         try {
             scanModel.save();
-            rebuild(); // IDs in the tree are now the real DB IDs
             // TODO
+            /* FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Export");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ZIP Files", "*.zip"));
+            fileChooser.setInitialFileName(""); // <- set as boxmetadata */
+
+            rebuild();
+
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Export Failed", "Could not save and export pages and documents. Please try again.");
@@ -509,6 +517,7 @@ public class ScanController implements Initializable, IViewController {
                 ViewHandler handler = ViewHandler.LOGIN;
                 handler.reset();
                 handler.show(modelFacade);
+                SessionManager.getInstance().logout();
                 currentStage.close();
             } catch (Exception e) {
                 e.printStackTrace();
