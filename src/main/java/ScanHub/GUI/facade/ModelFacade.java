@@ -12,7 +12,7 @@ public class ModelFacade {
     private BoxModel boxModel;
     private BoxMetadataModel metadataModel;
     private ClientModel clientModel;
-    private LogManager logManager;
+    private LogModel logModel;
 
     public ModelFacade() throws Exception {
         encrypter = new PasswordEncrypter();
@@ -21,7 +21,7 @@ public class ModelFacade {
         profileModel = new ProfileModel();
         metadataModel = new BoxMetadataModel();
         boxModel = new BoxModel();
-        logManager = new LogManager();
+        logModel = new LogModel();
     }
 
     public PasswordEncrypter getEncrypter() { return encrypter; }
@@ -35,5 +35,5 @@ public class ModelFacade {
     public BoxMetadataModel getMetadataModel() { return metadataModel; }
 
     public ClientModel getClientModel() { return clientModel; }
-    public LogManager getLogManager() { return logManager; }
+    public LogModel getLogModel() { return logModel; }
 }

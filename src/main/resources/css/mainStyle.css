@@ -394,6 +394,54 @@
 
 }
 
+.avatar-initial {
+
+    -fx-background-radius: 6px;
+    -fx-background-color: #2d3d4f;
+
+}
+
+.avatar-initial,
+.avatar-scan,
+.avatar-login,
+.avatar-create,
+.avatar-delete,
+.avatar-export {
+
+    -fx-background-radius: 6px;
+
+}
+
+.avatar-scan {
+
+    -fx-background-color: #4CD07D;
+
+}
+
+.avatar-login {
+
+    -fx-background-color: #2D3D4F;
+
+}
+
+.avatar-create {
+
+    -fx-background-color: #2d3d4f;
+
+}
+
+.avatar-delete {
+
+    -fx-background-color: #EF4444;
+
+}
+
+.avatar-export {
+
+    -fx-background-color: #2d3d4f;
+
+}
+
 .half-card {
 
     -fx-border-color: #E2E4E8;
@@ -500,6 +548,32 @@
     -fx-max-height: 0;
     -fx-padding: 0;
     visibility: hidden;
+
+}
+
+.arrow-spinner {
+
+    -fx-border-radius: 6px;
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 2;
+
+    -fx-background-color: WHITE;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+}
+
+.arrow-spinner .text-field {
+
+    -fx-border-width: 0;
+
+    -fx-background-color: TRANSPARENT;
+
+}
+
+.arrow-spinner .increment-arrow-button,
+.arrow-spinner .decrement-arrow-button {
+
+    -fx-background-color: TRANSPARENT;
 
 }
 

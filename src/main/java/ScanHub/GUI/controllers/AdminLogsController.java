@@ -1,7 +1,13 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.EntityType;
 import ScanHub.BE.Log;
+import ScanHub.BE.LogAction;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.RowMaker;
+import ScanHub.GUI.util.ViewHandler;
+import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,12 +17,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class AdminLogsController implements Initializable {
 
@@ -31,16 +41,25 @@ public class AdminLogsController implements Initializable {
 
     private ModelFacade modelFacade;
     private String activeAction = null;
+    private Stage currentStage;
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public AdminLogsController(ModelFacade modelFacade) {
+    public AdminLogsController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            modelFacade.getLogModel().refreshModel();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         txtFldSearchLogs.textProperty().addListener((obs, o, n) -> applyFilters());
         txtFldFilterUser.textProperty().addListener((obs, o, n) -> applyFilters());
         txtFldFilterDateFrom.textProperty().addListener((obs, o, n) -> applyFilters());
@@ -56,8 +75,29 @@ public class AdminLogsController implements Initializable {
         LocalDate dateTo = tryParseDate(txtFldFilterDateTo.getText());
 
         try {
-            List<Log> logs = modelFacade.getLogManager().getFilteredLogs(search, activeAction, dateFrom, dateTo);
-            renderLogs(logs);
+            List<Log> logs = modelFacade.getLogModel().getLogs();
+            if (dateFrom != null && dateTo != null) {
+                logs = logs.stream()
+                        .filter(
+                                log -> !log.getTimestamp().toLocalDate().isBefore(dateFrom) &&
+                                        !log.getTimestamp().toLocalDate().isAfter(dateTo)
+                        ).toList();
+            }
+
+            FilteredList<Log> filteredLogs = new FilteredList<>(FXCollections.observableArrayList(logs));
+            filteredLogs.setPredicate(log -> {
+
+                if (search.isBlank()) return true;
+
+                if (log.getUser().getUsername().contains(search)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+
+            });
+            renderLogs(filteredLogs);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,56 +109,14 @@ public class AdminLogsController implements Initializable {
         if (logs.isEmpty()) {
             Label empty = new Label("No logs found.");
             empty.getStyleClass().add("lbl");
-            empty.setStyle("-fx-padding: 18 0 0 18;");
             logsTableBox.getChildren().add(empty);
             return;
         }
 
         for (Log log : logs) {
-            HBox row = new HBox();
-            row.getStyleClass().add("table-row");
-            row.setPrefHeight(33);
-
-            if ("FILE_CREATED".equals(log.getAction())) {
-                row.setStyle("-fx-background-color: rgba(76, 208, 125, 0.15);");
-            } else if ("FILE_DELETED".equals(log.getAction())) {
-                row.setStyle("-fx-background-color: rgba(239, 68, 68, 0.15);");
-            }
-
-            Label logId     = makeCell(String.valueOf(log.getLogsId()), 80);
-            Label username  = makeCell(log.getUsername(), 200);
-            Label action    = makeCell(log.getAction(), 260);
-            Label fileId    = makeCell(String.valueOf(log.getFileId()), 120);
-            Label timestamp = makeCell(log.getTimestamp().format(DISPLAY_FORMAT), 200);
-
-            row.getChildren().addAll(
-                    logId,   makeSep(),
-                    username, makeSep(),
-                    action,   makeSep(),
-                    fileId,   makeSep(),
-                    timestamp
-            );
-
+            HBox row = RowMaker.addLogRow(log);
             logsTableBox.getChildren().add(row);
-            logsTableBox.getChildren().add(new Separator());
         }
-    }
-
-    private Label makeCell(String text, double width) {
-        Label lbl = new Label(text);
-        lbl.getStyleClass().add("lbl");
-        lbl.setPrefWidth(width);
-        lbl.setPrefHeight(33);
-        lbl.setStyle("-fx-padding: 0 9 0 9; -fx-alignment: CENTER_LEFT;");
-        HBox.setHgrow(lbl, Priority.ALWAYS);
-        return lbl;
-    }
-
-    private Separator makeSep() {
-        Separator sep = new Separator();
-        sep.setOrientation(Orientation.VERTICAL);
-        sep.setPrefHeight(33);
-        return sep;
     }
 
     private LocalDate tryParseDate(String text) {
@@ -129,13 +127,29 @@ public class AdminLogsController implements Initializable {
         }
     }
 
-    @FXML public void onTbAllLogsClick(ActionEvent e)    { activeAction = null;           applyFilters(); }
-    @FXML public void onTbCreateLogsClick(ActionEvent e) { activeAction = "FILE_CREATED"; applyFilters(); }
-    @FXML public void onTbDeleteLogsClick(ActionEvent e) { activeAction = "FILE_DELETED"; applyFilters(); }
+    @FXML private void onExportBtnClick() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Export");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+            fileChooser.setInitialFileName("activityLog.csv");
 
-    @FXML public void onLogIdClick(MouseEvent e) {}
-    @FXML public void onUsernameClick(MouseEvent e) {}
-    @FXML public void onActionClick(MouseEvent e) {}
-    @FXML public void onFileIdClick(MouseEvent e) {}
-    @FXML public void onTimestampClick(MouseEvent e) {}
+            File file = fileChooser.showSaveDialog(currentStage);
+
+            modelFacade.getLogModel().exportLogs(file.toPath(), modelFacade.getLogModel().getLogs());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            // TODO Alert View?
+        }
+    }
+
+    @FXML private void onTbAllLogsClick(ActionEvent e)    { activeAction = null;           applyFilters(); }
+    @FXML private void onTbCreateLogsClick(ActionEvent e) { activeAction = "FILE_CREATED"; applyFilters(); }
+    @FXML private void onTbDeleteLogsClick(ActionEvent e) { activeAction = "FILE_DELETED"; applyFilters(); }
+
+    @FXML private void onUsernameClick(MouseEvent e) {}
+    @FXML private void onActionClick(MouseEvent e) {}
+    @FXML private void onFileIdClick(MouseEvent e) {}
+    @FXML private void onTimestampClick(MouseEvent e) {}
 }

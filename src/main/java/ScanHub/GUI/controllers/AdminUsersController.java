@@ -13,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -28,6 +29,7 @@ public class AdminUsersController implements Initializable {
 
     @FXML private VBox userTableBox;
     @FXML private TextField txtFldUserSearch;
+    @FXML private Pagination pgUsers;
     private List<User> currentUsers = new ArrayList<>();
     private boolean userAscending = true;
 
@@ -35,15 +37,23 @@ public class AdminUsersController implements Initializable {
     private User selectedUser = null;
     private HBox selectedUserRow = null;
     private Role selectedRole = null;
+    private Stage currentStage;
 
-    public AdminUsersController(ModelFacade modelFacade) {
+    private final int TOTAL_TABLE_SIZE = 15;
+
+    public AdminUsersController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadUsers();
         txtFldUserSearch.textProperty().addListener((observable, oldValue, newValue) -> filterUsers(newValue));
+
+        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            loadUsers();
+        }));
     }
 
     private void loadUsers() {
@@ -55,7 +65,13 @@ public class AdminUsersController implements Initializable {
 
             // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<User> users = modelFacade.getUserModel().getUsers();
-            currentUsers = new ArrayList<>(users);
+
+            pgUsers.setPageCount(Math.ceilDiv(users.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = pgUsers.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, users.size());
+
+            currentUsers = new ArrayList<>(users.subList(startIndex, endIndex));
             for (User user : currentUsers) {
                 HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
                     // clear highlight of previously selected row

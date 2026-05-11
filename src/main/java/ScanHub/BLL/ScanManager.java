@@ -13,7 +13,6 @@ public class ScanManager {
     private final IScanSource scanSource;
     private final DocumentDAO documentDAO;
     private final FileDAO fileDAO;
-    private final LogManager logManager;
 
     private Document currentDocument;
     private final Box targetBox;
@@ -26,7 +25,6 @@ public class ScanManager {
         this.userId = userId;
         this.documentDAO = new DocumentDAO();
         this.fileDAO = new FileDAO();
-        this.logManager = new LogManager();
         this.currentDocument = documentDAO.createDocument(targetBox.getBoxId());
     }
 
@@ -51,9 +49,6 @@ public class ScanManager {
                 targetBox.getProfile().getBrightness(),
                 targetBox.getProfile().getContrast()
         );
-
-        // Log the file creation
-        logManager.createLog(userId, savedFile.getFileId(), currentDocument.getDocumentId(), "FILE_CREATED");
 
         return savedFile;
     }

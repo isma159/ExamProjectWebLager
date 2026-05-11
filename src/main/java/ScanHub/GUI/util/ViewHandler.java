@@ -91,6 +91,8 @@ public enum ViewHandler {
 
     public Stage show(ModelFacade model) throws IOException {
         Stage stage = prepareStage();
+        stage.setMinHeight(768);
+        stage.setMinWidth(1366);
         initController(model, stage);
         stage.show();
         return stage;

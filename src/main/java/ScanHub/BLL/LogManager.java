@@ -3,7 +3,12 @@ package ScanHub.BLL;
 import ScanHub.BE.Log;
 import ScanHub.DAL.DAO.LogDAO;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class LogManager {
@@ -13,11 +18,32 @@ public class LogManager {
         logDAO = new LogDAO();
     }
 
-    public List<Log> getFilteredLogs(String search, String action, LocalDate from, LocalDate to) throws Exception {
-        return logDAO.getFilteredLogs(search, action, from, to);
+    public List<Log> getLogs() throws Exception {
+        return logDAO.getLogs();
     }
 
-    public void createLog(int userId, int fieldId, int documentId, String action) throws Exception {
-        logDAO.createLog(userId, fieldId, documentId, action);
+    public Log createLog(Log log) throws Exception {
+        return logDAO.createLog(log);
+    }
+
+    public void exportLogs(Path path, List<Log> logs) throws Exception {
+
+        StringBuilder sb = new StringBuilder();
+        String delimiter = ";";
+        sb.append("id;username;action;entity-type;entity-id;timestamp\n");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss");
+
+        for (Log log: logs) {
+            sb.append(log.getLogId()).append(delimiter)
+                    .append(log.getUser().getUsername()).append(delimiter)
+                    .append(log.getAction()).append(delimiter)
+                    .append(log.getEntityType()).append(delimiter)
+                    .append(log.getEntityId()).append(delimiter)
+                    .append(log.getTimestamp().format(formatter)).append("\n");
+        }
+
+        Files.writeString(path, sb.toString());
+
     }
 }

@@ -1,7 +1,9 @@
 package ScanHub.DAL.DAO;
 
-import ScanHub.BE.Log;
+import ScanHub.BE.*;
 import ScanHub.DAL.DB.DBConnector;
+import ScanHub.DAL.interfaces.IDataAccess;
+import ScanHub.DAL.interfaces.ILogDataAccess;
 
 import java.io.IOException;
 import java.sql.*;
@@ -9,58 +11,64 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogDAO {
+public class LogDAO implements ILogDataAccess {
 
     DBConnector dbConnector = new DBConnector();
 
     public LogDAO() throws IOException {}
 
-    public List<Log> getFilteredLogs(String search, String action, LocalDate from, LocalDate to) throws Exception {
+    @Override
+    public List<Log> getLogs() throws Exception {
         List<Log> logs = new ArrayList<>();
 
         String sql = """
-            SELECT l.logsId, l.userId, u.username, l.fileId, l.documentId, l.action, l.log_timestamp
+            SELECT l.logsId, l.userId AS logUserId, l.entityId, l.entityType, l.action, l.log_timestamp, u.userId AS userId, u.username, u.passwordHash, u.role
             FROM Logs l
             JOIN Users u ON l.userId = u.userId
             WHERE l.deleted_at IS NULL
-            AND (? IS NULL OR LOWER(u.username) LIKE ?)
-            AND (? IS NULL OR l.action = ?)
-            AND (? IS NULL OR CAST(l.log_timestamp AS DATE) >= ?)
-            AND (? IS NULL OR CAST(l.log_timestamp AS DATE) <= ?)
-            ORDER BY l.log_timestamp DESC
+            ORDER BY l.log_timestamp ASC
         """;
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            setLikeParam(ps, 1, 2, search);
-            setExactParam(ps, 3, 4, action);
-            setDateParam(ps, 5, 6, from);
-            setDateParam(ps, 7, 8, to);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     logs.add(mapRow(rs));
                 }
             }
-
         } catch (SQLException e) {
             throw new Exception("Could not get logs", e);
         }
-
         return logs;
     }
 
-    public void createLog(int userId, int fileId, int documentId, String action) throws Exception {
-        String sql = "INSERT INTO Logs (userId, fileId, documentId, action, log_timestamp) VALUES (?, ?, ?, ?, GETDATE())";
+    @Override
+    public Log createLog(Log log) throws Exception {
+        String sql = "INSERT INTO Logs (userId, entityId, entityType, action, log_timestamp) VALUES (?, ?, ?, ?, GETDATE())";
 
         try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setInt(2, fileId);
-            ps.setInt(3, documentId);
-            ps.setString(4, action);
+             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setInt(1, log.getUser().getUserId());
+            ps.setInt(2, log.getEntityId());
+            ps.setString(3, log.getEntityType().toString());
+            ps.setString(4, log.getAction().toString());
             ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            Log newLog = null;
+
+            if (rs.next()) {
+                newLog = new Log(rs.getInt(1),
+                        log.getUser(), log.getEntityId(),
+                        log.getEntityType(),
+                        log.getAction(),
+                        log.getTimestamp());
+            }
+
+            return newLog;
+
         } catch (SQLException e) {
             throw new Exception("Could not create log", e);
         }
@@ -69,42 +77,14 @@ public class LogDAO {
     private Log mapRow(ResultSet rs) throws SQLException {
         return new Log(
                 rs.getInt("logsId"),
-                rs.getInt("userId"),
-                rs.getString("username"),
-                rs.getInt("fileId"),
-                rs.getInt("documentId"),
-                rs.getString("action"),
+                new User(rs.getInt("userId"),
+                        rs.getString("username"),
+                        rs.getString("passwordHash"),
+                        Role.valueOf(rs.getString("role"))),
+                rs.getInt("entityId"),
+                EntityType.valueOf(rs.getString("entityType")),
+                LogAction.valueOf(rs.getString("action")),
                 rs.getTimestamp("log_timestamp").toLocalDateTime()
         );
-    }
-
-    private void setLikeParam(PreparedStatement ps, int nullIdx, int valIdx, String val) throws SQLException {
-        if (val == null || val.isBlank()) {
-            ps.setNull(nullIdx, Types.NVARCHAR);
-            ps.setNull(valIdx, Types.NVARCHAR);
-        } else {
-            ps.setString(nullIdx, val);
-            ps.setString(valIdx, "%" + val.toLowerCase() + "%");
-        }
-    }
-
-    private void setExactParam(PreparedStatement ps, int nullIdx, int valIdx, String val) throws SQLException {
-        if (val == null || val.isBlank()) {
-            ps.setNull(nullIdx, Types.NVARCHAR);
-            ps.setNull(valIdx, Types.NVARCHAR);
-        } else {
-            ps.setString(nullIdx, val);
-            ps.setString(valIdx, val);
-        }
-    }
-
-    private void setDateParam(PreparedStatement ps, int nullIdx, int valIdx, LocalDate date) throws SQLException {
-        if (date == null) {
-            ps.setNull(nullIdx, Types.DATE);
-            ps.setNull(valIdx, Types.DATE);
-        } else {
-            ps.setDate(nullIdx, Date.valueOf(date));
-            ps.setDate(valIdx, Date.valueOf(date));
-        }
     }
 }

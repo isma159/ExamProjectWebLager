@@ -17,42 +17,6 @@
          <children>
             <HBox maxHeight="-Infinity" prefHeight="600.0" prefWidth="1550.0">
                <children>
-                  <VBox fx:id="statsBox" alignment="CENTER" prefHeight="200.0" prefWidth="210.0">
-                     <children>
-                        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="120.0" prefWidth="150.0">
-                           <styleClass>
-                              <String fx:value="card-bg" />
-                              <String fx:value="card" />
-                              <String fx:value="shadow" />
-                           </styleClass>
-                        </VBox>
-                        <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="9.0" prefWidth="200.0" />
-                        <VBox layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="120.0" prefWidth="150.0">
-                           <styleClass>
-                              <String fx:value="card-bg" />
-                              <String fx:value="card" />
-                              <String fx:value="shadow" />
-                           </styleClass>
-                        </VBox>
-                        <Region layoutX="10.0" layoutY="220.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="9.0" prefWidth="200.0" />
-                        <VBox layoutX="10.0" layoutY="250.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="120.0" prefWidth="150.0">
-                           <styleClass>
-                              <String fx:value="card-bg" />
-                              <String fx:value="card" />
-                              <String fx:value="shadow" />
-                           </styleClass>
-                        </VBox>
-                        <Region layoutX="10.0" layoutY="460.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="9.0" prefWidth="200.0" />
-                        <VBox layoutX="10.0" layoutY="490.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="120.0" prefWidth="150.0">
-                           <styleClass>
-                              <String fx:value="card-bg" />
-                              <String fx:value="card" />
-                              <String fx:value="shadow" />
-                           </styleClass>
-                        </VBox>
-                     </children>
-                  </VBox>
-                  <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                   <VBox prefHeight="390.0" prefWidth="1000.0" styleClass="shadow">
                      <children>
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0">
@@ -115,7 +79,7 @@
                               <String fx:value="card-bg" />
                            </styleClass>
                            <children>
-                              <Pagination maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" styleClass="lbl" />
+                              <Pagination fx:id="pgUsers" maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" styleClass="lbl" />
                            </children>
                         </HBox>
                      </children>
@@ -187,7 +151,7 @@
                               <String fx:value="card-bg" />
                            </styleClass>
                            <children>
-                              <Pagination maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" />
+                              <Pagination fx:id="pgProfiles" maxHeight="-Infinity" maxPageIndicatorCount="5" minHeight="-Infinity" prefHeight="45.0" prefWidth="538.0" />
                            </children>
                         </HBox>
                      </children>
@@ -249,7 +213,7 @@
                         </HBox>
                         <ScrollPane fitToWidth="true" prefHeight="600.0" styleClass="box-card">
                            <content>
-                              <VBox prefHeight="50.0" prefWidth="100.0" />
+                              <VBox fx:id="logTableBox" prefHeight="50.0" prefWidth="100.0" />
                            </content>
                         </ScrollPane>
                         <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
@@ -258,7 +222,7 @@
                               <String fx:value="card-bg" />
                            </styleClass>
                            <children>
-                              <Pagination maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="1092.0" />
+                              <Pagination fx:id="pgLogs" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="1092.0" />
                            </children>
                         </HBox>
                      </children>
