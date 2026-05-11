@@ -1,9 +1,13 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.EntityType;
 import ScanHub.BE.Log;
+import ScanHub.BE.LogAction;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.ViewHandler;
+import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class AdminLogsController implements Initializable {
 
@@ -71,7 +76,28 @@ public class AdminLogsController implements Initializable {
 
         try {
             List<Log> logs = modelFacade.getLogModel().getLogs();
-            renderLogs(logs);
+            if (dateFrom != null && dateTo != null) {
+                logs = logs.stream()
+                        .filter(
+                                log -> !log.getTimestamp().toLocalDate().isBefore(dateFrom) &&
+                                        !log.getTimestamp().toLocalDate().isAfter(dateTo)
+                        ).toList();
+            }
+
+            FilteredList<Log> filteredLogs = new FilteredList<>(FXCollections.observableArrayList(logs));
+            filteredLogs.setPredicate(log -> {
+
+                if (search.isBlank()) return true;
+
+                if (log.getUser().getUsername().contains(search)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+
+            });
+            renderLogs(filteredLogs);
         } catch (Exception e) {
             e.printStackTrace();
         }
