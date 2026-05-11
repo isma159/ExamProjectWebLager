@@ -1,8 +1,8 @@
 package ScanHub.GUI.controllers;
 
 // project imports
-import ScanHub.BE.Profile;
-import ScanHub.BE.ProfileStatus;
+import ScanHub.BE.*;
+import ScanHub.BLL.SessionManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
@@ -11,12 +11,14 @@ import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,21 +28,30 @@ public class AdminProfilesController implements Initializable {
 
     @FXML private VBox profileTableBox;
     @FXML private TextField txtFldSearchProfiles;
+    @FXML private Pagination pgProfiles;
     private List<Profile> currentProfiles = new ArrayList<>();
     private boolean profileAscending;
     private ModelFacade modelFacade;
     private Profile selectedProfile = null;
     private ProfileStatus selectedStatus = null;
     private HBox selectedProfileRow;
+    private SessionManager sessionManager = SessionManager.getInstance();
+    private Stage currentStage;
 
-    public AdminProfilesController(ModelFacade modelFacade) {
+    private final int TOTAL_TABLE_SIZE = 15;
+
+    public AdminProfilesController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadProfiles();
         txtFldSearchProfiles.textProperty().addListener((observable, oldValue, newValue) -> filterProfiles(newValue));
+        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            loadProfiles();
+        }));
     }
 
     private void loadProfiles() {
@@ -52,7 +63,13 @@ public class AdminProfilesController implements Initializable {
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
             List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
-            currentProfiles = new ArrayList<>(profiles);
+
+            pgProfiles.setPageCount(Math.ceilDiv(profiles.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = pgProfiles.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, profiles.size());
+
+            currentProfiles = new ArrayList<>(profiles.subList(startIndex, endIndex));
             for (Profile profile : currentProfiles) {
                 HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
                     // clear highlight of previously selected row
@@ -103,6 +120,7 @@ public class AdminProfilesController implements Initializable {
         AlertHelper.showConfirmation("Delete Profile", "Are you sure you want to delete the profile \"" + selectedProfile.getProfileName() + "\"? This action cannot be undone.", () -> {
                     try {
                         modelFacade.getProfileModel().deleteProfile(selectedProfile);
+                        modelFacade.getLogModel().createLog(new Log(sessionManager.getCurrentUser(), selectedProfile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
                         loadProfiles();
                     } catch (Exception e) {
                         e.printStackTrace();

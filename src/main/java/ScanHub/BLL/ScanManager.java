@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- *
+ * TODO explain
  */
 public class ScanManager {
 

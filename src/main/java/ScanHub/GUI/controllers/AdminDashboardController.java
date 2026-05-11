@@ -1,10 +1,7 @@
 package ScanHub.GUI.controllers;
 
 // project imports
-import ScanHub.BE.Profile;
-import ScanHub.BE.ProfileStatus;
-import ScanHub.BE.Role;
-import ScanHub.BE.User;
+import ScanHub.BE.*;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
@@ -14,8 +11,11 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Pagination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,8 +24,8 @@ import java.util.ResourceBundle;
 
 public class AdminDashboardController implements Initializable {
 
-    @FXML private VBox userTableBox;
-    @FXML private VBox profileTableBox;
+    @FXML private VBox userTableBox, profileTableBox, logTableBox;
+    @FXML private Pagination pgUsers, pgProfiles, pgLogs;
 
     private boolean userAscending;
     private boolean profileAscending;
@@ -41,29 +41,95 @@ public class AdminDashboardController implements Initializable {
     private HBox selectedProfileRow = null;
     private ProfileStatus selectedStatus = null;
 
+    private List<Log> currentLogs = new ArrayList<>();
+    private Stage currentStage;
 
-    public AdminDashboardController(ModelFacade modelFacade) {
+    private final int TOTAL_TABLE_SIZE = 6;
+
+    public AdminDashboardController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        loadUsers();
+        loadProfiles();
+        loadLogs();
+
+        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            loadUsers();
+        }));
+
+        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            loadProfiles();
+        }));
+
+        pgLogs.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            loadLogs();
+        }));
+    }
+
+    private void loadUsers() {
+        userTableBox.getChildren().clear();
         try {
             List<User> users = modelFacade.getUserModel().getUsers();
-            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
 
-            currentUsers = new ArrayList<>(users);
-            for (User user : users) {
+            pgUsers.setPageCount(Math.ceilDiv(users.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = pgUsers.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, users.size());
+
+            currentUsers = new ArrayList<>(users.subList(startIndex, endIndex));
+            for (User user : currentUsers) {
                 HBox row = RowMaker.addUserRow(user);
                 row.setUserData(user);
                 userTableBox.getChildren().add(row);
             }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            currentProfiles = new ArrayList<>(profiles);
-            for (Profile profile: profiles) {
+    private void loadProfiles() {
+        profileTableBox.getChildren().clear();
+        try {
+            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
+
+            pgProfiles.setPageCount(Math.ceilDiv(profiles.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = pgProfiles.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, profiles.size());
+
+            currentProfiles = new ArrayList<>(profiles.subList(startIndex, endIndex));
+            for (Profile profile: currentProfiles) {
                 HBox row = RowMaker.addProfileRow(profile);
                 row.setUserData(profile);
                 profileTableBox.getChildren().add(row);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertHelper.showError("Load Error", "Failed to load dashboard data.");
+        }
+    }
+
+    private void loadLogs() {
+        logTableBox.getChildren().clear();
+        try {
+            List<Log> logs = modelFacade.getLogModel().getLogs();
+
+            pgLogs.setPageCount(Math.ceilDiv(logs.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = pgLogs.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, logs.size());
+
+            currentLogs = new ArrayList<>(logs.subList(startIndex, endIndex));
+            for (Log log: currentLogs) {
+                HBox row = RowMaker.addLogRow(log);
+                row.setUserData(log);
+                logTableBox.getChildren().add(row);
             }
 
         } catch (Exception e) {

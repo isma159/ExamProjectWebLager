@@ -2,23 +2,39 @@ package ScanHub.GUI.models;
 
 import ScanHub.BE.Log;
 import ScanHub.BLL.LogManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-import java.time.LocalDate;
+import java.nio.file.Path;
 import java.util.List;
 
 public class LogModel {
 
-    private final LogManager logManager;
+    private ObservableList<Log> logObservableList;
+    private LogManager logManager;
 
     public LogModel() throws Exception {
-        this.logManager = new LogManager();
+        logManager = new LogManager();
+        logObservableList = FXCollections.observableArrayList();
+        logObservableList.setAll(logManager.getLogs().reversed());
     }
 
-    public List<Log> getFilteredLogs(String search, String action, LocalDate from, LocalDate to) throws Exception {
-        return logManager.getFilteredLogs(search, action, from, to);
+    public void refreshModel() throws Exception {
+        logObservableList.setAll(logManager.getLogs().reversed());
     }
 
-    public void createLog(int userId, int fileId, int documentId, String action) throws Exception {
-        logManager.createLog(userId, fileId, documentId, action);
+    public List<Log> getLogs() {return logObservableList;}
+
+    public Log createLog(Log log) throws Exception {
+        Log newLog = logManager.createLog(log);
+        logObservableList.add(log);
+        return newLog;
     }
+
+    public void exportLogs(Path path, List<Log> logs) throws Exception {
+
+        logManager.exportLogs(path, logs);
+
+    }
+
 }

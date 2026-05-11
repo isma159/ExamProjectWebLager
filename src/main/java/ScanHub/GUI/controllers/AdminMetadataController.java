@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -27,9 +28,11 @@ public class AdminMetadataController implements Initializable {
     private BoxMetadata selected = null;
     private HBox selectedRow = null;
     private List<BoxMetadata> currentMetadata;
+    private Stage currentStage;
 
-    public AdminMetadataController(ModelFacade modelFacade) {
+    public AdminMetadataController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
+        this.currentStage = currentStage;
     }
 
     @Override
