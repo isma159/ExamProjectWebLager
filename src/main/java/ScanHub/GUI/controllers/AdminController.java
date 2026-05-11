@@ -14,6 +14,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -65,11 +67,14 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/AdminMetadataView.fxml");
             } else if (newValue == logsBtn) {
                 loadPage("/views/AdminLogsView.fxml");
+
             }
         });
 
         lblUsername.setText(sessionManager.getCurrentUser().getUsername());
         lblRole.setText(sessionManager.getCurrentUser().getRole().toString());
+
+        javafx.application.Platform.runLater(this::registerShortcuts);
     }
 
     private void loadPage(String fxml) {
@@ -102,6 +107,28 @@ public class AdminController implements IViewController, Initializable {
             AlertHelper.showError("Navigation Error", "Failed to load the selected page. Please try again.");
         }
     }
+
+    private void registerShortcuts(){
+        Scene scene = contentArea.getScene();
+        if (scene == null) {return;}
+
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+
+                case D -> {if (event.isControlDown()) sidebarBtns.selectToggle(dashboardBtn);}
+                case U -> {if (event.isControlDown()) sidebarBtns.selectToggle(usersBtn);}
+                case P -> {if (event.isControlDown()) sidebarBtns.selectToggle(profilesBtn);}
+                case M -> {if (event.isControlDown()) sidebarBtns.selectToggle(metadataBtn);}
+                case L -> {if (event.isControlDown()) sidebarBtns.selectToggle(logsBtn);}
+                case A -> {if (event.isControlDown()) sidebarBtns.selectToggle(analyticsBtn);}
+                case H ->  {if (event.isControlDown()) sidebarBtns.selectToggle(shortcutsBtn);}
+                case F2 -> {darkMode.setSelected(!darkMode.isSelected());
+                ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());}
+
+            }
+        });
+    }
+
 
     @FXML
     private void onClickLogOut(ActionEvent actionEvent) {

@@ -7,6 +7,7 @@ import ScanHub.GUI.controllers.AlertController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -30,6 +31,13 @@ public class AlertHelper {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.setResizable(false);
 
+            stage.getScene().setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    stage.close();
+                    event.consume();
+                }
+            });
+
             controller.setStage(stage);
             controller.setHeaderText(header);
             controller.setContentText(content);
@@ -48,6 +56,17 @@ public class AlertHelper {
             fallback.setTitle("Error");
             fallback.setHeaderText("UI Error");
             fallback.setContentText("Failed to load custom alert: " + content);
+
+            fallback.setOnShown(event -> {
+                fallback.getDialogPane().getScene().setOnKeyPressed(keyEvent -> {
+                    if (keyEvent.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
+                        fallback.close();
+                        keyEvent.consume();
+                    }
+                });
+            });
+
+
             fallback.showAndWait();
         }
     }
