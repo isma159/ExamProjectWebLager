@@ -154,7 +154,9 @@ public class BoxDAO implements IDataAccess<Box> {
                 rs.getString("profileName"),
                 SplitBehavior.valueOf(rs.getString("splitBehavior")),
                 ProfileStatus.valueOf(rs.getString("status")),
-                rs.getString("exportLabel")
+                rs.getString("exportLabel"),
+                0,
+                0
         );
 
         String clientName = rs.getString("clientName");

@@ -35,6 +35,41 @@ public class BoxManager {
         return boxDAO.getDataFromId(boxId);
     }
 
+    public void updateBox(Box box) throws Exception {
+        dataAccess.updateData(box);
+    }
+
+    public void deleteBox(Box box) throws Exception {
+        dataAccess.deleteData(box);
+    }
+
+    /**
+     *
+     * @param boxInput
+     * @return
+     * @throws Exception
+     */
+    private Box tryGetExistingBox(String boxInput) throws Exception {
+        try {
+            int boxId = Integer.parseInt(boxInput);
+            Box box = getBoxFromId(boxId);
+            if (box != null) {
+                return box;
+            }
+        } catch (NumberFormatException ignored) {
+        }
+
+        return getBoxFromName(boxInput);
+    }
+
+    /**
+     * The core of BoxManager
+     * TODO: add detailed description
+     * @param boxInput
+     * @param profile
+     * @return
+     * @throws Exception
+     */
     public Box getOrCreateSessionBox(String boxInput, Profile profile) throws Exception {
         if (profile == null) {
             throw new IllegalArgumentException("A profile is required to start a scan session");
@@ -61,26 +96,5 @@ public class BoxManager {
         box.setProfileId(profile.getProfileId());
         box.setProfile(profile);
         return createBox(box);
-    }
-
-    public void updateBox(Box box) throws Exception {
-        dataAccess.updateData(box);
-    }
-
-    public void deleteBox(Box box) throws Exception {
-        dataAccess.deleteData(box);
-    }
-
-    private Box tryGetExistingBox(String boxInput) throws Exception {
-        try {
-            int boxId = Integer.parseInt(boxInput);
-            Box box = getBoxFromId(boxId);
-            if (box != null) {
-                return box;
-            }
-        } catch (NumberFormatException ignored) {
-        }
-
-        return getBoxFromName(boxInput);
     }
 }

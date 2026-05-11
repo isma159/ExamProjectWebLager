@@ -2,8 +2,9 @@ package ScanHub.BE;
 
 // java imports
 import java.time.LocalDateTime;
+import ScanHub.BE.interfaces.TreeNode;
 
-public class File {
+public class File implements TreeNode {
 
     private int fileId;
     private int documentId;
@@ -13,6 +14,7 @@ public class File {
     private int fileSizeBytes;
     private LocalDateTime createdAt;
     private int rotation;
+    private boolean staged = false;
 
     public File() {
     }
@@ -34,6 +36,7 @@ public class File {
     public int getFileSizeBytes() { return fileSizeBytes; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public int getRotation() { return rotation; }
+    public boolean isStaged() { return staged; }
 
     public void setFileId(int fileId) { this.fileId = fileId; }
     public void setDocumentId(int documentId) { this.documentId = documentId; }
@@ -43,10 +46,16 @@ public class File {
     public void setFileSizeBytes(int fileSizeBytes) { this.fileSizeBytes = fileSizeBytes; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setRotation(int rotation) { this.rotation = rotation; }
+    public void setStaged(boolean staged) { this.staged = staged; }
 
     // TODO: find out what to say
     @Override
     public String toString() {
         return "File " + this.referenceId;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "\uE958" + " " + "File #" + this.fileId;
     }
 }

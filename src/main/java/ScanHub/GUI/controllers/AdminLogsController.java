@@ -56,7 +56,7 @@ public class AdminLogsController implements Initializable {
         LocalDate dateTo = tryParseDate(txtFldFilterDateTo.getText());
 
         try {
-            List<Log> logs = modelFacade.getLogManager().getFilteredLogs(search, activeAction, dateFrom, dateTo);
+            List<Log> logs = modelFacade.getLogModel().getFilteredLogs(search, activeAction, dateFrom, dateTo);
             renderLogs(logs);
         } catch (Exception e) {
             e.printStackTrace();

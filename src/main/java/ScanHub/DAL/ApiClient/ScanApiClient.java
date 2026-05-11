@@ -16,13 +16,14 @@ public class ScanApiClient implements IScanSource {
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
     /**
-     * GET /getRandomFile - returns a random TIFF as raw bytes.
+     * GET /getRandomFile
      * Barcode detection is then done in {@link ScanHub.BLL.util.BarcodeDetector}.
+     * @return TIFF as raw bytes
+     * @throws Exception
      */
     @Override
     public ScanResult fetchNextScan() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getRandomFile")).GET().build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/getRandomFile")).GET().build();
 
         HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
@@ -30,6 +31,12 @@ public class ScanApiClient implements IScanSource {
         return new ScanResult(tiffBytes, false);
     }
 
+    /**
+     * Extracts files from zip to bytes
+     * @param zipBytes
+     * @return Zip as raw bytes
+     * @throws Exception
+     */
     private byte[] extractTiffFromZip(byte[] zipBytes) throws Exception {
         try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
             ZipEntry entry = zis.getNextEntry();

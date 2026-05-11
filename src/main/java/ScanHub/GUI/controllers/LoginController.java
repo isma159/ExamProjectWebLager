@@ -96,7 +96,7 @@ public class LoginController implements IViewController, Initializable {
         try {
             // checks to see if an active session is already active. if no session is active then user can log in.
             if (sessionManager.login(user)) {
-                ViewHandler handler = user.isAdmin() ? ViewHandler.ADMIN : ViewHandler.USER;
+                ViewHandler handler = user.isAdmin() ? ViewHandler.ADMIN : ViewHandler.SCAN_VIEW;
                 handler.reset();
                 handler.show(modelFacade).setMaximized(true);
                 currentStage.close();
