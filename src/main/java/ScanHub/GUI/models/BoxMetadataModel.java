@@ -21,15 +21,13 @@ public class BoxMetadataModel {
         metadataObservableList.add(created);
     }
 
-    public ObservableList<BoxMetadata> getAllMetadata() {
-        return metadataObservableList;
-    }
+    public ObservableList<BoxMetadata> getAllMetadata() { return metadataObservableList; }
 
     public BoxMetadata getMetadataByBoxId(int boxId) throws Exception {
         return manager.getMetadataByBoxId(boxId);
     }
 
-    public void refreshModel() throws Exception {
+    public void refreshMetadataModel() throws Exception {
         metadataObservableList.setAll(manager.getAllMetadata());
     }
 

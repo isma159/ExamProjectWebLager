@@ -4,6 +4,7 @@ import ScanHub.BE.EntityType;
 import ScanHub.BE.Log;
 import ScanHub.BE.LogAction;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.collections.FXCollections;
@@ -77,11 +78,8 @@ public class AdminLogsController implements Initializable {
         try {
             List<Log> logs = modelFacade.getLogModel().getLogs();
             if (dateFrom != null && dateTo != null) {
-                logs = logs.stream()
-                        .filter(
-                                log -> !log.getTimestamp().toLocalDate().isBefore(dateFrom) &&
-                                        !log.getTimestamp().toLocalDate().isAfter(dateTo)
-                        ).toList();
+                logs = logs.stream().filter(log -> !log.getTimestamp().toLocalDate().isBefore(dateFrom) &&
+                        !log.getTimestamp().toLocalDate().isAfter(dateTo)).toList();
             }
 
             FilteredList<Log> filteredLogs = new FilteredList<>(FXCollections.observableArrayList(logs));
@@ -140,7 +138,7 @@ public class AdminLogsController implements Initializable {
         }
         catch (Exception e) {
             e.printStackTrace();
-            // TODO Alert View?
+            AlertHelper.showError("Export Error", "Could not export to CSV");
         }
     }
 

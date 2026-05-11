@@ -2,12 +2,18 @@ package ScanHub.BLL;
 
 // project imports
 import ScanHub.BE.File;
+import ScanHub.DAL.DAO.FileDAO;
 import ScanHub.DAL.interfaces.IDataAccess;
 
 public class FileManager {
-    private IDataAccess<File> dataAccess;
+
+    private final FileDAO fileDAO;
 
     public FileManager() throws Exception {
-        //dataAccess = new FileDAO();
+        this.fileDAO = new FileDAO();
+    }
+
+    public void moveFile(File file, int newDocumentId) throws Exception {
+        fileDAO.moveFile(file.getFileId(), newDocumentId);
     }
 }
