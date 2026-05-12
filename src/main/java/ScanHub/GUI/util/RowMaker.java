@@ -417,7 +417,7 @@ public class RowMaker {
         col6.setPrefWidth(200.0);
         HBox.setHgrow(col6, Priority.ALWAYS);
 
-        Label timestampLabel = new Label(log.getTimestamp().format(DateTimeFormatter.ofPattern("dd/MM/yyy hh:mm:ss")));
+        Label timestampLabel = new Label(log.getTimestamp().format(DateTimeFormatter.ofPattern("dd/MM/yyy HH:mm:ss")));
         timestampLabel.setAlignment(Pos.CENTER);
         timestampLabel.getStyleClass().add("lbl");
         HBox.setHgrow(timestampLabel, Priority.ALWAYS);

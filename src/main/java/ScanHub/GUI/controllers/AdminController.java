@@ -67,7 +67,8 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/AdminMetadataView.fxml");
             } else if (newValue == logsBtn) {
                 loadPage("/views/AdminLogsView.fxml");
-
+            } else if (newValue == shortcutsBtn)  {
+                loadPage("/views/ShortcutsView.fxml");
             }
         });
 
@@ -92,6 +93,8 @@ public class AdminController implements IViewController, Initializable {
                     return new AdminMetadataController(modelFacade, currentStage);
                 } else if (controllerClass == AdminLogsController.class) {
                     return new AdminLogsController(modelFacade, currentStage);
+                } else if (controllerClass == ShortcutsController.class) {
+                    return new ShortcutsController(modelFacade, currentStage);
                 }
                 try {
                     return controllerClass.getDeclaredConstructor().newInstance();
@@ -101,6 +104,9 @@ public class AdminController implements IViewController, Initializable {
             });
 
             Node page = loader.load();
+            if (darkMode.isSelected()) {
+                page.getStyleClass().add("dark");
+            }
             contentArea.getChildren().setAll(page);
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,27 +114,63 @@ public class AdminController implements IViewController, Initializable {
         }
     }
 
-    private void registerShortcuts(){
+    private void registerShortcuts() {
         Scene scene = contentArea.getScene();
-        if (scene == null) {return;}
+        if (scene == null) {
+            return;
+        }
 
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
-
-                case D -> {if (event.isControlDown()) sidebarBtns.selectToggle(dashboardBtn);}
-                case U -> {if (event.isControlDown()) sidebarBtns.selectToggle(usersBtn);}
-                case P -> {if (event.isControlDown()) sidebarBtns.selectToggle(profilesBtn);}
-                case M -> {if (event.isControlDown()) sidebarBtns.selectToggle(metadataBtn);}
-                case L -> {if (event.isControlDown()) sidebarBtns.selectToggle(logsBtn);}
-                case A -> {if (event.isControlDown()) sidebarBtns.selectToggle(analyticsBtn);}
-                case H ->  {if (event.isControlDown()) sidebarBtns.selectToggle(shortcutsBtn);}
-                case F2 -> {darkMode.setSelected(!darkMode.isSelected());
-                ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());}
-
+                case D -> {
+                    if (event.isControlDown()) {
+                        sidebarBtns.selectToggle(dashboardBtn);
+                        contentArea.requestFocus();
+                    }
+                }
+                case U -> {
+                    if (event.isControlDown()) {
+                        sidebarBtns.selectToggle(usersBtn);
+                        contentArea.requestFocus();
+                    }
+                }
+                case P -> {
+                    if (event.isControlDown()) {
+                        sidebarBtns.selectToggle(profilesBtn);
+                        contentArea.requestFocus();
+                    }
+                }
+                case M -> {
+                    if (event.isControlDown()) {
+                        sidebarBtns.selectToggle(metadataBtn);
+                        contentArea.requestFocus();
+                    }
+                }
+                case L -> {
+                    if (event.isControlDown()) {
+                        sidebarBtns.selectToggle(logsBtn);
+                        contentArea.requestFocus();
+                    }
+                }
+                case A -> {
+                    if (event.isControlDown()) {
+                        sidebarBtns.selectToggle(analyticsBtn);
+                        contentArea.requestFocus();
+                    }
+                }
+                case H -> {
+                    if (event.isControlDown()) {
+                        sidebarBtns.selectToggle(shortcutsBtn);
+                        contentArea.requestFocus();
+                    }
+                }
+                case F2 -> {
+                    darkMode.setSelected(!darkMode.isSelected());
+                    ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());
+                }
             }
         });
     }
-
 
     @FXML
     private void onClickLogOut(ActionEvent actionEvent) {
