@@ -88,6 +88,14 @@
     -fx-text-fill: #ffffff;
 }
 
+.dark .primary-navigation-btn:focused {
+    -fx-border-color: #ffffff;
+    -fx-border-width: 2;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+
 .dark .secondary-navigation-bg {
     -fx-background-color: #2d3d4f;
 }
@@ -234,6 +242,13 @@
     -fx-font-family: "Montserrat SemiBold";
 }
 
+.dark .filter-btn:focused {
+    -fx-background-color: #2B3B4C;
+    -fx-border-color: #008FF7;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-insets: 2;
+}
+
 /* ---------- Dark State & Feedback ---------- */
 .dark .user-row:hover {
     -fx-background-color: #2B3B4C;
@@ -242,6 +257,20 @@
 .dark .user-row.row-selected {
     -fx-background-color: #354556;
 }
+
+.dark .user-row:focused {
+    -fx-background-color: #2B3B4C;
+    -fx-border-color: #008FF7;
+    -fx-border-width: 2;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+.dark .user-row.row-selected:focused {
+    -fx-background-color: #354556;
+    -fx-border-color: #008FF7;
+}
+
 
 /* ---------- Dark Separators ---------- */
 .dark .grey-separator .line {

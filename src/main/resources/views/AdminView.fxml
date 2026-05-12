@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.*?>
 
-<HBox minHeight="768.0" minWidth="1366.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminController">
+<HBox stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminController">
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="600.0" prefWidth="1200.0" styleClass="background" HBox.hgrow="ALWAYS">
          <children>
@@ -46,26 +46,32 @@
                               <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Region prefHeight="200.0" prefWidth="9.0" />
-                                    <ToggleButton fx:id="dashboardBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Dashboard">
-                                       <toggleGroup>
-                                          <ToggleGroup fx:id="sidebarBtns" />
-                                       </toggleGroup>
-                                       <styleClass>
-                                          <String fx:value="primary-navigation-btn" />
-                                          <String fx:value="lbl" />
-                                       </styleClass>
-                                    </ToggleButton>
+                                     <ToggleButton fx:id="dashboardBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Dashboard">
+                                         <toggleGroup>
+                                             <ToggleGroup fx:id="sidebarBtns" />
+                                         </toggleGroup>
+                                         <styleClass>
+                                             <String fx:value="primary-navigation-btn" />
+                                             <String fx:value="lbl" />
+                                         </styleClass>
+                                         <tooltip>
+                                             <Tooltip text="Go to Dashboard (Ctrl + D)" />
+                                         </tooltip>
+                                     </ToggleButton>
                                  </children>
                               </HBox>
                               <HBox fx:id="analyticsBox" alignment="CENTER_LEFT" layoutX="12.0" layoutY="144.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Region prefHeight="200.0" prefWidth="9.0" />
-                                    <ToggleButton fx:id="analyticsBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Analytics" toggleGroup="$sidebarBtns">
-                                       <styleClass>
-                                          <String fx:value="primary-navigation-btn" />
-                                          <String fx:value="lbl" />
-                                       </styleClass>
-                                    </ToggleButton>
+                                     <ToggleButton fx:id="analyticsBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Analytics" toggleGroup="$sidebarBtns">
+                                         <styleClass>
+                                             <String fx:value="primary-navigation-btn" />
+                                             <String fx:value="lbl" />
+                                         </styleClass>
+                                         <tooltip>
+                                             <Tooltip text="Go to Analytics (Ctrl + A)" />
+                                         </tooltip>
+                                     </ToggleButton>
                                  </children>
                               </HBox>
                               <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" prefWidth="200.0" />
@@ -80,34 +86,43 @@
                               <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="144.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Region prefHeight="200.0" prefWidth="9.0" />
-                                    <ToggleButton fx:id="usersBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Users" toggleGroup="$sidebarBtns">
-                                       <styleClass>
-                                          <String fx:value="primary-navigation-btn" />
-                                          <String fx:value="lbl" />
-                                       </styleClass>
-                                    </ToggleButton>
+                                     <ToggleButton fx:id="usersBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Users" toggleGroup="$sidebarBtns">
+                                         <styleClass>
+                                             <String fx:value="primary-navigation-btn" />
+                                             <String fx:value="lbl" />
+                                         </styleClass>
+                                         <tooltip>
+                                             <Tooltip text="Go to Users (Ctrl + U)" />
+                                         </tooltip>
+                                     </ToggleButton>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="252.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Region prefHeight="200.0" prefWidth="9.0" />
-                                    <ToggleButton fx:id="profilesBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Profiles" toggleGroup="$sidebarBtns">
-                                       <styleClass>
-                                          <String fx:value="primary-navigation-btn" />
-                                          <String fx:value="lbl" />
-                                       </styleClass>
-                                    </ToggleButton>
+                                     <ToggleButton fx:id="profilesBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Profiles" toggleGroup="$sidebarBtns">
+                                         <styleClass>
+                                             <String fx:value="primary-navigation-btn" />
+                                             <String fx:value="lbl" />
+                                         </styleClass>
+                                         <tooltip>
+                                             <Tooltip text="Go to Profiles (Ctrl + P)" />
+                                         </tooltip>
+                                     </ToggleButton>
                                  </children>
                               </HBox>
                               <HBox fx:id="metadataBox" alignment="CENTER_LEFT" layoutX="12.0" layoutY="282.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Region prefHeight="200.0" prefWidth="9.0" />
-                                    <ToggleButton fx:id="metadataBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Metadata" toggleGroup="$sidebarBtns">
-                                       <styleClass>
-                                          <String fx:value="primary-navigation-btn" />
-                                          <String fx:value="lbl" />
-                                       </styleClass>
-                                    </ToggleButton>
+                                     <ToggleButton fx:id="metadataBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Metadata" toggleGroup="$sidebarBtns">
+                                         <styleClass>
+                                             <String fx:value="primary-navigation-btn" />
+                                             <String fx:value="lbl" />
+                                         </styleClass>
+                                         <tooltip>
+                                             <Tooltip text="Go to Metadata (Ctrl + M)" />
+                                         </tooltip>
+                                     </ToggleButton>
                                  </children>
                               </HBox>
                               <Region layoutX="12.0" layoutY="189.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" prefWidth="200.0" />
@@ -122,34 +137,29 @@
                               <HBox fx:id="logBox" alignment="CENTER_LEFT" layoutX="12.0" layoutY="282.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Region prefHeight="200.0" prefWidth="9.0" />
-                                    <ToggleButton fx:id="logsBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Activity Logs" toggleGroup="$sidebarBtns">
-                                       <styleClass>
-                                          <String fx:value="primary-navigation-btn" />
-                                          <String fx:value="lbl" />
-                                       </styleClass>
-                                    </ToggleButton>
-                                 </children>
-                              </HBox>
-                              <HBox fx:id="settingsBox" alignment="CENTER_LEFT" layoutX="12.0" layoutY="405.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
-                                 <children>
-                                    <Region prefHeight="200.0" prefWidth="9.0" />
-                                    <ToggleButton fx:id="settingsBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Settings" toggleGroup="$sidebarBtns">
-                                       <styleClass>
-                                          <String fx:value="primary-navigation-btn" />
-                                          <String fx:value="lbl" />
-                                       </styleClass>
-                                    </ToggleButton>
+                                     <ToggleButton fx:id="logsBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Activity Logs" toggleGroup="$sidebarBtns">
+                                         <styleClass>
+                                             <String fx:value="primary-navigation-btn" />
+                                             <String fx:value="lbl" />
+                                         </styleClass>
+                                         <tooltip>
+                                             <Tooltip text="Go to Logs (Ctrl + L)" />
+                                         </tooltip>
+                                     </ToggleButton>
                                  </children>
                               </HBox>
                               <HBox fx:id="shortcutBox" alignment="CENTER_LEFT" layoutX="12.0" layoutY="435.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                                  <children>
                                     <Region prefHeight="200.0" prefWidth="9.0" />
-                                    <ToggleButton fx:id="shortcutsBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Shortcuts" toggleGroup="$sidebarBtns">
-                                       <styleClass>
-                                          <String fx:value="primary-navigation-btn" />
-                                          <String fx:value="lbl" />
-                                       </styleClass>
-                                    </ToggleButton>
+                                     <ToggleButton fx:id="shortcutsBtn" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="210.0" text="• Shortcuts" toggleGroup="$sidebarBtns">
+                                         <styleClass>
+                                             <String fx:value="primary-navigation-btn" />
+                                             <String fx:value="lbl" />
+                                         </styleClass>
+                                         <tooltip>
+                                             <Tooltip text="Go to Shortcuts (Ctrl + H)" />
+                                         </tooltip>
+                                     </ToggleButton>
                                  </children>
                               </HBox>
                               <Region layoutX="12.0" layoutY="360.0" prefHeight="510.0" prefWidth="230.0" VBox.vgrow="ALWAYS" />

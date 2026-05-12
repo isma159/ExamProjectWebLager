@@ -13,8 +13,11 @@ import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -55,6 +58,8 @@ public class AdminProfilesController implements Initializable {
         pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
             loadProfiles();
         }));
+
+        javafx.application.Platform.runLater(this::registerProfileShortcuts);
     }
 
     private void loadProfiles() {
@@ -90,6 +95,12 @@ public class AdminProfilesController implements Initializable {
                     selectedProfileRow = rowHBox;
                     rowHBox.getStyleClass().add("row-selected");
                 });
+                row.setFocusTraversable(true);
+                row.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        selectProfile(profile, row);
+                    }
+                });
                 row.setUserData(profile);
                 profileTableBox.getChildren().add(row);
             }
@@ -98,6 +109,38 @@ public class AdminProfilesController implements Initializable {
             AlertHelper.showError("Load Error", "Failed to load profiles.");
         }
     }
+
+    private void registerProfileShortcuts() {
+        Scene scene = profileTableBox.getScene();
+
+        if (scene == null) return;
+
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (profileTableBox.getScene() == null) return;
+
+            if (event.isControlDown()) {
+                switch (event.getCode()) {
+                    case N -> onClickCreateProfile();
+                    case E -> onClickUpdateProfile();
+                }
+                if (event.getCode() == javafx.scene.input.KeyCode.DELETE)  {
+                    onClickDeleteProfile(null);
+                    event.consume();
+                }
+            }
+        });
+    }
+
+    private void selectProfile(Profile profile, HBox rowHBox) {
+        if (selectedProfileRow != null) {
+            selectedProfileRow.getStyleClass().remove("row-selected");
+        }
+
+        selectedProfile = profile;
+        selectedProfileRow = rowHBox;
+        rowHBox.getStyleClass().add("row-selected");
+    }
+
 
     @FXML
     private void onClickCreateProfile() {
@@ -141,6 +184,14 @@ public class AdminProfilesController implements Initializable {
             ProfileFormController controller = handler.getController();
             Stage stage = handler.prepareStage();
             controller.setModel(stage, modelFacade, profile);
+
+            stage.getScene().setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    stage.close();
+                    event.consume();
+                }
+            });
+
             stage.showAndWait();
 
             loadProfiles(); // refresh the list after the form closes
@@ -198,6 +249,12 @@ public class AdminProfilesController implements Initializable {
                 selectedProfileRow = rowHBox;
                 rowHBox.getStyleClass().add("row-selected");
             });
+            row.setFocusTraversable(true);
+            row.focusedProperty().addListener((observable, oldValue, isFocused) -> {
+                if (isFocused) {
+                    selectProfile(profile, row);
+                }
+            });
             row.setUserData(profile);
             profileTableBox.getChildren().add(row);
         }
@@ -219,6 +276,12 @@ public class AdminProfilesController implements Initializable {
                 selectedProfile = clickedProfile;
                 selectedProfileRow = rowHBox;
                 rowHBox.getStyleClass().add("row-selected");
+            });
+            row.setFocusTraversable(true);
+            row.focusedProperty().addListener((observable, oldValue, isFocused) -> {
+                if (isFocused) {
+                    selectProfile(profile, row);
+                }
             });
             row.setUserData(profile);
             profileTableBox.getChildren().add(row);

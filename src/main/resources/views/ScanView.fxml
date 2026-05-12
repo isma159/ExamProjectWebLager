@@ -365,7 +365,7 @@
       </bottom>
    </BorderPane>
 
-   <StackPane fx:id="sessionPopupOverlay" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onSessionPopupBackdropClick" pickOnBounds="true" prefHeight="420.0" prefWidth="1280.0" styleClass="modal-backdrop" visible="false">
+   <StackPane fx:id="sessionPopupOverlay" maxHeight="-Infinity" maxWidth="-Infinity" <fx:include fx:id="shortcutsOverlay" source="ShortcutsView.fxml" /> minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onSessionPopupBackdropClick" pickOnBounds="true" prefHeight="420.0" prefWidth="1280.0" styleClass="modal-backdrop" visible="false">
       <VBox maxHeight="300.0" maxWidth="360.0" onMouseClicked="#onSessionPopupConsumeClick" prefHeight="300.0" prefWidth="360.0" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
