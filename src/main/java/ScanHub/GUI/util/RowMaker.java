@@ -4,6 +4,8 @@ package ScanHub.GUI.util;
 import ScanHub.BE.*;
 
 // java imports
+import ScanHub.BE.enums.LogAction;
+import ScanHub.BE.enums.ProfileStatus;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;

@@ -2,6 +2,8 @@ package ScanHub.DAL.DAO;
 
 // project imports
 import ScanHub.BE.*;
+import ScanHub.BE.enums.ProfileStatus;
+import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 

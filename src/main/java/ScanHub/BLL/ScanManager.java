@@ -4,7 +4,7 @@ import ScanHub.BE.Box;
 import ScanHub.BE.BoxMetadata;
 import ScanHub.BE.Document;
 import ScanHub.BE.File;
-import ScanHub.BE.SplitBehavior;
+import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.BLL.util.BarcodeDetector;
 import ScanHub.DAL.ApiClient.ScanResult;
 import ScanHub.DAL.DAO.BoxMetadataDAO;

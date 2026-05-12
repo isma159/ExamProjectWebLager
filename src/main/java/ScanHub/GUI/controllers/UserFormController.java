@@ -2,7 +2,7 @@ package ScanHub.GUI.controllers;
 
 // project imports
 import ScanHub.BE.Profile;
-import ScanHub.BE.Role;
+import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;

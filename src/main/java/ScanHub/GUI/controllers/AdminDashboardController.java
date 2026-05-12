@@ -2,6 +2,8 @@ package ScanHub.GUI.controllers;
 
 // project imports
 import ScanHub.BE.*;
+import ScanHub.BE.enums.ProfileStatus;
+import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;

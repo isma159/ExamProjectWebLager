@@ -4,6 +4,7 @@ import ScanHub.BE.Box;
 import ScanHub.BE.Document;
 import ScanHub.BE.File;
 import ScanHub.BE.Profile;
+import ScanHub.BE.enums.ExportMode;
 import ScanHub.BE.interfaces.TreeNode;
 import ScanHub.BLL.ScanManager;
 import ScanHub.GUI.util.ThemeManager;
@@ -49,7 +50,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private Label lblUsername, lblRole, lblEmptyState;
     @FXML private ToggleSwitch darkMode;
     @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport, btnZoomOut, btnZoomIn;
-    @FXML private ComboBox<String> comboBoxExport;
+    @FXML private ComboBox<ExportMode> comboBoxExport;
     @FXML private FlowPane pageGrid;
     @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel; // status bar down left
     @FXML private TreeView<TreeNode> boxTreeView;
@@ -70,7 +71,7 @@ public class ScanController implements Initializable, IViewController {
 
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop - see the initalizeTreeView())
     private Thread scanThread; // scan loop is controlled by the volatile boolean 'scanning', not thread interruption
-    private volatile boolean scanning = false; // volatile: FX-thread writes are immediately visible to scan Thread (scanThread)
+    private volatile boolean scanning = false; // volatile: FX-thread writes are immediately visible to Thread (scanThread)
     private boolean sessionActive;
 
     // Zoom Level stuff
@@ -110,9 +111,8 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
-    // TODO: implement export - for now does nothing
     private void initializeExportComboBoxes() {
-        comboBoxExport.setItems(FXCollections.observableArrayList("Single-page TIFF", "Multi-page TIFF"));
+        comboBoxExport.setItems(FXCollections.observableArrayList(ExportMode.values()));
         comboBoxExport.getSelectionModel().selectFirst();
     }
 
@@ -775,10 +775,6 @@ public class ScanController implements Initializable, IViewController {
         return "Page ?"; // something is wrong
     }
 
-    /**
-     * TODO explain
-     * @return
-     */
     private int currentPageIndex() {
         if (selectedFile == null) return -1;
         return allPages().indexOf(selectedFile);
