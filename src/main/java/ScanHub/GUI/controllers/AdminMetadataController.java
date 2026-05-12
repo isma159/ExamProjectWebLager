@@ -30,6 +30,8 @@ public class AdminMetadataController implements Initializable {
     private List<BoxMetadata> currentMetadata;
     private Stage currentStage;
 
+    private final int TOTAL_TABLE_SIZE = 15;
+
     public AdminMetadataController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
         this.currentStage = currentStage;
@@ -49,7 +51,12 @@ public class AdminMetadataController implements Initializable {
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
             List<BoxMetadata> metadata = modelFacade.getMetadataModel().getAllMetadata();
-            currentMetadata = new ArrayList<>(metadata);
+            metadataPagination.setPageCount(Math.ceilDiv(metadata.size(), TOTAL_TABLE_SIZE));
+
+            int startIndex = metadataPagination.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
+            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, metadata.size());
+
+            currentMetadata = new ArrayList<>(metadata.subList(startIndex, endIndex));
             for (BoxMetadata boxMetadata : currentMetadata) {
                 HBox row = RowMaker.addMetadataRow(boxMetadata, (clickedMetadata, rowHBox) -> {
                     if (selectedRow != null) {
@@ -73,64 +80,9 @@ public class AdminMetadataController implements Initializable {
         }
     }
 
-    // TODO: find out if editing metadata manually is necessary?? it should update when you scan no?
-    @FXML
-    private void onClickEditMetadata() {
-        if (selected == null) { AlertHelper.showWarning("No Selection", "Select a row first."); return; }
 
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Edit Metadata");
-        GridPane grid = new GridPane();
-        grid.setHgap(10); grid.setVgap(10);
 
-        TextField profileName = new TextField(selected.getProfileName() != null ? selected.getProfileName() : "");
-        TextField boxName = new TextField(selected.getBoxName() != null ? selected.getBoxName() : "");
-        TextField documentCount = new TextField(String.valueOf(selected.getDocumentCount()));
-        TextField fileCount = new TextField(String.valueOf(selected.getFileCount()));
-        TextField boxCreatedAt = new TextField(selected.getBoxCreatedAt() != null ? selected.getBoxCreatedAt().toString() : "");
 
-        grid.addRow(0, new Label("Profile:"), profileName);
-        grid.addRow(1, new Label("Box:"), boxName);
-        grid.addRow(2, new Label("Documents:"), documentCount);
-        grid.addRow(3, new Label("Files:"), fileCount);
-        grid.addRow(4, new Label("Created at:"), boxCreatedAt);
-
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        dialog.showAndWait().ifPresent(result -> {
-            if (result == ButtonType.OK) {
-                try {
-                    selected.setProfileName(profileName.getText());
-                    selected.setBoxName(boxName.getText());
-                    selected.setDocumentCount(Integer.parseInt(documentCount.getText()));
-                    selected.setFileCount(Integer.parseInt(fileCount.getText()));
-                    selected.setBoxCreatedAt(LocalDateTime.parse(boxCreatedAt.getText()));
-                    modelFacade.getMetadataModel().updateMetadata(selected);
-                    loadMetadata();
-                } catch (NumberFormatException | DateTimeParseException e) {
-                    AlertHelper.showWarning("Invalid Values", "Counts must be numbers and created at must use ISO date-time format.");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    AlertHelper.showError("Update Failed", "Failed to update.");
-                }
-            }
-        });
-    }
-
-    @FXML
-    private void onClickDeleteMetadata() {
-        if (selected == null) { AlertHelper.showWarning("No Selection", "Select a row first."); return; }
-        AlertHelper.showConfirmation("Delete", "Delete metadata for Box #" + selected.getBoxId() + "?", () -> {
-            try {
-                modelFacade.getMetadataModel().deleteMetadata(selected);
-                loadMetadata();
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertHelper.showError("Delete Failed", "Failed to delete.");
-            }
-        });
-    }
 
     @FXML private void onTbAllMetadataClick()   { loadMetadata(); }
     @FXML private void onTbWithMetadataClick()  {}

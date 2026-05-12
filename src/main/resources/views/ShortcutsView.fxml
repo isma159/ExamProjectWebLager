@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ShortcutsController">
+    <children>
+        <VBox HBox.hgrow="ALWAYS">
+            <children>
+                <ScrollPane fitToWidth="true" prefHeight="720.0" styleClass="scroll-pane">
+                    <content>
+                        <VBox prefWidth="1371.0">
+                            <children>
+                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="24.0" prefWidth="200.0" />
+
+                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0">
+                                    <children>
+                                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="24.0" />
+                                        <Label styleClass="h1" text="Keyboard Shortcuts" />
+                                    </children>
+                                </HBox>
+
+                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="6.0" prefWidth="200.0" />
+
+                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="24.0">
+                                    <children>
+                                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" />
+                                        <Label styleClass="lbl" text="Use these keyboard shortcuts to navigate quickly across the application." />
+                                    </children>
+                                </HBox>
+
+                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="24.0" prefWidth="200.0" />
+
+                                <HBox>
+                                    <children>
+                                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="24.0" />
+
+                                        <VBox spacing="15.0" HBox.hgrow="ALWAYS">
+                                            <children>
+
+                                                <VBox styleClass="shadow">
+                                                    <children>
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0">
+                                                            <styleClass>
+                                                                <String fx:value="half-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="15.0" />
+                                                                <Label styleClass="h2" text="Navigation" />
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="second-card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="bold-lbl" text="Action" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" styleClass="bold-lbl" text="Shortcut" HBox.hgrow="ALWAYS" />
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Close View" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="ESC" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Go to Dashboard" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="D" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Go to Metadata" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="M" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Go to Logs" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="L" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Go to Analytics" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="A" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="second-card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Go to Shortcuts" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="H" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="1.0">
+                                                            <styleClass>
+                                                                <String fx:value="half-card-bottom" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                        </HBox>
+                                                    </children>
+                                                </VBox>
+
+                                                <VBox styleClass="shadow">
+                                                    <children>
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0">
+                                                            <styleClass>
+                                                                <String fx:value="half-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="15.0" />
+                                                                <Label styleClass="h2" text="Management" />
+                                                            </children>
+                                                        </HBox>
+                                                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="second-card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="bold-lbl" text="Action" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" styleClass="bold-lbl" text="Shortcut" HBox.hgrow="ALWAYS" />
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Go to Users" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="U" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Go to Profiles" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="P" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Create User/Profile" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="N" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Edit User/Profile" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="E" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Delete User/Profile" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Delete" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="1.0">
+                                                            <styleClass>
+                                                                <String fx:value="half-card-bottom" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                        </HBox>
+                                                    </children>
+                                                </VBox>
+
+                                                <VBox styleClass="shadow">
+                                                    <children>
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0">
+                                                            <styleClass>
+                                                                <String fx:value="half-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="15.0" />
+                                                                <Label styleClass="h2" text="Appearance" />
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="second-card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="bold-lbl" text="Action" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" styleClass="bold-lbl" text="Shortcut" HBox.hgrow="ALWAYS" />
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Toggle Dark Mode" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="F2" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="1.0">
+                                                            <styleClass>
+                                                                <String fx:value="half-card-bottom" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                        </HBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </VBox>
+
+                                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="24.0" />
+                                    </children>
+                                </HBox>
+
+                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="24.0" prefWidth="200.0" />
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
+</HBox>

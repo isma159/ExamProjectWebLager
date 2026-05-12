@@ -13,8 +13,11 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -54,6 +57,8 @@ public class AdminUsersController implements Initializable {
         pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
             loadUsers();
         }));
+
+        javafx.application.Platform.runLater(this::registerUserShortcuts);
     }
 
     private void loadUsers() {
@@ -89,6 +94,12 @@ public class AdminUsersController implements Initializable {
                     selectedUserRow = rowHBox;
                     rowHBox.getStyleClass().add("row-selected");
                 });
+                row.setFocusTraversable(true);
+                row.focusedProperty().addListener((observable, oldValue, isFocused) -> {
+                    if (isFocused) {
+                        selectUser(user, row);
+                    }
+                });
                 row.setUserData(user);
                 userTableBox.getChildren().add(row);
             }
@@ -97,6 +108,38 @@ public class AdminUsersController implements Initializable {
             AlertHelper.showError("Load Error", "Failed to load users.");
         }
     }
+
+    private void registerUserShortcuts() {
+        Scene scene = userTableBox.getScene();
+
+        if (scene == null) return;
+
+        scene.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
+            if (userTableBox.getScene() == null) return;
+
+            if (event.isControlDown()) {
+                switch (event.getCode()) {
+                    case N -> onClickCreateUser();
+                    case E -> onClickUpdateUser();
+                }
+        }
+            if (event.getCode() == javafx.scene.input.KeyCode.DELETE) {
+                onClickDeleteUser(null);
+                event.consume();
+            }
+        });
+    }
+
+    private void selectUser(User user, HBox rowHBox) {
+        if (selectedUserRow != null) {
+            selectedUserRow.getStyleClass().remove("row-selected");
+        }
+
+        selectedUser = user;
+        selectedUserRow = rowHBox;
+        rowHBox.getStyleClass().add("row-selected");
+    }
+
 
     @FXML
     private void onClickCreateUser() {
@@ -138,6 +181,14 @@ public class AdminUsersController implements Initializable {
             UserFormController controller = handler.getController();
             Stage stage = handler.prepareStage();
             controller.setModel(stage, modelFacade, user);
+
+            stage.getScene().setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    stage.close();
+                    event.consume();
+                }
+            });
+
             stage.showAndWait();
 
             loadUsers(); // refresh the list after the form closes
@@ -198,6 +249,12 @@ public class AdminUsersController implements Initializable {
                 selectedUser = clickedUser;
                 selectedUserRow = rowHBox;
                 rowHBox.getStyleClass().add("row-selected");
+            });
+            row.setFocusTraversable(true);
+            row.focusedProperty().addListener((observable, oldValue, isFocused) -> {
+                if (isFocused) {
+                    selectUser(user, row);
+                }
             });
             row.setUserData(user);
             userTableBox.getChildren().add(row);
