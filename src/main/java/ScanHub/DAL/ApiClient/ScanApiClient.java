@@ -2,10 +2,13 @@ package ScanHub.DAL.ApiClient;
 
 import ScanHub.DAL.interfaces.IScanSource;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ScanApiClient implements IScanSource {
 
@@ -13,40 +16,34 @@ public class ScanApiClient implements IScanSource {
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
     /**
-     * GET /getRandomFile - returns a random TIFF as raw bytes.
+     * GET /getRandomFile
      * Barcode detection is then done in {@link ScanHub.BLL.util.BarcodeDetector}.
+     * @return TIFF as raw bytes
+     * @throws Exception
      */
     @Override
     public ScanResult fetchNextScan() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getRandomFile")).GET().build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/getRandomFile")).GET().build();
 
         HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-        return new ScanResult(response.body(), false); // isBarcode always false here cause it is detected later
+        byte[] tiffBytes = extractTiffFromZip(response.body());
+        return new ScanResult(tiffBytes, false);
     }
 
     /**
-     * GET /getById/{id} - for reloading a specific file
-     * when displaying/exporting from DB, to bypass storing
-     * the full blob locally during a session.
+     * Extracts files from zip to bytes
+     * @param zipBytes
+     * @return Zip as raw bytes
+     * @throws Exception
      */
-    public byte[] fetchById(int id) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getById/" + id)).GET().build();
-
-        return httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray()).body();
-    }
-
-    /**
-     * GET /getCount if we wanted to know how many TIFFs the API has available.
-     */
-    public int fetchCount() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/getCount")).GET().build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        return Integer.parseInt(response.body().trim());
+    private byte[] extractTiffFromZip(byte[] zipBytes) throws Exception {
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+            ZipEntry entry = zis.getNextEntry();
+            if (entry == null) {
+                throw new Exception("API zip response contained no files");
+            }
+            return zis.readAllBytes();
+        }
     }
 }

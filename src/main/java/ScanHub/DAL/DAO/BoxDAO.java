@@ -1,73 +1,172 @@
 package ScanHub.DAL.DAO;
 
 import ScanHub.BE.Box;
+import ScanHub.BE.Client;
+import ScanHub.BE.Profile;
+import ScanHub.BE.ProfileStatus;
+import ScanHub.BE.SplitBehavior;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BoxDAO implements IDataAccess<Box> {
 
-    DBConnector dbConnector = new DBConnector();
+    private final DBConnector dbConnector;
 
-    public BoxDAO() throws IOException {}
+    public BoxDAO() throws IOException {
+        this.dbConnector = new DBConnector();
+    }
 
     @Override
-    public Box createData(Box data) throws Exception {
+    public Box createData(Box box) throws Exception {
         String sql = """
                 INSERT INTO Boxes (boxName, profileId)
-                OUTPUT INSERTED.boxId, INSERTED.boxName, INSERTED.profileId, INSERTED.created_at, INSERTED.modified_at
+                OUTPUT INSERTED.boxId, INSERTED.boxName, INSERTED.profileId,
+                       INSERTED.created_at, INSERTED.modified_at
                 VALUES (?, ?)
                 """;
+
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setString(1, data.getBoxName());
-            ps.setInt(2, data.getProfileId());
+            ps.setString(1, box.getBoxName());
+            ps.setInt(2, box.getProfileId());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Box created = mapBox(rs);
-                    created.setProfile(data.getProfile());
+                    created.setProfile(box.getProfile());
                     return created;
                 }
             }
+
             throw new SQLException("Insert returned no boxId");
         } catch (SQLException e) {
-            throw new Exception("Could not create Box");
+            throw new Exception("Could not create box", e);
         }
     }
 
     @Override
     public List<Box> getData() throws Exception {
-        return List.of();
+        List<Box> boxes = new ArrayList<>();
+        String sql = baseSelectSql() + " WHERE b.deleted_at IS NULL ORDER BY b.created_at DESC";
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                boxes.add(mapJoinedBox(rs));
+            }
+        } catch (SQLException e) {
+            throw new Exception("Could not get boxes", e);
+        }
+
+        return boxes;
     }
 
     @Override
     public Box getDataFromName(String name) throws Exception {
-        return null;
-    }
+        String sql = baseSelectSql() + " WHERE b.boxName = ? AND b.deleted_at IS NULL";
 
-    @Override
-    public void updateData(Box newData) throws Exception {
-
-    }
-
-    @Override
-    public void deleteData(Box data) throws Exception {
-        String sql = "UPDATE Boxes SET deleted_at = SYSDATETIME() WHERE boxId = ?";
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setInt(1, data.getBoxId());
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapJoinedBox(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new Exception("Could not fetch box from name " + name, e);
+        }
+    }
+
+    public Box getDataFromId(int boxId) throws Exception {
+        String sql = baseSelectSql() + " WHERE b.boxId = ? AND b.deleted_at IS NULL";
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, boxId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapJoinedBox(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new Exception("Could not fetch box from id " + boxId, e);
+        }
+    }
+
+    @Override
+    public void updateData(Box box) throws Exception {
+        String sql = "UPDATE Boxes SET boxName = ?, profileId = ?, modified_at = SYSDATETIME() WHERE boxId = ? AND deleted_at IS NULL";
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, box.getBoxName());
+            ps.setInt(2, box.getProfileId());
+            ps.setInt(3, box.getBoxId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new Exception("Could not update box", e);
+        }
+    }
+
+    @Override
+    public void deleteData(Box box) throws Exception {
+        String sql = "UPDATE Boxes SET deleted_at = SYSDATETIME() WHERE boxId = ?";
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, box.getBoxId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new Exception("Could not delete box", e);
         }
     }
 
+    private String baseSelectSql() {
+        return """
+                SELECT b.boxId, b.boxName, b.profileId, b.created_at, b.modified_at,
+                       p.clientId, p.profileName, p.splitBehavior, p.status, p.exportLabel,
+                       c.clientName
+                FROM Boxes b
+                JOIN Profiles p ON b.profileId = p.profileId
+                LEFT JOIN Clients c ON p.clientId = c.clientId
+                """;
+    }
+
+    private Box mapJoinedBox(ResultSet rs) throws SQLException {
+        Box box = mapBox(rs);
+
+        Profile profile = new Profile(
+                rs.getInt("profileId"),
+                rs.getInt("clientId"),
+                rs.getString("profileName"),
+                SplitBehavior.valueOf(rs.getString("splitBehavior")),
+                ProfileStatus.valueOf(rs.getString("status")),
+                rs.getString("exportLabel"),
+                0,
+                0
+        );
+
+        String clientName = rs.getString("clientName");
+        if (clientName != null) {
+            profile.setClient(new Client(profile.getClientId(), clientName));
+        }
+
+        box.setProfile(profile);
+        return box;
+    }
 
     private Box mapBox(ResultSet rs) throws SQLException {
         Timestamp createdAt = rs.getTimestamp("created_at");
@@ -77,7 +176,7 @@ public class BoxDAO implements IDataAccess<Box> {
                 rs.getInt("boxId"),
                 rs.getString("boxName"),
                 rs.getInt("profileId"),
-                createdAt != null ? createdAt.toLocalDateTime() : null, // is createdAt  null then set time, if
+                createdAt != null ? createdAt.toLocalDateTime() : null,
                 modifiedAt != null ? modifiedAt.toLocalDateTime() : null
         );
     }

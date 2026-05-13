@@ -45,8 +45,9 @@ public class AdminLogsController implements Initializable {
 
     private List<Log> currentLogs = new ArrayList<>();
 
+    private final int ROWS_PER_PAGE = 15;
+
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public AdminLogsController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
@@ -57,8 +58,7 @@ public class AdminLogsController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             modelFacade.getLogModel().refreshModel();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -66,6 +66,16 @@ public class AdminLogsController implements Initializable {
         dtPickerFrom.valueProperty().addListener((obs, o, n) -> applyFilters());
         dtPickerTo.valueProperty().addListener((obs, o, n) -> applyFilters());
 
+        // Manual Pagination Listener (instead of Page Factory)
+        logsPagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+            renderLogsForCurrentPage();
+        });
+
+        applyFilters();
+    }
+
+    private void resetAndApply() {
+        logsPagination.setCurrentPageIndex(0);
         applyFilters();
     }
 
@@ -76,12 +86,12 @@ public class AdminLogsController implements Initializable {
 
         try {
             List<Log> logs = modelFacade.getLogModel().getLogs();
+
+            // Filter logic
             if (dateFrom != null && dateTo != null) {
-                logs = logs.stream()
-                        .filter(
-                                log -> !log.getTimestamp().toLocalDate().isBefore(dateFrom) &&
-                                        !log.getTimestamp().toLocalDate().isAfter(dateTo)
-                        ).toList();
+                logs = logs.stream().filter(log ->
+                        !log.getTimestamp().toLocalDate().isBefore(dateFrom) &&
+                                !log.getTimestamp().toLocalDate().isAfter(dateTo)).toList();
             }
 
             if (selectedAction != null) {
@@ -105,26 +115,37 @@ public class AdminLogsController implements Initializable {
                     return false;
                 }
 
+            // Calculate and set page count
+            int pageCount = Math.max(1, (int) Math.ceil((double) allFilteredLogs.size() / ROWS_PER_PAGE));
+            logsPagination.setPageCount(pageCount);
+
+            renderLogsForCurrentPage();
             });
-            renderLogs(filteredLogs);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void renderLogs(List<Log> logs) {
+    private void renderLogsForCurrentPage() {
         logsTableBox.getChildren().clear();
         currentLogs.clear();
-        currentLogs.addAll(logs);
+        currentLogs.addAll(currentLogs);
 
-        if (logs.isEmpty()) {
+        if (currentLogs.isEmpty()) {
             Label empty = new Label("No logs found.");
             empty.getStyleClass().add("lbl");
             logsTableBox.getChildren().add(empty);
             return;
         }
 
-        for (Log log : logs) {
+        int startIndex = logsPagination.getCurrentPageIndex() * ROWS_PER_PAGE;
+        int endIndex = Math.min(startIndex + ROWS_PER_PAGE, allFilteredLogs.size());
+
+        // Extract sublist for the current page
+        List<Log> pageItems = currentLogs.subList(startIndex, endIndex);
+
+        for (Log log : pageItems) {
             HBox row = RowMaker.addLogRow(log);
             logsTableBox.getChildren().add(row);
         }

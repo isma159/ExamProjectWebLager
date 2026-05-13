@@ -481,6 +481,14 @@
 
 }
 
+.filter-btn:focused {
+    -fx-background-color: #F1F5F9;
+    -fx-border-color: #2d3d4f;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-insets: 2;
+}
+
+
 .container.error-border {
 
     -fx-border-color: #FF3D32;
@@ -759,6 +767,17 @@
 
 }
 
+.primary-navigation-btn:focused {
+    -fx-background-color: #2d3d4f;
+    -fx-borderwidth: 2;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.primary-navigation-btn:selected:focused {
+    -fx-border-color: #ffffff;
+}
+
 .user-row:hover {
     -fx-background-color: #F1F5F9;
 }
@@ -766,6 +785,20 @@
 .user-row.row-selected {
     -fx-background-color: #e0eaf5;
 }
+
+.user-row:focused {
+    -fx-background-color: #F1F5F9;
+    -fx-border-color: #2d3d4f;
+    -fx-border-width: 2;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+.user-row.row-selected:focused {
+    -fx-background-color: #e0eaf5;
+    -fx-border-color: #2d3d4f;
+}
+
 
 .box-card {
 

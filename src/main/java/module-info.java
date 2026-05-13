@@ -10,10 +10,9 @@ module scanhub {
     requires java.desktop;
     requires java.net.http;
     requires org.controlsfx.controls;
-    requires jdk.compiler;
     requires javafx.base;
     requires com.twelvemonkeys.imageio.tiff;
-
+    requires javafx.graphics;
 
     exports ScanHub.GUI.controllers;
     opens ScanHub.GUI.controllers to javafx.fxml;
