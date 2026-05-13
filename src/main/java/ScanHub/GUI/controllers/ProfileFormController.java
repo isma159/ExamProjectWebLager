@@ -13,6 +13,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.controlsfx.control.SearchableComboBox;
@@ -34,11 +36,15 @@ public class ProfileFormController implements Initializable {
     @FXML private SearchableComboBox<Client> searchableComboBoxClient;
     @FXML private Slider sliderBrightness, sliderContrast;
     @FXML private Button saveButton;
+    @FXML private ImageView imgPreview;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
     private Profile editingProfile = null;
     private List<User> selectedUsers;
+
+    private double brightness;
+    private double contrast;
 
     public void setModel(Stage currentStage, ModelFacade modelFacade, Profile profile) {
         this.currentStage = currentStage;
@@ -73,11 +79,15 @@ public class ProfileFormController implements Initializable {
 
         // Wire sliders to their value labels
         sliderBrightness.valueProperty().addListener((obs, oldVal, newVal) -> {
-            lblBrightnessValue.setText(String.valueOf(newVal.intValue()));
+            brightness = newVal.intValue();
+            lblBrightnessValue.setText(String.valueOf(brightness));
+            imgPreview.setEffect(new ColorAdjust(0, 0, contrast / 100, brightness / 100));
         });
 
         sliderContrast.valueProperty().addListener((obs, oldVal, newVal) -> {
-            lblContrastValue.setText(String.valueOf(newVal.intValue()));
+            contrast = newVal.intValue();
+            lblContrastValue.setText(String.valueOf(contrast));
+            imgPreview.setEffect(new ColorAdjust(0, 0, contrast / 100, brightness / 100));
         });
     }
 

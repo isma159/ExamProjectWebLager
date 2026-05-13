@@ -3,6 +3,7 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.ScrollPane?>
@@ -25,16 +26,16 @@
         </styleClass>
         <Region prefWidth="15.0" />
         <Label styleClass="h2" text="Activity Logs" />
-        <TextField fx:id="txtFldSearchLogs" prefHeight="30.0" prefWidth="220.0" promptText="Search logs…" styleClass="container">
+        <TextField fx:id="txtFldSearchLogs" prefHeight="30.0" prefWidth="210.0" promptText="Search logs…" styleClass="container">
          <HBox.margin>
             <Insets left="15.0" right="15.0" />
          </HBox.margin></TextField>
         <Region HBox.hgrow="ALWAYS" />
-      <Button mnemonicParsing="false" onAction="#onExportBtnClick" prefHeight="33.0" prefWidth="120.0" styleClass="primary-btn">
+      <Button mnemonicParsing="false" onAction="#onExportBtnClick" prefHeight="33.0" prefWidth="135.0" styleClass="primary-btn">
          <graphic>
             <HBox alignment="CENTER">
                <children>
-                  <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="&#xe956;">
+                  <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -67,7 +68,7 @@
             <ToggleGroup fx:id="logsFilter" />
          </toggleGroup>
         </ToggleButton>
-        <ToggleButton mnemonicParsing="false" onAction="#onTbCreateLogsClick" prefHeight="30.0" prefWidth="75.0" text="Scan" toggleGroup="$logsFilter">
+        <ToggleButton mnemonicParsing="false" onAction="#onTbScanLogsClick" prefHeight="30.0" prefWidth="75.0" text="Scan" toggleGroup="$logsFilter">
             <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
         </ToggleButton>
       <ToggleButton layoutX="103.0" layoutY="11.0" mnemonicParsing="false" onAction="#onTbCreateLogsClick" prefHeight="30.0" prefWidth="75.0" text="Create" toggleGroup="$logsFilter">
@@ -79,13 +80,13 @@
         <ToggleButton mnemonicParsing="false" onAction="#onTbDeleteLogsClick" prefHeight="30.0" prefWidth="75.0" text="Delete" toggleGroup="$logsFilter">
             <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
         </ToggleButton>
-      <ToggleButton layoutX="271.0" layoutY="11.0" mnemonicParsing="false" onAction="#onTbDeleteLogsClick" prefHeight="30.0" prefWidth="75.0" text="Export" toggleGroup="$logsFilter">
+      <ToggleButton layoutX="271.0" layoutY="11.0" mnemonicParsing="false" onAction="#onTbExportLogsClick" prefHeight="30.0" prefWidth="75.0" text="Export" toggleGroup="$logsFilter">
          <styleClass>
             <String fx:value="filter-btn" />
             <String fx:value="lbl" />
          </styleClass>
       </ToggleButton>
-      <ToggleButton layoutX="355.0" layoutY="11.0" mnemonicParsing="false" onAction="#onTbDeleteLogsClick" prefHeight="30.0" prefWidth="75.0" text="Login" toggleGroup="$logsFilter">
+      <ToggleButton layoutX="355.0" layoutY="11.0" mnemonicParsing="false" onAction="#onTbLoginLogsClick" prefHeight="30.0" prefWidth="75.0" text="Login" toggleGroup="$logsFilter">
          <styleClass>
             <String fx:value="filter-btn" />
             <String fx:value="lbl" />
@@ -93,54 +94,11 @@
       </ToggleButton>
 
         <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="24.0" styleClass="grey-separator" />
-
-        <!-- Text filters -->
-        <TextField fx:id="txtFldFilterUser" prefHeight="30.0" prefWidth="160.0" promptText="User" styleClass="container" />
-        <TextField fx:id="txtFldFilterDocument" prefHeight="30.0" prefWidth="160.0" promptText="Document" styleClass="container" />
-        <TextField fx:id="txtFldFilterDateFrom" prefHeight="30.0" prefWidth="130.0" promptText="From DD/MM/YYYY" styleClass="container" />
-        <TextField fx:id="txtFldFilterDateTo" prefHeight="30.0" prefWidth="130.0" promptText="To DD/MM/YYYY" styleClass="container" />
+      <DatePicker fx:id="dtPickerFrom" prefHeight="30.0" prefWidth="120.0" promptText="Start Date" />
+      <DatePicker fx:id="dtPickerTo" layoutX="534.0" layoutY="11.0" prefHeight="30.0" prefWidth="120.0" promptText="End Date" />
 
         <Region HBox.hgrow="ALWAYS" />
         <Region prefWidth="15.0" />
-    </HBox>
-
-    <!-- ── Column headers ── -->
-    <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="1800.0">
-        <styleClass>
-            <String fx:value="second-card-bg" />
-            <String fx:value="box-card" />
-        </styleClass>
-      <HBox alignment="CENTER" prefWidth="120.0" HBox.hgrow="NEVER" />
-        <Separator orientation="VERTICAL" prefHeight="33.0" styleClass="grey-separator" />
-      <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-         <children>
-              <Label alignment="CENTER" onMouseClicked="#onUsernameClick" styleClass="lbl" text="Username" />
-         </children>
-      </HBox>
-        <Separator orientation="VERTICAL" prefHeight="33.0" styleClass="grey-separator" />
-      <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-         <children>
-              <Label alignment="CENTER" onMouseClicked="#onActionClick" styleClass="lbl" text="Action" />
-         </children>
-      </HBox>
-        <Separator orientation="VERTICAL" prefHeight="33.0" styleClass="grey-separator" />
-      <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-         <children>
-              <Label alignment="CENTER" onMouseClicked="#onFileIdClick" styleClass="lbl" text="Entity Type" />
-         </children>
-      </HBox>
-        <Separator orientation="VERTICAL" prefHeight="33.0" styleClass="grey-separator" />
-      <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-         <children>
-              <Label alignment="CENTER" onMouseClicked="#onTimestampClick" styleClass="lbl" text="Entity ID" />
-         </children>
-      </HBox>
-      <Separator layoutX="1167.0" layoutY="10.0" orientation="VERTICAL" prefHeight="33.0" styleClass="grey-separator" />
-      <HBox alignment="CENTER" layoutX="1407.0" layoutY="10.0" HBox.hgrow="ALWAYS">
-         <children>
-            <Label alignment="CENTER" onMouseClicked="#onTimestampClick" styleClass="lbl" text="Timestamp" />
-         </children>
-      </HBox>
     </HBox>
 
        <!-- ── Rows ── -->

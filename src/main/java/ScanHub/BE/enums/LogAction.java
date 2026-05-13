@@ -5,5 +5,6 @@ public enum LogAction {
     DELETE,
     SCAN,
     EXPORT,
-    LOGIN
+    LOGIN,
+    ERROR
 }

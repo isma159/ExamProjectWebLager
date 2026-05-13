@@ -16,13 +16,13 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox styleClass="dark" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="810.0" prefWidth="510.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
    <children>
       <VBox prefHeight="810.0" prefWidth="520" styleClass="background">
           <padding>
             <Insets bottom="0" left="0" right="0" top="0" />
          </padding>
-          <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12">
+          <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12" styleClass="primary-navigation-bg">
               <padding>
                <Insets bottom="0" left="20" right="20" top="0" />
             </padding>
@@ -31,25 +31,25 @@
                       <Image url="@../images/Green/WeblagerGreenIcon.png" />
                   </image>
               </ImageView>
-              <Label fx:id="formTitle" text="Create user" textFill="WHITE" />
-              <Region HBox.hgrow="ALWAYS" />
+              <Label fx:id="formTitle" styleClass="bold-lbl" text="Create user" textFill="WHITE" />
+              <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" HBox.hgrow="ALWAYS" />
               <Label fx:id="userIdLabel" text="" />
           </HBox>
           <VBox alignment="CENTER" prefWidth="540.0" VBox.vgrow="ALWAYS">
               <padding>
-               <Insets bottom="24" left="24" right="24" top="24" />
+               <Insets left="24.0" right="24.0" top="24.0" />
             </padding>
               <VBox prefHeight="675.0" prefWidth="480.0" spacing="0">
                   <padding>
                   <Insets bottom="24" left="24" right="24" top="24" />
                </padding>
-                  <Label styleClass="lbl" text="Username" />
+                  <Label styleClass="bold-lbl" text="Username" />
                   <Region prefHeight="6" />
                   <TextField fx:id="usernameField" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30" promptText="e.g. jens.hansen" styleClass="container" />
                   <Label fx:id="usernameError" managed="false" text="Username is required." visible="false" />
       
                   <Region prefHeight="18" />
-                  <Label styleClass="lbl" text="Password" />
+                  <Label styleClass="bold-lbl" text="Password" />
                   <Region prefHeight="4" />
                   <Label fx:id="passwordHint" styleClass="lbl" text="Choose a password for this user." />
                   <Region prefHeight="8" />
@@ -60,11 +60,11 @@
                   <Label fx:id="confirmError" managed="false" text="Passwords do not match." visible="false" />
       
                   <Region prefHeight="18" />
-                  <Label styleClass="lbl" text="Role" />
+                  <Label styleClass="bold-lbl" text="Role" />
                   <Region prefHeight="4" />
                   <Label styleClass="lbl" text="Defines what the user can access in the system." />
                   <Region prefHeight="8" />
-                  <VBox fx:id="vboxRole" spacing="8">
+                  <VBox fx:id="vboxRole" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="135.0" spacing="8">
                       <padding>
                      <Insets bottom="14" left="14" right="14" top="14" />
                   </padding>
@@ -87,9 +87,13 @@
                               <Label prefWidth="360" styleClass="lbl" text="Full access. Can manage users, profiles, and view all logs." wrapText="true" />
                           </VBox>
                       </HBox>
+                  <styleClass>
+                     <String fx:value="card" />
+                     <String fx:value="second-card-bg" />
+                  </styleClass>
                   </VBox>
                   <Region prefHeight="18" />
-                  <Label styleClass="lbl" text="Assign profiles" />
+                  <Label styleClass="bold-lbl" text="Assign profiles" />
                   <Region prefHeight="4" />
                   <Label styleClass="lbl" text="Select which profiles this user can access." />
                   <Region prefHeight="8" />
@@ -97,6 +101,10 @@
                       <content>
                           <VBox fx:id="vboxProfiles" prefHeight="50.0" prefWidth="100.0" />
                       </content>
+                  <styleClass>
+                     <String fx:value="card" />
+                     <String fx:value="second-card-bg" />
+                  </styleClass>
                   </ScrollPane>
                <styleClass>
                   <String fx:value="card" />
@@ -104,7 +112,7 @@
                </styleClass>
               </VBox>
           </VBox>
-          <HBox alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="520.0" spacing="8">
+          <HBox alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="520.0" spacing="8">
               <padding>
                <Insets bottom="0" left="24" right="24" top="0" />
             </padding>

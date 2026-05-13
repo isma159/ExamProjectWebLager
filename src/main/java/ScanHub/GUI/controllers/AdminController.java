@@ -67,6 +67,8 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/ShortcutsView.fxml");
             }
         });
+
+        javafx.application.Platform.runLater(this::registerShortcuts);
     }
 
     private void loadPage(String fxml) {

@@ -80,6 +80,7 @@ public class AdminMetadataController implements Initializable {
 
 
 
+    // TODO: needs to be removed properly
     @FXML private void onTbAllMetadataClick()   { loadMetadata(); }
     @FXML private void onTbWithMetadataClick()  {}
     @FXML private void onTbNoMetadataClick()    {}

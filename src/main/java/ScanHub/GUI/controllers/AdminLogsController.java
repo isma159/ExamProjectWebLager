@@ -1,16 +1,23 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.Log;
+import ScanHub.BE.enums.LogAction;
+import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
+import ScanHub.GUI.util.ViewHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -22,24 +29,23 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class AdminLogsController implements Initializable {
 
     @FXML private TextField txtFldSearchLogs;
-    @FXML private TextField txtFldFilterUser;
-    @FXML private TextField txtFldFilterDateFrom;
-    @FXML private TextField txtFldFilterDateTo;
-    @FXML private TextField txtFldFilterDocument;
+    @FXML private DatePicker dtPickerFrom, dtPickerTo;
     @FXML private ToggleGroup logsFilter;
     @FXML private VBox logsTableBox;
     @FXML private Pagination logsPagination;
 
-    private final ModelFacade modelFacade;
-    private final Stage currentStage;
-    private String activeAction = null;
+    private ModelFacade modelFacade;
+    private LogAction selectedAction = null;
+    private Stage currentStage;
+
+    private List<Log> currentLogs = new ArrayList<>();
 
     private final int ROWS_PER_PAGE = 15;
-    private List<Log> allFilteredLogs = new ArrayList<>();
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -56,16 +62,13 @@ public class AdminLogsController implements Initializable {
             e.printStackTrace();
         }
 
-        // Listeners for text fields
-        txtFldSearchLogs.textProperty().addListener((obs, o, n) -> resetAndApply());
-        txtFldFilterUser.textProperty().addListener((obs, o, n) -> resetAndApply());
-        txtFldFilterDateFrom.textProperty().addListener((obs, o, n) -> resetAndApply());
-        txtFldFilterDateTo.textProperty().addListener((obs, o, n) -> resetAndApply());
-        txtFldFilterDocument.textProperty().addListener((obs, o, n) -> resetAndApply());
+        txtFldSearchLogs.textProperty().addListener((obs, o, n) -> applyFilters());
+        dtPickerFrom.valueProperty().addListener((obs, o, n) -> applyFilters());
+        dtPickerTo.valueProperty().addListener((obs, o, n) -> applyFilters());
 
         // Manual Pagination Listener (instead of Page Factory)
         logsPagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
-            renderLogsForCurrentPage();
+            applyFilters();
         });
 
         applyFilters();
@@ -77,9 +80,9 @@ public class AdminLogsController implements Initializable {
     }
 
     private void applyFilters() {
-        String search = txtFldSearchLogs.getText().toLowerCase();
-        LocalDate dateFrom = tryParseDate(txtFldFilterDateFrom.getText());
-        LocalDate dateTo = tryParseDate(txtFldFilterDateTo.getText());
+        String search = txtFldSearchLogs.getText();
+        LocalDate dateFrom = dtPickerFrom.getValue();
+        LocalDate dateTo = dtPickerTo.getValue();
 
         try {
             List<Log> logs = modelFacade.getLogModel().getLogs();
@@ -91,43 +94,54 @@ public class AdminLogsController implements Initializable {
                                 !log.getTimestamp().toLocalDate().isAfter(dateTo)).toList();
             }
 
-            if (activeAction != null) {
-                logs = logs.stream().filter(log -> log.getAction().name().equals(activeAction)).toList();
+            if (selectedAction != null) {
+
+                logs = logs.stream().filter(log -> log.getAction() == selectedAction).toList();
+
             }
 
-            FilteredList<Log> filteredList = new FilteredList<>(FXCollections.observableArrayList(logs));
-            filteredList.setPredicate(log -> {
+            FilteredList<Log> filteredLogs = new FilteredList<>(FXCollections.observableArrayList(logs));
+            filteredLogs.setPredicate(log -> {
+
                 if (search.isBlank()) return true;
-                return log.getUser().getUsername().toLowerCase().contains(search);
+
+                if (log.getUser().getUsername().contains(search)) {
+                    return true;
+                } else if (String.valueOf(log.getLogId()).contains(search)) {
+                    return true;
+                } else {
+                    return false;
+                }
             });
 
-            allFilteredLogs = new ArrayList<>(filteredList);
+            renderLogsForCurrentPage(filteredLogs);
 
-            // Calculate and set page count
-            int pageCount = Math.max(1, (int) Math.ceil((double) allFilteredLogs.size() / ROWS_PER_PAGE));
-            logsPagination.setPageCount(pageCount);
-
-            renderLogsForCurrentPage();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void renderLogsForCurrentPage() {
+    private void renderLogsForCurrentPage(List<Log> logs) {
         logsTableBox.getChildren().clear();
+        currentLogs.clear();
+        currentLogs.addAll(logs);
 
-        if (allFilteredLogs.isEmpty()) {
+        if (logs.isEmpty()) {
             Label empty = new Label("No logs found.");
             empty.getStyleClass().add("lbl");
             logsTableBox.getChildren().add(empty);
             return;
         }
 
+        // Calculate and set page count
+        int pageCount = Math.ceilDiv(logs.size(), ROWS_PER_PAGE);
+        logsPagination.setPageCount(pageCount);
+
         int startIndex = logsPagination.getCurrentPageIndex() * ROWS_PER_PAGE;
-        int endIndex = Math.min(startIndex + ROWS_PER_PAGE, allFilteredLogs.size());
+        int endIndex = Math.min(startIndex + ROWS_PER_PAGE, logs.size());
 
         // Extract sublist for the current page
-        List<Log> pageItems = allFilteredLogs.subList(startIndex, endIndex);
+        List<Log> pageItems = logs.subList(startIndex, endIndex);
 
         for (Log log : pageItems) {
             HBox row = RowMaker.addLogRow(log);
@@ -135,32 +149,35 @@ public class AdminLogsController implements Initializable {
         }
     }
 
-    private LocalDate tryParseDate(String text) {
-        try {
-            return LocalDate.parse(text.trim(), DATE_FORMAT);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     @FXML private void onExportBtnClick() {
         try {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save Export");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-            fileChooser.setInitialFileName("activityLog.csv");
-            File file = fileChooser.showSaveDialog(currentStage);
-            if (file != null) {
-                modelFacade.getLogModel().exportLogs(file.toPath(), allFilteredLogs);
+            if (!currentLogs.isEmpty()) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save Export");
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+                fileChooser.setInitialFileName("activityLog.csv");
+
+                File file = fileChooser.showSaveDialog(currentStage);
+
+                modelFacade.getLogModel().exportLogs(file.toPath(), currentLogs);
             }
-        } catch (Exception e) {
+            else {
+                AlertHelper.showError("No Logs", "There are no logs to export.");
+            }
+        }
+        catch (Exception e) {
             e.printStackTrace();
+            // TODO Alert View?
         }
     }
 
-    @FXML private void onTbAllLogsClick(ActionEvent e)    { activeAction = null;           resetAndApply(); }
-    @FXML private void onTbCreateLogsClick(ActionEvent e) { activeAction = "FILE_CREATED"; resetAndApply(); }
-    @FXML private void onTbDeleteLogsClick(ActionEvent e) { activeAction = "FILE_DELETED"; resetAndApply(); }
+    @FXML private void onTbAllLogsClick(ActionEvent e)    { selectedAction = null;           applyFilters(); }
+    @FXML private void onTbCreateLogsClick(ActionEvent e) { selectedAction = LogAction.CREATE; applyFilters(); }
+    @FXML private void onTbDeleteLogsClick(ActionEvent e) { selectedAction = LogAction.DELETE; applyFilters(); }
+    @FXML private void onTbScanLogsClick(ActionEvent e) { selectedAction = LogAction.SCAN; applyFilters(); }
+    @FXML private void onTbExportLogsClick(ActionEvent e) { selectedAction = LogAction.EXPORT; applyFilters(); }
+    @FXML private void onTbLoginLogsClick(ActionEvent e) { selectedAction = LogAction.LOGIN; applyFilters(); }
+
 
     @FXML private void onUsernameClick(MouseEvent e) {}
     @FXML private void onActionClick(MouseEvent e) {}
