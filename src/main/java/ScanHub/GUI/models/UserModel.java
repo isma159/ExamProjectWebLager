@@ -10,8 +10,8 @@ import javafx.collections.ObservableList;
 
 
 public class UserModel {
-    private ObservableList<User> userObservableList;
-    private UserManager userManager = new UserManager();
+    private final ObservableList<User> userObservableList;
+    private final UserManager userManager = new UserManager();
 
     public UserModel() throws Exception {
         userObservableList = FXCollections.observableArrayList();

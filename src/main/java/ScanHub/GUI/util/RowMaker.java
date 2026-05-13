@@ -4,6 +4,8 @@ package ScanHub.GUI.util;
 import ScanHub.BE.*;
 
 // java imports
+import ScanHub.BE.enums.LogAction;
+import ScanHub.BE.enums.ProfileStatus;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -23,20 +25,18 @@ import java.util.function.BiConsumer;
  * elements like avatars (name initials) and status chips.
  * <p>
  * Optionally supports a click handler via {@link BiConsumer} to define custom
- * behaviour when a row is selected.
+ * behavior when a row is selected.
  */
 public class RowMaker {
 
-    private static final double ROW_HEIGHT      = 45.0;
-    private static final double ROW_PREF_WIDTH  = 200.0;
+    private static final double ROW_HEIGHT = 45.0;
+    private static final double ROW_PREF_WIDTH = 200.0;
     private static final double COL_PREF_HEIGHT = 100.0;
-    private static final double COL_PREF_WIDTH  = 200.0;
-    private static final double AVATAR_SIZE     = 30.0;
-    private static final double SPACER_WIDTH    = 9.0;
+    private static final double COL_PREF_WIDTH = 200.0;
+    private static final double AVATAR_SIZE = 30.0;
+    private static final double SPACER_WIDTH = 9.0;
 
-    private static final DateTimeFormatter DATETIME_FORMATTER =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
+    private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public static HBox addUserRow(User user) {
         return addUserRow(user, null);
@@ -60,7 +60,7 @@ public class RowMaker {
     }
 
     public static HBox addProfileRow(Profile profile, BiConsumer<Profile, HBox> onSelect) {
-        HBox col1 = createAvatarNameCol(profile.getProfileName());
+        HBox col1 = centeredCol(createLabel(profile.getProfileName()));
         HBox col2 = centeredCol(createLabel(profile.getSplitBehavior().toString() + "-SPLIT"));
         HBox col3 = centeredCol(createLabel(profile.getExportLabel()));
         HBox col4 = centeredCol(profileStatusChip(profile));
@@ -125,8 +125,7 @@ public class RowMaker {
         return row;
     }
 
-    public static HBox addProfileRowToForm(Profile profile, User user,
-                                           BiConsumer<Profile, Boolean> onCheckChanged) {
+    public static HBox addProfileRowToForm(Profile profile, User user, BiConsumer<Profile, Boolean> onCheckChanged) {
         CheckBox checkBox = new CheckBox();
         checkBox.setMnemonicParsing(false);
 
@@ -134,18 +133,12 @@ public class RowMaker {
             checkBox.setSelected(user.getProfiles().contains(profile));
         }
 
-        checkBox.selectedProperty().addListener(
-                (obs, oldVal, newVal) -> onCheckChanged.accept(profile, newVal));
+        checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> onCheckChanged.accept(profile, newVal));
 
-        return buildFormRow(
-                checkBox,
-                profile.getProfileName(),
-                profileStatusChip(profile)
-        );
+        return buildFormRow(checkBox, profile.getProfileName(), profileStatusChip(profile));
     }
 
-    public static HBox addUserRowToForm(User user, Profile profile,
-                                        BiConsumer<User, Boolean> onCheckChanged) {
+    public static HBox addUserRowToForm(User user, Profile profile, BiConsumer<User, Boolean> onCheckChanged) {
         CheckBox checkBox = new CheckBox();
         checkBox.setMnemonicParsing(false);
 
@@ -153,18 +146,12 @@ public class RowMaker {
             checkBox.setSelected(user.getProfiles().contains(profile));
         }
 
-        checkBox.selectedProperty().addListener(
-                (obs, oldVal, newVal) -> onCheckChanged.accept(user, newVal));
+        checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> onCheckChanged.accept(user, newVal));
 
-        return buildFormRow(
-                checkBox,
-                user.getUsername(),
-                ChipMaker.createChip(user.getRole().toString(), "chip-color")
-        );
+        return buildFormRow(checkBox, user.getUsername(), ChipMaker.createChip(user.getRole().toString(), "chip-color"));
     }
 
-    // Rows
-
+    /** Base row shared by all non-form rows. */
     private static HBox createBaseRow() {
         HBox row = new HBox();
         row.getStyleClass().add("box-card");
@@ -175,6 +162,10 @@ public class RowMaker {
         return row;
     }
 
+    /**
+     * Builds the checkbox form row shared by {@code addProfileRowToForm} and
+     * {@code addUserRowToForm}, differing only in the display name and chip.
+     */
     private static HBox buildFormRow(CheckBox checkBox, String displayName, HBox chip) {
         HBox chipHolder = new HBox(chip);
         chipHolder.setAlignment(Pos.CENTER);
@@ -184,15 +175,15 @@ public class RowMaker {
         HBox.setHgrow(chipHolder, Priority.NEVER);
 
         HBox row = new HBox(
-                fixedSpacer(SPACER_WIDTH),
+                fixedSpacer(),
                 checkBox,
-                fixedSpacer(SPACER_WIDTH),
+                fixedSpacer(),
                 createAvatarPane(displayName),
-                fixedSpacer(SPACER_WIDTH),
+                fixedSpacer(),
                 createLabel(displayName),
                 growingSpacer(),
                 chipHolder,
-                fixedSpacer(SPACER_WIDTH)
+                fixedSpacer()
         );
 
         row.setAlignment(Pos.CENTER);
@@ -204,9 +195,7 @@ public class RowMaker {
         return row;
     }
 
-
-    // Columns
-
+    /** Creates a centered, growing HBox column containing the given node. */
     private static HBox centeredCol(javafx.scene.Node node) {
         HBox col = new HBox(node);
         col.setAlignment(Pos.CENTER);
@@ -215,10 +204,11 @@ public class RowMaker {
         return col;
     }
 
+    /** Column 1 variant: circular avatar + spacer + name label. */
     private static HBox createAvatarNameCol(String name) {
         HBox col = new HBox(
                 createAvatarPane(name),
-                fixedSpacer(SPACER_WIDTH),
+                fixedSpacer(),
                 createLabel(name)
         );
         col.setAlignment(Pos.CENTER);
@@ -227,9 +217,7 @@ public class RowMaker {
         return col;
     }
 
-
-    // Nodes
-
+    /** Creates a label with the "lbl" style class and optional preferred width. */
     private static Label createLabel(String text, double prefWidth) {
         Label lbl = createLabel(text);
         lbl.setAlignment(Pos.CENTER);
@@ -246,6 +234,7 @@ public class RowMaker {
         return lbl;
     }
 
+    /** Circular avatar pane showing the first character of {@code name}. */
     private static Pane createAvatarPane(String name) {
         Label initial = new Label(name.strip().substring(0, 1));
         initial.setAlignment(Pos.CENTER);
@@ -261,27 +250,31 @@ public class RowMaker {
         return avatar;
     }
 
-    private static Region fixedSpacer(double width) {
+    /** Fixed-width spacer that never grows. */
+    private static Region fixedSpacer() {
         Region spacer = new Region();
         spacer.setMaxWidth(Region.USE_PREF_SIZE);
         spacer.setMinWidth(Region.USE_PREF_SIZE);
-        spacer.setPrefSize(width, COL_PREF_HEIGHT);
+        spacer.setPrefSize(RowMaker.SPACER_WIDTH, COL_PREF_HEIGHT);
         HBox.setHgrow(spacer, Priority.NEVER);
         return spacer;
     }
 
+    /** Growing spacer that pushes subsequent nodes to the right. */
     private static Region growingSpacer() {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         return spacer;
     }
 
+    /** Returns the appropriate status chip for a {@link Profile}. */
     private static HBox profileStatusChip(Profile profile) {
         return profile.getStatus() == ProfileStatus.ACTIVE
-                ? ChipMaker.createChip("Active",   "chip-color-success")
+                ? ChipMaker.createChip("Active", "chip-color-success")
                 : ChipMaker.createChip("Inactive", "chip-color-error");
     }
 
+    /** Builds the human-readable description string for a log entry. */
     private static String buildLogDescription(Log log) {
         String ts = log.getTimestamp().format(DATETIME_FORMATTER);
 
@@ -290,17 +283,18 @@ public class RowMaker {
         }
 
         String verb = switch (log.getAction()) {
-            case EXPORT -> "exported";
-            case CREATE -> "created";
-            case DELETE -> "deleted";
-            case SCAN   -> "scanned";
-            default     -> log.getAction().toString();
+            case EXPORT -> "Exported";
+            case CREATE -> "Created";
+            case DELETE -> "Deleted";
+            case SCAN -> "Scanned";
+            default -> log.getAction().toString();
         };
 
-        return log.getUser().getUsername() + " " + verb + " " + log.getEntityType().toString().toLowerCase()
+        return verb + " " + log.getEntityType().toString().toLowerCase()
                 + " " + log.getEntityId() + " on " + ts;
     }
 
+    /** Attaches a mouse-click handler to {@code row} if {@code handler} is non-null. */
     private static <T> void attachClickHandler(HBox row, T item, BiConsumer<T, HBox> handler) {
         if (handler != null) {
             row.setOnMouseClicked(e -> handler.accept(item, row));

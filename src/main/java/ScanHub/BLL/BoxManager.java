@@ -11,8 +11,8 @@ import ScanHub.DAL.interfaces.IDataAccess;
 import java.util.List;
 
 public class BoxManager {
-    private IDataAccess<Box> dataAccess;
-    private BoxDAO boxDAO;
+    private final IDataAccess<Box> dataAccess;
+    private final BoxDAO boxDAO;
 
     public BoxManager() throws Exception {
         boxDAO = new BoxDAO();

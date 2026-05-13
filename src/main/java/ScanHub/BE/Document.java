@@ -14,6 +14,7 @@ public class Document implements TreeNode {
     private LocalDateTime createdAt;
     private List<File> files;
     private boolean staged = false;
+    private boolean modified = false;
 
     public Document() {
         this.files = new ArrayList<>();
@@ -31,16 +32,14 @@ public class Document implements TreeNode {
     public List<File> getFiles() { return files; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public boolean isStaged() { return staged; }
+    public boolean isModified() { return modified; }
 
     public void setDocumentId(int documentId) { this.documentId = documentId; }
     public void setBoxId(int boxId) { this.boxId = boxId; }
     public void setFiles(List<File> files) { this.files = files; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setStaged(boolean staged) { this.staged = staged; }
-
-    public void addFile(File file) {this.files.add(file);}
-
-    //public void addFile(File file) {this.files.add(file);}
+    public void setModified(boolean modified) { this.modified = modified; }
 
     @Override
     public String toString() {

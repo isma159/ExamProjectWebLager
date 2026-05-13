@@ -1,6 +1,6 @@
 package ScanHub.GUI.util;
 
-// java imports
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -9,58 +9,35 @@ import javafx.scene.layout.Region;
 
 public class ChipMaker {
 
+    private static final double HEIGHT = 30;
+    private static final double WIDTH = 75;
+    private static final double SPACER = 6;
+
     public static HBox createChip(String text, String colorStyleClass) {
-        // Outer HBox
-        HBox outerHBox = new HBox();
-        outerHBox.setAlignment(Pos.CENTER_RIGHT);
-        outerHBox.setMaxHeight(Double.NEGATIVE_INFINITY);
-        outerHBox.setMinHeight(Double.NEGATIVE_INFINITY);
-        outerHBox.setPrefHeight(30.0);
-        outerHBox.setPrefWidth(75.0);
-        outerHBox.getStyleClass().add(colorStyleClass); // e.g. "chip-color-success"
 
-        // Left spacer region
-        Region leftSpacer = new Region();
-        leftSpacer.setMaxWidth(Double.NEGATIVE_INFINITY);
-        leftSpacer.setMinWidth(Double.NEGATIVE_INFINITY);
-        leftSpacer.setPrefHeight(30.0);
-        leftSpacer.setPrefWidth(6.0);
-
-        // Inner HBox
-        HBox innerHBox = new HBox();
-        innerHBox.setAlignment(Pos.CENTER);
-        innerHBox.setPrefHeight(30.0);
-        innerHBox.setPrefWidth(69.0);
-        innerHBox.getStyleClass().add("chip");
-        HBox.setHgrow(innerHBox, Priority.ALWAYS);
-
-        // Inner left spacer
-        Region innerLeftSpacer = new Region();
-        innerLeftSpacer.setMaxWidth(Double.NEGATIVE_INFINITY);
-        innerLeftSpacer.setMinWidth(Double.NEGATIVE_INFINITY);
-        innerLeftSpacer.setPrefHeight(30.0);
-        innerLeftSpacer.setPrefWidth(6.0);
-        HBox.setHgrow(innerLeftSpacer, Priority.NEVER);
-
-        // Label
         Label label = new Label(text);
         label.setAlignment(Pos.CENTER);
         label.getStyleClass().add("lbl");
 
-        // Inner right spacer
-        Region innerRightSpacer = new Region();
-        innerRightSpacer.setLayoutX(10.0);
-        innerRightSpacer.setLayoutY(10.0);
-        innerRightSpacer.setMaxWidth(Double.NEGATIVE_INFINITY);
-        innerRightSpacer.setMinWidth(Double.NEGATIVE_INFINITY);
-        innerRightSpacer.setPrefHeight(30.0);
-        innerRightSpacer.setPrefWidth(6.0);
-        HBox.setHgrow(innerRightSpacer, Priority.NEVER);
+        HBox inner = new HBox(label);
+        inner.setAlignment(Pos.CENTER);
+        inner.setPrefSize(WIDTH - SPACER, HEIGHT);
+        inner.setPadding(new Insets(0, SPACER, 0, SPACER));
+        inner.getStyleClass().add("chip");
+        HBox.setHgrow(inner, Priority.ALWAYS);
 
-        innerHBox.getChildren().addAll(innerLeftSpacer, label, innerRightSpacer);
-        outerHBox.getChildren().addAll(leftSpacer, innerHBox);
+        Region leftSpacer = new Region();
+        leftSpacer.setPrefWidth(SPACER);
 
-        return outerHBox;
+        HBox outer = new HBox(leftSpacer, inner);
+        outer.setAlignment(Pos.CENTER_RIGHT);
+        outer.setPrefSize(WIDTH, HEIGHT);
+        outer.setMaxWidth(Region.USE_PREF_SIZE);
+        outer.setMaxHeight(Region.USE_PREF_SIZE);
+        outer.setMinWidth(Region.USE_PREF_SIZE);
+        outer.setMinHeight(Region.USE_PREF_SIZE);
+        outer.getStyleClass().add(colorStyleClass);
+
+        return outer;
     }
-
 }

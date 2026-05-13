@@ -1,6 +1,8 @@
 package ScanHub.BE;
 
 // java imports
+import ScanHub.BE.enums.Role;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

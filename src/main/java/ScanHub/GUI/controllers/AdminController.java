@@ -1,14 +1,11 @@
 package ScanHub.GUI.controllers;
 
 // project imports
-import ScanHub.BE.User;
-import ScanHub.BLL.SessionManager;
 import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
-import ScanHub.Main;
 
 // java imports
 import javafx.event.ActionEvent;
@@ -39,16 +36,14 @@ public class AdminController implements IViewController, Initializable {
 
     private Stage currentStage;
     private ModelFacade modelFacade;
-    private SessionManager sessionManager = SessionManager.getInstance();
-
-    public AdminController() throws Exception {
-    }
 
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
         this.currentStage = currentStage;
 
         sidebarBtns.selectToggle(dashboardBtn);
+        lblUsername.setText(modelFacade.getSessionModel().getCurrentUser().getUsername());
+        lblRole.setText(modelFacade.getSessionModel().getCurrentUser().getRole().toString());
     }
 
     @Override
@@ -72,9 +67,6 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/ShortcutsView.fxml");
             }
         });
-
-        lblUsername.setText(sessionManager.getCurrentUser().getUsername());
-        lblRole.setText(sessionManager.getCurrentUser().getRole().toString());
 
         javafx.application.Platform.runLater(this::registerShortcuts);
     }
@@ -180,7 +172,7 @@ public class AdminController implements IViewController, Initializable {
                 ViewHandler handler = ViewHandler.LOGIN;
                 handler.reset();
                 handler.show(modelFacade);
-                sessionManager.logout();
+                modelFacade.getSessionModel().logout();
                 currentStage.close();
             } catch (Exception e) {
                 e.printStackTrace();

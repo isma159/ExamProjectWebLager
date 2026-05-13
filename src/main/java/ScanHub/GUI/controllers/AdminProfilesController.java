@@ -2,7 +2,9 @@ package ScanHub.GUI.controllers;
 
 // project imports
 import ScanHub.BE.*;
-import ScanHub.BLL.SessionManager;
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
+import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
@@ -32,14 +34,15 @@ public class AdminProfilesController implements Initializable {
     @FXML private VBox profileTableBox;
     @FXML private TextField txtFldSearchProfiles;
     @FXML private Pagination pgProfiles;
+
+    private final ModelFacade modelFacade;
+    private Stage currentStage;
+
     private List<Profile> currentProfiles = new ArrayList<>();
     private boolean profileAscending;
-    private ModelFacade modelFacade;
     private Profile selectedProfile = null;
     private ProfileStatus selectedStatus = null;
     private HBox selectedProfileRow;
-    private SessionManager sessionManager = SessionManager.getInstance();
-    private Stage currentStage;
 
     private final int TOTAL_TABLE_SIZE = 15;
 
@@ -163,7 +166,7 @@ public class AdminProfilesController implements Initializable {
         AlertHelper.showConfirmation("Delete Profile", "Are you sure you want to delete the profile \"" + selectedProfile.getProfileName() + "\"? This action cannot be undone.", () -> {
                     try {
                         modelFacade.getProfileModel().deleteProfile(selectedProfile);
-                        modelFacade.getLogModel().createLog(new Log(sessionManager.getCurrentUser(), selectedProfile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
+                        modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedProfile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
                         loadProfiles();
                     } catch (Exception e) {
                         e.printStackTrace();

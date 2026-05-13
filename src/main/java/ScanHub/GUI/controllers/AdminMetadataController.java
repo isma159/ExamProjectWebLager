@@ -1,7 +1,6 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.BoxMetadata;
-import ScanHub.BE.Profile;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
@@ -12,8 +11,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -24,10 +21,9 @@ public class AdminMetadataController implements Initializable {
     @FXML private TextField txtFldSearchMetadata;
     @FXML private Pagination metadataPagination;
 
-    private ModelFacade modelFacade;
+    private final ModelFacade modelFacade;
     private BoxMetadata selected = null;
     private HBox selectedRow = null;
-    private List<BoxMetadata> currentMetadata;
     private Stage currentStage;
 
     private final int TOTAL_TABLE_SIZE = 15;
@@ -56,7 +52,7 @@ public class AdminMetadataController implements Initializable {
             int startIndex = metadataPagination.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
             int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, metadata.size());
 
-            currentMetadata = new ArrayList<>(metadata.subList(startIndex, endIndex));
+            List<BoxMetadata> currentMetadata = new ArrayList<>(metadata.subList(startIndex, endIndex));
             for (BoxMetadata boxMetadata : currentMetadata) {
                 HBox row = RowMaker.addMetadataRow(boxMetadata, (clickedMetadata, rowHBox) -> {
                     if (selectedRow != null) {

@@ -9,8 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class ProfileModel {
-    private ObservableList<Profile> profileObservableList;
-    private ProfileManager profileManager = new ProfileManager();
+    private final ObservableList<Profile> profileObservableList;
+    private final ProfileManager profileManager = new ProfileManager();
 
     public ProfileModel() throws Exception {
         profileObservableList = FXCollections.observableArrayList();
@@ -23,9 +23,7 @@ public class ProfileModel {
         return createdProfile;
     }
 
-    public ObservableList<Profile> getProfiles() {
-        return profileObservableList;
-    }
+    public ObservableList<Profile> getProfiles() { return profileObservableList; }
 
     public void refreshProfiles() throws Exception {
         profileObservableList.setAll(profileManager.getProfiles());

@@ -1,5 +1,8 @@
 package ScanHub.BE;
 
+import ScanHub.BE.enums.ProfileStatus;
+import ScanHub.BE.enums.SplitBehavior;
+
 import java.util.Objects;
 
 public class Profile {

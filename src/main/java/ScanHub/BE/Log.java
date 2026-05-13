@@ -1,5 +1,8 @@
 package ScanHub.BE;
 
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
+
 import java.time.LocalDateTime;
 
 public class Log {

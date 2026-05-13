@@ -1,7 +1,10 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.*;
-import ScanHub.BLL.SessionManager;
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
+import ScanHub.BE.enums.ProfileStatus;
+import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
@@ -39,7 +42,6 @@ public class ProfileFormController implements Initializable {
     private ModelFacade modelFacade;
     private Profile editingProfile = null;
     private List<User> selectedUsers;
-    private SessionManager sessionManager = SessionManager.getInstance();
 
     private double brightness;
     private double contrast;
@@ -186,7 +188,7 @@ public class ProfileFormController implements Initializable {
             Profile newProfile = new Profile(selectedClient.getClientId(), profileName, splitBehavior, status, buildExportLabel(profileName), brightness, contrast);
             newProfile.setClient(selectedClient);
             Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
-            modelFacade.getLogModel().createLog(new Log(sessionManager.getCurrentUser(), createdProfile.getProfileId(), EntityType.PROFILE, LogAction.CREATE, LocalDateTime.now()));
+            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), createdProfile.getProfileId(), EntityType.PROFILE, LogAction.CREATE, LocalDateTime.now()));
             syncUserAssignments(createdProfile);
             currentStage.close();
         } catch (Exception e) {
