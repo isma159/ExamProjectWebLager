@@ -147,7 +147,7 @@ public class AdminProfilesController implements Initializable {
         }
     }
 
-    private void filterProfiles(String search) {
+    private void filterProfiles(String search) { // TODO: needs rework
         for (var node : profileTableBox.getChildren()) {
             HBox row = (HBox) node;
             Profile profile = (Profile) row.getUserData();

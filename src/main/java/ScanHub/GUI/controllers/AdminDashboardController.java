@@ -156,7 +156,7 @@ public class AdminDashboardController implements Initializable {
         filterUsers();
     }
 
-    private void filterUsers() {
+    private void filterUsers() { // TODO: needs rework
         for (var node : userTableBox.getChildren()) {
             HBox row = (HBox) node;
             User user = (User) row.getUserData();
@@ -208,7 +208,7 @@ public class AdminDashboardController implements Initializable {
         filterProfiles();
     }
 
-    private void filterProfiles() {
+    private void filterProfiles() { // TODO: needs rework
         for (var node : profileTableBox.getChildren()) {
             HBox row = (HBox) node;
             Profile profile = (Profile) row.getUserData();

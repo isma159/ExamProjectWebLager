@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import org.controlsfx.control.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import org.controlsfx.control.SearchableComboBox?>
 
-<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="780.0" styleClass="dark" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="780.0" prefWidth="1200.0" styleClass="dark" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
     <children>
         <VBox prefHeight="750.0" prefWidth="750.0" styleClass="background" HBox.hgrow="ALWAYS">
-            <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12.0" styleClass="primary-navigation-bg" VBox.vgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" spacing="12.0" styleClass="primary-navigation-bg" VBox.vgrow="NEVER">
                 <padding>
                     <Insets left="20.0" right="20.0" />
                 </padding>
@@ -24,11 +35,11 @@
             </HBox>
             <HBox VBox.vgrow="ALWAYS">
                 <children>
-                    <VBox HBox.hgrow="ALWAYS">
+                    <VBox prefWidth="400.0" HBox.hgrow="ALWAYS">
                         <padding>
-                            <Insets bottom="6.0" left="12.0" right="6.0" top="12.0" />
+                            <Insets bottom="12.0" left="12.0" right="6.0" top="12.0" />
                         </padding>
-                        <VBox spacing="0">
+                        <VBox spacing="0" VBox.vgrow="ALWAYS">
                             <padding>
                                 <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
                             </padding>
@@ -37,6 +48,7 @@
                             <TextField fx:id="profileNameField" prefHeight="30" prefWidth="422.0" promptText="e.g. Maersk Oil" styleClass="container" />
                             <Region prefHeight="18" />
                             <Label layoutX="36.0" layoutY="36.0" styleClass="bold-lbl" text="Client" />
+                     <Region layoutX="36.0" layoutY="51.0" prefHeight="6" />
                             <SearchableComboBox fx:id="searchableComboBoxClient" prefHeight="30.0" prefWidth="422.0" />
                             <Region layoutX="36.0" layoutY="88.0" prefHeight="18" />
                             <Label styleClass="bold-lbl" text="Split Behavior" />
@@ -71,66 +83,65 @@
                                     <String fx:value="second-card-bg" />
                                 </styleClass>
                             </VBox>
-                            <Region layoutX="35.0" layoutY="123.0" prefHeight="4" />
+                     <Region layoutX="36.0" layoutY="550.0" prefHeight="18" />
+                     <Label styleClass="bold-lbl" text="Profile Status" />
+                     <Region prefHeight="4" />
+                     <Label styleClass="lbl" text="Defines the state the profile is currently in." />
+                     <Region prefHeight="8" />
+                     <VBox fx:id="vboxStatus" spacing="8">
+                        <padding>
+                           <Insets bottom="14" left="14" right="14" top="14" />
+                        </padding>
+                        <children>
+                           <HBox alignment="TOP_LEFT" spacing="10">
+                              <children>
+                                 <RadioButton fx:id="radioACTIVE">
+                                    <toggleGroup>
+                                       <ToggleGroup fx:id="toggleGroupProfileStatus" />
+                                    </toggleGroup>
+                                 </RadioButton>
+                                 <VBox spacing="2">
+                                    <children>
+                                       <Label styleClass="lbl" text="Active" />
+                                       <Label prefWidth="360" styleClass="lbl" text="The profile is available for use and can be assigned to any user." wrapText="true" />
+                                    </children>
+                                 </VBox>
+                              </children>
+                           </HBox>
+                           <Separator />
+                           <HBox alignment="TOP_LEFT" spacing="10">
+                              <children>
+                                 <RadioButton fx:id="radioINACTIVE" toggleGroup="$toggleGroupProfileStatus" />
+                                 <VBox spacing="2">
+                                    <children>
+                                       <Label styleClass="lbl" text="Inactive" />
+                                       <Label prefWidth="360" styleClass="lbl" text="The profile is unable to be utilized for scanning and cannot be assigned" wrapText="true" />
+                                    </children>
+                                 </VBox>
+                              </children>
+                           </HBox>
+                        </children>
+                        <styleClass>
+                           <String fx:value="card" />
+                           <String fx:value="second-card-bg" />
+                        </styleClass>
+                     </VBox>
                             <styleClass>
                                 <String fx:value="card" />
                                 <String fx:value="card-bg" />
                             </styleClass>
                         </VBox>
                     </VBox>
-                    <VBox layoutX="10.0" layoutY="10.0">
+                    <VBox prefWidth="400.0" HBox.hgrow="ALWAYS">
                         <padding>
-                            <Insets bottom="6.0" left="6.0" right="12.0" top="12.0" />
+                            <Insets bottom="12.0" left="6.0" right="6.0" top="12.0" />
                         </padding>
                         <children>
-                            <VBox spacing="0">
+                            <VBox spacing="0" VBox.vgrow="ALWAYS">
                                 <padding>
                                     <Insets bottom="24" left="24" right="24" top="24" />
                                 </padding>
                                 <children>
-                                    <Label layoutX="35.0" layoutY="108.0" styleClass="bold-lbl" text="Profile Status" />
-                                    <Region layoutX="35.0" layoutY="123.0" prefHeight="4" />
-                                    <Label layoutX="35.0" layoutY="127.0" styleClass="lbl" text="Defines the state the profile is currently in." />
-                                    <Region layoutX="35.0" layoutY="141.0" prefHeight="8" />
-                                    <VBox fx:id="vboxStatus" layoutX="35.0" layoutY="149.0" spacing="8">
-                                        <padding>
-                                            <Insets bottom="14" left="14" right="14" top="14" />
-                                        </padding>
-                                        <children>
-                                            <HBox alignment="TOP_LEFT" spacing="10">
-                                                <children>
-                                                    <RadioButton fx:id="radioACTIVE">
-                                                        <toggleGroup>
-                                                            <ToggleGroup fx:id="toggleGroupProfileStatus" />
-                                                        </toggleGroup>
-                                                    </RadioButton>
-                                                    <VBox spacing="2">
-                                                        <children>
-                                                            <Label styleClass="lbl" text="Active" />
-                                                            <Label prefWidth="360" styleClass="lbl" text="The profile is available for use and can be assigned to any user." wrapText="true" />
-                                                        </children>
-                                                    </VBox>
-                                                </children>
-                                            </HBox>
-                                            <Separator />
-                                            <HBox alignment="TOP_LEFT" spacing="10">
-                                                <children>
-                                                    <RadioButton fx:id="radioINACTIVE" toggleGroup="$toggleGroupProfileStatus" />
-                                                    <VBox spacing="2">
-                                                        <children>
-                                                            <Label styleClass="lbl" text="Inactive" />
-                                                            <Label prefWidth="360" styleClass="lbl" text="The profile is unable to be utilized for scanning and cannot be assigned" wrapText="true" />
-                                                        </children>
-                                                    </VBox>
-                                                </children>
-                                            </HBox>
-                                        </children>
-                                        <styleClass>
-                                            <String fx:value="card" />
-                                            <String fx:value="second-card-bg" />
-                                        </styleClass>
-                                    </VBox>
-                                    <Region layoutX="35.0" layoutY="324.0" prefHeight="18" />
                                     <Label styleClass="bold-lbl" text="Export name preview" />
                                     <Region prefHeight="6" />
                                     <HBox alignment="CENTER_LEFT">
@@ -152,7 +163,7 @@
                                     <Label styleClass="bold-lbl" text="Image Adjustments" />
                                     <Region prefHeight="4" />
                                     <Label prefWidth="360" styleClass="lbl" text="Applied automatically to each scanned file on ingest." wrapText="true" />
-                                    <Region prefHeight="8" />
+                                    <Region prefHeight="6.0" />
                                     <VBox spacing="12">
                                         <padding>
                                             <Insets bottom="14" left="14" right="14" top="14" />
@@ -160,25 +171,40 @@
                                         <VBox spacing="4">
                                             <HBox alignment="CENTER_LEFT" spacing="8">
                                                 <Label styleClass="lbl" text="Brightness" HBox.hgrow="ALWAYS" />
-                                                <Label fx:id="lblBrightnessValue" styleClass="lbl" text="0" minWidth="30" />
+                                                <Label fx:id="lblBrightnessValue" minWidth="30" styleClass="lbl" text="0" />
                                             </HBox>
-                                            <Slider fx:id="sliderBrightness" min="-100" max="100" value="0"
-                                                    blockIncrement="1" showTickLabels="false" prefHeight="30" />
+                                            <Slider fx:id="sliderBrightness" blockIncrement="1" max="100" min="-100" prefHeight="30" showTickLabels="false" value="0" />
                                         </VBox>
                                         <Separator />
                                         <VBox spacing="4">
                                             <HBox alignment="CENTER_LEFT" spacing="8">
                                                 <Label styleClass="lbl" text="Contrast" HBox.hgrow="ALWAYS" />
-                                                <Label fx:id="lblContrastValue" styleClass="lbl" text="0" minWidth="30" />
+                                                <Label fx:id="lblContrastValue" minWidth="30" styleClass="lbl" text="0" />
                                             </HBox>
-                                            <Slider fx:id="sliderContrast" min="-100" max="100" value="0"
-                                                    blockIncrement="1" showTickLabels="false" prefHeight="30" />
+                                            <Slider fx:id="sliderContrast" blockIncrement="1" max="100" min="-100" prefHeight="30" showTickLabels="false" value="0" />
                                         </VBox>
                                         <styleClass>
                                             <String fx:value="card" />
                                             <String fx:value="second-card-bg" />
                                         </styleClass>
                                     </VBox>
+                           <Region layoutX="36.0" layoutY="105.0" prefHeight="18" />
+                           <Label layoutX="36.0" layoutY="123.0" styleClass="bold-lbl" text="Image Preview" />
+                           <Label layoutX="36.0" layoutY="142.0" prefWidth="360" styleClass="lbl" text="Preview of what the scanned pages would look like with the given adjustments" wrapText="true" />
+                           <Region layoutX="36.0" layoutY="320.0" prefHeight="6.0" />
+                           <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" VBox.vgrow="NEVER">
+                              <styleClass>
+                                 <String fx:value="card" />
+                                 <String fx:value="second-card-bg" />
+                              </styleClass>
+                              <children>
+                                 <ImageView fx:id="imgPreview" fitHeight="200.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
+                                    <image>
+                                       <Image url="@../images/placeholders/placeholder-image.png" />
+                                    </image>
+                                 </ImageView>
+                              </children>
+                           </VBox>
 
                                 </children>
                                 <styleClass>
@@ -188,29 +214,64 @@
                             </VBox>
                         </children>
                     </VBox>
-                </children>
-            </HBox>
-            <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-                <children>
-                    <VBox HBox.hgrow="ALWAYS">
+                    <VBox prefWidth="400.0" HBox.hgrow="ALWAYS">
                         <padding>
-                            <Insets bottom="12.0" left="12.0" right="12.0" top="6.0" />
+                            <Insets bottom="12.0" left="6.0" right="12.0" top="12.0" />
                         </padding>
                         <children>
-                            <VBox spacing="0">
+                     <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                        <styleClass>
+                           <String fx:value="card" />
+                           <String fx:value="card-bg" />
+                        </styleClass>
+                        <VBox.margin>
+                           <Insets bottom="12.0" />
+                        </VBox.margin>
+                        <padding>
+                           <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+                        </padding>
+                        <children>
+                           <Label styleClass="bold-lbl" text="Global image rotation" />
+                           <Label prefWidth="360" styleClass="lbl" text="Adjust the default image rotaion of scanned pages." wrapText="true" />
+                           <Region prefHeight="6.0" />
+                           <VBox spacing="12">
+                              <padding>
+                                 <Insets bottom="14" left="14" right="14" top="14" />
+                              </padding>
+                              <styleClass>
+                                 <String fx:value="card" />
+                                 <String fx:value="second-card-bg" />
+                              </styleClass>
+                              <children>
+                                 <VBox spacing="4">
+                                    <children>
+                                       <HBox alignment="CENTER_LEFT" spacing="8">
+                                          <children>
+                                             <Label styleClass="lbl" text="Global Rotation:" HBox.hgrow="ALWAYS" />
+                                             <Label fx:id="lblBrightnessValue1" minWidth="30" styleClass="lbl" text="0" />
+                                          </children>
+                                       </HBox>
+                                       <Slider fx:id="sliderBrightness1" blockIncrement="5.0" majorTickUnit="90.0" max="270.0" min="-270.0" minorTickCount="5" prefHeight="30" showTickLabels="true" snapToTicks="true" value="0" />
+                                    </children>
+                                 </VBox>
+                              </children>
+                           </VBox>
+                        </children>
+                     </VBox>
+                            <VBox spacing="0" VBox.vgrow="ALWAYS">
                                 <padding>
                                     <Insets bottom="24" left="24" right="24" top="24" />
                                 </padding>
                                 <children>
                                     <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
                                         <children>
-                                            <Label styleClass="bold-lbl" text="Assign profile to users" />
-                                            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                                            <TextField maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="180.0" promptText="Filter users" styleClass="container" />
+                                            <Label maxWidth="-Infinity" minWidth="-Infinity" styleClass="bold-lbl" text="Assign profile to users" />
+                                 <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                            <TextField maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="120.0" promptText="Filter users" styleClass="container" />
                                         </children>
                                     </HBox>
                                     <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="18.0" />
-                                    <ScrollPane fitToWidth="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="150.0" prefWidth="200.0" styleClass="card">
+                                    <ScrollPane fitToWidth="true" prefHeight="150.0" prefWidth="200.0" styleClass="card" VBox.vgrow="ALWAYS">
                                         <content>
                                             <VBox fx:id="vboxUsers" prefHeight="50.0" prefWidth="100.0" />
                                         </content>
@@ -226,7 +287,7 @@
                     </VBox>
                 </children>
             </HBox>
-            <HBox alignment="CENTER_RIGHT" prefHeight="56.0" spacing="8" VBox.vgrow="NEVER">
+            <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" spacing="8" VBox.vgrow="NEVER">
                 <padding>
                     <Insets bottom="0" left="24" right="24" top="0" />
                 </padding>

@@ -32,7 +32,7 @@ public class LogManager {
         String delimiter = ";";
         sb.append("id;username;action;entity-type;entity-id;timestamp\n");
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
         for (Log log: logs) {
             sb.append(log.getLogId()).append(delimiter)

@@ -147,7 +147,7 @@ public class AdminUsersController implements Initializable {
         }
     }
 
-    private void filterUsers(String search) {
+    private void filterUsers(String search) { // TODO: needs rework
         // loops through every row in user table
         for (var node : userTableBox.getChildren()) {
             HBox row = (HBox) node;
