@@ -1,7 +1,6 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.User;
-import ScanHub.BLL.SessionManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
@@ -29,7 +28,6 @@ public class LoginController implements IViewController, Initializable {
 
     private ModelFacade modelFacade;
     private Stage currentStage;
-    private SessionManager sessionManager = SessionManager.getInstance();
 
     public void setModel (ModelFacade modelFacade, Stage stage) {
         this.modelFacade = modelFacade;
@@ -95,7 +93,7 @@ public class LoginController implements IViewController, Initializable {
 
         try {
             // checks to see if an active session is already active. if no session is active then user can log in.
-            if (sessionManager.login(user)) {
+            if (modelFacade.getSessionModel().login(user)) {
                 ViewHandler handler = user.isAdmin() ? ViewHandler.ADMIN : ViewHandler.SCAN_VIEW;
                 handler.reset();
                 handler.show(modelFacade).setMaximized(true);

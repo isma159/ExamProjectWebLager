@@ -14,6 +14,7 @@ public class ModelFacade {
     private final FileModel fileModel;
     private final BoxMetadataModel metadataModel;
     private final LogModel logModel;
+    private final SessionModel sessionModel;
 
 
     public ModelFacade() throws Exception {
@@ -25,6 +26,7 @@ public class ModelFacade {
         fileModel = new FileModel();
         metadataModel = new BoxMetadataModel();
         logModel = new LogModel();
+        sessionModel = new SessionModel();
     }
 
     public PasswordEncrypter getEncrypter() { return encrypter; }
@@ -35,4 +37,5 @@ public class ModelFacade {
     public FileModel getFileModel() { return fileModel; }
     public BoxMetadataModel getMetadataModel() { return metadataModel; }
     public LogModel getLogModel() { return logModel; }
+    public SessionModel getSessionModel() {return sessionModel;}
 }

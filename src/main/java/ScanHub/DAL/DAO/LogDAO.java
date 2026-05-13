@@ -1,13 +1,14 @@
 package ScanHub.DAL.DAO;
 
 import ScanHub.BE.*;
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
+import ScanHub.BE.enums.Role;
 import ScanHub.DAL.DB.DBConnector;
-import ScanHub.DAL.interfaces.IDataAccess;
 import ScanHub.DAL.interfaces.ILogDataAccess;
 
 import java.io.IOException;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

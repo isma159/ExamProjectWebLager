@@ -4,7 +4,6 @@ package ScanHub.GUI.util;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -91,30 +90,16 @@ public enum ViewHandler {
 
     public Stage show(ModelFacade model) throws IOException {
         Stage stage = prepareStage();
-        stage.setMinHeight(768);
-        stage.setMinWidth(1366);
-        initController(model, stage);
+        initializeController(model, stage);
         stage.show();
         return stage;
     }
 
     public Stage show(ModelFacade model, Stage stage) throws IOException {
         Stage preparedStage = prepareStage(stage);
-        initController(model, preparedStage);
+        initializeController(model, preparedStage);
         preparedStage.show();
         return preparedStage;
-    }
-
-    public Stage showAndWait(ModelFacade model) throws IOException {
-        Stage stage = prepareStage();
-        initController(model, stage);
-        stage.showAndWait();
-        return stage;
-    }
-
-    public Parent getRoot() throws IOException {
-        if (scene == null) loadScene();
-        return (Parent) scene.getRoot();
     }
 
     /**
@@ -130,18 +115,12 @@ public enum ViewHandler {
         return (T) loader.getController();
     }
 
-    public void close() {
-        if (stage != null) {
-            stage.close();
-        }
-    }
-
     /**
      *
      * @param model
      * @param stage
      */
-    public void initController(ModelFacade model, Stage stage) {
+    public void initializeController(ModelFacade model, Stage stage) {
         IViewController controller = getController();
         controller.setModel(model, stage);
     }

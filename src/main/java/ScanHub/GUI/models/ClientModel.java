@@ -7,8 +7,8 @@ import javafx.collections.ObservableList;
 
 public class ClientModel {
 
-    private ObservableList<Client> clientObservableList;
-    private ClientManager clientManager = new ClientManager();
+    private final ObservableList<Client> clientObservableList;
+    private final ClientManager clientManager = new ClientManager();
 
     public ClientModel() throws Exception {
         clientObservableList = FXCollections.observableArrayList();
@@ -21,13 +21,9 @@ public class ClientModel {
         return createdClient;
     }
 
-    public ObservableList<Client> getClients() {
-        return clientObservableList;
-    }
+    public ObservableList<Client> getClients() { return clientObservableList; }
 
-    public void refreshClients() throws Exception {
-        clientObservableList.setAll(clientManager.getClients());
-    }
+    public void refreshClients() throws Exception { clientObservableList.setAll(clientManager.getClients()); }
 
     public void updateClient(Client client) throws Exception {
         clientManager.updateClient(client);

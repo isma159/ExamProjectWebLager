@@ -10,8 +10,8 @@ import java.util.List;
 
 public class LogModel {
 
-    private ObservableList<Log> logObservableList;
-    private LogManager logManager;
+    private final ObservableList<Log> logObservableList;
+    private final LogManager logManager;
 
     public LogModel() throws Exception {
         logManager = new LogManager();
@@ -19,11 +19,9 @@ public class LogModel {
         logObservableList.setAll(logManager.getLogs().reversed());
     }
 
-    public void refreshModel() throws Exception {
-        logObservableList.setAll(logManager.getLogs().reversed());
-    }
+    public void refreshModel() throws Exception { logObservableList.setAll(logManager.getLogs().reversed()); }
 
-    public List<Log> getLogs() {return logObservableList;}
+    public List<Log> getLogs() { return logObservableList; }
 
     public Log createLog(Log log) throws Exception {
         Log newLog = logManager.createLog(log);
@@ -31,10 +29,5 @@ public class LogModel {
         return newLog;
     }
 
-    public void exportLogs(Path path, List<Log> logs) throws Exception {
-
-        logManager.exportLogs(path, logs);
-
-    }
-
+    public void exportLogs(Path path, List<Log> logs) throws Exception { logManager.exportLogs(path, logs); }
 }

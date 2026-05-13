@@ -34,9 +34,9 @@ public class AdminLogsController implements Initializable {
     @FXML private VBox logsTableBox;
     @FXML private Pagination logsPagination;
 
-    private ModelFacade modelFacade;
+    private final ModelFacade modelFacade;
+    private final Stage currentStage;
     private String activeAction = null;
-    private Stage currentStage;
 
     private final int ROWS_PER_PAGE = 15;
     private List<Log> allFilteredLogs = new ArrayList<>();

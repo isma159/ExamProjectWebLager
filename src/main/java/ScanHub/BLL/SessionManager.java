@@ -5,17 +5,9 @@ import ScanHub.GUI.util.AlertHelper;
 
 public class SessionManager {
 
-    private static SessionManager sessionManager;
     private User currentUser;
 
-    private SessionManager() {}
-
-    public static SessionManager getInstance() {
-        if (sessionManager == null) {
-            sessionManager = new SessionManager();
-        }
-        return sessionManager;
-    }
+    public SessionManager() {}
 
     public boolean login(User user) {
         if (currentUser == null) {

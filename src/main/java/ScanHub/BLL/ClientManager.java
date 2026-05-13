@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ClientManager {
 
-    private IDataAccess<Client> dataAccess;
+    private final IDataAccess<Client> dataAccess;
 
     public ClientManager() throws Exception {
         dataAccess = new ClientDAO();

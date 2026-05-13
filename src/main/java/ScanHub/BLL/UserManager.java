@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class UserManager {
-    private IDataAccess<User> dataAccess;
+    private final IDataAccess<User> dataAccess;
 
     public UserManager() throws Exception {
         dataAccess = new UserDAO();

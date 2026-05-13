@@ -2,11 +2,9 @@ package ScanHub.GUI.controllers;
 
 // project imports
 import ScanHub.BE.Profile;
-import ScanHub.BE.Role;
+import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
-import ScanHub.BLL.ThemeManager;
-import ScanHub.BLL.interfaces.IPasswordEncrypter;
-import ScanHub.BLL.util.PasswordEncrypter;
+import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
