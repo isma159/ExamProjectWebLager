@@ -1,9 +1,9 @@
 package ScanHub.GUI.controllers;
 
-import ScanHub.BE.EntityType;
+import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.Log;
-import ScanHub.BE.LogAction;
-import ScanHub.BE.Role;
+import ScanHub.BE.enums.LogAction;
+import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
