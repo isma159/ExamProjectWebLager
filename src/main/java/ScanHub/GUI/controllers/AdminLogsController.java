@@ -68,7 +68,7 @@ public class AdminLogsController implements Initializable {
 
         // Manual Pagination Listener (instead of Page Factory)
         logsPagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
-            renderLogsForCurrentPage();
+            applyFilters();
         });
 
         applyFilters();
@@ -107,43 +107,41 @@ public class AdminLogsController implements Initializable {
 
                 if (log.getUser().getUsername().contains(search)) {
                     return true;
-                }
-                else if (String.valueOf(log.getLogId()).contains(search)) {
+                } else if (String.valueOf(log.getLogId()).contains(search)) {
                     return true;
-                }
-                else {
+                } else {
                     return false;
                 }
-
-            // Calculate and set page count
-            int pageCount = Math.max(1, (int) Math.ceil((double) allFilteredLogs.size() / ROWS_PER_PAGE));
-            logsPagination.setPageCount(pageCount);
-
-            renderLogsForCurrentPage();
             });
-        }
-        catch (Exception e) {
+
+            renderLogsForCurrentPage(filteredLogs);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void renderLogsForCurrentPage() {
+    private void renderLogsForCurrentPage(List<Log> logs) {
         logsTableBox.getChildren().clear();
         currentLogs.clear();
-        currentLogs.addAll(currentLogs);
+        currentLogs.addAll(logs);
 
-        if (currentLogs.isEmpty()) {
+        if (logs.isEmpty()) {
             Label empty = new Label("No logs found.");
             empty.getStyleClass().add("lbl");
             logsTableBox.getChildren().add(empty);
             return;
         }
 
+        // Calculate and set page count
+        int pageCount = Math.ceilDiv(logs.size(), ROWS_PER_PAGE);
+        logsPagination.setPageCount(pageCount);
+
         int startIndex = logsPagination.getCurrentPageIndex() * ROWS_PER_PAGE;
-        int endIndex = Math.min(startIndex + ROWS_PER_PAGE, allFilteredLogs.size());
+        int endIndex = Math.min(startIndex + ROWS_PER_PAGE, logs.size());
 
         // Extract sublist for the current page
-        List<Log> pageItems = currentLogs.subList(startIndex, endIndex);
+        List<Log> pageItems = logs.subList(startIndex, endIndex);
 
         for (Log log : pageItems) {
             HBox row = RowMaker.addLogRow(log);

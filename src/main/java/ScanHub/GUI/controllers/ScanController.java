@@ -7,7 +7,7 @@ import ScanHub.BE.Profile;
 import ScanHub.BE.interfaces.TreeNode;
 import ScanHub.BLL.ScanManager;
 import ScanHub.BLL.SessionManager;
-import ScanHub.BLL.ThemeManager;
+import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
