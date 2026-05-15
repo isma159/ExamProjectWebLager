@@ -173,6 +173,12 @@ public class AdminUsersController implements Initializable {
         });
     }
 
+    @FXML private void onClickCreateClient() {}
+
+    @FXML private void onClickUpdateClient() {}
+
+    @FXML private void onClickDeleteClient() {}
+
     private void openUserForm(User user) { // TODO
         try {
             ViewHandler handler = user == null ? ViewHandler.CREATE_USER : ViewHandler.EDIT_USER;

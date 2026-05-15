@@ -98,11 +98,10 @@ public class LoginController implements IViewController, Initializable {
                 handler.reset();
 
                 Stage stage = new Stage();
-                stage.setMinHeight(768);
                 stage.setMinWidth(1366);
-                stage.setMaximized(true);
+                stage.setMinHeight(768);
 
-                handler.show(modelFacade, stage);
+                handler.show(modelFacade, stage).setMaximized(true);
                 currentStage.close();
             }
         } catch (Exception e) {

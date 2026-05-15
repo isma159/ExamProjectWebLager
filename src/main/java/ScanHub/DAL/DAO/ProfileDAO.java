@@ -8,10 +8,7 @@ import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,21 +20,19 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public Profile createData(Profile newProfile) throws Exception {
-        String sql = "INSERT INTO Profiles (clientId, profileName, splitBehavior, status, exportLabel, brightness, contrast) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Profiles (clientId, profileName, splitBehavior, status, exportLabel, fileSettingsId) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                int clientId = resolveClientId(connection, newProfile);
 
-                ps.setInt(1, clientId);
+                ps.setInt(1, newProfile.getClient().getClientId());
                 ps.setString(2, newProfile.getProfileName());
                 ps.setString(3, newProfile.getSplitBehavior().toString());
                 ps.setString(4, newProfile.getStatus().toString());
                 ps.setString(5, newProfile.getExportLabel());
-                ps.setInt(6, newProfile.getBrightness());
-                ps.setInt(7, newProfile.getContrast());
+                ps.setInt(6, getOrCreateFileSettings(connection, newProfile.getFileSettings()));
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -48,8 +43,6 @@ public class ProfileDAO implements IDataAccess<Profile> {
                     }
                 }
 
-                newProfile.setClientId(clientId);
-                newProfile.setClient(loadClient(connection, clientId));
                 connection.commit();
                 return newProfile;
             }
@@ -72,10 +65,12 @@ public class ProfileDAO implements IDataAccess<Profile> {
         List<Profile> profiles = new ArrayList<>();
 
         String selectProfileSQL = """
-                SELECT p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.splitBehavior, p.status, p.exportLabel, p.brightness, p.contrast
+                SELECT p.profileId, p.clientId, p.profileName,
+                       p.splitBehavior, p.status, p.exportLabel, fs.hue, fs.brightness,
+                       fs.contrast, fs.saturation, c.clientName
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
+                JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                 WHERE p.deleted_at IS NULL
                 ORDER BY c.clientName, p.profileName
                 """;
@@ -97,10 +92,12 @@ public class ProfileDAO implements IDataAccess<Profile> {
     @Override
     public Profile getDataFromName(String name) throws Exception {
         String sql = """
-                SELECT p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.splitBehavior, p.status, p.exportLabel, p.brightness, p.contrast
+                SELECT p.profileId, p.clientId, p.profileName,
+                       p.splitBehavior, p.status, p.exportLabel, fs.hue, fs.brightness,
+                       fs.contrast, fs.saturation, c.clientName
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
+                JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                 WHERE p.profileName = ? AND p.deleted_at IS NULL
                 """;
 
@@ -119,26 +116,22 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public void updateData(Profile newData) throws Exception {
-        String sql = "UPDATE Profiles SET clientId = ?, profileName = ?, splitBehavior = ?, status = ?, exportLabel = ?, brightness = ?, contrast = ? WHERE profileId = ?";
+        String sql = "UPDATE Profiles SET clientId = ?, profileName = ?, splitBehavior = ?, status = ?, exportLabel = ?, fileSettingsId = ? WHERE profileId = ?";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
-                int clientId = resolveClientId(connection, newData);
 
-                ps.setInt(1, clientId);
+                ps.setInt(1, newData.getClient().getClientId());
                 ps.setString(2, newData.getProfileName());
                 ps.setString(3, newData.getSplitBehavior().toString());
                 ps.setString(4, newData.getStatus().toString());
                 ps.setString(5, newData.getExportLabel());
-                ps.setInt(6, newData.getBrightness());
-                ps.setInt(7, newData.getContrast());
+                ps.setInt(6, getOrCreateFileSettings(connection, newData.getFileSettings()));
                 ps.setInt(8, newData.getProfileId());
                 ps.executeUpdate();
 
-                newData.setClientId(clientId);
-                newData.setClient(loadClient(connection, clientId));
                 connection.commit();
             }
             catch (SQLException e) {
@@ -178,49 +171,61 @@ public class ProfileDAO implements IDataAccess<Profile> {
         }
     }
 
-    private int resolveClientId(Connection connection, Profile profile) throws SQLException {
-        if (profile.getClientId() > 0) {
-            return profile.getClientId();
-        }
-
-        if (profile.getClient() != null && profile.getClient().getClientId() > 0) {
-            return profile.getClient().getClientId();
-        }
-
-        throw new SQLException("Profile requires a selected clientId");
-    }
-
-    private Client loadClient(Connection connection, int clientId) throws SQLException {
-        String sql = "SELECT clientId, clientName FROM Clients WHERE clientId = ? AND deleted_at IS NULL";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, clientId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Client(rs.getInt("clientId"), rs.getString("clientName"));
-                }
-            }
-        }
-        return null;
-    }
-
     private Profile mapRow(ResultSet rs) throws SQLException {
         Profile profile = new Profile(
                 rs.getInt("profileId"),
-                rs.getInt("clientId"),
+                new Client(rs.getInt("clientId"),
+                        rs.getString("clientName")),
                 rs.getString("profileName"),
                 SplitBehavior.valueOf(rs.getString("splitBehavior")),
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
-                rs.getInt("brightness"),
-                rs.getInt("contrast")
+                new FileSettings(rs.getInt("fileSettingsId"),
+                        rs.getDouble("hue"),
+                        rs.getDouble("brightness"),
+                        rs.getDouble("contrast"),
+                        rs.getDouble("saturation"))
         );
 
-        int clientId = rs.getInt("clientId");
-        String clientName = rs.getString("clientName");
-        if (!rs.wasNull() && clientName != null) {
-            profile.setClient(new Client(clientId, clientName));
+        return profile;
+    }
+
+    private int getOrCreateFileSettings(Connection connection, FileSettings fileSettings) throws SQLException {
+
+        String selectSQL = "SELECT fileSettingsId FROM FileSettings WHERE hue = ? AND brightness = ? AND contrast = ? AND saturation = ?";
+
+        try (PreparedStatement selectPs = connection.prepareStatement(selectSQL)) {
+            selectPs.setDouble(1, fileSettings.getHue());
+            selectPs.setDouble(2, fileSettings.getBrightness());
+            selectPs.setDouble(3, fileSettings.getContrast());
+            selectPs.setDouble(4, fileSettings.getSaturation());
+
+            ResultSet rs = selectPs.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("fileSettingsId");
+            }
         }
 
-        return profile;
+        String insertSQL = "INSERT INTO FileSettings (hue, brightness, contrast, saturation) VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement insertPS = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+
+            insertPS.setDouble(1, fileSettings.getHue());
+            insertPS.setDouble(2, fileSettings.getBrightness());
+            insertPS.setDouble(3, fileSettings.getContrast());
+            insertPS.setDouble(4, fileSettings.getSaturation());
+
+            insertPS.executeUpdate();
+
+            ResultSet rs = insertPS.getGeneratedKeys();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        }
+
+        throw new SQLException("Could not get or create file settings");
     }
 }
