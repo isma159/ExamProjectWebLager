@@ -2,10 +2,11 @@ package ScanHub.BE;
 
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.enums.SplitBehavior;
+import ScanHub.BE.interfaces.CheckTreeNode;
 
 import java.util.Objects;
 
-public class Profile {
+public class Profile implements CheckTreeNode {
 
     private int profileId;
     private int clientId;

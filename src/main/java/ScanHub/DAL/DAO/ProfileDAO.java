@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ProfileDAO implements IDataAccess<Profile> {
 
-    DBConnector dbConnector = new DBConnector();
+    private final DBConnector dbConnector = new DBConnector();
 
     public ProfileDAO() throws IOException {}
 
@@ -66,7 +66,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
         String selectProfileSQL = """
                 SELECT p.profileId, p.clientId, p.profileName,
-                       p.splitBehavior, p.status, p.exportLabel, fs.hue, fs.brightness,
+                       p.splitBehavior, p.status, p.exportLabel, p.fileSettingsId, fs.hue, fs.brightness,
                        fs.contrast, fs.saturation, c.clientName
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
@@ -93,7 +93,8 @@ public class ProfileDAO implements IDataAccess<Profile> {
     public Profile getDataFromName(String name) throws Exception {
         String sql = """
                 SELECT p.profileId, p.clientId, p.profileName,
-                       p.splitBehavior, p.status, p.exportLabel, fs.hue, fs.brightness,
+                       p.splitBehavior, p.status, p.exportLabel,
+                       p.fileSettingsId, fs.hue, fs.brightness,
                        fs.contrast, fs.saturation, c.clientName
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
@@ -129,7 +130,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 ps.setString(4, newData.getStatus().toString());
                 ps.setString(5, newData.getExportLabel());
                 ps.setInt(6, getOrCreateFileSettings(connection, newData.getFileSettings()));
-                ps.setInt(8, newData.getProfileId());
+                ps.setInt(7, newData.getProfileId());
                 ps.executeUpdate();
 
                 connection.commit();
@@ -172,7 +173,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
     }
 
     private Profile mapRow(ResultSet rs) throws SQLException {
-        Profile profile = new Profile(
+        return new Profile(
                 rs.getInt("profileId"),
                 new Client(rs.getInt("clientId"),
                         rs.getString("clientName")),
@@ -186,8 +187,6 @@ public class ProfileDAO implements IDataAccess<Profile> {
                         rs.getDouble("contrast"),
                         rs.getDouble("saturation"))
         );
-
-        return profile;
     }
 
     private int getOrCreateFileSettings(Connection connection, FileSettings fileSettings) throws SQLException {
@@ -200,10 +199,10 @@ public class ProfileDAO implements IDataAccess<Profile> {
             selectPs.setDouble(3, fileSettings.getContrast());
             selectPs.setDouble(4, fileSettings.getSaturation());
 
-            ResultSet rs = selectPs.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("fileSettingsId");
+            try (ResultSet rs = selectPs.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("fileSettingsId");
+                }
             }
         }
 
@@ -218,14 +217,12 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
             insertPS.executeUpdate();
 
-            ResultSet rs = insertPS.getGeneratedKeys();
-
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (ResultSet rs = insertPS.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
-
         }
-
         throw new SQLException("Could not get or create file settings");
     }
 }

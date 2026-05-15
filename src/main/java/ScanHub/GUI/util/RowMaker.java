@@ -59,6 +59,18 @@ public class RowMaker {
         return row;
     }
 
+    public static HBox addClientRow (Client client, BiConsumer<Client, HBox> onSelect) {
+        Label clientNameLabel = createLabel(client.getClientName(), 210);
+
+        HBox row = createBaseRow();
+        row.getStyleClass().add("user-row");
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.getChildren().add(clientNameLabel);
+
+        attachClickHandler(row, client, onSelect);
+        return row;
+    }
+
     public static HBox addProfileRow(Profile profile, BiConsumer<Profile, HBox> onSelect) {
         HBox col1 = centeredCol(createLabel(profile.getProfileName()));
         HBox col2 = centeredCol(createLabel(profile.getSplitBehavior().toString() + "-SPLIT"));
