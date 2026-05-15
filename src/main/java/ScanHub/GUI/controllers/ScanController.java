@@ -39,6 +39,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -194,7 +195,12 @@ public class ScanController implements Initializable, IViewController {
                 Label icon = new Label();
                 icon.getStyleClass().add("icon");
 
-                if (object instanceof Document document) {
+                if (object instanceof Box box) {
+                    icon.setText("\ue9d9");
+                    icon.getStyleClass().add("tree-cell-box");
+                    setText(box.getBoxName());
+                    setStyle("");
+                } else if (object instanceof Document document) {
                     icon.setText("\ue963");
                     icon.getStyleClass().add("tree-cell-doc");
                     setText(documentLabel(document));
@@ -227,7 +233,7 @@ public class ScanController implements Initializable, IViewController {
      * Ctrl + c: copy a file or document with all files
      * Ctrl + v: past a file or document with all files
      * Ctrl + z: undo
-     * Backspace: delete a file or document with all files (lidt voldsomt måske men idk)
+     * Backspace: delete a file or document with all files
      */
     private void initializeKeyboardShortcuts() {
         pageGrid.sceneProperty().addListener((obs, oldScene, scene) -> {
@@ -267,30 +273,67 @@ public class ScanController implements Initializable, IViewController {
 
         if (profile == null) {
             AlertHelper.showError("Session Setup", "Please select a profile before starting.");
+            // TODO add visual error feedback
             return;
         }
         if (boxInput.isEmpty()) {
             AlertHelper.showError("Session Setup", "Please enter a Box ID before starting.");
+            // TODO add visual error feedback
             return;
         }
 
-        try {
-            Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
-            scanModel = new ScanModel(activeBox);
-            syncDocumentsFromModel();
+        // check whether this profile already owns a box
+        Box existingBox = modelFacade.getBoxModel().getBoxes().stream()
+                .filter(box -> box.getProfileId() == profile.getProfileId())
+                .findFirst()
+                .orElse(null);
 
-            sessionActive = true;
-            selectedDocument = null;
-            selectedFile = null;
+        if (existingBox != null) {
+            // TODO add creator name to alert
+            String createdAt = existingBox.getCreatedAt() != null ? existingBox.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "Unknown";
 
-            setSessionControlsDisabled(false);
-            lblSessionStatus.setText("Profile: " + profile.getProfileName() + " – Box: " + activeBox.getBoxName());
-            sessionPopupOverlay.setVisible(false);
-            rebuild();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            AlertHelper.showError("Session Setup", "Could not start scan session.");
+            String message = "Profile \"" + profile.getProfileName() + "\" already has a box assigned.\n\n"
+                            + "Box ID: " + existingBox.getBoxId() + "\n"
+                            + "Created: " + createdAt + "\n"
+                            + "Do you want to delete this box and start a new one?";
+
+            AlertHelper.showConfirmation("Box Already Exists", message, () -> {
+                try {
+                    modelFacade.getBoxModel().deleteBox(existingBox);
+                    launchSession(boxInput, profile);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    AlertHelper.showError("Session Setup", "Could not replace the existing box.");
+                }
+            });
+
+        } else {
+            try {
+                launchSession(boxInput, profile);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                AlertHelper.showError("Session Setup", "Could not start scan session.");
+            }
         }
+    }
+
+    /**
+     * Shared entry point that resolves (or creates) the session box,
+     * wires up the ScanModel and opens the scan UI.
+     */
+    private void launchSession(String boxInput, Profile profile) throws Exception {
+        Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
+        scanModel = new ScanModel(activeBox);
+        syncDocumentsFromModel();
+
+        sessionActive = true;
+        selectedDocument = null;
+        selectedFile = null;
+
+        setSessionControlsDisabled(false);
+        lblSessionStatus.setText("Profile: " + profile.getProfileName() + " – Box: " + activeBox.getBoxName());
+        sessionPopupOverlay.setVisible(false);
+        rebuild();
     }
 
     /**

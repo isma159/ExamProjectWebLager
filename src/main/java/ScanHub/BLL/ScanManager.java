@@ -106,19 +106,19 @@ public class ScanManager {
      * updates the in-memory objects with their real DB ids and refreshes metadata.
      */
     public void commitAll() throws Exception {
-        for (Document doc : targetBox.getDocuments()) {
-            if (doc.isStaged()) {
+        for (Document document : targetBox.getDocuments()) {
+            if (document.isStaged()) {
                 Document persisted = documentDAO.createDocument(targetBox.getBoxId());
-                doc.setDocumentId(persisted.getDocumentId());
-                doc.setCreatedAt(persisted.getCreatedAt());
-                doc.setStaged(false);
+                document.setDocumentId(persisted.getDocumentId());
+                document.setCreatedAt(persisted.getCreatedAt());
+                document.setStaged(false);
             }
 
-            for (File file : doc.getFiles()) {
+            for (File file : document.getFiles()) {
                 if (file.isStaged()) {
-                    file.setDocumentId(doc.getDocumentId());
+                    file.setDocumentId(document.getDocumentId());
                     File persisted = fileDAO.createFile(
-                            doc.getDocumentId(),
+                            document.getDocumentId(),
                             file.getReferenceId(),
                             file.getImageData(),
                             file.getRotation()
@@ -137,8 +137,8 @@ public class ScanManager {
      * <p>
      * <b>Single-Page TIFF</b> - each page is its own TIFF inside its own sub-folder:
      * <pre>
-     *   exportDir/boxName/Document1/File1/scan.tiff
-     *   exportDir/boxName/Document1/File2/scan.tiff
+     *   exportDir/boxName/Document1/File1.tiff
+     *   exportDir/boxName/Document1/File2.tiff
      * </pre>
      * <p>
      * <b>Multi-Page TIFF</b> - all pages of a document are merged into one
@@ -171,16 +171,15 @@ public class ScanManager {
         }
     }
 
-    /** Single-page mode: each file gets its own sub-folder containing one TIFF. */
+    /** Single-page mode: each file becomes a TIFF directly under the document folder. */
     private void exportSinglePage(Document document, Path documentDirectory) throws Exception {
         int fileIndex = 1;
         for (File file : document.getFiles()) {
             byte[] data = resolveImageData(file);
             if (data == null) { fileIndex++; continue; }
 
-            Path fileDirectory = documentDirectory.resolve("File" + fileIndex);
-            Files.createDirectories(fileDirectory);
-            Files.write(fileDirectory.resolve("scan.tiff"), data);
+            Path outputFile = documentDirectory.resolve("File" + fileIndex + ".tiff");
+            Files.write(outputFile, data);
             fileIndex++;
         }
     }
@@ -311,10 +310,10 @@ public class ScanManager {
     public Box getTargetBox() { return targetBox; }
 
     private Document stageDocument() {
-        Document doc = new Document(0, targetBox.getBoxId(), LocalDateTime.now());
-        doc.setStaged(true);
-        targetBox.getDocuments().add(doc);
-        return doc;
+        Document document = new Document(0, targetBox.getBoxId(), LocalDateTime.now());
+        document.setStaged(true);
+        targetBox.getDocuments().add(document);
+        return document;
     }
 
     private File stageFile(Document document, int referenceId, byte[] imageData, int rotation) {
