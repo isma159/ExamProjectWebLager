@@ -29,8 +29,7 @@ public class AdminController implements IViewController, Initializable {
 
     @FXML private StackPane contentArea;
     @FXML private ToggleGroup sidebarBtns;
-    @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, settingsBtn, shortcutsBtn;
-    @FXML private HBox analyticsBox, metadataBox, systemBox, logBox, settingsBox, shortcutBox;
+    @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, shortcutsBtn;
     @FXML private ToggleSwitch darkMode;
     @FXML private Label lblUsername, lblRole;
 

@@ -27,14 +27,14 @@ import java.util.ResourceBundle;
 
 public class ProfileFormController implements Initializable {
 
-    @FXML private ToggleGroup toggleGroupSplitBehavior, toggleGroupProfileStatus;
+    @FXML private ToggleGroup toggleGroupProfileStatus;
     @FXML private Label formTitle, profileIdLabel, nameError, exportPreviewLabel, usersError;
-    @FXML private Label lblBrightnessValue, lblContrastValue;
-    @FXML private RadioButton radioBARCODE, radioNONE, radioACTIVE, radioINACTIVE;
-    @FXML private VBox userCheckboxList, vboxSplitBehavior, vboxStatus, vboxUsers;
+    @FXML private Label lblHueValue, lblBrightnessValue, lblContrastValue, lblSaturationValue;
+    @FXML private RadioButton radioACTIVE, radioINACTIVE;
+    @FXML private VBox vboxStatus;
     @FXML private TextField profileNameField;
     @FXML private SearchableComboBox<Client> searchableComboBoxClient;
-    @FXML private Slider sliderBrightness, sliderContrast;
+    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation;
     @FXML private Button saveButton;
     @FXML private ImageView imgPreview;
 
@@ -43,8 +43,10 @@ public class ProfileFormController implements Initializable {
     private Profile editingProfile = null;
     private List<User> selectedUsers;
 
+    private double hue;
     private double brightness;
     private double contrast;
+    private double saturation;
 
     public void setModel(Stage currentStage, ModelFacade modelFacade, Profile profile) {
         this.currentStage = currentStage;
@@ -52,7 +54,6 @@ public class ProfileFormController implements Initializable {
         this.editingProfile = profile;
 
         ThemeManager.apply(currentStage.getScene());
-        loadClients();
 
         if (editingProfile != null) {
             formTitle.setText("Edit Profile");
@@ -60,13 +61,10 @@ public class ProfileFormController implements Initializable {
             populateFields(editingProfile);
         }
 
-        loadUsers();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        radioBARCODE.setUserData(SplitBehavior.BARCODE);
-        radioNONE.setUserData(SplitBehavior.NONE);
 
         radioACTIVE.setUserData(ProfileStatus.ACTIVE);
         radioINACTIVE.setUserData(ProfileStatus.INACTIVE);
@@ -78,72 +76,47 @@ public class ProfileFormController implements Initializable {
         }));
 
         // Wire sliders to their value labels
+        sliderHue.valueProperty().addListener((obs, oldVal, newVal) -> {
+            hue = newVal.intValue();
+            lblHueValue.setText(String.valueOf(hue));
+            imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, contrast / 100, brightness / 100));
+        });
+
         sliderBrightness.valueProperty().addListener((obs, oldVal, newVal) -> {
             brightness = newVal.intValue();
             lblBrightnessValue.setText(String.valueOf(brightness));
-            imgPreview.setEffect(new ColorAdjust(0, 0, contrast / 100, brightness / 100));
+            imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, contrast / 100, brightness / 100));
         });
 
         sliderContrast.valueProperty().addListener((obs, oldVal, newVal) -> {
             contrast = newVal.intValue();
             lblContrastValue.setText(String.valueOf(contrast));
-            imgPreview.setEffect(new ColorAdjust(0, 0, contrast / 100, brightness / 100));
+            imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, contrast / 100, brightness / 100));
         });
-    }
 
-    private void loadClients() {
-        try {
-            searchableComboBoxClient.setItems(modelFacade.getClientModel().getClients());
-
-            if (editingProfile != null) {
-                for (Client client : searchableComboBoxClient.getItems()) {
-                    if (client.getClientId() == editingProfile.getClientId()) {
-                        searchableComboBoxClient.getSelectionModel().select(client);
-                        break;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Could not load clients");
-            e.printStackTrace();
-        }
-    }
-
-    private void loadUsers() {
-        try {
-            selectedUsers.clear();
-            vboxUsers.getChildren().clear();
-            List<User> users = modelFacade.getUserModel().getUsers();
-
-            for (User user : users) {
-                vboxUsers.getChildren().add(RowMaker.addUserRowToForm(user, editingProfile, (selectedUser, isChecked) -> {
-                    if (isChecked && !selectedUsers.contains(selectedUser)) {
-                        selectedUsers.add(selectedUser);
-                    } else if (!isChecked) {
-                        selectedUsers.remove(selectedUser);
-                    }
-                }));
-            }
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Could not load users");
-            e.printStackTrace();
-        }
+        sliderSaturation.valueProperty().addListener((obs, oldVal, newVal) -> {
+            saturation = newVal.intValue();
+            lblSaturationValue.setText(String.valueOf(saturation));
+            imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, contrast / 100, brightness / 100));
+        });
     }
 
     private void populateFields(Profile profile) {
         profileNameField.setText(profile.getProfileName());
 
-        if (profile.getSplitBehavior() == SplitBehavior.BARCODE) { toggleGroupSplitBehavior.selectToggle(radioBARCODE); }
-        else toggleGroupSplitBehavior.selectToggle(radioNONE);
-
         if (profile.getStatus() == ProfileStatus.ACTIVE) { toggleGroupProfileStatus.selectToggle(radioACTIVE); }
         else toggleGroupProfileStatus.selectToggle(radioINACTIVE);
 
         // Populate slider values from existing profile
-        sliderBrightness.setValue(profile.getBrightness());
-        sliderContrast.setValue(profile.getContrast());
-        lblBrightnessValue.setText(String.valueOf(profile.getBrightness()));
-        lblContrastValue.setText(String.valueOf(profile.getContrast()));
+        sliderHue.setValue(profile.getFileSettings().getHue());
+        sliderBrightness.setValue(profile.getFileSettings().getBrightness());
+        sliderContrast.setValue(profile.getFileSettings().getContrast());
+        sliderSaturation.setValue(profile.getFileSettings().getSaturation());
+
+        lblHueValue.setText(String.valueOf(profile.getFileSettings().getHue()));
+        lblBrightnessValue.setText(String.valueOf(profile.getFileSettings().getBrightness()));
+        lblContrastValue.setText(String.valueOf(profile.getFileSettings().getContrast()));
+        lblContrastValue.setText(String.valueOf(profile.getFileSettings().getSaturation()));
     }
 
     @FXML
@@ -165,32 +138,32 @@ public class ProfileFormController implements Initializable {
     private void createProfile() {
         String profileName = profileNameField.getText();
         Client selectedClient = searchableComboBoxClient.getValue();
-        Toggle selectedSplitBehaviorToggle = toggleGroupSplitBehavior.getSelectedToggle();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
 
         clearError();
 
-        if (profileName.isBlank() || selectedClient == null || selectedSplitBehaviorToggle == null || selectedStatusToggle == null) {
+        if (profileName.isBlank() || selectedClient == null || selectedStatusToggle == null) {
             if (profileName.isBlank()) profileNameField.getStyleClass().add("error-border");
             if (selectedClient == null) searchableComboBoxClient.getStyleClass().add("error-border");
-            if (selectedSplitBehaviorToggle == null) vboxSplitBehavior.getStyleClass().add("error-border");
             if (selectedStatusToggle == null) vboxStatus.getStyleClass().add("error-border");
             AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
             return;
         }
 
-        SplitBehavior splitBehavior = (SplitBehavior) selectedSplitBehaviorToggle.getUserData();
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
-        int brightness = (int) sliderBrightness.getValue();
-        int contrast = (int) sliderContrast.getValue();
+
+        double hue = sliderHue.getValue();
+        double brightness = sliderBrightness.getValue();
+        double contrast = sliderContrast.getValue();
+        double saturation = sliderContrast.getValue();
 
         try {
-            Profile newProfile = new Profile(selectedClient.getClientId(), profileName, splitBehavior, status, buildExportLabel(profileName), brightness, contrast);
-            newProfile.setClient(selectedClient);
+
+            Profile newProfile = new Profile(selectedClient, profileName, SplitBehavior.BARCODE, status, buildExportLabel(profileName), new FileSettings(hue, brightness, contrast, saturation));
             Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
             modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), createdProfile.getProfileId(), EntityType.PROFILE, LogAction.CREATE, LocalDateTime.now()));
-            syncUserAssignments(createdProfile);
             currentStage.close();
+
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Create Failed", "Failed to create profile. Please try again.");
@@ -200,36 +173,35 @@ public class ProfileFormController implements Initializable {
     private void updateProfile() {
         String newProfileName = profileNameField.getText();
         Client selectedClient = searchableComboBoxClient.getValue();
-        Toggle selectedSplitToggle = toggleGroupSplitBehavior.getSelectedToggle();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
         String newExportLabel = buildExportLabel(newProfileName);
 
         clearError();
 
-        if (newProfileName.isBlank() || selectedClient == null || selectedSplitToggle == null || selectedStatusToggle == null) {
+        if (newProfileName.isBlank() || selectedClient == null || selectedStatusToggle == null) {
             if (newProfileName.isBlank()) profileNameField.getStyleClass().add("error-border");
             if (selectedClient == null) searchableComboBoxClient.getStyleClass().add("error-border");
-            if (selectedSplitToggle == null) vboxSplitBehavior.getStyleClass().add("error-border");
             if (selectedStatusToggle == null) vboxStatus.getStyleClass().add("error-border");
             AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
             return;
         }
 
-        SplitBehavior splitBehavior = (SplitBehavior) selectedSplitToggle.getUserData();
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
 
+        double hue = sliderHue.getValue();
+        double brightness = sliderBrightness.getValue();
+        double contrast = sliderContrast.getValue();
+        double saturation = sliderContrast.getValue();
+
         editingProfile.setProfileName(newProfileName);
-        editingProfile.setClientId(selectedClient.getClientId());
         editingProfile.setClient(selectedClient);
-        editingProfile.setSplitBehavior(splitBehavior);
+        editingProfile.setSplitBehavior(SplitBehavior.BARCODE);
         editingProfile.setStatus(status);
         editingProfile.setExportLabel(newExportLabel);
-        editingProfile.setBrightness((int) sliderBrightness.getValue());
-        editingProfile.setContrast((int) sliderContrast.getValue());
+        editingProfile.setFileSettings(new FileSettings(hue, brightness, contrast, saturation));
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);
-            syncUserAssignments(editingProfile);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -240,28 +212,11 @@ public class ProfileFormController implements Initializable {
     private void clearError() {
         profileNameField.getStyleClass().remove("error-border");
         searchableComboBoxClient.getStyleClass().remove("error-border");
-        vboxSplitBehavior.getStyleClass().remove("error-border");
         vboxStatus.getStyleClass().remove("error-border");
     }
 
     private String buildExportLabel(String profileName) {
         return profileName.replace(" ", "") + "_";
-    }
-
-    private void syncUserAssignments(Profile profile) throws Exception {
-        for (User user : new ArrayList<>(modelFacade.getUserModel().getUsers())) {
-            boolean shouldHaveProfile = selectedUsers.contains(user);
-            boolean changed = user.getProfiles().removeIf(p -> p.getProfileId() == profile.getProfileId());
-
-            if (shouldHaveProfile) {
-                user.getProfiles().add(profile);
-                changed = true;
-            }
-
-            if (changed) {
-                modelFacade.getUserModel().updateUser(user);
-            }
-        }
     }
 
     @FXML

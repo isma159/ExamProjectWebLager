@@ -14,16 +14,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class UserDAO implements IDataAccess<User> {
 
-    DBConnector dbConnector = new DBConnector();
+    private final DBConnector dbConnector = new DBConnector();
 
     public UserDAO() throws IOException {}
 
@@ -59,7 +54,14 @@ public class UserDAO implements IDataAccess<User> {
                     profilePS.addBatch();
                 }
                 profilePS.executeBatch();
-                insertUserClients(newUser, clientPS);
+
+                for (Client client: newUser.getClients()) {
+                    clientPS.setInt(1, newUser.getUserId());
+                    clientPS.setInt(2, client.getClientId());
+                    clientPS.addBatch();
+                }
+                clientPS.executeBatch();
+
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
@@ -75,17 +77,20 @@ public class UserDAO implements IDataAccess<User> {
 
     @Override
     public List<User> getData() throws Exception {
-        Map<Integer, User> usersById = new LinkedHashMap<>();
+        Map<Integer, User> usersById = new HashMap<>();
 
         // 1. Added brightness and contrast to SELECT
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
-                       p.profileId, p.clientId, c.clientName, p.profileName,
+                       p.profileId, p.clientId, p.profileName,
                        p.splitBehavior, p.exportLabel, p.status,
-                       p.brightness, p.contrast
+                       p.fileSettingsId,
+                       c.clientName, fs.hue, fs.brightness,
+                       fs.contrast, fs.saturation
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
+                LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 WHERE u.deleted_at IS NULL
                 ORDER BY u.username, p.profileName
@@ -107,28 +112,24 @@ public class UserDAO implements IDataAccess<User> {
                     usersById.put(userId, user);
                 }
 
-                int profileId = rs.getInt("profileId");
+                rs.getInt("profileId");
                 if (!rs.wasNull()) {
-                    // 2. Updated constructor call with 8 arguments
-                    Profile profile = new Profile(
-                            profileId,
-                            rs.getInt("clientId"),
-                            rs.getString("profileName"),
-                            SplitBehavior.valueOf(rs.getString("splitBehavior")),
-                            ProfileStatus.valueOf(rs.getString("status")),
-                            rs.getString("exportLabel"),
-                            rs.getInt("brightness"),
-                            rs.getInt("contrast")
-                    );
-                    String clientName = rs.getString("clientName");
-                    if (clientName != null) {
-                        profile.setClient(new Client(profile.getClientId(), clientName));
-                    }
+
+                    Client client = new Client(rs.getInt("clientId"), rs.getString("clientName"));
+                    Profile profile = mapProfile(rs, client);
+
                     user.getProfiles().add(profile);
+
+                    if (!user.getClients().contains(client)) {
+                        user.getClients().add(client);
+                    }
+                    else {
+                        System.out.println("Duplicate client, ignoring.");
+                    }
                 }
             }
         } catch (SQLException e) {
-            throw new Exception("Could not get users", e);
+            throw new SQLException("Could not get users", e);
         }
         return new ArrayList<>(usersById.values());
     }
@@ -138,11 +139,12 @@ public class UserDAO implements IDataAccess<User> {
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
                        p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.splitBehavior, p.exportLabel, p.status,
-                       p.brightness, p.contrast
+                       p.splitBehavior, p.exportLabel, p.status, p.fileSettingsId,
+                       fs.hue, fs.brightness, fs.contrast, fs.saturation
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
+                LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 WHERE u.username = ? AND u.deleted_at IS NULL
                 """;
@@ -163,24 +165,20 @@ public class UserDAO implements IDataAccess<User> {
                         );
                     }
 
-                    int profileId = rs.getInt("profileId");
+                    rs.getInt("profileId");
                     if (!rs.wasNull()) {
                         // 2. Updated constructor call with 8 arguments
-                        Profile profile = new Profile(
-                                profileId,
-                                rs.getInt("clientId"),
-                                rs.getString("profileName"),
-                                SplitBehavior.valueOf(rs.getString("splitBehavior")),
-                                ProfileStatus.valueOf(rs.getString("status")),
-                                rs.getString("exportLabel"),
-                                rs.getInt("brightness"),
-                                rs.getInt("contrast")
-                        );
-                        String clientName = rs.getString("clientName");
-                        if (clientName != null) {
-                            profile.setClient(new Client(profile.getClientId(), clientName));
-                        }
+                        Client client = new Client(rs.getInt("clientId"), rs.getString("clientName"));
+                        Profile profile = mapProfile(rs, client);
+
                         user.getProfiles().add(profile);
+
+                        if (!user.getClients().contains(client)) {
+                            user.getClients().add(client);
+                        }
+                        else {
+                            System.out.println("Duplicate client, ignoring.");
+                        }
                     }
                 }
                 return user;
@@ -225,7 +223,14 @@ public class UserDAO implements IDataAccess<User> {
                     insertProfilePS.addBatch();
                 }
                 insertProfilePS.executeBatch();
-                insertUserClients(updatedUser, insertUserClientPS);
+
+                for (Client client: updatedUser.getClients()) {
+                    insertUserClientPS.setInt(1, updatedUser.getUserId());
+                    insertUserClientPS.setInt(2, client.getClientId());
+                    insertUserClientPS.addBatch();
+                }
+                insertUserClientPS.executeBatch();
+
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
@@ -270,20 +275,20 @@ public class UserDAO implements IDataAccess<User> {
         }
     }
 
-    private void insertUserClients(User user, PreparedStatement ps) throws SQLException {
-        Set<Integer> clientIds = new LinkedHashSet<>();
-        for (Profile profile : user.getProfiles()) {
-            if (profile.getClientId() > 0) {
-                clientIds.add(profile.getClientId());
-            }
-        }
+    private Profile mapProfile(ResultSet rs, Client client) throws SQLException {
 
-        for (Integer clientId : clientIds) {
-            ps.setInt(1, user.getUserId());
-            ps.setInt(2, clientId);
-            ps.addBatch();
-        }
-        ps.executeBatch();
+        return new Profile(
+                rs.getInt("profileId"),
+                client,
+                rs.getString("profileName"),
+                SplitBehavior.valueOf(rs.getString("splitBehavior")),
+                ProfileStatus.valueOf(rs.getString("status")),
+                rs.getString("exportLabel"),
+                new FileSettings(rs.getInt("fileSettingsId"),
+                        rs.getDouble("hue"),
+                        rs.getDouble("brightness"),
+                        rs.getDouble("contrast"),
+                        rs.getDouble("saturation"))
+        );
     }
 }
-

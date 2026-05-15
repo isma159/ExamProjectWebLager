@@ -252,6 +252,18 @@
     -fx-background-color: #F1F5F9;
 }
 
+.combo-box {
+
+    -fx-background-color: WHITE;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-border-width: 2;
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 6px;
+
+}
+
 .searchable-combo-box {
 
     -fx-background-color: WHITE;

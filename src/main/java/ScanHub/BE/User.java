@@ -14,6 +14,7 @@ public class User {
     private String passwordHash;
     private Role role;
     private List<Profile> profiles;
+    private List<Client> clients;
 
     public User(int userId, String username, String passwordHash, Role role) {
         this.userId = userId;
@@ -21,6 +22,7 @@ public class User {
         this.passwordHash = passwordHash;
         this.role = role;
         this.profiles = new ArrayList<>();
+        this.clients = new ArrayList<>();
     }
 
     public User(String username, String passwordHash, Role role) {
@@ -28,6 +30,7 @@ public class User {
         this.passwordHash = passwordHash;
         this.role = role;
         this.profiles = new ArrayList<>();
+        this.clients = new ArrayList<>();
     }
 
     public int getUserId() {
@@ -43,6 +46,7 @@ public class User {
         return role;
     }
     public List<Profile> getProfiles() {return profiles;}
+    public List<Client> getClients() {return clients;}
 
     public void setUserId(int userId) {
         this.userId = userId;
@@ -57,6 +61,7 @@ public class User {
         this.role = role;
     }
     public void setProfiles(List<Profile> profiles) {this.profiles = profiles;}
+    public void setClients(List<Client> clients) {this.clients = clients;}
 
     public boolean isAdmin() {
         return this.role == Role.ADMIN;

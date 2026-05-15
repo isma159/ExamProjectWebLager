@@ -14,30 +14,25 @@ public class Profile {
     private SplitBehavior splitBehavior;
     private ProfileStatus status;
     private String exportLabel;
-    private int brightness;
-    private int contrast;
+    private FileSettings fileSettings;
 
-    public Profile() {}
-
-    public Profile(int profileId, int clientId, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel, int brightness, int contrast) {
+    public Profile(int profileId, Client client, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel, FileSettings fileSettings) {
         this.profileId = profileId;
-        this.clientId = clientId;
+        this.client = client;
         this.profileName = profileName;
         this.splitBehavior = splitBehavior;
         this.status = status;
         this.exportLabel = exportLabel;
-        this.brightness = brightness;
-        this.contrast = contrast;
+        this.fileSettings = fileSettings;
     }
 
-    public Profile(int clientId, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel, int brightness, int contrast) {
-        this.clientId = clientId;
+    public Profile(Client client, String profileName, SplitBehavior splitBehavior, ProfileStatus status, String exportLabel, FileSettings fileSettings) {
+        this.client = client;
         this.profileName = profileName;
         this.splitBehavior = splitBehavior;
         this.status = status;
         this.exportLabel = exportLabel;
-        this.brightness = brightness;
-        this.contrast = contrast;
+        this.fileSettings = fileSettings;
     }
 
     public int getProfileId() { return profileId; }
@@ -47,8 +42,7 @@ public class Profile {
     public SplitBehavior getSplitBehavior() { return splitBehavior; }
     public ProfileStatus getStatus() { return status; }
     public String getExportLabel() { return exportLabel; }
-    public int getBrightness() { return brightness; }
-    public int getContrast() { return contrast; }
+    public FileSettings getFileSettings() { return fileSettings; }
 
     public void setProfileId(int profileId) { this.profileId = profileId; }
     public void setClientId(int clientId) { this.clientId = clientId; }
@@ -57,8 +51,7 @@ public class Profile {
     public void setSplitBehavior(SplitBehavior splitBehavior) { this.splitBehavior = splitBehavior; }
     public void setStatus(ProfileStatus status) { this.status = status; }
     public void setExportLabel(String exportLabel) { this.exportLabel = exportLabel; }
-    public void setBrightness(int brightness) { this.brightness = brightness; }
-    public void setContrast(int contrast) { this.contrast = contrast; }
+    public void setFileSettings(FileSettings fileSettings) { this.fileSettings = fileSettings; }
 
     @Override
     public String toString() { return this.profileName; }
