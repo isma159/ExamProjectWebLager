@@ -1,6 +1,10 @@
 package ScanHub.DAL.DAO;
 
 import ScanHub.BE.Client;
+import ScanHub.BE.FileSettings;
+import ScanHub.BE.Profile;
+import ScanHub.BE.enums.ProfileStatus;
+import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
@@ -44,13 +48,42 @@ public class ClientDAO implements IDataAccess<Client> {
     public List<Client> getData() throws Exception {
         List<Client> clients = new ArrayList<>();
         String sql = "SELECT clientId, clientName FROM Clients WHERE deleted_at IS NULL ORDER BY clientName";
+        String selectProfilesSQL = """
+                                       SELECT p.profileId, p.profileName, p.splitBehavior,
+                                              p.exportLabel, p.status, p.fileSettingsId, fs.hue,
+                                              fs.brightness, fs.contrast, fs.saturation
+                                       FROM Profiles p
+                                       LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
+                                       WHERE p.clientId = ? AND p.deleted_at IS NULL
+                                       """;
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
+             PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);
              ResultSet rs = ps.executeQuery()) {
 
+            // loops through each client
             while (rs.next()) {
-                clients.add(mapRow(rs));
+
+                Client client = mapRow(rs);
+                Client tempClient = mapRow(rs);
+
+                ps2.setInt(1, client.getClientId());
+                try (ResultSet rs2 = ps2.executeQuery()) {
+
+                    // loops through each profile in the current client.
+                    while (rs2.next()) {
+
+                        rs2.getInt("profileId");
+                        if (!rs2.wasNull()) {
+                            Profile profile = mapProfile(rs2, tempClient);
+                            client.getProfiles().add(profile);
+                        }
+
+                    }
+
+                    clients.add(client);
+                }
             }
         } catch (SQLException e) {
             throw new Exception("Could not get clients", e);
@@ -62,14 +95,44 @@ public class ClientDAO implements IDataAccess<Client> {
     @Override
     public Client getDataFromName(String name) throws Exception {
         String sql = "SELECT clientId, clientName FROM Clients WHERE clientName = ? AND deleted_at IS NULL";
+        String selectProfilesSQL = """
+                                       SELECT p.profileId, p.profileName, p.splitBehavior,
+                                              p.exportLabel, p.status, p.fileSettingsId, fs.hue,
+                                              fs.brightness, fs.contrast, fs.saturation
+                                       FROM Profiles p
+                                       LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
+                                       WHERE p.clientId = ?
+                                       """;
 
         try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql);
+             PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);) {
 
             ps.setString(1, name);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? mapRow(rs) : null;
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Client client = mapRow(rs);
+                Client tempClient = mapRow(rs);
+
+                ps2.setInt(1, client.getClientId());
+                try (ResultSet rs2 = ps2.executeQuery()) {
+
+                    while (rs2.next()) {
+                        rs2.getInt("profileId");
+                        if (!rs2.wasNull()) {
+                            Profile profile = mapProfile(rs2, tempClient);
+                            client.getProfiles().add(profile);
+                        }
+                    }
+                    return client;
+                }
             }
+            else{
+                return null;
+            }
+
         } catch (SQLException e) {
             throw new Exception("Could not fetch client from name " + name, e);
         }
@@ -119,5 +182,24 @@ public class ClientDAO implements IDataAccess<Client> {
 
     private Client mapRow(ResultSet rs) throws SQLException {
         return new Client(rs.getInt("clientId"), rs.getString("clientName"));
+    }
+
+    private Profile mapProfile(ResultSet rs, Client tempClient) throws SQLException {
+
+        return new Profile(
+                rs.getInt("profileId"),
+                tempClient,
+                rs.getString("profileName"),
+                SplitBehavior.valueOf(rs.getString("splitBehavior")),
+                ProfileStatus.valueOf(rs.getString("status")),
+                rs.getString("exportLabel"),
+                new FileSettings(
+                        rs.getInt("fileSettingsId"),
+                        rs.getDouble("hue"),
+                        rs.getDouble("brightness"),
+                        rs.getDouble("contrast"),
+                        rs.getDouble("saturation")
+                ));
+
     }
 }

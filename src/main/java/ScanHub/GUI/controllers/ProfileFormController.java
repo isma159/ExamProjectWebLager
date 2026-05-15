@@ -24,11 +24,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.DoubleConsumer;
 
 public class ProfileFormController implements Initializable {
 
     @FXML private ToggleGroup toggleGroupProfileStatus;
-    @FXML private Label formTitle, profileIdLabel, nameError, exportPreviewLabel, usersError;
+    @FXML private Label formTitle, exportPreviewLabel;
     @FXML private Label lblHueValue, lblBrightnessValue, lblContrastValue, lblSaturationValue;
     @FXML private RadioButton radioACTIVE, radioINACTIVE;
     @FXML private VBox vboxStatus;
@@ -41,7 +42,6 @@ public class ProfileFormController implements Initializable {
     private Stage currentStage;
     private ModelFacade modelFacade;
     private Profile editingProfile = null;
-    private List<User> selectedUsers;
 
     private double hue;
     private double brightness;
@@ -54,6 +54,8 @@ public class ProfileFormController implements Initializable {
         this.editingProfile = profile;
 
         ThemeManager.apply(currentStage.getScene());
+
+        searchableComboBoxClient.setItems(modelFacade.getClientModel().getClients());
 
         if (editingProfile != null) {
             formTitle.setText("Edit Profile");
@@ -69,55 +71,21 @@ public class ProfileFormController implements Initializable {
         radioACTIVE.setUserData(ProfileStatus.ACTIVE);
         radioINACTIVE.setUserData(ProfileStatus.INACTIVE);
 
-        selectedUsers = new ArrayList<>();
-
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
-            exportPreviewLabel.setText(buildExportLabel(newValue) + "1");
+
+            String clientName = (searchableComboBoxClient.getValue() != null) ? searchableComboBoxClient.getValue().getClientName() : "";
+
+            exportPreviewLabel.setText(buildExportLabel(newValue, clientName) + "1");
         }));
 
         // Wire sliders to their value labels
-        sliderHue.valueProperty().addListener((obs, oldVal, newVal) -> {
-            hue = newVal.intValue();
-            lblHueValue.setText(String.valueOf(hue));
-            imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, contrast / 100, brightness / 100));
-        });
-
-        sliderBrightness.valueProperty().addListener((obs, oldVal, newVal) -> {
-            brightness = newVal.intValue();
-            lblBrightnessValue.setText(String.valueOf(brightness));
-            imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, contrast / 100, brightness / 100));
-        });
-
-        sliderContrast.valueProperty().addListener((obs, oldVal, newVal) -> {
-            contrast = newVal.intValue();
-            lblContrastValue.setText(String.valueOf(contrast));
-            imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, contrast / 100, brightness / 100));
-        });
-
-        sliderSaturation.valueProperty().addListener((obs, oldVal, newVal) -> {
-            saturation = newVal.intValue();
-            lblSaturationValue.setText(String.valueOf(saturation));
-            imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, contrast / 100, brightness / 100));
-        });
+        bindSlider(sliderHue, lblHueValue, val -> hue = val);
+        bindSlider(sliderBrightness, lblBrightnessValue, val -> brightness = val);
+        bindSlider(sliderContrast, lblContrastValue, val -> contrast = val);
+        bindSlider(sliderSaturation, lblSaturationValue, val -> saturation = val);
     }
 
-    private void populateFields(Profile profile) {
-        profileNameField.setText(profile.getProfileName());
-
-        if (profile.getStatus() == ProfileStatus.ACTIVE) { toggleGroupProfileStatus.selectToggle(radioACTIVE); }
-        else toggleGroupProfileStatus.selectToggle(radioINACTIVE);
-
-        // Populate slider values from existing profile
-        sliderHue.setValue(profile.getFileSettings().getHue());
-        sliderBrightness.setValue(profile.getFileSettings().getBrightness());
-        sliderContrast.setValue(profile.getFileSettings().getContrast());
-        sliderSaturation.setValue(profile.getFileSettings().getSaturation());
-
-        lblHueValue.setText(String.valueOf(profile.getFileSettings().getHue()));
-        lblBrightnessValue.setText(String.valueOf(profile.getFileSettings().getBrightness()));
-        lblContrastValue.setText(String.valueOf(profile.getFileSettings().getContrast()));
-        lblContrastValue.setText(String.valueOf(profile.getFileSettings().getSaturation()));
-    }
+    // event handlers
 
     @FXML
     private void onClickSave(ActionEvent actionEvent) {
@@ -135,31 +103,25 @@ public class ProfileFormController implements Initializable {
         }
     }
 
+    @FXML
+    private void onClickCancel(ActionEvent actionEvent) {
+        currentStage.close();
+    }
+
+    // helper methods
+
     private void createProfile() {
         String profileName = profileNameField.getText();
         Client selectedClient = searchableComboBoxClient.getValue();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
 
-        clearError();
-
-        if (profileName.isBlank() || selectedClient == null || selectedStatusToggle == null) {
-            if (profileName.isBlank()) profileNameField.getStyleClass().add("error-border");
-            if (selectedClient == null) searchableComboBoxClient.getStyleClass().add("error-border");
-            if (selectedStatusToggle == null) vboxStatus.getStyleClass().add("error-border");
-            AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
-            return;
-        }
+        if (!validateFields(profileName, selectedClient, selectedStatusToggle)) {return;}
 
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
 
-        double hue = sliderHue.getValue();
-        double brightness = sliderBrightness.getValue();
-        double contrast = sliderContrast.getValue();
-        double saturation = sliderContrast.getValue();
-
         try {
 
-            Profile newProfile = new Profile(selectedClient, profileName, SplitBehavior.BARCODE, status, buildExportLabel(profileName), new FileSettings(hue, brightness, contrast, saturation));
+            Profile newProfile = new Profile(selectedClient, profileName, SplitBehavior.BARCODE, status, buildExportLabel(profileName, selectedClient.getClientName()), buildFileSettings());
             Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
             modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), createdProfile.getProfileId(), EntityType.PROFILE, LogAction.CREATE, LocalDateTime.now()));
             currentStage.close();
@@ -174,31 +136,18 @@ public class ProfileFormController implements Initializable {
         String newProfileName = profileNameField.getText();
         Client selectedClient = searchableComboBoxClient.getValue();
         Toggle selectedStatusToggle = toggleGroupProfileStatus.getSelectedToggle();
-        String newExportLabel = buildExportLabel(newProfileName);
 
-        clearError();
+        if (!validateFields(newProfileName, selectedClient, selectedStatusToggle)) {return;}
 
-        if (newProfileName.isBlank() || selectedClient == null || selectedStatusToggle == null) {
-            if (newProfileName.isBlank()) profileNameField.getStyleClass().add("error-border");
-            if (selectedClient == null) searchableComboBoxClient.getStyleClass().add("error-border");
-            if (selectedStatusToggle == null) vboxStatus.getStyleClass().add("error-border");
-            AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
-            return;
-        }
-
+        String newExportLabel = buildExportLabel(newProfileName, selectedClient.getClientName());
         ProfileStatus status = (ProfileStatus) selectedStatusToggle.getUserData();
-
-        double hue = sliderHue.getValue();
-        double brightness = sliderBrightness.getValue();
-        double contrast = sliderContrast.getValue();
-        double saturation = sliderContrast.getValue();
 
         editingProfile.setProfileName(newProfileName);
         editingProfile.setClient(selectedClient);
         editingProfile.setSplitBehavior(SplitBehavior.BARCODE);
         editingProfile.setStatus(status);
         editingProfile.setExportLabel(newExportLabel);
-        editingProfile.setFileSettings(new FileSettings(hue, brightness, contrast, saturation));
+        editingProfile.setFileSettings(buildFileSettings());
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);
@@ -209,18 +158,69 @@ public class ProfileFormController implements Initializable {
         }
     }
 
+    private void populateFields(Profile profile) {
+        profileNameField.setText(profile.getProfileName());
+
+        if (profile.getStatus() == ProfileStatus.ACTIVE) { toggleGroupProfileStatus.selectToggle(radioACTIVE); }
+        else toggleGroupProfileStatus.selectToggle(radioINACTIVE);
+
+        searchableComboBoxClient.getSelectionModel().select(profile.getClient());
+
+        // Populate slider values from existing profile
+        sliderHue.setValue(profile.getFileSettings().getHue());
+        sliderBrightness.setValue(profile.getFileSettings().getBrightness());
+        sliderContrast.setValue(profile.getFileSettings().getContrast());
+        sliderSaturation.setValue(profile.getFileSettings().getSaturation());
+    }
+
+    private void bindSlider(Slider slider, Label label, DoubleConsumer setter) {
+        slider.valueProperty().addListener(((observable, oldValue, newValue) -> {
+            setter.accept(newValue.doubleValue());
+            label.setText(String.valueOf(newValue.intValue()));
+            updatePreview();
+        }));
+    }
+
+    private void updatePreview() {
+        imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, brightness / 100, contrast / 100));
+    }
+
+    private boolean validateFields(String profile, Client client, Toggle statusToggle) {
+        clearError();
+
+        if (profile.isBlank()) profileNameField.getStyleClass().add("error-border");
+        if (client == null) searchableComboBoxClient.getStyleClass().add("error-border");
+        if (statusToggle == null) vboxStatus.getStyleClass().add("error-border");
+
+        if (profile.isBlank() || client == null || statusToggle == null) {
+            AlertHelper.showWarning("Missing Fields", "Please fill in all required fields.");
+            return false;
+        }
+
+        return true;
+    }
+
     private void clearError() {
         profileNameField.getStyleClass().remove("error-border");
         searchableComboBoxClient.getStyleClass().remove("error-border");
         vboxStatus.getStyleClass().remove("error-border");
     }
 
-    private String buildExportLabel(String profileName) {
-        return profileName.replace(" ", "") + "_";
+    private FileSettings buildFileSettings() {
+        return new FileSettings(
+                hue,
+                brightness,
+                contrast,
+                saturation
+        );
     }
 
-    @FXML
-    private void onClickCancel(ActionEvent actionEvent) {
-        currentStage.close();
+    private String buildExportLabel(String profileName, String clientName) {
+        if (clientName != null) {
+            return clientName.replace(" ", "") + "_" + profileName.replace(" ", "") + "_";
+        }
+        else {
+            return profileName.replace(" ", "") + "_";
+        }
     }
 }

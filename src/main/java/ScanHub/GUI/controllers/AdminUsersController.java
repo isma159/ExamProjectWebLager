@@ -1,11 +1,13 @@
 package ScanHub.GUI.controllers;
 
 // project imports
+import ScanHub.BE.Client;
 import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
+import ScanHub.GUI.util.TableLoader;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.event.ActionEvent;
 
@@ -30,15 +32,17 @@ import java.util.ResourceBundle;
 
 public class AdminUsersController implements Initializable {
 
-    @FXML private VBox userTableBox;
+    @FXML private VBox userTableBox, clientTableBox;
     @FXML private TextField txtFldUserSearch;
-    @FXML private Pagination pgUsers;
+    @FXML private Pagination pgUsers, pgClients;
     private List<User> currentUsers = new ArrayList<>();
     private boolean userAscending = true;
 
     private final ModelFacade modelFacade;
     private User selectedUser = null;
+    private Client selectedClient = null;
     private HBox selectedUserRow = null;
+    private HBox selectedClientRow = null;
     private Role selectedRole = null;
     private Stage currentStage;
 
@@ -52,57 +56,41 @@ public class AdminUsersController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadUsers();
+        loadClients();
         txtFldUserSearch.textProperty().addListener((observable, oldValue, newValue) -> filterUsers(newValue));
 
-        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            loadUsers();
-        }));
+        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> loadUsers()));
+        pgClients.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> loadClients()));
 
         javafx.application.Platform.runLater(this::registerUserShortcuts);
     }
 
     private void loadUsers() {
         try {
-            // resets
-            userTableBox.getChildren().clear();
             selectedUser = null;
             selectedUserRow = null;
 
-            // sets up with all users by running a for-loop that makes an interactive HBox of every user
             List<User> users = modelFacade.getUserModel().getUsers();
+            TableLoader.loadTable(userTableBox, pgUsers, TOTAL_TABLE_SIZE, users, item -> {
+                User user = (User) item;
+                return RowMaker.addUserRow(user, this::selectUser);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertHelper.showError("Load Error", "Failed to load users.");
+        }
+    }
 
-            pgUsers.setPageCount(Math.ceilDiv(users.size(), TOTAL_TABLE_SIZE));
+    private void loadClients() {
+        try {
+            selectedClient = null;
+            selectedClientRow = null;
 
-            int startIndex = pgUsers.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
-            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, users.size());
-
-            currentUsers = new ArrayList<>(users.subList(startIndex, endIndex));
-            for (User user : currentUsers) {
-                HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
-                    // clear highlight of previously selected row
-                    if (selectedUserRow != null) {
-                        selectedUserRow.getStyleClass().remove("row-selected");
-                    }
-                    // remove selected row if clicked on again
-                    if (selectedUser == clickedUser) {
-                        selectedUser = null;
-                        selectedUserRow = null;
-                        return; // will reselect on the next line if not returning
-                    }
-                    // select clicked row as selected user (with highlight to show)
-                    selectedUser = clickedUser;
-                    selectedUserRow = rowHBox;
-                    rowHBox.getStyleClass().add("row-selected");
-                });
-                row.setFocusTraversable(true);
-                row.focusedProperty().addListener((observable, oldValue, isFocused) -> {
-                    if (isFocused) {
-                        selectUser(user, row);
-                    }
-                });
-                row.setUserData(user);
-                userTableBox.getChildren().add(row);
-            }
+            List<Client> clients = modelFacade.getClientModel().getClients();
+            TableLoader.loadTable(clientTableBox, pgClients, TOTAL_TABLE_SIZE, clients, item -> {
+                Client client = (Client) item;
+                return RowMaker.addClientRow(client, this::selectClient);
+            });
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Load Error", "Failed to load users.");
@@ -133,11 +121,36 @@ public class AdminUsersController implements Initializable {
     private void selectUser(User user, HBox rowHBox) {
         if (selectedUserRow != null) {
             selectedUserRow.getStyleClass().remove("row-selected");
+            selectedClient = null;
+            selectedClientRow = null;
+            return;
         }
 
         selectedUser = user;
         selectedUserRow = rowHBox;
         rowHBox.getStyleClass().add("row-selected");
+    }
+
+    private void selectClient(Client client, HBox rowHBox) {
+        if (selectedClientRow != null) {
+            selectedClientRow.getStyleClass().remove("row-selected");
+            selectedClient = null;
+            selectedClientRow = null;
+            return;
+        }
+
+        selectedClient = client;
+        selectedClientRow = rowHBox;
+        rowHBox.getStyleClass().add("row-selected");
+    }
+
+    private void registerRow(VBox tableBox, HBox row, Object data, Runnable onFocus) {
+        row.setFocusTraversable(true);
+        row.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (focused) onFocus.run();
+        });
+        row.setUserData(data);
+        tableBox.getChildren().add(row);
     }
 
 
@@ -158,7 +171,7 @@ public class AdminUsersController implements Initializable {
     @FXML
     private void onClickDeleteUser(MouseEvent mouseEvent) {
         if (selectedUser == null) {
-            AlertHelper.showWarning("No Selection", "Please select a user to delete.");
+            AlertHelper.showError("No Selection", "Please select a user to delete.");
             return;
         }
 
@@ -173,9 +186,15 @@ public class AdminUsersController implements Initializable {
         });
     }
 
-    @FXML private void onClickCreateClient() {}
+    @FXML private void onClickCreateClient() {openClientForm(null);}
 
-    @FXML private void onClickUpdateClient() {}
+    @FXML private void onClickUpdateClient() {
+        if (selectedClient == null) {
+            AlertHelper.showError("No Selection", "Please select a client to delete.");
+            return;
+        }
+        openClientForm(selectedClient);
+    }
 
     @FXML private void onClickDeleteClient() {}
 
@@ -198,6 +217,32 @@ public class AdminUsersController implements Initializable {
             stage.showAndWait();
 
             loadUsers(); // refresh the list after the form closes
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertHelper.showError("Error", "Failed to open the user form. Please try again.");
+        }
+    }
+
+    private void openClientForm(Client client) { // TODO
+        try {
+            ViewHandler handler = client == null ? ViewHandler.CREATE_CLIENT : ViewHandler.EDIT_CLIENT;
+            handler.reset();
+            handler.preLoad();
+
+            ClientFormController controller = handler.getController();
+            Stage stage = handler.prepareStage();
+            controller.setModel(stage, modelFacade, client);
+
+            stage.getScene().setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    stage.close();
+                    event.consume();
+                }
+            });
+
+            stage.showAndWait();
+
+            loadClients(); // refresh the list after the form closes
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Error", "Failed to open the user form. Please try again.");

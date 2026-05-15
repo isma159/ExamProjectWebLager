@@ -2,12 +2,13 @@ package ScanHub.BE;
 
 // java imports
 import ScanHub.BE.enums.Role;
+import ScanHub.BE.interfaces.CheckTreeNode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class User {
+public class User implements CheckTreeNode {
 
     private int userId;
     private String username;
