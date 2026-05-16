@@ -264,6 +264,13 @@
 
 }
 
+.combo-box-base:focused {
+
+    -fx-border-color: #2d3d4f;
+    -fx-effect: none;
+
+}
+
 .searchable-combo-box {
 
     -fx-background-color: WHITE;
@@ -276,9 +283,94 @@
 
 }
 
+.searchable-combo-box .text-field {
+    -fx-focus-color: TRANSPARENT;
+    -fx-faint-focus-color: TRANSPARENT;
+}
+
+.searchable-combo-box .text-field:focused {
+    -fx-background-color: #2d3d4f, white;
+    -fx-background-insets: -1.5, 0;
+    -fx-background-radius: 6, 6;
+}
+
+.combo-box:focused .text-field {
+
+    -fx-border-color: #2d3d4f;
+    -fx-effect: none;
+
+}
+
+.combo-box .list-view {
+
+    -fx-background-color: WHITE;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-border-width: 0.5;
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 6px;
+
+}
+
+.combo-box .list-cell:hover {
+
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #2d3d4f;
+
+}
+
+.combo-box .list-cell:focused {
+
+    -fx-background-color: WHITE;
+
+}
+
 .slider {
 
 }
+
+.client-row {
+
+    -fx-background-color: #F5f5f5;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-border-width: 2;
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 6px;
+
+    -fx-text-fill: BLACK;
+
+}
+
+.client-row:hover {
+
+}
+
+.client-row:focused {
+
+}
+
+.profile-row {
+
+    -fx-background-color: WHITE;
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-insets: 0 20 0 20;
+
+    transition: -fx-background-color 300ms ease-out;
+
+}
+
+.profile-row:hover {
+
+    -fx-background-color: #F1F5F9;
+
+}
+
+
 
 .primary-btn {
 
@@ -393,12 +485,6 @@
 
 }
 
-.tree-view-scanner .tree-cell .tree-disclosure-node .arrow {
-
-    /*-fx-background-color: #ffffff;*/
-
-}
-
 .tree-cell-box {
 
     -fx-text-fill: #FFAC1C;
@@ -414,6 +500,32 @@
 .tree-cell-file {
 
     -fx-text-fill: #FFEA00;
+
+}
+
+.tree-view-form {
+
+    -fx-background-color: TRANSPARENT;
+    -fx-border-color: TRANSPARENT;
+
+}
+
+.tree-view-form:focused {
+
+    -fx-background-color: TRANSPARENT;
+    -fx-border-color: TRANSPARENT;
+
+}
+
+.tree-view-form .tree-cell {
+
+    -fx-font-size: 12;
+
+}
+
+.tree-view-form .tree-cell:focused {
+
+    -fx-text-fill: #000000;
 
 }
 

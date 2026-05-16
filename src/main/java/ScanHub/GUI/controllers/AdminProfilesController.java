@@ -8,10 +8,10 @@ import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
-
-// java imports
 import ScanHub.GUI.util.TableLoader;
 import ScanHub.GUI.util.ViewHandler;
+
+// javafx imports
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -23,6 +23,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+// java imports
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -140,6 +142,8 @@ public class AdminProfilesController implements Initializable {
                     try {
                         modelFacade.getProfileModel().deleteProfile(selectedProfile);
                         modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedProfile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
+                        modelFacade.getClientModel().refreshClients();
+                        modelFacade.getUserModel().refreshUsers();
                         loadProfiles();
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -98,6 +98,7 @@ public class ProfileFormController implements Initializable {
         try {
             modelFacade.getUserModel().refreshUsers();
             modelFacade.getProfileModel().refreshProfiles();
+            modelFacade.getClientModel().refreshClients();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Could not save changes. Please try again.");
         }
