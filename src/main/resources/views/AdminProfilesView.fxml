@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
     <children>
         <VBox HBox.hgrow="ALWAYS">
             <children>
@@ -123,8 +123,6 @@
                             </styleClass>
                             <children>
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Profile Name" HBox.hgrow="ALWAYS" />
-                                <Separator orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Split Behaviour" HBox.hgrow="ALWAYS" />
                                 <Separator orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Export Label" HBox.hgrow="ALWAYS" />
                                 <Separator orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />

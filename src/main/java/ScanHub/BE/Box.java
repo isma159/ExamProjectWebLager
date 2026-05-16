@@ -17,9 +17,7 @@ public class Box implements TreeNode {
     private LocalDateTime modifiedAt;
     private List<Document> documents;
 
-    public Box() {
-        this.documents = new ArrayList<>();
-    }
+    public Box() { this.documents = new ArrayList<>(); }
 
     public Box(int boxId, String boxName, int profileId, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.boxId = boxId;
@@ -50,12 +48,8 @@ public class Box implements TreeNode {
     public int getFileCount() { return documents.stream().mapToInt(d -> d.getFiles().size()).sum(); }
 
     @Override
-    public String toString() {
-        return this.boxName;
-    }
+    public String toString() { return this.boxName; }
 
     @Override
-    public String getDisplayName() {
-        return "\uE9D9" + " " + boxName;
-    }
+    public String getDisplayName() { return "\uE9D9" + " " + boxName; }
 }

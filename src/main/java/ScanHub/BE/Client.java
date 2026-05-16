@@ -1,10 +1,12 @@
 package ScanHub.BE;
 
+import ScanHub.BE.interfaces.CheckTreeNode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Client {
+public class Client implements CheckTreeNode {
 
     private int clientId;
     private String clientName;

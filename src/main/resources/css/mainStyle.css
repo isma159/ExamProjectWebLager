@@ -252,6 +252,18 @@
     -fx-background-color: #F1F5F9;
 }
 
+.combo-box {
+
+    -fx-background-color: WHITE;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-border-width: 2;
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 6px;
+
+}
+
 .searchable-combo-box {
 
     -fx-background-color: WHITE;
@@ -886,4 +898,14 @@
 .toggle-switch .thumb {
     -fx-background-color: white;
     -fx-background-radius: 50px;
+}
+
+.dialog-card {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 2;
+    -fx-border-radius: 18;
+    -fx-padding: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 24, 0.2, 0, 4);
 }

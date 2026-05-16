@@ -1,9 +1,11 @@
 package ScanHub.GUI.controllers;
 
 // project imports
+import ScanHub.BE.Client;
 import ScanHub.BE.Profile;
 import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
+import ScanHub.BE.interfaces.CheckTreeNode;
 import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
@@ -16,6 +18,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.controlsfx.control.CheckTreeView;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +28,10 @@ import java.util.ResourceBundle;
 public class UserFormController implements Initializable {
 
     @FXML private ToggleGroup toggleGroupRole;
-    @FXML private Label formTitle, passwordHint, usernameError, passwordError, confirmError;
+    @FXML private Label formTitle, passwordHint;
     @FXML private RadioButton radioADMIN, radioUSER;
-    @FXML private VBox vboxRole, vboxProfiles;
+    @FXML private VBox vboxRole;
+    @FXML private CheckTreeView<CheckTreeNode> clientTreeView;
     @FXML private TextField usernameField;
     @FXML private Button saveButton;
     @FXML private PasswordField passwordField, confirmPasswordField;
@@ -63,26 +68,26 @@ public class UserFormController implements Initializable {
         }
 
         ThemeManager.apply(currentStage.getScene());
-        loadProfiles();
+        loadClientsAndProfiles();
     }
 
-    private void loadProfiles() {
-        try {
-            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
+    private void loadClientsAndProfiles() {
+        clientTreeView.setRoot(null);
 
-            for (Profile profile: profiles) {
-                vboxProfiles.getChildren().add(RowMaker.addProfileRowToForm(profile, editingUser, (selectedProfile, isChecked) -> {
-                    if (isChecked) {
-                        selectedProfiles.add(profile);
-                    }
-                    else {
-                        selectedProfiles.remove(profile);
-                    }
-                }));
+        CheckBoxTreeItem<CheckTreeNode> root = new CheckBoxTreeItem<>();
+        clientTreeView.setRoot(root);
+        root.setExpanded(true);
+
+        List<Client> clients = modelFacade.getClientModel().getClients();
+
+        for (Client client: clients) {
+            CheckBoxTreeItem<CheckTreeNode> clientItem = new CheckBoxTreeItem<>(client);
+            clientItem.setExpanded(true);
+            for (Profile profile: client.getProfiles()) {
+                CheckBoxTreeItem<CheckTreeNode> profileItem = new CheckBoxTreeItem<>(profile);
+                clientItem.getChildren().add(profileItem);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertHelper.showError("Load Error", "Failed to load profiles.");
+            root.getChildren().add(clientItem);
         }
     }
 

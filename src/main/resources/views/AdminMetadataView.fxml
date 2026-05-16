@@ -4,14 +4,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminMetadataController">
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminMetadataController">
     <children>
         <VBox prefHeight="200.0" prefWidth="1800.0" HBox.hgrow="ALWAYS">
             <children>
                 <VBox prefHeight="1200.0" prefWidth="1371.0" styleClass="shadow">
                     <children>
-
-                        <!-- ── Top bar: title + search + action buttons ── -->
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0">
                             <styleClass>
                                 <String fx:value="half-card" />
@@ -28,8 +26,6 @@
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                             </children>
                         </HBox>
-
-                        <!-- ── Column headers ── -->
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="second-card-bg" />
@@ -74,14 +70,12 @@
                             </children>
                         </HBox>
 
-                        <!-- ── Scrollable row list ── -->
                         <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
                             <content>
                                 <VBox fx:id="metadataTableBox" prefHeight="100.0" prefWidth="100.0" />
                             </content>
                         </ScrollPane>
 
-                        <!-- ── Pagination footer ── -->
                         <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="half-card-bottom" />

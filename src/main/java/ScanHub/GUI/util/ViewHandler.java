@@ -17,7 +17,9 @@ public enum ViewHandler {
     CREATE_USER("/views/UserFormView.fxml", "Create User", false, Modality.APPLICATION_MODAL),
     EDIT_USER("/views/UserFormView.fxml", "Edit User", false, Modality.APPLICATION_MODAL),
     CREATE_PROFILE("/views/ProfileFormView.fxml", "Create Profile", false, Modality.APPLICATION_MODAL),
-    EDIT_PROFILE("/views/ProfileFormView.fxml", "Edit Profile", false, Modality.APPLICATION_MODAL);
+    EDIT_PROFILE("/views/ProfileFormView.fxml", "Edit Profile", false, Modality.APPLICATION_MODAL),
+    CREATE_CLIENT("/views/ClientFormView.fxml", "Create Client", false, Modality.APPLICATION_MODAL),
+    EDIT_CLIENT("/views/ClientFormView.fxml", "Edit Client", false, Modality.APPLICATION_MODAL);
 
     private final String path;
     private final String title;

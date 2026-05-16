@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="255.0" prefWidth="450.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ClientFormController">
+   <children>
+      <VBox prefHeight="810.0" prefWidth="520" styleClass="background" HBox.hgrow="ALWAYS">
+          <padding>
+            <Insets bottom="0" left="0" right="0" top="0" />
+         </padding>
+          <HBox alignment="CENTER_LEFT" prefHeight="56" spacing="12" styleClass="primary-navigation-bg">
+              <padding>
+               <Insets bottom="0" left="20" right="20" top="0" />
+            </padding>
+              <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                      <Image url="@../images/Green/WeblagerGreenIcon.png" />
+                  </image>
+              </ImageView>
+              <Label fx:id="formTitle" styleClass="bold-lbl" text="Create client" textFill="WHITE" />
+              <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" HBox.hgrow="ALWAYS" />
+              <Label fx:id="userIdLabel" text="" />
+          </HBox>
+         <HBox VBox.vgrow="ALWAYS">
+            <children>
+                <VBox alignment="CENTER" prefWidth="540.0" HBox.hgrow="ALWAYS">
+                    <padding>
+                     <Insets left="12.0" right="6.0" top="12.0" />
+                  </padding>
+                    <VBox prefHeight="675.0" prefWidth="480.0" spacing="0">
+                        <padding>
+                        <Insets bottom="24" left="24" right="24" top="24" />
+                     </padding>
+                        <Label styleClass="bold-lbl" text="Client Name" />
+                        <Region prefHeight="6" />
+                        <TextField fx:id="clientNameField" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30" promptText="e.g. jens.hansen" styleClass="container" />
+                        <Label fx:id="usernameError" managed="false" text="Username is required." visible="false" />
+                     <styleClass>
+                        <String fx:value="card" />
+                        <String fx:value="card-bg" />
+                     </styleClass>
+                    </VBox>
+                </VBox>
+            </children>
+         </HBox>
+          <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="520.0" spacing="8">
+              <padding>
+               <Insets bottom="0" left="24" right="24" top="0" />
+            </padding>
+              <Button onAction="#onClickCancel" prefHeight="30" styleClass="tertiary-btn" text="Cancel" />
+              <Button fx:id="saveButton" defaultButton="true" onAction="#onClickSave" prefHeight="33" styleClass="primary-btn" text="Create client" />
+          </HBox>
+      </VBox>
+   </children>
+</HBox>

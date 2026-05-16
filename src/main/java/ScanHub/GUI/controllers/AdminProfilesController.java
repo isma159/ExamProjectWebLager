@@ -10,6 +10,7 @@ import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 
 // java imports
+import ScanHub.GUI.util.TableLoader;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -64,46 +65,16 @@ public class AdminProfilesController implements Initializable {
 
     private void loadProfiles() {
         try {
-            // resets
-            profileTableBox.getChildren().clear();
             selectedProfile = null;
             selectedProfileRow = null;
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
             List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
+            TableLoader.loadTable(profileTableBox, pgProfiles, TOTAL_TABLE_SIZE, profiles, item ->{
+                Profile profile = (Profile) item;
+                return RowMaker.addProfileRow(profile, this::selectProfile);
+            });
 
-            pgProfiles.setPageCount(Math.ceilDiv(profiles.size(), TOTAL_TABLE_SIZE));
-
-            int startIndex = pgProfiles.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
-            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, profiles.size());
-
-            currentProfiles = new ArrayList<>(profiles.subList(startIndex, endIndex));
-            for (Profile profile : currentProfiles) {
-                HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
-                    // clear highlight of previously selected row
-                    if (selectedProfileRow != null) {
-                        selectedProfileRow.getStyleClass().remove("row-selected");
-                    }
-                    // remove selected row if clicked on again
-                    if (selectedProfile == clickedProfile) {
-                        selectedProfile = null;
-                        selectedProfileRow = null;
-                        return; // will reselect on the next line if not returning
-                    }
-                    // select clicked row as selected profile (with highlight to show)
-                    selectedProfile = clickedProfile;
-                    selectedProfileRow = rowHBox;
-                    rowHBox.getStyleClass().add("row-selected");
-                });
-                row.setFocusTraversable(true);
-                row.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        selectProfile(profile, row);
-                    }
-                });
-                row.setUserData(profile);
-                profileTableBox.getChildren().add(row);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Load Error", "Failed to load profiles.");
@@ -134,6 +105,8 @@ public class AdminProfilesController implements Initializable {
     private void selectProfile(Profile profile, HBox rowHBox) {
         if (selectedProfileRow != null) {
             selectedProfileRow.getStyleClass().remove("row-selected");
+            selectedProfile = null;
+            selectedProfileRow = null;
         }
 
         selectedProfile = profile;
@@ -206,8 +179,7 @@ public class AdminProfilesController implements Initializable {
             HBox row = (HBox) node;
             Profile profile = (Profile) row.getUserData();
 
-            boolean matching = search.isBlank()
-            || profile.getProfileName().toLowerCase().contains(search.toLowerCase()) || profile.getSplitBehavior().name().toLowerCase().contains(search.toLowerCase());
+            boolean matching = search.isBlank() || profile.getProfileName().toLowerCase().contains(search.toLowerCase());
             boolean matchingStatus = selectedStatus == null || profile.getStatus() == selectedStatus;
             row.setVisible(matching && matchingStatus);
             row.setManaged(matching && matchingStatus);
@@ -238,34 +210,6 @@ public class AdminProfilesController implements Initializable {
         // toggle ascending and descending order
         profileAscending = !profileAscending;
         // sorting the profile names on the direction
-        currentProfiles.sort(profileAscending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
-        profileTableBox.getChildren().clear();
-
-        for (Profile profile : currentProfiles) {
-            HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
-                if (selectedProfile != null) selectedProfileRow.getStyleClass().remove("row-selected");
-                if (selectedProfile == clickedProfile) { selectedProfile = null; selectedProfileRow = null; return;}
-                selectedProfile = clickedProfile;
-                selectedProfileRow = rowHBox;
-                rowHBox.getStyleClass().add("row-selected");
-            });
-            row.setFocusTraversable(true);
-            row.focusedProperty().addListener((observable, oldValue, isFocused) -> {
-                if (isFocused) {
-                    selectProfile(profile, row);
-                }
-            });
-            row.setUserData(profile);
-            profileTableBox.getChildren().add(row);
-        }
-        filterProfiles(txtFldSearchProfiles.getText());
-    }
-
-    @FXML
-    private void onSplitBehaviorClick() {
-        // toggle ascending and descending order
-        profileAscending = !profileAscending;
-
         currentProfiles.sort(profileAscending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
         profileTableBox.getChildren().clear();
 

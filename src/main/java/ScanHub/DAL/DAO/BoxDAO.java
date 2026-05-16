@@ -2,9 +2,9 @@ package ScanHub.DAL.DAO;
 
 import ScanHub.BE.Box;
 import ScanHub.BE.Client;
+import ScanHub.BE.FileSettings;
 import ScanHub.BE.Profile;
 import ScanHub.BE.enums.ProfileStatus;
-import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
@@ -137,10 +137,11 @@ public class BoxDAO implements IDataAccess<Box> {
     private String baseSelectSql() {
         return """
                 SELECT b.boxId, b.boxName, b.profileId, b.created_at, b.modified_at,
-                       p.clientId, p.profileName, p.splitBehavior, p.status, p.exportLabel,
-                       c.clientName
+                       p.clientId, p.profileName, p.status, p.exportLabel, p.fileSettingsId,
+                       c.clientName, fs.hue, fs.brightness, fs.contrast, fs.saturation
                 FROM Boxes b
                 JOIN Profiles p ON b.profileId = p.profileId
+                JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 """;
     }
@@ -150,19 +151,17 @@ public class BoxDAO implements IDataAccess<Box> {
 
         Profile profile = new Profile(
                 rs.getInt("profileId"),
-                rs.getInt("clientId"),
+                new Client(rs.getInt("clientId"),
+                        rs.getString("clientName")),
                 rs.getString("profileName"),
-                SplitBehavior.valueOf(rs.getString("splitBehavior")),
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
-                0,
-                0
+                new FileSettings(rs.getInt("fileSettingsId"),
+                        rs.getDouble("hue"),
+                        rs.getDouble("brightness"),
+                        rs.getDouble("contrast"),
+                        rs.getDouble("saturation"))
         );
-
-        String clientName = rs.getString("clientName");
-        if (clientName != null) {
-            profile.setClient(new Client(profile.getClientId(), clientName));
-        }
 
         box.setProfile(profile);
         return box;
