@@ -22,7 +22,6 @@ public class ScanModel {
     /**
      * Fetches the next page and holds it in memory.
      * For an empty box the very first fetch is always a barcode page (enforced by ScanManager).
-     * Handles barcode-split logic automatically via the profile's SplitBehavior.
      *
      * @param rotation initial rotation in degrees (0, 90, 180, 270)
      * @return a StoredScan record with the File, its Document, and a barcode-split flag

@@ -4,7 +4,6 @@ import ScanHub.BE.Client;
 import ScanHub.BE.FileSettings;
 import ScanHub.BE.Profile;
 import ScanHub.BE.enums.ProfileStatus;
-import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
@@ -49,7 +48,7 @@ public class ClientDAO implements IDataAccess<Client> {
         List<Client> clients = new ArrayList<>();
         String sql = "SELECT clientId, clientName FROM Clients WHERE deleted_at IS NULL ORDER BY clientName";
         String selectProfilesSQL = """
-                                       SELECT p.profileId, p.profileName, p.splitBehavior,
+                                       SELECT p.profileId, p.profileName,
                                               p.exportLabel, p.status, p.fileSettingsId, fs.hue,
                                               fs.brightness, fs.contrast, fs.saturation
                                        FROM Profiles p
@@ -96,7 +95,7 @@ public class ClientDAO implements IDataAccess<Client> {
     public Client getDataFromName(String name) throws Exception {
         String sql = "SELECT clientId, clientName FROM Clients WHERE clientName = ? AND deleted_at IS NULL";
         String selectProfilesSQL = """
-                                       SELECT p.profileId, p.profileName, p.splitBehavior,
+                                       SELECT p.profileId, p.profileName,
                                               p.exportLabel, p.status, p.fileSettingsId, fs.hue,
                                               fs.brightness, fs.contrast, fs.saturation
                                        FROM Profiles p
@@ -190,7 +189,6 @@ public class ClientDAO implements IDataAccess<Client> {
                 rs.getInt("profileId"),
                 tempClient,
                 rs.getString("profileName"),
-                SplitBehavior.valueOf(rs.getString("splitBehavior")),
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
                 new FileSettings(

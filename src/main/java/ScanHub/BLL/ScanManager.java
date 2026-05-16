@@ -5,7 +5,6 @@ import ScanHub.BE.BoxMetadata;
 import ScanHub.BE.Document;
 import ScanHub.BE.File;
 import ScanHub.BE.enums.ExportMode;
-import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.BLL.util.BarcodeDetector;
 import ScanHub.DAL.ApiClient.ScanResult;
 import ScanHub.DAL.DAO.BoxMetadataDAO;
@@ -41,14 +40,11 @@ public class ScanManager {
     private final Box targetBox;
     private int referenceCounter = 0;
 
-    /**
-     * Set to true when the box has no files at all — the very first scan of a
-     * new (or empty) box must be a barcode page so every document starts with one.
-     */
-    private boolean needsBarcodeFirst;
+    public boolean needsBarcodeFirst; // true when box has no files and documents
+    private final List<Integer> pendingDeleteFileIds = new ArrayList<>(); // list of file id's to be deleted at the next commit
+    private final List<Integer> pendingDeleteDocumentIds = new ArrayList<>(); // list document id's to be deleted at the next commit
 
-    /** Thin record returned to the controller after each successful scan. */
-    public record StoredScan(File file, Document document, boolean barcodeSplit) {}
+    public record StoredScan(File file, Document document, boolean barcodeSplit) {} // record returned to controller after each successful scan
 
     public ScanManager(IScanSource scanSource, Box targetBox) throws Exception {
         this.scanSource = scanSource;
@@ -69,7 +65,7 @@ public class ScanManager {
         }
 
         // Box is empty (no files anywhere) -> first page must be a barcode
-        needsBarcodeFirst = existingDocs.stream().allMatch(d -> d.getFiles().isEmpty());
+        needsBarcodeFirst = existingDocs.stream().allMatch(document -> document.getFiles().isEmpty());
     }
 
     /**
@@ -84,15 +80,13 @@ public class ScanManager {
         needsBarcodeFirst = false; // only enforce barcode-first on the very first scan.
         boolean barcodeSplit = false;
 
-        SplitBehavior behavior = targetBox.getProfile().getSplitBehavior();
-
         // we only create a new document if there is no current document yet or the current document already contains pages
-        if (behavior == SplitBehavior.BARCODE && BarcodeDetector.containsBarcode(result.data())) {
+        if (BarcodeDetector.containsBarcode(result.data())) {
             if (currentDocument == null || !currentDocument.getFiles().isEmpty()) {
                 currentDocument = stageDocument();
             }
             barcodeSplit = true;
-        } else if (currentDocument == null) { // just in case, but all documents should start with a barcode
+        } else if (currentDocument == null) { // just in case, but all documents will always start with a barcode
             currentDocument = stageDocument();
         }
 
@@ -102,10 +96,23 @@ public class ScanManager {
     }
 
     /**
-     * Walks every staged document and file in order, persists them, then
-     * updates the in-memory objects with their real DB ids and refreshes metadata.
+     * Applies all pending in-memory deletes to the DB, then walks every staged
+     * document and file in order, persists them, updates their real DB ids, and
+     * refreshes metadata.
      */
     public void commitAll() throws Exception {
+        // delete
+        for (int fileId : pendingDeleteFileIds) {
+            fileDAO.deleteFile(fileId);
+        }
+        pendingDeleteFileIds.clear();
+
+        for (int documentId : pendingDeleteDocumentIds) {
+            documentDAO.deleteDocument(documentId);
+        }
+        pendingDeleteDocumentIds.clear();
+
+        // persist staged files and documents
         for (Document document : targetBox.getDocuments()) {
             if (document.isStaged()) {
                 Document persisted = documentDAO.createDocument(targetBox.getBoxId());
@@ -150,7 +157,7 @@ public class ScanManager {
     public void exportToDirectory(java.io.File exportDirectory, ExportMode mode) throws Exception {
         ImageIO.scanForPlugins(); // ensure TwelveMonkeys TIFF writer/reader is registered
 
-        Path boxRoot = exportDirectory.toPath().resolve(sanitize(targetBox.getBoxName()));
+        Path boxRoot = exportDirectory.toPath().resolve(targetBox.getBoxName());
         Files.createDirectories(boxRoot);
 
         int documentIndex = 1;
@@ -245,39 +252,71 @@ public class ScanManager {
     }
 
     /**
-     * Deletes a single file.
-     * Staged files are removed from memory only.
-     * Persisted files are soft-deleted in the DB and metadata is refreshed.
+     * Removes a file from the in-memory box.
+     * <p>
+     * Staged files are discarded immediately with no DB call.
+     * Persisted files are queued for soft-delete and written to the DB only when
+     * {@link #commitAll()} is called, so the session stays consistent until saved on export.
+     * <p>
+     * {@code needsBarcodeFirst} is re-evaluated after removal (if everything is deleted the first file should be a barcode).
      */
     public void deleteFile(File file) throws Exception {
-        if (!file.isStaged()) {
-            fileDAO.softDelete(file.getFileId());
-        }
+        // remove from memory (also sets the owning document to modified if it is persisted)
         for (Document document : targetBox.getDocuments()) {
-            document.getFiles().removeIf(f -> file.isStaged() ? f == file : f.getFileId() == file.getFileId());
+            boolean removed = file.isStaged() ? document.getFiles().removeIf(f -> f == file) : document.getFiles().removeIf(f -> f.getFileId() == file.getFileId());
+            if (removed && !document.isStaged()) {
+                document.setModified(true);
+            }
         }
-        if (!file.isStaged()) {
-            refreshMetadata();
+
+        // queue db delete for persisted files (applied at commitAll)
+        if (!file.isStaged() && file.getFileId() > 0) {
+            pendingDeleteFileIds.add(file.getFileId());
         }
+        refreshNeedsBarcodeFirst();
     }
 
     /**
-     * Deletes an entire document and all its files.
-     * Persisted files are soft-deleted in the DB.
+     * Removes a document (and all its files) from the in-memory box.
+     * <p>
+     * Staged items are discarded immediately with no DB call.
+     * Persisted files and the document record itself are queued for soft-delete
+     * and written to the DB only when {@link #commitAll()} is called.
+     * <p>
+     * If {@code currentDocument} is the one being deleted, it is updated to the
+     * nearest preceding document so the next scan lands in the right place.
+     * {@code needsBarcodeFirst} is re-evaluated after removal (if everything is deleted the first file should be a barcode).
      */
     public void deleteDocument(Document document) throws Exception {
-        boolean hadPersistedFiles = false;
+        // queue all persisted files for deletion
         for (File file : new ArrayList<>(document.getFiles())) {
-            if (!file.isStaged()) {
-                fileDAO.softDelete(file.getFileId());
-                hadPersistedFiles = true;
+            if (!file.isStaged() && file.getFileId() > 0) {
+                pendingDeleteFileIds.add(file.getFileId());
             }
         }
         document.getFiles().clear();
-        targetBox.getDocuments().remove(document);
-        if (hadPersistedFiles) {
-            refreshMetadata();
+
+        // queue the document row for deletion
+        if (!document.isStaged() && document.getDocumentId() > 0) {
+            pendingDeleteDocumentIds.add(document.getDocumentId());
         }
+
+        // update currentDocument before removing from the list so indexOf still works
+        if (document == currentDocument) {
+            int index = targetBox.getDocuments().indexOf(document);
+            targetBox.getDocuments().remove(document);
+            List<Document> remaining = targetBox.getDocuments();
+            // set currentDocument to the preceding document, but if the deleted one was first stay at index 0, else null
+            if (!remaining.isEmpty()) {
+                currentDocument = remaining.get(Math.max(0, index - 1));
+            } else {
+                currentDocument = null;
+            }
+        } else {
+            targetBox.getDocuments().remove(document);
+        }
+
+        refreshNeedsBarcodeFirst();
     }
 
     /** Creates metadata if it doesn't exist, otherwise keeps it up to date. */
@@ -309,6 +348,16 @@ public class ScanManager {
 
     public Box getTargetBox() { return targetBox; }
 
+    /**
+     * Re-evaluates whether the next scan must be a barcode page.
+     * True whenever the box is completely empty (no documents or every document
+     * has had all its files removed), so that starting to scan again always
+     * produces a valid barcode-led document.
+     */
+    private void refreshNeedsBarcodeFirst() {
+        needsBarcodeFirst = targetBox.getDocuments().isEmpty() || targetBox.getDocuments().stream().allMatch(document -> document.getFiles().isEmpty());
+    }
+
     private Document stageDocument() {
         Document document = new Document(0, targetBox.getBoxId(), LocalDateTime.now());
         document.setStaged(true);
@@ -326,6 +375,9 @@ public class ScanManager {
         file.setCreatedAt(LocalDateTime.now());
         file.setRotation(normaliseRotation(rotation));
         document.getFiles().add(file);
+        if (!document.isStaged()) {
+            document.setModified(true); // visual
+        }
         return file;
     }
 
@@ -336,7 +388,4 @@ public class ScanManager {
             default -> 0;
         };
     }
-
-    /** Strips characters that are illegal in folder/file names on common OSes. */
-    private static String sanitize(String name) { return name.replaceAll("[\\\\/:*?\"<>|]", "_"); }
 }

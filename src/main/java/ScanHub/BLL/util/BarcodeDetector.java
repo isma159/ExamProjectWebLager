@@ -12,10 +12,7 @@ public class BarcodeDetector {
 
     private static final MultiFormatReader READER = new MultiFormatReader();
 
-    /**
-     * Returns true if the TIFF bytes contain a recognizable barcode.
-     * Used to trigger document splitting when SplitBehavior is BARCODE.
-     */
+    /** Returns true if the TIFF bytes contain a recognizable barcode. */
     public static boolean containsBarcode(byte[] tiffData) {
         try {
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(tiffData));

@@ -3,7 +3,6 @@ package ScanHub.DAL.DAO;
 // project imports
 import ScanHub.BE.*;
 import ScanHub.BE.enums.ProfileStatus;
-import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
@@ -20,7 +19,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public Profile createData(Profile newProfile) throws Exception {
-        String sql = "INSERT INTO Profiles (clientId, profileName, splitBehavior, status, exportLabel, fileSettingsId) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Profiles (clientId, profileName, status, exportLabel, fileSettingsId) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
@@ -29,10 +28,9 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
                 ps.setInt(1, newProfile.getClient().getClientId());
                 ps.setString(2, newProfile.getProfileName());
-                ps.setString(3, newProfile.getSplitBehavior().toString());
-                ps.setString(4, newProfile.getStatus().toString());
-                ps.setString(5, newProfile.getExportLabel());
-                ps.setInt(6, getOrCreateFileSettings(connection, newProfile.getFileSettings()));
+                ps.setString(3, newProfile.getStatus().toString());
+                ps.setString(4, newProfile.getExportLabel());
+                ps.setInt(5, getOrCreateFileSettings(connection, newProfile.getFileSettings()));
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -65,8 +63,8 @@ public class ProfileDAO implements IDataAccess<Profile> {
         List<Profile> profiles = new ArrayList<>();
 
         String selectProfileSQL = """
-                SELECT p.profileId, p.clientId, p.profileName,
-                       p.splitBehavior, p.status, p.exportLabel, p.fileSettingsId, fs.hue, fs.brightness,
+                SELECT p.profileId, p.clientId, p.profileName, p.status,
+                       p.exportLabel, p.fileSettingsId,fs.hue, fs.brightness,
                        fs.contrast, fs.saturation, c.clientName
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
@@ -93,9 +91,9 @@ public class ProfileDAO implements IDataAccess<Profile> {
     public Profile getDataFromName(String name) throws Exception {
         String sql = """
                 SELECT p.profileId, p.clientId, p.profileName,
-                       p.splitBehavior, p.status, p.exportLabel,
-                       p.fileSettingsId, fs.hue, fs.brightness,
-                       fs.contrast, fs.saturation, c.clientName
+                       p.status, p.exportLabel, p.fileSettingsId,
+                       fs.hue, fs.brightness, fs.contrast, fs.saturation,
+                       c.clientName
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
@@ -117,7 +115,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     @Override
     public void updateData(Profile newData) throws Exception {
-        String sql = "UPDATE Profiles SET clientId = ?, profileName = ?, splitBehavior = ?, status = ?, exportLabel = ?, fileSettingsId = ? WHERE profileId = ?";
+        String sql = "UPDATE Profiles SET clientId = ?, profileName = ?, status = ?, exportLabel = ?, fileSettingsId = ? WHERE profileId = ?";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
@@ -126,11 +124,10 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
                 ps.setInt(1, newData.getClient().getClientId());
                 ps.setString(2, newData.getProfileName());
-                ps.setString(3, newData.getSplitBehavior().toString());
-                ps.setString(4, newData.getStatus().toString());
-                ps.setString(5, newData.getExportLabel());
-                ps.setInt(6, getOrCreateFileSettings(connection, newData.getFileSettings()));
-                ps.setInt(7, newData.getProfileId());
+                ps.setString(3, newData.getStatus().toString());
+                ps.setString(4, newData.getExportLabel());
+                ps.setInt(5, getOrCreateFileSettings(connection, newData.getFileSettings()));
+                ps.setInt(6, newData.getProfileId());
                 ps.executeUpdate();
 
                 connection.commit();
@@ -178,7 +175,6 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 new Client(rs.getInt("clientId"),
                         rs.getString("clientName")),
                 rs.getString("profileName"),
-                SplitBehavior.valueOf(rs.getString("splitBehavior")),
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
                 new FileSettings(rs.getInt("fileSettingsId"),

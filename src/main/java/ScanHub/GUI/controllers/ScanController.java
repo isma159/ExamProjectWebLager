@@ -24,8 +24,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -46,12 +46,13 @@ import java.util.ResourceBundle;
 
 public class ScanController implements Initializable, IViewController {
 
+    @FXML private BorderPane workspaceView;
     @FXML private Label lblUsername, lblRole, lblEmptyState;
     @FXML private ToggleSwitch darkMode;
     @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport, btnZoomOut, btnZoomIn;
     @FXML private ComboBox<ExportMode> comboBoxExport;
     @FXML private FlowPane pageGrid;
-    @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel; // status bar down left
+    @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel;
     @FXML private TreeView<TreeNode> boxTreeView;
 
     // Session startup popup
@@ -260,11 +261,15 @@ public class ScanController implements Initializable, IViewController {
     private void onSessionStartup(ActionEvent e) {
         initializeProfileComboBox();
         sessionPopupOverlay.setVisible(true);
+        sessionPopupOverlay.setDisable(false);
+        workspaceView.setDisable(true);
     }
 
-    @FXML private void onSessionPopupClose(ActionEvent e)          { sessionPopupOverlay.setVisible(false); }
-    @FXML private void onSessionPopupBackdropClick(MouseEvent e)   { sessionPopupOverlay.setVisible(false); }
-    @FXML private void onSessionPopupConsumeClick(MouseEvent e)    { e.consume(); }
+    @FXML private void onSessionPopupClose(ActionEvent e) {
+        sessionPopupOverlay.setVisible(false);
+        sessionPopupOverlay.setDisable(true);
+        workspaceView.setDisable(false);
+    }
 
     @FXML
     private void onStartSession(ActionEvent e) {
@@ -284,18 +289,26 @@ public class ScanController implements Initializable, IViewController {
 
         // check whether this profile already owns a box
         Box existingBox = modelFacade.getBoxModel().getBoxes().stream()
-                .filter(box -> box.getProfileId() == profile.getProfileId())
+                .filter(b -> b.getProfileId() == profile.getProfileId())
                 .findFirst()
                 .orElse(null);
 
         if (existingBox != null) {
-            // TODO add creator name to alert
-            String createdAt = existingBox.getCreatedAt() != null ? existingBox.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "Unknown";
+            // if Box id (name) matches a Box name already in db then fetch it
+            if (existingBox.getBoxName().trim().equalsIgnoreCase(boxInput)) {
+                try {
+                    launchSession(boxInput, profile);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    AlertHelper.showError("Session Setup", "Could not open the existing box.");
+                }
+                return;
+            }
 
-            String message = "Profile \"" + profile.getProfileName() + "\" already has a box assigned.\n\n"
-                            + "Box ID: " + existingBox.getBoxId() + "\n"
-                            + "Created: " + createdAt + "\n"
-                            + "Do you want to delete this box and start a new one?";
+            String message = "Profile \"" + profile.getProfileName() + "\" already has a box assigned."
+                    + "\n\nBox ID: " + existingBox.getBoxName()
+                    + "\nCreated: " + existingBox.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                    + "\n\nDo you want to delete this box and create \"" + boxInput + "\" instead?";
 
             AlertHelper.showConfirmation("Box Already Exists", message, () -> {
                 try {
@@ -333,6 +346,8 @@ public class ScanController implements Initializable, IViewController {
         setSessionControlsDisabled(false);
         lblSessionStatus.setText("Profile: " + profile.getProfileName() + " – Box: " + activeBox.getBoxName());
         sessionPopupOverlay.setVisible(false);
+        sessionPopupOverlay.setDisable(true);
+        workspaceView.setDisable(false);
         rebuild();
     }
 
@@ -349,7 +364,6 @@ public class ScanController implements Initializable, IViewController {
 
         scanning = true;
         btnScan.setDisable(true);
-        btnStop.setDisable(false);
 
         int rotation = spinnerGlobalRotation.getValue();
 
@@ -383,7 +397,7 @@ public class ScanController implements Initializable, IViewController {
                 }
             }
 
-            // clean exit, loop condition became false (stop was pressed and fetch completed)
+            // loop condition became false (stop was pressed and fetch completed)
             Platform.runLater(() -> {
                 btnScan.setDisable(false);
                 btnStop.setDisable(true);
@@ -407,6 +421,9 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
+    /**
+     * TODO: prompt a before or after split while selecting a file
+     */
     @FXML
     private void onNewDocument(ActionEvent e) {
         if (!sessionActive || scanModel == null) return;
@@ -433,14 +450,17 @@ public class ScanController implements Initializable, IViewController {
         try {
             if (selectedFile != null) {
                 int deletedIndex = currentPageIndex();
-                Document ownerDocument = findOwnerDocument(selectedFile);
                 scanModel.deleteFile(selectedFile);
 
-                if (ownerDocument != null && !ownerDocument.isStaged()) { ownerDocument.setModified(true); }
+                List<Document> emptyDocuments = new ArrayList<>(documents);
+                emptyDocuments.removeIf(document -> !document.getFiles().isEmpty());
+                for (Document emptyDocument : emptyDocuments) {
+                    scanModel.deleteDocument(emptyDocument);
+                }
 
-                documents.removeIf(document -> document.getFiles().isEmpty());
+                syncDocumentsFromModel(); // resync the observable list so that it matches the models
 
-                // Select nearest page, or clear selection if nothing left
+                // clear selection if nothing left, else select nearest file
                 List<File> remaining = allPages();
                 if (remaining.isEmpty()) {
                     selectedDocument = null;
@@ -450,9 +470,10 @@ public class ScanController implements Initializable, IViewController {
                     selectedFile = remaining.get(Math.max(next, 0));
                     selectedDocument = findOwnerDocument(selectedFile);
                 }
+
             } else if (selectedDocument != null) {
                 scanModel.deleteDocument(selectedDocument);
-                documents.remove(selectedDocument);
+                syncDocumentsFromModel();
                 selectedDocument = null;
                 selectedFile = null;
             } else return;
@@ -461,7 +482,7 @@ public class ScanController implements Initializable, IViewController {
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Delete Failed", "Could not delete the selected "
-                    + (selectedFile != null ? "page." : "document.") + " Please try again.");
+                    + (selectedFile != null ? "file." : "document. ") + "Please try again.");
         }
     }
 
@@ -477,7 +498,7 @@ public class ScanController implements Initializable, IViewController {
             rebuildPreviewCard();
         } catch (Exception ex) {
             ex.printStackTrace();
-            AlertHelper.showError("Rotation Failed", "Could not update page rotation.");
+            AlertHelper.showError("Rotation Failed", "Could not update file rotation.");
         }
     }
 
@@ -542,8 +563,7 @@ public class ScanController implements Initializable, IViewController {
             scanModel.save(); // persist staged data first
             scanModel.export(exportDirectory, mode);
             rebuild();
-            AlertHelper.showInformation("Export Complete", "Export finished.\n"
-                    + "Files saved to:" + exportDirectory.getAbsolutePath());
+            AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Export Failed", "Could not export documents. Please try again.");
@@ -706,7 +726,7 @@ public class ScanController implements Initializable, IViewController {
 
     private void refreshStatusBar() {
         stDocsLabel.setText("Documents: " + documents.size());
-        stPagesLabel.setText("Pages: " + totalPageCount());
+        stPagesLabel.setText("Files: " + totalPageCount());
     }
 
     private void updatePageInfoLabel() {

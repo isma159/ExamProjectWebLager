@@ -4,7 +4,6 @@ package ScanHub.DAL.DAO;
 import ScanHub.BE.*;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.enums.Role;
-import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 
@@ -83,8 +82,7 @@ public class UserDAO implements IDataAccess<User> {
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
                        p.profileId, p.clientId, p.profileName,
-                       p.splitBehavior, p.exportLabel, p.status,
-                       p.fileSettingsId,
+                       p.exportLabel, p.status, p.fileSettingsId,
                        c.clientName, fs.hue, fs.brightness,
                        fs.contrast, fs.saturation
                 FROM Users u
@@ -139,7 +137,7 @@ public class UserDAO implements IDataAccess<User> {
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
                        p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.splitBehavior, p.exportLabel, p.status, p.fileSettingsId,
+                    p.exportLabel, p.status, p.fileSettingsId,
                        fs.hue, fs.brightness, fs.contrast, fs.saturation
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
@@ -281,7 +279,6 @@ public class UserDAO implements IDataAccess<User> {
                 rs.getInt("profileId"),
                 client,
                 rs.getString("profileName"),
-                SplitBehavior.valueOf(rs.getString("splitBehavior")),
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
                 new FileSettings(rs.getInt("fileSettingsId"),
