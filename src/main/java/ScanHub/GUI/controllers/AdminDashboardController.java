@@ -231,28 +231,4 @@ public class AdminDashboardController implements Initializable {
         }
         filterProfiles();
     }
-
-    @FXML
-    private void onSplitBehaviorClick() {
-        profileAscending = !profileAscending;
-        currentProfiles.sort(profileAscending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
-        profileTableBox.getChildren().clear();
-
-        for (Profile profile : currentProfiles) {
-            HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
-                if (selectedProfile != null) selectedProfileRow.getStyleClass().remove("row-selected");
-                if (selectedProfile == clickedProfile) {
-                    selectedProfile = null;
-                    selectedProfileRow = null;
-                    return;
-                }
-                selectedProfile = clickedProfile;
-                selectedProfileRow = rowHBox;
-                rowHBox.getStyleClass().add("row-selected");
-            });
-            row.setUserData(profile);
-            profileTableBox.getChildren().add(row);
-        }
-        filterProfiles();
-    }
 }

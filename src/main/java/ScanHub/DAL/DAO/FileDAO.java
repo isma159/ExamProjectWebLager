@@ -25,10 +25,6 @@ public class FileDAO {
      * Inserts a new scanned TIFF file into the Files table.
      * sortId is initially set equal to referenceId — users can reorder later.
      */
-    public File createFile(int documentId, int referenceId, byte[] imageData) throws SQLException {
-        return createFile(documentId, referenceId, imageData, 0);
-    }
-
     public File createFile(int documentId, int referenceId, byte[] imageData, int rotation) throws SQLException {
         String sql = """
                 INSERT INTO Files (documentId, referenceId, sortId, imageData, fileSizeBytes, rotation)
@@ -90,17 +86,6 @@ public class FileDAO {
         }
     }
 
-    public void softDelete(int fileId) throws SQLException {
-        String sql = "UPDATE Files SET deleted_at = SYSDATETIME() WHERE fileId = ?";
-
-        try (Connection conn = dbConnector.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, fileId);
-            ps.executeUpdate();
-        }
-    }
-
     public List<File> getFilesForDocument(int documentId) throws SQLException {
         List<File> files = new ArrayList<>();
         String sql = """
@@ -129,6 +114,17 @@ public class FileDAO {
             }
         }
         return files;
+    }
+
+    public void deleteFile(int fileId) throws SQLException {
+        String sql = "UPDATE Files SET deleted_at = SYSDATETIME() WHERE fileId = ?";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, fileId);
+            ps.executeUpdate();
+        }
     }
 
     public void moveFile(int fileId, int newDocumentId) throws SQLException {

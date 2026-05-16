@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.*?>
 
-<HBox stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminController">
+<HBox stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminController">
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="600.0" prefWidth="1200.0" styleClass="background" HBox.hgrow="ALWAYS">
          <children>

@@ -16,9 +16,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminLogsController">
+<VBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminLogsController">
 
-    <!-- ── Header bar ── -->
     <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="1800.0">
         <styleClass>
             <String fx:value="half-card" />
@@ -53,7 +52,6 @@
         <Region prefWidth="18.0" />
     </HBox>
 
-    <!-- ── Filter row ── -->
     <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="1800.0" spacing="9.0">
         <styleClass>
             <String fx:value="second-card-bg" />
@@ -61,7 +59,6 @@
         </styleClass>
         <Region prefWidth="15.0" />
 
-        <!-- Action type toggles -->
         <ToggleButton mnemonicParsing="false" onAction="#onTbAllLogsClick" prefHeight="30.0" prefWidth="60.0" selected="true" text="All">
             <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
          <toggleGroup>
@@ -101,14 +98,12 @@
         <Region prefWidth="15.0" />
     </HBox>
 
-       <!-- ── Rows ── -->
     <ScrollPane fitToWidth="true" styleClass="box-card" VBox.vgrow="ALWAYS">
         <content>
             <VBox fx:id="logsTableBox" />
         </content>
     </ScrollPane>
 
-    <!-- ── Pagination ── -->
     <HBox alignment="CENTER" prefHeight="45.0" prefWidth="1800.0">
         <styleClass>
             <String fx:value="half-card-bottom" />

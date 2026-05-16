@@ -76,6 +76,17 @@ public class DocumentDAO {
         return documents;
     }
 
+    public void deleteDocument(int documentId) throws SQLException {
+        String sql = "UPDATE Documents SET deleted_at = SYSDATETIME() WHERE documentId = ?";
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, documentId);
+            ps.executeUpdate();
+        }
+    }
+
     public int countDocumentsForBox(int boxId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Documents WHERE boxId = ? AND deleted_at IS NULL";
 

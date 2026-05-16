@@ -8,8 +8,8 @@
 <?import javafx.scene.text.*?>
 <?import org.controlsfx.control.*?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
-   <BorderPane prefHeight="700.0" prefWidth="1280.0" styleClass="background">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+   <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
       <top>
          <VBox>
             <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="75.0" prefWidth="1280.0" spacing="12.0" styleClass="card,card-bg,shadow">
@@ -365,8 +365,8 @@
       </bottom>
    </BorderPane>
 
-   <StackPane fx:id="sessionPopupOverlay" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onSessionPopupBackdropClick" pickOnBounds="true" prefHeight="420.0" prefWidth="1280.0" styleClass="modal-backdrop" visible="false">
-      <VBox maxHeight="300.0" maxWidth="360.0" onMouseClicked="#onSessionPopupConsumeClick" prefHeight="300.0" prefWidth="360.0" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
+   <StackPane fx:id="sessionPopupOverlay" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="1280.0" visible="false">
+      <VBox maxHeight="300.0" maxWidth="360.0" prefHeight="300.0" prefWidth="360.0" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
          </padding>

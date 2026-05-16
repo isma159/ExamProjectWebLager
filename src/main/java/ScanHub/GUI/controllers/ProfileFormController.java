@@ -4,11 +4,9 @@ import ScanHub.BE.*;
 import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
-import ScanHub.BE.enums.SplitBehavior;
 import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
-import ScanHub.GUI.util.RowMaker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -21,8 +19,6 @@ import org.controlsfx.control.SearchableComboBox;
 
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.DoubleConsumer;
 
@@ -122,7 +118,7 @@ public class ProfileFormController implements Initializable {
 
         try {
 
-            Profile newProfile = new Profile(selectedClient, profileName, SplitBehavior.BARCODE, status, buildExportLabel(profileName, selectedClient.getClientName()), buildFileSettings());
+            Profile newProfile = new Profile(selectedClient, profileName, status, buildExportLabel(profileName, selectedClient.getClientName()), buildFileSettings());
             Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
             modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), createdProfile.getProfileId(), EntityType.PROFILE, LogAction.CREATE, LocalDateTime.now()));
             currentStage.close();
@@ -145,7 +141,6 @@ public class ProfileFormController implements Initializable {
 
         editingProfile.setProfileName(newProfileName);
         editingProfile.setClient(selectedClient);
-        editingProfile.setSplitBehavior(SplitBehavior.BARCODE);
         editingProfile.setStatus(status);
         editingProfile.setExportLabel(newExportLabel);
         editingProfile.setFileSettings(buildFileSettings());

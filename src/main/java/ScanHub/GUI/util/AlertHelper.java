@@ -8,10 +8,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.Window;
 import java.io.IOException;
 
 public class AlertHelper {
@@ -22,13 +22,22 @@ public class AlertHelper {
         try {
             FXMLLoader loader = new FXMLLoader(AlertHelper.class.getResource(ALERT_FXML));
             Parent root = loader.load();
-
             AlertController controller = loader.getController();
 
-            Stage stage = new Stage(StageStyle.UNDECORATED);
+            // rounded corners
+            Rectangle clip = new Rectangle();
+            clip.setArcWidth(20);
+            clip.setArcHeight(20);
+            clip.widthProperty().bind(root.layoutBoundsProperty().map(bounds -> bounds.getWidth()));
+            clip.heightProperty().bind(root.layoutBoundsProperty().map(bounds -> bounds.getHeight()));
+            root.setClip(clip);
+
+            Stage stage = new Stage(StageStyle.TRANSPARENT);
             stage.setTitle(title);
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
+            Scene scene = new Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setResizable(false);
 
             stage.getScene().setOnKeyPressed(event -> {
