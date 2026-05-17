@@ -65,7 +65,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
         String selectProfileSQL = """
                 SELECT p.profileId, p.clientId, p.profileName, p.status,
                        p.exportLabel, p.fileSettingsId,fs.hue, fs.brightness,
-                       fs.contrast, fs.saturation, c.clientName
+                       fs.contrast, fs.saturation, fs.globalRotation, c.clientName
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
@@ -93,7 +93,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 SELECT p.profileId, p.clientId, p.profileName,
                        p.status, p.exportLabel, p.fileSettingsId,
                        fs.hue, fs.brightness, fs.contrast, fs.saturation,
-                       c.clientName
+                       fs.globalRotation, c.clientName
                 FROM Profiles p
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
@@ -181,19 +181,21 @@ public class ProfileDAO implements IDataAccess<Profile> {
                         rs.getDouble("hue"),
                         rs.getDouble("brightness"),
                         rs.getDouble("contrast"),
-                        rs.getDouble("saturation"))
+                        rs.getDouble("saturation"),
+                        rs.getInt("globalRotation"))
         );
     }
 
     private int getOrCreateFileSettings(Connection connection, FileSettings fileSettings) throws SQLException {
 
-        String selectSQL = "SELECT fileSettingsId FROM FileSettings WHERE hue = ? AND brightness = ? AND contrast = ? AND saturation = ?";
+        String selectSQL = "SELECT fileSettingsId FROM FileSettings WHERE hue = ? AND brightness = ? AND contrast = ? AND saturation = ? AND globalRotation = ?";
 
         try (PreparedStatement selectPs = connection.prepareStatement(selectSQL)) {
             selectPs.setDouble(1, fileSettings.getHue());
             selectPs.setDouble(2, fileSettings.getBrightness());
             selectPs.setDouble(3, fileSettings.getContrast());
             selectPs.setDouble(4, fileSettings.getSaturation());
+            selectPs.setDouble(5, fileSettings.getGlobalRotation());
 
             try (ResultSet rs = selectPs.executeQuery()) {
                 if (rs.next()) {
@@ -202,7 +204,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
             }
         }
 
-        String insertSQL = "INSERT INTO FileSettings (hue, brightness, contrast, saturation) VALUES (?, ?, ?, ?)";
+        String insertSQL = "INSERT INTO FileSettings (hue, brightness, contrast, saturation, globalRotation) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement insertPS = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -210,6 +212,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
             insertPS.setDouble(2, fileSettings.getBrightness());
             insertPS.setDouble(3, fileSettings.getContrast());
             insertPS.setDouble(4, fileSettings.getSaturation());
+            insertPS.setInt(5, fileSettings.getGlobalRotation());
 
             insertPS.executeUpdate();
 

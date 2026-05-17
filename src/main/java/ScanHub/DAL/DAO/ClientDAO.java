@@ -50,7 +50,8 @@ public class ClientDAO implements IDataAccess<Client> {
         String selectProfilesSQL = """
                                        SELECT p.profileId, p.profileName,
                                               p.exportLabel, p.status, p.fileSettingsId, fs.hue,
-                                              fs.brightness, fs.contrast, fs.saturation
+                                              fs.brightness, fs.contrast, fs.saturation,
+                                              fs.globalRotation
                                        FROM Profiles p
                                        LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                                        WHERE p.clientId = ? AND p.deleted_at IS NULL
@@ -97,7 +98,8 @@ public class ClientDAO implements IDataAccess<Client> {
         String selectProfilesSQL = """
                                        SELECT p.profileId, p.profileName,
                                               p.exportLabel, p.status, p.fileSettingsId, fs.hue,
-                                              fs.brightness, fs.contrast, fs.saturation
+                                              fs.brightness, fs.contrast, fs.saturation,
+                                              fs.globalRotation
                                        FROM Profiles p
                                        LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                                        WHERE p.clientId = ?
@@ -196,7 +198,8 @@ public class ClientDAO implements IDataAccess<Client> {
                         rs.getDouble("hue"),
                         rs.getDouble("brightness"),
                         rs.getDouble("contrast"),
-                        rs.getDouble("saturation")
+                        rs.getDouble("saturation"),
+                        rs.getInt("globalRotation")
                 ));
 
     }

@@ -326,7 +326,39 @@
 
 }
 
-.slider {
+.slider .track {
+
+    -fx-background-color: WHITE;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-width: 2;
+    -fx-border-radius: 3px;
+
+}
+
+.slider .thumb {
+
+    -fx-background-color: #F5f5f5;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-border-color: #BFBFBF;
+    -fx-border-width: 2;
+    -fx-border-radius: 9px;
+
+}
+
+.slider .thumb:hover {
+
+    -fx-background-color: #F1F5F9;
+
+}
+
+.slider .thumb:pressed {
+
+    -fx-background-color: WHITE;
 
 }
 
