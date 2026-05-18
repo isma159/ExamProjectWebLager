@@ -190,7 +190,7 @@ public class AdminUsersController implements Initializable {
 
     @FXML private void onClickUpdateClient() {
         if (selectedClient == null) {
-            AlertHelper.showError("No Selection", "Please select a client to delete.");
+            AlertHelper.showError("No Selection", "Please select a client to edit.");
             return;
         }
         openClientForm(selectedClient);
