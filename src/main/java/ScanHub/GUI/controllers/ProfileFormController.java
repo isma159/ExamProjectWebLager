@@ -26,12 +26,12 @@ public class ProfileFormController implements Initializable {
 
     @FXML private ToggleGroup toggleGroupProfileStatus;
     @FXML private Label formTitle, exportPreviewLabel;
-    @FXML private Label lblHueValue, lblBrightnessValue, lblContrastValue, lblSaturationValue;
+    @FXML private Label lblHueValue, lblBrightnessValue, lblContrastValue, lblSaturationValue, lblRotationValue;
     @FXML private RadioButton radioACTIVE, radioINACTIVE;
     @FXML private VBox vboxStatus;
     @FXML private TextField profileNameField;
     @FXML private SearchableComboBox<Client> searchableComboBoxClient;
-    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation;
+    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderRotation;
     @FXML private Button saveButton;
     @FXML private ImageView imgPreview;
 
@@ -43,6 +43,7 @@ public class ProfileFormController implements Initializable {
     private double brightness;
     private double contrast;
     private double saturation;
+    private int rotation;
 
     public void setModel(Stage currentStage, ModelFacade modelFacade, Profile profile) {
         this.currentStage = currentStage;
@@ -79,6 +80,7 @@ public class ProfileFormController implements Initializable {
         bindSlider(sliderBrightness, lblBrightnessValue, val -> brightness = val);
         bindSlider(sliderContrast, lblContrastValue, val -> contrast = val);
         bindSlider(sliderSaturation, lblSaturationValue, val -> saturation = val);
+        bindSlider(sliderRotation, lblRotationValue, val -> rotation = (int) val);
     }
 
     // event handlers
@@ -94,6 +96,7 @@ public class ProfileFormController implements Initializable {
         try {
             modelFacade.getUserModel().refreshUsers();
             modelFacade.getProfileModel().refreshProfiles();
+            modelFacade.getClientModel().refreshClients();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Could not save changes. Please try again.");
         }
@@ -166,6 +169,7 @@ public class ProfileFormController implements Initializable {
         sliderBrightness.setValue(profile.getFileSettings().getBrightness());
         sliderContrast.setValue(profile.getFileSettings().getContrast());
         sliderSaturation.setValue(profile.getFileSettings().getSaturation());
+        sliderRotation.setValue(profile.getFileSettings().getGlobalRotation());
     }
 
     private void bindSlider(Slider slider, Label label, DoubleConsumer setter) {
@@ -178,6 +182,7 @@ public class ProfileFormController implements Initializable {
 
     private void updatePreview() {
         imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, brightness / 100, contrast / 100));
+        imgPreview.setRotate(rotation);
     }
 
     private boolean validateFields(String profile, Client client, Toggle statusToggle) {
@@ -206,7 +211,8 @@ public class ProfileFormController implements Initializable {
                 hue,
                 brightness,
                 contrast,
-                saturation
+                saturation,
+                rotation
         );
     }
 
