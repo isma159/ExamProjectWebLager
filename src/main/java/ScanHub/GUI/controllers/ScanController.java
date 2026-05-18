@@ -49,7 +49,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private BorderPane workspaceView;
     @FXML private Label lblUsername, lblRole, lblEmptyState;
     @FXML private ToggleSwitch darkMode;
-    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport, btnZoomOut, btnZoomIn;
+    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnSplitDoc, btnDelete, btnUndo, btnExport, btnZoomOut, btnZoomIn;
     @FXML private ComboBox<ExportMode> comboBoxExport;
     @FXML private FlowPane pageGrid;
     @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel;
@@ -58,8 +58,7 @@ public class ScanController implements Initializable, IViewController {
     // Session startup popup
     @FXML private StackPane sessionPopupOverlay;
     @FXML private SearchableComboBox<Profile> comboBoxProfiles;
-    @FXML private TextField txtFldBoxId;
-    @FXML private Spinner<Integer> spinnerGlobalRotation;
+    @FXML private TextField txtFldBoxId, txtFldGlobalRotation, txtFldGlobalHue, txtFldGlobalBrightness, txtFldGlobalContrast, txtFldGlobalSaturation;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -96,7 +95,7 @@ public class ScanController implements Initializable, IViewController {
         initializeTreeView(boxTreeView);
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
-        spinnerGlobalRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 90));
+        //spinnerGlobalRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 90));
 
         setSessionControlsDisabled(true);
         lblSessionStatus.setText("Press Session Startup to configure and begin.");
@@ -287,68 +286,25 @@ public class ScanController implements Initializable, IViewController {
             return;
         }
 
-        // check whether this profile already owns a box
-        Box existingBox = modelFacade.getBoxModel().getBoxes().stream()
-                .filter(b -> b.getProfileId() == profile.getProfileId())
-                .findFirst()
-                .orElse(null);
+        try {
+            Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
+            scanModel = new ScanModel(activeBox);
+            syncDocumentsFromModel();
 
-        if (existingBox != null) {
-            // if Box id (name) matches a Box name already in db then fetch it
-            if (existingBox.getBoxName().trim().equalsIgnoreCase(boxInput)) {
-                try {
-                    launchSession(boxInput, profile);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    AlertHelper.showError("Session Setup", "Could not open the existing box.");
-                }
-                return;
-            }
+            sessionActive = true;
+            selectedDocument = null;
+            selectedFile = null;
 
-            String message = "Profile \"" + profile.getProfileName() + "\" already has a box assigned."
-                    + "\n\nBox ID: " + existingBox.getBoxName()
-                    + "\nCreated: " + existingBox.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                    + "\n\nDo you want to delete this box and create \"" + boxInput + "\" instead?";
-
-            AlertHelper.showConfirmation("Box Already Exists", message, () -> {
-                try {
-                    modelFacade.getBoxModel().deleteBox(existingBox);
-                    launchSession(boxInput, profile);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    AlertHelper.showError("Session Setup", "Could not replace the existing box.");
-                }
-            });
-
-        } else {
-            try {
-                launchSession(boxInput, profile);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                AlertHelper.showError("Session Setup", "Could not start scan session.");
-            }
+            setSessionControlsDisabled(false);
+            lblSessionStatus.setText("Profile: " + profile.getProfileName() + "   Box: " + activeBox.getBoxName());
+            sessionPopupOverlay.setVisible(false);
+            sessionPopupOverlay.setDisable(true);
+            workspaceView.setDisable(false);
+            rebuild();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Session Setup", "Could not start scan session.");
         }
-    }
-
-    /**
-     * Shared entry point that resolves (or creates) the session box,
-     * wires up the ScanModel and opens the scan UI.
-     */
-    private void launchSession(String boxInput, Profile profile) throws Exception {
-        Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
-        scanModel = new ScanModel(activeBox);
-        syncDocumentsFromModel();
-
-        sessionActive = true;
-        selectedDocument = null;
-        selectedFile = null;
-
-        setSessionControlsDisabled(false);
-        lblSessionStatus.setText("Profile: " + profile.getProfileName() + " – Box: " + activeBox.getBoxName());
-        sessionPopupOverlay.setVisible(false);
-        sessionPopupOverlay.setDisable(true);
-        workspaceView.setDisable(false);
-        rebuild();
     }
 
     /**
@@ -365,12 +321,17 @@ public class ScanController implements Initializable, IViewController {
         scanning = true;
         btnScan.setDisable(true);
 
-        int rotation = spinnerGlobalRotation.getValue();
+        Profile currentProfile = comboBoxProfiles.getValue();
+        int rotation = currentProfile.getFileSettings().getRotation();
+        double hue = currentProfile.getFileSettings().getHue();
+        double brightness = currentProfile.getFileSettings().getBrightness();
+        double contrast = currentProfile.getFileSettings().getContrast();
+        double saturation = currentProfile.getFileSettings().getSaturation();
 
         scanThread = new Thread(() -> {
             while (scanning) {
                 try {
-                    ScanManager.StoredScan result = scanModel.fetchScan(rotation);
+                    ScanManager.StoredScan result = scanModel.fetchScan(rotation, hue, brightness, contrast, saturation);
 
                     if (!scanning) break; // stop was pressed during fetch (leave loop)
 
@@ -421,9 +382,6 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
-    /**
-     * TODO: prompt a before or after split while selecting a file
-     */
     @FXML
     private void onNewDocument(ActionEvent e) {
         if (!sessionActive || scanModel == null) return;
@@ -441,6 +399,14 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("New Document Failed", "Could not create a new document. Please try again.");
         }
+    }
+
+    /**
+     * TODO: prompt a before or after split while selecting a file
+     */
+    @FXML
+    private void onSplitDocument(ActionEvent actionEvent) {
+
     }
 
     @FXML

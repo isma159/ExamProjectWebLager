@@ -24,9 +24,13 @@ public class ScanModel {
      * For an empty box the very first fetch is always a barcode page (enforced by ScanManager).
      *
      * @param rotation initial rotation in degrees (0, 90, 180, 270)
+     * @param hue initial hue (-100 to 100)
+     * @param brightness initial brightness (-100 to 100)
+     * @param contrast initial contrast (-100 to 100)
+     * @param saturation initial saturation (-100 to 100)
      * @return a StoredScan record with the File, its Document, and a barcode-split flag
      */
-    public ScanManager.StoredScan fetchScan(int rotation) throws Exception { return scanManager.fetchScan(rotation); }
+    public ScanManager.StoredScan fetchScan(int rotation, double hue, double brightness, double contrast, double saturation) throws Exception { return scanManager.fetchScan(rotation, hue, brightness, contrast, saturation); }
 
     /** Persists all staged documents and files in one pass, then refreshes metadata. */
     public void save() throws Exception { scanManager.commitAll(); }

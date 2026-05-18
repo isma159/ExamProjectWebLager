@@ -42,12 +42,5 @@ public class Document implements TreeNode {
     public void setModified(boolean modified) { this.modified = modified; }
 
     @Override
-    public String toString() {
-        return "Document #" + this.documentId;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return "\uE963" + " " + "Document #" + this.documentId;
-    }
+    public String toString() { return "Document #" + this.documentId; }
 }

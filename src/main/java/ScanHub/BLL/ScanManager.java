@@ -11,6 +11,7 @@ import ScanHub.DAL.DAO.BoxMetadataDAO;
 import ScanHub.DAL.DAO.DocumentDAO;
 import ScanHub.DAL.DAO.FileDAO;
 import ScanHub.DAL.interfaces.IScanSource;
+import javafx.scene.effect.ColorAdjust;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -74,7 +75,7 @@ public class ScanManager {
      * If this is the very first page of a brand-new (or empty) box, it always
      * fetches a barcode page so that the first document begins with a barcode.
      */
-    public StoredScan fetchScan(int rotation) throws Exception {
+    public StoredScan fetchScan(int rotation, double hue, double brightness, double contrast, double saturation) throws Exception {
         ScanResult result = needsBarcodeFirst ? scanSource.fetchBarcodeFile() : scanSource.fetchNextScan();
 
         needsBarcodeFirst = false; // only enforce barcode-first on the very first scan.
@@ -91,7 +92,7 @@ public class ScanManager {
         }
 
         int ref = ++referenceCounter; // generate/increment next page reference
-        File file = stageFile(currentDocument, ref, result.data(), rotation);
+        File file = stageFile(currentDocument, ref, result.data(), rotation, hue, brightness, contrast, saturation);
         return new StoredScan(file, currentDocument, barcodeSplit);
     }
 
@@ -365,7 +366,7 @@ public class ScanManager {
         return document;
     }
 
-    private File stageFile(Document document, int referenceId, byte[] imageData, int rotation) {
+    private File stageFile(Document document, int referenceId, byte[] imageData, int rotation, double hue, double brightness, double contrast, double saturation) {
         File file = new File();
         file.setStaged(true);
         file.setReferenceId(referenceId);
@@ -374,6 +375,10 @@ public class ScanManager {
         file.setFileSizeBytes(imageData.length);
         file.setCreatedAt(LocalDateTime.now());
         file.setRotation(normaliseRotation(rotation));
+        file.setHue(hue);
+        file.setBrigthness(brightness);
+        file.setContrast(contrast);
+        file.setSaturation(saturation);
         document.getFiles().add(file);
         if (!document.isStaged()) {
             document.setModified(true); // visual

@@ -8,6 +8,8 @@ public class FileSettings {
     private double contrast;
     private double saturation;
 
+    public FileSettings() {}
+
     public FileSettings(int fileSettingsId, double hue, double brightness, double contrast, double saturation) {
         this.fileSettingsId = fileSettingsId;
         this.hue = hue;

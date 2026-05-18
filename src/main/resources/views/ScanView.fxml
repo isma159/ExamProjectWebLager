@@ -8,7 +8,7 @@
 <?import javafx.scene.text.*?>
 <?import org.controlsfx.control.*?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
    <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
       <top>
          <VBox>
@@ -149,40 +149,6 @@
 
                            <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
 
-                           <Button fx:id="btnRotLeft" mnemonicParsing="false" onAction="#onRotateLeft" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Rotate L" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                           </Button>
-
-                           <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Rotate R" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                           </Button>
-
-                           <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
-
                            <Button fx:id="btnNewDoc" mnemonicParsing="false" onAction="#onNewDocument" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
                               <graphic>
                                  <HBox alignment="CENTER">
@@ -193,6 +159,25 @@
                                        <Region prefWidth="3.0" />
                                        <Label styleClass="bold-lbl" text="New Doc" textFill="WHITE">
                                           <font><Font size="12.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
+                           <Button fx:id="btnSplitDoc" mnemonicParsing="false" onAction="#onSplitDocument" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
+                              <graphic>
+                                 <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                          <font>
+                                             <Font size="16.0" />
+                                          </font>
+                                       </Label>
+                                       <Region prefWidth="3.0" />
+                                       <Label styleClass="bold-lbl" text="Split Doc" textFill="WHITE">
+                                          <font>
+                                             <Font size="12.0" />
+                                          </font>
                                        </Label>
                                     </children>
                                  </HBox>
@@ -249,7 +234,7 @@
                               </graphic>
                            </Button>
 
-                           <ComboBox fx:id="comboBoxExport" prefHeight="30.0" prefWidth="163.0" styleClass="container" />
+                           <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
                         </children>
 
                         <VBox.margin>
@@ -317,6 +302,54 @@
                            <Insets left="3.0" right="3.0" />
                         </HBox.margin>
                      </Button>
+
+                     <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+
+                     <Button fx:id="btnRotLeft" mnemonicParsing="false" onAction="#onRotateLeft" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
+                        <graphic>
+                           <HBox alignment="CENTER">
+                              <children>
+                                 <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                    <font>
+                                       <Font size="16.0" />
+                                    </font>
+                                 </Label>
+                                 <Region prefWidth="3.0" />
+                                 <Label styleClass="bold-lbl" text="Rotate L" textFill="WHITE">
+                                    <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                 </Label>
+                              </children>
+                           </HBox>
+                        </graphic>
+                        <HBox.margin>
+                           <Insets left="3.0" right="3.0" />
+                        </HBox.margin>
+                     </Button>
+
+                     <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
+                        <graphic>
+                           <HBox alignment="CENTER">
+                              <children>
+                                 <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                    <font>
+                                       <Font size="16.0" />
+                                    </font>
+                                 </Label>
+                                 <Region prefWidth="3.0" />
+                                 <Label styleClass="bold-lbl" text="Rotate R" textFill="WHITE">
+                                    <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                 </Label>
+                              </children>
+                           </HBox>
+                        </graphic>
+                        <HBox.margin>
+                           <Insets left="3.0" right="3.0" />
+                        </HBox.margin>
+                     </Button>
                   </children>
 
                   <VBox.margin>
@@ -365,8 +398,8 @@
       </bottom>
    </BorderPane>
 
-   <StackPane fx:id="sessionPopupOverlay" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="1280.0" visible="false">
-      <VBox maxHeight="300.0" maxWidth="360.0" prefHeight="300.0" prefWidth="360.0" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
+   <StackPane fx:id="sessionPopupOverlay" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false">
+      <VBox spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
          </padding>
@@ -395,10 +428,75 @@
                   <TextField fx:id="txtFldBoxId" promptText="e.g. BOX-042" styleClass="container" />
                </children>
             </VBox>
-
-            <Label styleClass="h3" text="Global Rotation" />
-
-            <Spinner fx:id="spinnerGlobalRotation" prefWidth="120.0" />
+            <HBox alignment="CENTER" spacing="9.0">
+               <children>
+                  <VBox>
+                     <children>
+            
+                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Rotation" />
+                        <TextField fx:id="txtFldGlobalRotation" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets></TextField>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </VBox>
+                  <VBox layoutX="10.0" layoutY="10.0">
+                     <children>
+                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Hue" />
+                        <TextField fx:id="txtFldGlobalHue" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </TextField>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </VBox>
+                  <VBox layoutX="79.0" layoutY="10.0">
+                     <children>
+                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Brightness" />
+                        <TextField fx:id="txtFldGlobalBrightness" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </TextField>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </VBox>
+                  <VBox layoutX="79.0" layoutY="10.0">
+                     <children>
+                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Contrast" />
+                        <TextField fx:id="txtFldGlobalContrast" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </TextField>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </VBox>
+                  <VBox layoutX="79.0" layoutY="10.0">
+                     <children>
+                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Saturation" />
+                        <TextField fx:id="txtFldGlobalSaturation" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </TextField>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </VBox>
+               </children>
+            </HBox>
 
             <Button mnemonicParsing="false" onAction="#onStartSession" prefHeight="33.0" styleClass="primary-btn" text="Start Session" />
             <Separator />
