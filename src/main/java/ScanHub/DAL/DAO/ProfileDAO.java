@@ -178,11 +178,11 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
                 new FileSettings(rs.getInt("fileSettingsId"),
+                        rs.getInt("globalRotation"),
                         rs.getDouble("hue"),
                         rs.getDouble("brightness"),
                         rs.getDouble("contrast"),
-                        rs.getDouble("saturation"),
-                        rs.getInt("globalRotation"))
+                        rs.getDouble("saturation"))
         );
     }
 
@@ -195,7 +195,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
             selectPs.setDouble(2, fileSettings.getBrightness());
             selectPs.setDouble(3, fileSettings.getContrast());
             selectPs.setDouble(4, fileSettings.getSaturation());
-            selectPs.setDouble(5, fileSettings.getGlobalRotation());
+            selectPs.setDouble(5, fileSettings.getRotation());
 
             try (ResultSet rs = selectPs.executeQuery()) {
                 if (rs.next()) {
@@ -212,7 +212,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
             insertPS.setDouble(2, fileSettings.getBrightness());
             insertPS.setDouble(3, fileSettings.getContrast());
             insertPS.setDouble(4, fileSettings.getSaturation());
-            insertPS.setInt(5, fileSettings.getGlobalRotation());
+            insertPS.setInt(5, fileSettings.getRotation());
 
             insertPS.executeUpdate();
 

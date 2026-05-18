@@ -37,7 +37,7 @@ public class File implements TreeNode {
     public int getFileSizeBytes()       { return fileSizeBytes; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public int getRotation()            { return fileSettings.getRotation(); }
-    public double getHue()    { return  fileSettings.getHue(); }
+    public double getHue()              { return  fileSettings.getHue(); }
     public double getBrightness()       { return fileSettings.getBrightness(); }
     public double getContrast()         { return fileSettings.getContrast(); }
     public double getSaturation()       { return fileSettings.getSaturation(); }

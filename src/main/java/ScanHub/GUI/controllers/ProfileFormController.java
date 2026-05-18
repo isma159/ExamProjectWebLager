@@ -169,7 +169,7 @@ public class ProfileFormController implements Initializable {
         sliderBrightness.setValue(profile.getFileSettings().getBrightness());
         sliderContrast.setValue(profile.getFileSettings().getContrast());
         sliderSaturation.setValue(profile.getFileSettings().getSaturation());
-        sliderRotation.setValue(profile.getFileSettings().getGlobalRotation());
+        sliderRotation.setValue(profile.getFileSettings().getRotation());
     }
 
     private void bindSlider(Slider slider, Label label, DoubleConsumer setter) {
@@ -208,11 +208,11 @@ public class ProfileFormController implements Initializable {
 
     private FileSettings buildFileSettings() {
         return new FileSettings(
+                rotation,
                 hue,
                 brightness,
                 contrast,
-                saturation,
-                rotation
+                saturation
         );
     }
 

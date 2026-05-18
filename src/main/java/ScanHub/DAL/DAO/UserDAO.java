@@ -283,11 +283,11 @@ public class UserDAO implements IDataAccess<User> {
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
                 new FileSettings(rs.getInt("fileSettingsId"),
+                        rs.getInt("globalRotation"),
                         rs.getDouble("hue"),
                         rs.getDouble("brightness"),
                         rs.getDouble("contrast"),
-                        rs.getDouble("saturation"),
-                        rs.getInt("globalRotation"))
+                        rs.getDouble("saturation"))
         );
     }
 }

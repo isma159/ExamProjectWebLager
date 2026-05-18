@@ -788,6 +788,7 @@ public class ScanController implements Initializable, IViewController {
         btnRotLeft.setDisable(disabled);
         btnRotRight.setDisable(disabled);
         btnNewDoc.setDisable(disabled);
+        btnSplitDoc.setDisable(disabled);
         btnDelete.setDisable(disabled);
         btnUndo.setDisable(disabled);
         btnExport.setDisable(disabled);
