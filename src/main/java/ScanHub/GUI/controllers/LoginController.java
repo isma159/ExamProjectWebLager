@@ -1,6 +1,9 @@
 package ScanHub.GUI.controllers;
 
+import ScanHub.BE.Log;
 import ScanHub.BE.User;
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
@@ -15,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -102,6 +106,7 @@ public class LoginController implements IViewController, Initializable {
                 stage.setMinHeight(768);
 
                 handler.show(modelFacade, stage).setMaximized(true);
+                modelFacade.getLogModel().createLog(new Log(user, user.getUserId(), EntityType.USER, LogAction.LOGIN, LocalDateTime.now()));
                 currentStage.close();
             }
         } catch (Exception e) {

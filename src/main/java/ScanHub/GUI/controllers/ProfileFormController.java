@@ -26,7 +26,7 @@ public class ProfileFormController implements Initializable {
 
     @FXML private ToggleGroup toggleGroupProfileStatus;
     @FXML private Label formTitle, exportPreviewLabel;
-    @FXML private Label lblHueValue, lblBrightnessValue, lblContrastValue, lblSaturationValue, lblRotationValue;
+    @FXML private Spinner<Integer> spnHue, spnBrightness, spnContrast, spnSaturation, spnRotation;
     @FXML private RadioButton radioACTIVE, radioINACTIVE;
     @FXML private VBox vboxStatus;
     @FXML private TextField profileNameField;
@@ -68,6 +68,12 @@ public class ProfileFormController implements Initializable {
         radioACTIVE.setUserData(ProfileStatus.ACTIVE);
         radioINACTIVE.setUserData(ProfileStatus.INACTIVE);
 
+        spnHue.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spnBrightness.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spnContrast.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spnSaturation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spnRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 1));
+
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
 
             String clientName = (searchableComboBoxClient.getValue() != null) ? searchableComboBoxClient.getValue().getClientName() : "";
@@ -76,11 +82,13 @@ public class ProfileFormController implements Initializable {
         }));
 
         // Wire sliders to their value labels
-        bindSlider(sliderHue, lblHueValue, val -> hue = val);
-        bindSlider(sliderBrightness, lblBrightnessValue, val -> brightness = val);
-        bindSlider(sliderContrast, lblContrastValue, val -> contrast = val);
-        bindSlider(sliderSaturation, lblSaturationValue, val -> saturation = val);
-        bindSlider(sliderRotation, lblRotationValue, val -> rotation = (int) val);
+        bindSlider(sliderHue, spnHue, val -> hue = val);
+        bindSlider(sliderBrightness, spnBrightness, val -> brightness = val);
+        bindSlider(sliderContrast, spnContrast, val -> contrast = val);
+        bindSlider(sliderSaturation, spnSaturation, val -> saturation = val);
+        bindSlider(sliderRotation, spnRotation, val -> rotation = (int) val);
+
+
     }
 
     // event handlers
@@ -149,6 +157,7 @@ public class ProfileFormController implements Initializable {
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);
+            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), editingProfile.getProfileId(), EntityType.PROFILE, LogAction.UPDATE, LocalDateTime.now()));
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,11 +181,19 @@ public class ProfileFormController implements Initializable {
         sliderRotation.setValue(profile.getFileSettings().getRotation());
     }
 
-    private void bindSlider(Slider slider, Label label, DoubleConsumer setter) {
+    private void bindSlider(Slider slider, Spinner<Integer> spinner, DoubleConsumer setter) {
         slider.valueProperty().addListener(((observable, oldValue, newValue) -> {
             setter.accept(newValue.doubleValue());
-            label.setText(String.valueOf(newValue.intValue()));
+            spinner.getValueFactory().setValue(newValue.intValue());
             updatePreview();
+        }));
+        spinner.getEditor().textProperty().addListener(((observable, oldValue, newValue) -> {
+            try {
+                slider.setValue(Integer.parseInt(newValue));
+            }
+            catch (NumberFormatException e) {
+                // wrong input format, ignoring :)
+            }
         }));
     }
 

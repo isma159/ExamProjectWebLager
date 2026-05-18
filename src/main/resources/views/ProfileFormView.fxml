@@ -7,6 +7,7 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
@@ -139,41 +140,49 @@
                                         </padding>
                               <VBox spacing="4">
                                  <children>
-                                    <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" spacing="8">
                                        <children>
-                                          <Label styleClass="lbl" text="Hue" HBox.hgrow="ALWAYS" />
-                                          <Label fx:id="lblHueValue" minWidth="30" styleClass="lbl" text="0" />
+                                          <Label maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" styleClass="lbl" text="Hue" HBox.hgrow="ALWAYS" />
+                                          <Region prefHeight="15.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                          <Spinner fx:id="spnHue" editable="true" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
                                        </children>
                                     </HBox>
-                                    <Slider fx:id="sliderHue" blockIncrement="1" max="100" min="-100" prefHeight="30" showTickLabels="false" value="0" />
+                                    <Slider fx:id="sliderHue" blockIncrement="1" max="100" min="-100" minorTickCount="1" prefHeight="30" showTickLabels="false" snapToTicks="true" value="0" />
                                  </children>
                               </VBox>
                               <Separator />
                                         <VBox spacing="4">
-                                            <HBox alignment="CENTER_LEFT" spacing="8">
-                                                <Label styleClass="lbl" text="Brightness" HBox.hgrow="ALWAYS" />
-                                                <Label fx:id="lblBrightnessValue" minWidth="30" styleClass="lbl" text="0" />
-                                            </HBox>
-                                            <Slider fx:id="sliderBrightness" blockIncrement="1" max="100" min="-100" prefHeight="30" showTickLabels="false" value="0" />
+                                 <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" spacing="8">
+                                    <children>
+                                       <Label maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" styleClass="lbl" text="Brightness" HBox.hgrow="ALWAYS" />
+                                       <Region prefHeight="15.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spnBrightness" editable="true" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                            <Slider fx:id="sliderBrightness" blockIncrement="1" max="100" min="-100" minorTickCount="1" prefHeight="30" showTickLabels="false" snapToTicks="true" value="0" />
                                         </VBox>
                                         <Separator />
                                         <VBox spacing="4">
-                                            <HBox alignment="CENTER_LEFT" spacing="8">
-                                                <Label styleClass="lbl" text="Contrast" HBox.hgrow="ALWAYS" />
-                                                <Label fx:id="lblContrastValue" minWidth="30" styleClass="lbl" text="0" />
-                                            </HBox>
-                                            <Slider fx:id="sliderContrast" blockIncrement="1" max="100" min="-100" prefHeight="30" showTickLabels="false" value="0" />
+                                 <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" spacing="8">
+                                    <children>
+                                       <Label maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" styleClass="lbl" text="Contrast" HBox.hgrow="ALWAYS" />
+                                       <Region prefHeight="15.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spnContrast" editable="true" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                            <Slider fx:id="sliderContrast" blockIncrement="1" max="100" min="-100" minorTickCount="1" prefHeight="30" showTickLabels="false" snapToTicks="true" value="0" />
                                         </VBox>
                               <Separator />
                               <VBox layoutX="26.0" layoutY="102.0" spacing="4">
                                  <children>
-                                    <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" spacing="8">
                                        <children>
-                                          <Label styleClass="lbl" text="Saturation" HBox.hgrow="ALWAYS" />
-                                          <Label fx:id="lblSaturationValue" minWidth="30" styleClass="lbl" text="0" />
+                                          <Label maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" styleClass="lbl" text="Saturation" HBox.hgrow="ALWAYS" />
+                                          <Region prefHeight="15.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                          <Spinner fx:id="spnSaturation" editable="true" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
                                        </children>
                                     </HBox>
-                                    <Slider fx:id="sliderSaturation" blockIncrement="1" max="100" min="-100" prefHeight="30" showTickLabels="false" value="0" />
+                                    <Slider fx:id="sliderSaturation" blockIncrement="1" max="100" min="-100" minorTickCount="1" prefHeight="30" showTickLabels="false" snapToTicks="true" value="0" />
                                  </children>
                               </VBox>
                                         <styleClass>
@@ -196,10 +205,11 @@
                               <children>
                                  <VBox spacing="4">
                                     <children>
-                                       <HBox alignment="CENTER_LEFT" spacing="8">
+                                       <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" spacing="8">
                                           <children>
-                                             <Label styleClass="lbl" text="Global Rotation:" HBox.hgrow="ALWAYS" />
-                                             <Label fx:id="lblRotationValue" minWidth="30" styleClass="lbl" text="0" />
+                                             <Label maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" styleClass="lbl" text="Global Rotation" HBox.hgrow="ALWAYS" />
+                                             <Region prefHeight="15.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                             <Spinner fx:id="spnRotation" editable="true" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
                                           </children>
                                        </HBox>
                                        <Slider fx:id="sliderRotation" blockIncrement="5.0" majorTickUnit="90.0" max="270.0" min="-270.0" minorTickCount="5" prefHeight="30" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="0" />
