@@ -84,7 +84,7 @@ public class UserDAO implements IDataAccess<User> {
                        p.profileId, p.clientId, p.profileName,
                        p.exportLabel, p.status, p.fileSettingsId,
                        c.clientName, fs.hue, fs.brightness,
-                       fs.contrast, fs.saturation
+                       fs.contrast, fs.saturation, fs.globalRotation
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
@@ -137,8 +137,9 @@ public class UserDAO implements IDataAccess<User> {
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
                        p.profileId, p.clientId, c.clientName, p.profileName,
-                    p.exportLabel, p.status, p.fileSettingsId,
-                       fs.hue, fs.brightness, fs.contrast, fs.saturation
+                       p.exportLabel, p.status, p.fileSettingsId,
+                       fs.hue, fs.brightness, fs.contrast, fs.saturation,
+                       fs.globalRotation
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
@@ -285,7 +286,8 @@ public class UserDAO implements IDataAccess<User> {
                         rs.getDouble("hue"),
                         rs.getDouble("brightness"),
                         rs.getDouble("contrast"),
-                        rs.getDouble("saturation"))
+                        rs.getDouble("saturation"),
+                        rs.getInt("globalRotation"))
         );
     }
 }

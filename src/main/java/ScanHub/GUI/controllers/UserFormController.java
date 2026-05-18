@@ -3,15 +3,16 @@ package ScanHub.GUI.controllers;
 // project imports
 import ScanHub.BE.Client;
 import ScanHub.BE.Profile;
+import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
 import ScanHub.BE.interfaces.CheckTreeNode;
 import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
-import ScanHub.GUI.util.RowMaker;
 
 // java imports
+import ScanHub.GUI.util.TreeViewInitializer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -21,9 +22,8 @@ import javafx.stage.Stage;
 import org.controlsfx.control.CheckTreeView;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserFormController implements Initializable {
 
@@ -32,21 +32,21 @@ public class UserFormController implements Initializable {
     @FXML private RadioButton radioADMIN, radioUSER;
     @FXML private VBox vboxRole;
     @FXML private CheckTreeView<CheckTreeNode> clientTreeView;
-    @FXML private TextField usernameField;
+    @FXML private TextField usernameField, txtFldClientSearch;
     @FXML private Button saveButton;
     @FXML private PasswordField passwordField, confirmPasswordField;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
     private User editingUser = null; // null means create mode, non-null means edit mode
-    private List<Profile> selectedProfiles;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         radioADMIN.setUserData(Role.ADMIN);
         radioUSER.setUserData(Role.USER);
-        selectedProfiles = new ArrayList<>();
+        TreeViewInitializer.initUserFormTreeView(clientTreeView);
+        clientTreeView.setFixedCellSize(40);
     }
 
     /**
@@ -68,23 +68,33 @@ public class UserFormController implements Initializable {
         }
 
         ThemeManager.apply(currentStage.getScene());
-        loadClientsAndProfiles();
+        applyFilters();
+        txtFldClientSearch.textProperty().addListener(((obs, oldVal, newVal) -> applyFilters()));
     }
 
-    private void loadClientsAndProfiles() {
+    private void loadClientsAndProfiles(List<Client> clients) {
         clientTreeView.setRoot(null);
 
         CheckBoxTreeItem<CheckTreeNode> root = new CheckBoxTreeItem<>();
         clientTreeView.setRoot(root);
         root.setExpanded(true);
 
-        List<Client> clients = modelFacade.getClientModel().getClients();
+        // used to check if the profile we're looping through has a matching id with one of the assigned profiles in the user being edited. set has O(1) time complexity :)
+        Set<Integer> assignedProfileIds = (editingUser != null) ? editingUser.getProfiles().stream().map(
+                Profile::getProfileId).collect(Collectors.toSet()) : Collections.emptySet();
 
         for (Client client: clients) {
             CheckBoxTreeItem<CheckTreeNode> clientItem = new CheckBoxTreeItem<>(client);
-            clientItem.setExpanded(true);
             for (Profile profile: client.getProfiles()) {
+
+                boolean isAssigned = assignedProfileIds.contains(profile.getProfileId());
+                if (profile.getStatus() == ProfileStatus.INACTIVE && !isAssigned) {
+                    continue;
+                }
+
                 CheckBoxTreeItem<CheckTreeNode> profileItem = new CheckBoxTreeItem<>(profile);
+                profileItem.setSelected(isAssigned);
+
                 clientItem.getChildren().add(profileItem);
             }
             root.getChildren().add(clientItem);
@@ -93,7 +103,6 @@ public class UserFormController implements Initializable {
 
     /**
      * Pre-fills input fields when editing an existing user.
-     * TODO: populate profile checkboxes from user's assigned profiles
      */
     private void populateFields(User user) {
         usernameField.setText(user.getUsername());
@@ -101,6 +110,7 @@ public class UserFormController implements Initializable {
         if (user.getRole() == Role.ADMIN) {
             toggleGroupRole.selectToggle(radioADMIN);
         }
+
         else if (user.getRole() == Role.USER) {
             toggleGroupRole.selectToggle(radioUSER);
         }
@@ -161,7 +171,7 @@ public class UserFormController implements Initializable {
 
         try {
             User newUser = new User(username, hashedPassword, role);
-            newUser.setProfiles(selectedProfiles);
+            newUser.setProfiles(retrieveSelectedProfiles());
             modelFacade.getUserModel().createUser(newUser);
             currentStage.close();
         } catch (Exception e) {
@@ -206,7 +216,7 @@ public class UserFormController implements Initializable {
 
         editingUser.setUsername(newUsername);
         editingUser.setRole(newRole);
-        editingUser.setProfiles(selectedProfiles);
+        editingUser.setProfiles(retrieveSelectedProfiles());
 
         // only update password if user filled in a new one
         if (!newPassword.isBlank()) {
@@ -220,6 +230,44 @@ public class UserFormController implements Initializable {
             e.printStackTrace();
             AlertHelper.showError("Update Failed", "Failed to update user. Please try again.");
         }
+    }
+
+    private void applyFilters() {
+
+        List<Client> clients = modelFacade.getClientModel().getClients();
+        String search = txtFldClientSearch.getText().toLowerCase();
+
+
+        List<Client> filtered = clients.stream().filter(client -> client.getClientName().toLowerCase().contains(search)).toList();
+
+        loadClientsAndProfiles(filtered);
+
+    }
+
+    // TODO find out if clients should be saved in UserClients in database. If not then the method below in unnecessary.
+    private List<Client> retrieveSelectedClients() {
+        List<Client> clients = new ArrayList<>();
+        for (TreeItem<CheckTreeNode> item: clientTreeView.getRoot().getChildren()) {
+            CheckBoxTreeItem<CheckTreeNode> clientItem = (CheckBoxTreeItem<CheckTreeNode>) item;
+            if (clientItem.isSelected() || clientItem.isIndeterminate()) {
+                clients.add((Client) clientItem.getValue());
+            }
+        }
+        return clients;
+    }
+
+    private List<Profile> retrieveSelectedProfiles() {
+        List<Profile> profiles = new ArrayList<>();
+        for (TreeItem<CheckTreeNode> item: clientTreeView.getRoot().getChildren()) {
+            CheckBoxTreeItem<CheckTreeNode> clientItem = (CheckBoxTreeItem<CheckTreeNode>) item;
+            for (TreeItem<CheckTreeNode> item2: item.getChildren()) {
+                CheckBoxTreeItem<CheckTreeNode> profileItem = (CheckBoxTreeItem<CheckTreeNode>) item2;
+                if (profileItem.isSelected()) {
+                    profiles.add((Profile) profileItem.getValue());
+                }
+            }
+        }
+        return profiles;
     }
 
     private void clearError() {
