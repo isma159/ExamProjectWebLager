@@ -1053,3 +1053,8 @@
     -fx-padding: 8;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 24, 0.2, 0, 4);
 }
+.shortcut-label {
+    -fx-font-size: 9px;
+    -fx-text-fill: #888888;
+    -fx-alignment: center;
+}
