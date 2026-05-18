@@ -5,21 +5,21 @@ import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.Role;
 import ScanHub.DAL.DB.DBConnector;
-import ScanHub.DAL.interfaces.ILogDataAccess;
+import ScanHub.DAL.interfaces.IDataAccess;
 
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogDAO implements ILogDataAccess {
+public class LogDAO implements IDataAccess<Log> {
 
     DBConnector dbConnector = new DBConnector();
 
     public LogDAO() throws IOException {}
 
     @Override
-    public List<Log> getLogs() throws Exception {
+    public List<Log> getData() throws Exception {
         List<Log> logs = new ArrayList<>();
 
         String sql = """
@@ -45,7 +45,22 @@ public class LogDAO implements ILogDataAccess {
     }
 
     @Override
-    public Log createLog(Log log) throws Exception {
+    public Log getDataFromName(String name) throws Exception {
+        return null;
+    }
+
+    @Override
+    public void updateData(Log newData) throws Exception {
+
+    }
+
+    @Override
+    public void deleteData(Log data) throws Exception {
+
+    }
+
+    @Override
+    public Log createData(Log log) throws Exception {
         String sql = "INSERT INTO Logs (userId, entityId, entityType, action, log_timestamp) VALUES (?, ?, ?, ?, GETDATE())";
 
         try (Connection connection = dbConnector.getConnection();

@@ -3,7 +3,10 @@ package ScanHub.GUI.controllers;
 // project imports
 
 import ScanHub.BE.Client;
+import ScanHub.BE.Log;
 import ScanHub.BE.User;
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
@@ -15,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 public class ClientFormController implements Initializable {
@@ -88,6 +92,7 @@ public class ClientFormController implements Initializable {
         try {
             Client newClient = new Client(clientName);
             modelFacade.getClientModel().createClient(newClient);
+            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), newClient.getClientId(), EntityType.CLIENT, LogAction.CREATE, LocalDateTime.now()));
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,6 +119,7 @@ public class ClientFormController implements Initializable {
 
         try {
             modelFacade.getClientModel().updateClient(editingClient);
+            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), editingClient.getClientId(), EntityType.CLIENT, LogAction.UPDATE, LocalDateTime.now()));
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

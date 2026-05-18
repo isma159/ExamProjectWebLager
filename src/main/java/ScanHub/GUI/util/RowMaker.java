@@ -290,18 +290,10 @@ public class RowMaker {
         String ts = log.getTimestamp().format(DATETIME_FORMATTER);
 
         if (log.getAction() == LogAction.LOGIN) {
-            return log.getUser().getUsername() + " logged in at " + ts;
+            return log.getUser().getUsername() + " " + log.getAction().getVerb() + " at " + ts;
         }
 
-        String verb = switch (log.getAction()) {
-            case EXPORT -> "Exported";
-            case CREATE -> "Created";
-            case DELETE -> "Deleted";
-            case SCAN -> "Scanned";
-            default -> log.getAction().toString();
-        };
-
-        return verb + " " + log.getEntityType().toString().toLowerCase()
+        return log.getUser().getUsername() + " " + log.getAction().getVerb() + " " + log.getEntityType().getLabel()
                 + " " + log.getEntityId() + " on " + ts;
     }
 
