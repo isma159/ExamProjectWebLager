@@ -2,7 +2,10 @@ package ScanHub.GUI.controllers;
 
 // project imports
 import ScanHub.BE.Client;
+import ScanHub.BE.Log;
 import ScanHub.BE.Profile;
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
@@ -22,6 +25,7 @@ import javafx.stage.Stage;
 import org.controlsfx.control.CheckTreeView;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,9 +97,10 @@ public class UserFormController implements Initializable {
                 }
 
                 CheckBoxTreeItem<CheckTreeNode> profileItem = new CheckBoxTreeItem<>(profile);
-                profileItem.setSelected(isAssigned);
 
                 clientItem.getChildren().add(profileItem);
+
+                profileItem.setSelected(isAssigned);
             }
             root.getChildren().add(clientItem);
         }
@@ -173,6 +178,7 @@ public class UserFormController implements Initializable {
             User newUser = new User(username, hashedPassword, role);
             newUser.setProfiles(retrieveSelectedProfiles());
             modelFacade.getUserModel().createUser(newUser);
+            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), newUser.getUserId(), EntityType.USER, LogAction.CREATE, LocalDateTime.now()));
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -225,6 +231,7 @@ public class UserFormController implements Initializable {
 
         try {
             modelFacade.getUserModel().updateUser(editingUser);
+            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), editingUser.getUserId(), EntityType.USER, LogAction.UPDATE, LocalDateTime.now()));
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -238,7 +245,13 @@ public class UserFormController implements Initializable {
         String search = txtFldClientSearch.getText().toLowerCase();
 
 
-        List<Client> filtered = clients.stream().filter(client -> client.getClientName().toLowerCase().contains(search)).toList();
+        List<Client> filtered = clients.stream().filter(client -> {
+
+            if (client.getClientName().toLowerCase().contains(search)) {return true;}
+
+            return client.getProfiles().stream().anyMatch(p -> p.getProfileName().toLowerCase().contains(search));
+
+        }).toList();
 
         loadClientsAndProfiles(filtered);
 

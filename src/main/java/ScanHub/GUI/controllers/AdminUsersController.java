@@ -2,6 +2,9 @@ package ScanHub.GUI.controllers;
 
 // project imports
 import ScanHub.BE.Client;
+import ScanHub.BE.Log;
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
@@ -25,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -178,6 +182,7 @@ public class AdminUsersController implements Initializable {
         AlertHelper.showConfirmation("Delete User", "Are you sure you want to delete \"" + selectedUser.getUsername() + "\"? This action cannot be undone.", () -> {
             try {
                 modelFacade.getUserModel().deleteUser(selectedUser);
+                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedUser.getUserId(), EntityType.USER, LogAction.DELETE, LocalDateTime.now()));
                 loadUsers();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -196,7 +201,23 @@ public class AdminUsersController implements Initializable {
         openClientForm(selectedClient);
     }
 
-    @FXML private void onClickDeleteClient() {}
+    @FXML private void onClickDeleteClient() {
+        if (selectedClient == null) {
+            AlertHelper.showError("No Selection", "Please select a client to delete.");
+            return;
+        }
+
+        AlertHelper.showConfirmation("Delete Client", "Are you sure you want to delete \"" + selectedClient.getClientName() + "\"? This action cannot be undone.", () -> {
+            try {
+                modelFacade.getClientModel().deleteClient(selectedClient);
+                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedClient.getClientId(), EntityType.CLIENT, LogAction.DELETE, LocalDateTime.now()));
+                loadClients();
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertHelper.showError("Delete Failed", "Failed to delete client. Please try again.");
+            }
+        });
+    }
 
     private void openUserForm(User user) { // TODO
         try {

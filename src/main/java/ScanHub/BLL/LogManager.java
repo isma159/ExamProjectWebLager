@@ -5,9 +5,6 @@ import ScanHub.DAL.DAO.LogDAO;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -20,11 +17,11 @@ public class LogManager {
     }
 
     public List<Log> getLogs() throws Exception {
-        return logDAO.getLogs();
+        return logDAO.getData();
     }
 
     public Log createLog(Log log) throws Exception {
-        return logDAO.createLog(log);
+        return logDAO.createData(log);
     }
 
     public void exportLogs(Path path, List<Log> logs) throws Exception {

@@ -3,22 +3,21 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminLogsController">
+<VBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminLogsController">
 
-    <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="1800.0">
+    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="1800.0">
         <styleClass>
             <String fx:value="half-card" />
             <String fx:value="card-bg" />
@@ -58,37 +57,8 @@
             <String fx:value="box-card" />
         </styleClass>
         <Region prefWidth="15.0" />
-
-        <ToggleButton mnemonicParsing="false" onAction="#onTbAllLogsClick" prefHeight="30.0" prefWidth="60.0" selected="true" text="All">
-            <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
-         <toggleGroup>
-            <ToggleGroup fx:id="logsFilter" />
-         </toggleGroup>
-        </ToggleButton>
-        <ToggleButton mnemonicParsing="false" onAction="#onTbScanLogsClick" prefHeight="30.0" prefWidth="75.0" text="Scan" toggleGroup="$logsFilter">
-            <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
-        </ToggleButton>
-      <ToggleButton layoutX="103.0" layoutY="11.0" mnemonicParsing="false" onAction="#onTbCreateLogsClick" prefHeight="30.0" prefWidth="75.0" text="Create" toggleGroup="$logsFilter">
-         <styleClass>
-            <String fx:value="filter-btn" />
-            <String fx:value="lbl" />
-         </styleClass>
-      </ToggleButton>
-        <ToggleButton mnemonicParsing="false" onAction="#onTbDeleteLogsClick" prefHeight="30.0" prefWidth="75.0" text="Delete" toggleGroup="$logsFilter">
-            <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
-        </ToggleButton>
-      <ToggleButton layoutX="271.0" layoutY="11.0" mnemonicParsing="false" onAction="#onTbExportLogsClick" prefHeight="30.0" prefWidth="75.0" text="Export" toggleGroup="$logsFilter">
-         <styleClass>
-            <String fx:value="filter-btn" />
-            <String fx:value="lbl" />
-         </styleClass>
-      </ToggleButton>
-      <ToggleButton layoutX="355.0" layoutY="11.0" mnemonicParsing="false" onAction="#onTbLoginLogsClick" prefHeight="30.0" prefWidth="75.0" text="Login" toggleGroup="$logsFilter">
-         <styleClass>
-            <String fx:value="filter-btn" />
-            <String fx:value="lbl" />
-         </styleClass>
-      </ToggleButton>
+      <Label prefWidth="60.0" styleClass="bold-lbl" text="Filter by: " />
+      <ComboBox fx:id="cbFilter" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
 
         <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="24.0" styleClass="grey-separator" />
       <DatePicker fx:id="dtPickerFrom" prefHeight="30.0" prefWidth="120.0" promptText="Start Date" />
@@ -104,7 +74,7 @@
         </content>
     </ScrollPane>
 
-    <HBox alignment="CENTER" prefHeight="45.0" prefWidth="1800.0">
+    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="1800.0">
         <styleClass>
             <String fx:value="half-card-bottom" />
             <String fx:value="card-bg" />

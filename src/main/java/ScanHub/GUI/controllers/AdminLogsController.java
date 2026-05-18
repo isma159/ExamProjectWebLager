@@ -3,6 +3,7 @@ package ScanHub.GUI.controllers;
 import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.Log;
 import ScanHub.BE.enums.LogAction;
+import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
@@ -35,9 +36,9 @@ public class AdminLogsController implements Initializable {
 
     @FXML private TextField txtFldSearchLogs;
     @FXML private DatePicker dtPickerFrom, dtPickerTo;
-    @FXML private ToggleGroup logsFilter;
     @FXML private VBox logsTableBox;
     @FXML private Pagination logsPagination;
+    @FXML private ComboBox<LogAction> cbFilter;
 
     private ModelFacade modelFacade;
     private LogAction selectedAction = null;
@@ -62,9 +63,15 @@ public class AdminLogsController implements Initializable {
             e.printStackTrace();
         }
 
+        cbFilter.getItems().addAll(LogAction.values());
+
         txtFldSearchLogs.textProperty().addListener((obs, o, n) -> applyFilters());
         dtPickerFrom.valueProperty().addListener((obs, o, n) -> applyFilters());
         dtPickerTo.valueProperty().addListener((obs, o, n) -> applyFilters());
+
+        cbFilter.valueProperty().addListener(((obs, o, n) -> applyFilters()));
+
+        cbFilter.getSelectionModel().select(LogAction.ALL);
 
         // Manual Pagination Listener (instead of Page Factory)
         logsPagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
@@ -94,14 +101,15 @@ public class AdminLogsController implements Initializable {
                                 !log.getTimestamp().toLocalDate().isAfter(dateTo)).toList();
             }
 
-            if (selectedAction != null) {
+            List<Log> firstFiltering = logs.stream().filter(log -> {
 
-                logs = logs.stream().filter(log -> log.getAction() == selectedAction).toList();
+                if (cbFilter.getSelectionModel().getSelectedItem() == LogAction.ALL) {return true;}
 
-            }
+                return log.getAction() == cbFilter.getSelectionModel().getSelectedItem();
 
-            FilteredList<Log> filteredLogs = new FilteredList<>(FXCollections.observableArrayList(logs));
-            filteredLogs.setPredicate(log -> {
+            }).toList();
+
+            List<Log> filteredLogs = firstFiltering.stream().filter(log -> {
 
                 if (search.isBlank()) return true;
 
@@ -112,7 +120,7 @@ public class AdminLogsController implements Initializable {
                 } else {
                     return false;
                 }
-            });
+            }).toList();
 
             renderLogsForCurrentPage(filteredLogs);
 
@@ -170,17 +178,4 @@ public class AdminLogsController implements Initializable {
             // TODO Alert View?
         }
     }
-
-    @FXML private void onTbAllLogsClick(ActionEvent e)    { selectedAction = null;           applyFilters(); }
-    @FXML private void onTbCreateLogsClick(ActionEvent e) { selectedAction = LogAction.CREATE; applyFilters(); }
-    @FXML private void onTbDeleteLogsClick(ActionEvent e) { selectedAction = LogAction.DELETE; applyFilters(); }
-    @FXML private void onTbScanLogsClick(ActionEvent e) { selectedAction = LogAction.SCAN; applyFilters(); }
-    @FXML private void onTbExportLogsClick(ActionEvent e) { selectedAction = LogAction.EXPORT; applyFilters(); }
-    @FXML private void onTbLoginLogsClick(ActionEvent e) { selectedAction = LogAction.LOGIN; applyFilters(); }
-
-
-    @FXML private void onUsernameClick(MouseEvent e) {}
-    @FXML private void onActionClick(MouseEvent e) {}
-    @FXML private void onFileIdClick(MouseEvent e) {}
-    @FXML private void onTimestampClick(MouseEvent e) {}
 }
