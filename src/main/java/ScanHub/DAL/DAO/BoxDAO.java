@@ -138,7 +138,8 @@ public class BoxDAO implements IDataAccess<Box> {
         return """
                 SELECT b.boxId, b.boxName, b.profileId, b.created_at, b.modified_at,
                        p.clientId, p.profileName, p.status, p.exportLabel, p.fileSettingsId,
-                       c.clientName, fs.hue, fs.brightness, fs.contrast, fs.saturation
+                       c.clientName, fs.hue, fs.brightness, fs.contrast, fs.saturation,
+                       fs.globalRotation
                 FROM Boxes b
                 JOIN Profiles p ON b.profileId = p.profileId
                 JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
@@ -160,7 +161,8 @@ public class BoxDAO implements IDataAccess<Box> {
                         rs.getDouble("hue"),
                         rs.getDouble("brightness"),
                         rs.getDouble("contrast"),
-                        rs.getDouble("saturation"))
+                        rs.getDouble("saturation"),
+                        rs.getInt("globalRotation"))
         );
 
         box.setProfile(profile);

@@ -3,7 +3,6 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
@@ -17,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.SearchableComboBox?>
 
-<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="705.0" prefWidth="1200.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="705.0" prefWidth="1200.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ProfileFormController">
     <children>
         <VBox prefHeight="750.0" prefWidth="750.0" styleClass="background" HBox.hgrow="ALWAYS">
             <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" spacing="12.0" styleClass="primary-navigation-bg" VBox.vgrow="NEVER">
@@ -112,15 +111,6 @@
                            <String fx:value="second-card-bg" />
                         </styleClass>
                      </VBox>
-                     <Region prefHeight="15.0" />
-                     <Label styleClass="bold-lbl" text="Image Resolution" />
-                     <Label prefWidth="360" styleClass="lbl" text="Adjust the default resolution of scanned pages." wrapText="true" />
-                     <Region prefHeight="15.0" />
-                     <HBox>
-                        <children>
-                           <ComboBox fx:id="cbResolution" prefHeight="30.0" prefWidth="422.0" HBox.hgrow="ALWAYS" />
-                        </children>
-                     </HBox>
                             <styleClass>
                                 <String fx:value="card" />
                                 <String fx:value="card-bg" />
@@ -212,7 +202,7 @@
                                              <Label fx:id="lblRotationValue" minWidth="30" styleClass="lbl" text="0" />
                                           </children>
                                        </HBox>
-                                       <Slider fx:id="sliderRotation" blockIncrement="5.0" majorTickUnit="90.0" max="270.0" min="-270.0" minorTickCount="5" prefHeight="30" showTickLabels="true" snapToTicks="true" value="0" />
+                                       <Slider fx:id="sliderRotation" blockIncrement="5.0" majorTickUnit="90.0" max="270.0" min="-270.0" minorTickCount="5" prefHeight="30" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="0" />
                                     </children>
                                  </VBox>
                               </children>
@@ -253,7 +243,7 @@
                                  <String fx:value="second-card-bg" />
                               </styleClass>
                               <children>
-                                 <ImageView fitHeight="300.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
+                                 <ImageView fitHeight="200.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
                                     <image>
                                        <Image url="@../images/placeholders/placeholder-image.png" />
                                     </image>
@@ -268,7 +258,7 @@
                                  <String fx:value="second-card-bg" />
                               </styleClass>
                               <children>
-                                 <ImageView fx:id="imgPreview" fitHeight="300.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
+                                 <ImageView fx:id="imgPreview" fitHeight="200.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
                                     <image>
                                        <Image url="@../images/placeholders/placeholder-image.png" />
                                     </image>
