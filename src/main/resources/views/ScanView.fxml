@@ -113,7 +113,7 @@
                               </graphic>
                            </Button>
 
-                           <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+                           <Separator orientation="VERTICAL" styleClass="grey-separator" />
 
                            <Button fx:id="btnScan" mnemonicParsing="false" onAction="#onScan" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
                               <graphic>
@@ -147,7 +147,7 @@
                               </graphic>
                            </Button>
 
-                           <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+                           <Separator orientation="VERTICAL" styleClass="grey-separator" />
 
                            <Button fx:id="btnNewDoc" mnemonicParsing="false" onAction="#onNewDocument" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
                               <graphic>
@@ -216,7 +216,7 @@
                               </graphic>
                            </Button>
 
-                           <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+                           <Separator orientation="VERTICAL" styleClass="grey-separator" />
 
                            <Button fx:id="btnExport" mnemonicParsing="false" onAction="#onExport" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
                               <graphic>
@@ -365,16 +365,16 @@
       </center>
 
       <bottom>
-         <HBox alignment="CENTER_LEFT" spacing="16.0">
+         <HBox alignment="CENTER_LEFT" spacing="12.0">
             <padding>
                <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
             </padding>
 
             <children>
                <Label fx:id="stDocsLabel" styleClass="lbl" text="Documents: 0" />
-               <Label alignment="CENTER" styleClass="lbl" text="|" />
+               <Separator orientation="VERTICAL" />
                <Label fx:id="stPagesLabel" styleClass="lbl" text="Pages: 0" />
-               <Label text="|" />
+               <Separator layoutX="111.0" layoutY="14.0" orientation="VERTICAL" />
                <Label fx:id="pageInfoLabel" styleClass="lbl" text="0 / 0" />
                <Region HBox.hgrow="ALWAYS" />
                <Label styleClass="lbl" text="Space scan" />

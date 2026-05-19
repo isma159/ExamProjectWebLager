@@ -16,15 +16,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
     <children>
-        <!-- ==================== USERS SECTION ==================== -->
         <VBox prefHeight="200.0" prefWidth="1800.0">
             <children>
                 <VBox prefHeight="1200.0" prefWidth="1371.0" styleClass="shadow">
                     <children>
-                        <!-- Header with buttons -->
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0">
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0">
                             <styleClass>
                                 <String fx:value="half-card" />
                                 <String fx:value="card-bg" />
@@ -33,133 +31,74 @@
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                                 <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="60.0" styleClass="h2" text="Users" />
                                 <Region prefHeight="56.0" prefWidth="1482.0" HBox.hgrow="ALWAYS" />
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-      
-                                      <!-- Add User -->
-                                      <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
-                                          <graphic>
-                                              <VBox alignment="CENTER" spacing="4.0">
-                                                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
-                                                      <children>
-                                                          <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
-                                                              <font>
-                                                   <Font size="16.0" />
-                                                </font>
-                                                          </Label>
-                                                          <Region prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" styleClass="lbl" text="Add" textFill="WHITE">
-                                                              <font>
-                                                   <Font size="12.0" />
-                                                </font>
-                                                          </Label>
-                                                      </children>
-                                                  </HBox>
-                                              </VBox>
-                                          </graphic>
-                                          <tooltip>
-                                              <Tooltip text="Create a new user (Ctrl + N)" />
-                                          </tooltip>
-                                      </Button>
-                                         <Label styleClass="shortcut-label" text="Ctrl + N" textFill="#888888">
-                                             <font>
-                                    <Font size="9.0" />
-                                 </font>
-                                             <padding>
-                                    <Insets top="2.0" />
-                                 </padding>
-                                         </Label>
-                           </children>
-                        </VBox>
 
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="12.0" />
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-      
-                                      <!-- Edit User -->
-                                      <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
-                                          <graphic>
-                                              <VBox alignment="CENTER" spacing="4.0">
-                                                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickUpdateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
-                                                      <children>
-                                                          <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
-                                                              <font>
-                                                   <Font size="16.0" />
-                                                </font>
-                                                          </Label>
-                                                          <Region prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" styleClass="lbl" text="Edit" textFill="WHITE">
-                                                              <font>
-                                                   <Font size="12.0" />
-                                                </font>
-                                                          </Label>
-                                                      </children>
-                                                  </HBox>
-                                              </VBox>
-                                          </graphic>
-                                          <tooltip>
-                                              <Tooltip text="Edit the selected user (Ctrl + E)" />
-                                          </tooltip>
-                                      </Button>
-                                         <Label styleClass="shortcut-label" text="Ctrl + E" textFill="#888888">
-                                             <font>
-                                    <Font size="9.0" />
-                                 </font>
-                                             <padding>
-                                    <Insets top="2.0" />
-                                 </padding>
-                                         </Label>
-                           </children>
-                        </VBox>
+                                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                                    <graphic>
+                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                                            <children>
+                                                <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                                    <font><Font size="16.0" /></font>
+                                                </Label>
+                                                <Region prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" styleClass="lbl" text="Add" textFill="WHITE">
+                                                    <font><Font size="12.0" /></font>
+                                                </Label>
+                                            </children>
+                                        </HBox>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Create a new user (Ctrl + N)" />
+                                    </tooltip>
+                                </Button>
 
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="12.0" />
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-      
-                                      <!-- Delete User -->
-                                      <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
-                                          <graphic>
-                                              <VBox alignment="CENTER" spacing="4.0">
-                                                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteUser" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
-                                                      <children>
-                                                          <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
-                                                              <font>
-                                                   <Font size="16.0" />
-                                                </font>
-                                                          </Label>
-                                                          <Region prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" styleClass="lbl" text="Delete" textFill="WHITE">
-                                                              <font>
-                                                   <Font size="12.0" />
-                                                </font>
-                                                          </Label>
-                                                      </children>
-                                                  </HBox>
-                                              </VBox>
-                                          </graphic>
-                                          <tooltip>
-                                              <Tooltip text="Delete the selected user (Delete)" />
-                                          </tooltip>
-                                      </Button>
-                                         <Label styleClass="shortcut-label" text="Del" textFill="#888888">
-                                             <font>
-                                    <Font size="9.0" />
-                                 </font>
-                                             <padding>
-                                    <Insets top="2.0" />
-                                 </padding>
-                                         </Label>
-                           </children>
-                        </VBox>
+                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+
+                                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                                    <graphic>
+                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickUpdateUser" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                                            <children>
+                                                <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                                    <font><Font size="16.0" /></font>
+                                                </Label>
+                                                <Region prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" styleClass="lbl" text="Edit" textFill="WHITE">
+                                                    <font><Font size="12.0" /></font>
+                                                </Label>
+                                            </children>
+                                        </HBox>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Edit the selected user (Ctrl + E)" />
+                                    </tooltip>
+                                </Button>
+
+                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+
+                                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                                    <graphic>
+                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteUser" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
+                                            <children>
+                                                <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                                    <font><Font size="16.0" /></font>
+                                                </Label>
+                                                <Region prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" styleClass="lbl" text="Delete" textFill="WHITE">
+                                                    <font><Font size="12.0" /></font>
+                                                </Label>
+                                            </children>
+                                        </HBox>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Delete the selected user (Delete)" />
+                                    </tooltip>
+                                </Button>
 
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                             </children>
                         </HBox>
-
-                        <!-- Filters and Table (unchanged) -->
                         <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="box-card" />
@@ -180,24 +119,17 @@
                                     <styleClass>
                                         <String fx:value="filter-btn" />
                                         <String fx:value="lbl" />
-                                    </styleClass>
-                                </ToggleButton>
+                                    </styleClass></ToggleButton>
                                 <ToggleButton mnemonicParsing="false" onAction="#onTbUsersClick" prefHeight="30.0" prefWidth="75.0" text="Users" toggleGroup="$userFilter">
                                     <styleClass>
                                         <String fx:value="filter-btn" />
                                         <String fx:value="lbl" />
-                                    </styleClass>
-                                </ToggleButton>
+                                    </styleClass></ToggleButton>
                                 <Separator orientation="VERTICAL" prefHeight="200.0" styleClass="grey-separator" />
                                 <Region layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                                 <TextField fx:id="txtFldUserSearch" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for specific user" styleClass="container" />
-                        <Separator prefWidth="468.0" />
                             </children>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
                         </HBox>
-
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="second-card-bg" />
@@ -208,17 +140,12 @@
                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Role" HBox.hgrow="ALWAYS" />
                             </children>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
                         </HBox>
-
                         <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
                             <content>
                                 <VBox fx:id="userTableBox" prefHeight="100.0" prefWidth="100.0" />
                             </content>
                         </ScrollPane>
-
                         <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="half-card-bottom" />
@@ -235,14 +162,11 @@
                 <Insets right="6.0" />
             </HBox.margin>
         </VBox>
-
-        <!-- ==================== CLIENTS SECTION ==================== -->
         <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="900.0">
             <children>
                 <VBox prefHeight="1200.0" prefWidth="1371.0" styleClass="shadow">
                     <children>
-                        <!-- Clients Header with buttons -->
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0" spacing="6.0">
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0" spacing="6.0">
                             <styleClass>
                                 <String fx:value="half-card" />
                                 <String fx:value="card-bg" />
@@ -251,132 +175,78 @@
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                                 <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="75.0" styleClass="h2" text="Clients" />
                                 <Region prefHeight="56.0" prefWidth="1482.0" HBox.hgrow="ALWAYS" />
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-      
-                                      <!-- Add Client -->
-                                      <Button mnemonicParsing="false" onAction="#onClickCreateClient" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
-                                          <graphic>
-                                              <VBox alignment="CENTER" spacing="4.0">
-                                                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
-                                                      <children>
-                                                          <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
-                                                              <font>
-                                                   <Font size="16.0" />
-                                                </font>
-                                                          </Label>
-                                                          <Region prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" styleClass="lbl" text="Add" textFill="WHITE">
-                                                              <font>
-                                                   <Font size="12.0" />
-                                                </font>
-                                                          </Label>
-                                                      </children>
-                                                  </HBox>
-                                              </VBox>
-                                          </graphic>
-                                          <tooltip>
-                                              <Tooltip text="Create a new client (Ctrl + N)" />
-                                          </tooltip>
-                                      </Button>
-                                         <Label styleClass="shortcut-label" text="Ctrl + N" textFill="#888888">
-                                             <font>
-                                    <Font size="9.0" />
-                                 </font>
-                                             <padding>
-                                    <Insets top="2.0" />
-                                 </padding>
-                                         </Label>
-                           </children>
-                        </VBox>
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-      
-                                      <!-- Edit Client -->
-                                      <Button mnemonicParsing="false" onAction="#onClickUpdateClient" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
-                                          <graphic>
-                                              <VBox alignment="CENTER" spacing="4.0">
-                                                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
-                                                      <children>
-                                                          <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
-                                                              <font>
-                                                   <Font size="16.0" />
-                                                </font>
-                                                          </Label>
-                                                          <Region prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" styleClass="lbl" text="Edit" textFill="WHITE">
-                                                              <font>
-                                                   <Font size="12.0" />
-                                                </font>
-                                                          </Label>
-                                                      </children>
-                                                  </HBox>
-                                              </VBox>
-                                          </graphic>
-                                          <tooltip>
-                                              <Tooltip text="Edit the selected client (Ctrl + F)" />
-                                          </tooltip>
-                                      </Button>
-                                         <Label styleClass="shortcut-label" text="Ctrl + E" textFill="#888888">
-                                             <font>
-                                    <Font size="9.0" />
-                                 </font>
-                                             <padding>
-                                    <Insets top="2.0" />
-                                 </padding>
-                                         </Label>
-                           </children>
-                        </VBox>
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-      
-                                      <!-- Delete Client -->
-                                      <Button mnemonicParsing="false" onAction="#onClickDeleteClient" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
-                                          <graphic>
-                                              <VBox alignment="CENTER" spacing="4.0">
-                                                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
-                                                      <children>
-                                                          <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
-                                                              <font>
-                                                   <Font size="16.0" />
-                                                </font>
-                                                          </Label>
-                                                          <Region prefHeight="200.0" prefWidth="6.0" />
-                                                          <Label alignment="CENTER" styleClass="lbl" text="Delete" textFill="WHITE">
-                                                              <font>
-                                                   <Font size="12.0" />
-                                                </font>
-                                                          </Label>
-                                                      </children>
-                                          <VBox.margin>
-                                             <Insets />
-                                          </VBox.margin>
-                                                  </HBox>
-                                              </VBox>
-                                          </graphic>
-                                          <tooltip>
-                                              <Tooltip text="Delete the selected client (Delete)" />
-                                          </tooltip>
-                                      </Button>
-                                         <Label styleClass="shortcut-label" text="Del" textFill="#888888">
-                                             <font>
-                                    <Font size="9.0" />
-                                 </font>
-                                             <padding>
-                                    <Insets top="2.0" />
-                                 </padding>
-                                         </Label>
-                           </children>
-                        </VBox>
-
+                                <Button mnemonicParsing="false" onAction="#onClickCreateClient" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                                    <graphic>
+                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                                            <children>
+                                                <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                                    <font>
+                                                        <Font size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <Region prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" styleClass="lbl" text="Add" textFill="WHITE">
+                                                    <font>
+                                                        <Font size="12.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </HBox>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Create a new user (Ctrl + N)" />
+                                    </tooltip>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#onClickUpdateClient" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                                    <graphic>
+                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
+                                            <children>
+                                                <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                                    <font>
+                                                        <Font size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <Region prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" styleClass="lbl" text="Edit" textFill="WHITE">
+                                                    <font>
+                                                        <Font size="12.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </HBox>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Edit the selected user (Ctrl + E)" />
+                                    </tooltip>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#onClickDeleteClient" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                                    <graphic>
+                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
+                                            <children>
+                                                <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                                    <font>
+                                                        <Font size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <Region prefHeight="200.0" prefWidth="6.0" />
+                                                <Label alignment="CENTER" styleClass="lbl" text="Delete" textFill="WHITE">
+                                                    <font>
+                                                        <Font size="12.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </HBox>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Delete the selected user (Delete)" />
+                                    </tooltip>
+                                </Button>
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                             </children>
                         </HBox>
-
-                        <!-- Clients filters and table (unchanged) -->
                         <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="box-card" />
@@ -390,7 +260,6 @@
                         <Insets />
                      </VBox.margin>
                         </HBox>
-
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="second-card-bg" />
@@ -401,13 +270,11 @@
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Client Name" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>
-
                         <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
                             <content>
                                 <VBox fx:id="clientTableBox" prefHeight="100.0" prefWidth="100.0" />
                             </content>
                         </ScrollPane>
-
                         <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="half-card-bottom" />

@@ -219,7 +219,7 @@ public class AdminUsersController implements Initializable {
         });
     }
 
-    private void openUserForm(User user) { // TODO
+    private void openUserForm(User user) {
         try {
             ViewHandler handler = user == null ? ViewHandler.CREATE_USER : ViewHandler.EDIT_USER;
             handler.reset();
@@ -244,7 +244,7 @@ public class AdminUsersController implements Initializable {
         }
     }
 
-    private void openClientForm(Client client) { // TODO
+    private void openClientForm(Client client) {
         try {
             ViewHandler handler = client == null ? ViewHandler.CREATE_CLIENT : ViewHandler.EDIT_CLIENT;
             handler.reset();
