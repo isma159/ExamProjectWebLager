@@ -106,7 +106,13 @@ public class ScanController implements Initializable, IViewController {
 
     private void initializeProfileComboBox() {
         if (modelFacade == null) return;
-        comboBoxProfiles.setItems(modelFacade.getProfileModel().getProfiles());
+        User user = modelFacade.getSessionModel().getCurrentUser();
+
+        comboBoxProfiles.getSelectionModel().clearSelection();
+
+        if (user.isAdmin()) { comboBoxProfiles.setItems(modelFacade.getProfileModel().getProfiles()); }
+        else { comboBoxProfiles.setItems(FXCollections.observableArrayList(user.getProfiles())); }
+
         if (!comboBoxProfiles.getItems().isEmpty()) {
             comboBoxProfiles.getSelectionModel().selectFirst();
         }

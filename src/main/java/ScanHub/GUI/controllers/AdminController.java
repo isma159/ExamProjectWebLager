@@ -1,6 +1,7 @@
 package ScanHub.GUI.controllers;
 
 // project imports
+import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.ThemeManager;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
@@ -17,11 +18,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import org.controlsfx.control.ToggleSwitch;
 
@@ -29,12 +32,14 @@ public class AdminController implements IViewController, Initializable {
 
     @FXML private StackPane contentArea;
     @FXML private ToggleGroup sidebarBtns;
-    @FXML private ToggleButton dashboardBtn, analyticsBtn, usersBtn, profilesBtn, metadataBtn, logsBtn, shortcutsBtn;
+    @FXML private ToggleButton dashboardBtn, usersBtn, clientsBtn, profilesBtn, metadataBtn, logsBtn, shortcutsBtn;
     @FXML private ToggleSwitch darkMode;
     @FXML private Label lblUsername, lblRole;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
+    private final Map<KeyCodeCombination, Runnable> adminShortcuts = new HashMap<>();
+    private final Map<KeyCodeCombination, Runnable> activeShortcuts = new HashMap<>();
 
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
@@ -47,6 +52,36 @@ public class AdminController implements IViewController, Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
+                () -> {sidebarBtns.selectToggle(dashboardBtn); contentArea.requestFocus();}
+        );
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN),
+                () -> {sidebarBtns.selectToggle(usersBtn); contentArea.requestFocus();}
+        );
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN),
+                () -> {sidebarBtns.selectToggle(clientsBtn); contentArea.requestFocus();}
+        );
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
+                () -> {sidebarBtns.selectToggle(profilesBtn); contentArea.requestFocus();}
+        );
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN),
+                () -> {sidebarBtns.selectToggle(metadataBtn); contentArea.requestFocus();}
+        );
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN),
+                () -> {sidebarBtns.selectToggle(logsBtn); contentArea.requestFocus();}
+        );
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN),
+                () -> {sidebarBtns.selectToggle(shortcutsBtn); contentArea.requestFocus();}
+        );
+
         sidebarBtns.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 oldValue.setSelected(true);
@@ -56,6 +91,8 @@ public class AdminController implements IViewController, Initializable {
                 loadPage("/views/AdminDashboardView.fxml");
             } else if (newValue == usersBtn) {
                 loadPage("/views/AdminUsersView.fxml");
+            } else if (newValue == clientsBtn) {
+                loadPage("/views/AdminClientsView.fxml");
             } else if (newValue == profilesBtn) {
                 loadPage("/views/AdminProfilesView.fxml");
             } else if (newValue == metadataBtn) {
@@ -79,6 +116,8 @@ public class AdminController implements IViewController, Initializable {
                     return new AdminDashboardController(modelFacade, currentStage);
                 } else if (controllerClass == AdminUsersController.class) {
                     return new AdminUsersController(modelFacade, currentStage);
+                } else if (controllerClass == AdminClientsController.class) {
+                    return new AdminClientsController(modelFacade, currentStage);
                 } else if (controllerClass == AdminProfilesController.class) {
                     return new AdminProfilesController(modelFacade, currentStage);
                 } else if (controllerClass == AdminMetadataController.class) {
@@ -96,6 +135,10 @@ public class AdminController implements IViewController, Initializable {
             });
 
             Node page = loader.load();
+
+            IShortcutHandler controller = loader.getController();
+            setShortcuts(controller.getShortcuts());
+
             if (darkMode.isSelected()) {
                 page.getStyleClass().add("dark");
             }
@@ -109,59 +152,29 @@ public class AdminController implements IViewController, Initializable {
     private void registerShortcuts() {
         Scene scene = contentArea.getScene();
         if (scene == null) {
+            contentArea.sceneProperty().addListener(((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    registerShortcuts();
+                }
+            }));
             return;
         }
 
-        scene.setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case D -> {
-                    if (event.isControlDown()) {
-                        sidebarBtns.selectToggle(dashboardBtn);
-                        contentArea.requestFocus();
-                    }
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            new HashMap<>(activeShortcuts).forEach(((keyCodeCombination, runnable) -> {
+                if (keyCodeCombination.match(event)) {
+                    runnable.run();
+                    event.consume();
                 }
-                case U -> {
-                    if (event.isControlDown()) {
-                        sidebarBtns.selectToggle(usersBtn);
-                        contentArea.requestFocus();
-                    }
-                }
-                case P -> {
-                    if (event.isControlDown()) {
-                        sidebarBtns.selectToggle(profilesBtn);
-                        contentArea.requestFocus();
-                    }
-                }
-                case M -> {
-                    if (event.isControlDown()) {
-                        sidebarBtns.selectToggle(metadataBtn);
-                        contentArea.requestFocus();
-                    }
-                }
-                case L -> {
-                    if (event.isControlDown()) {
-                        sidebarBtns.selectToggle(logsBtn);
-                        contentArea.requestFocus();
-                    }
-                }
-                case A -> {
-                    if (event.isControlDown()) {
-                        sidebarBtns.selectToggle(analyticsBtn);
-                        contentArea.requestFocus();
-                    }
-                }
-                case H -> {
-                    if (event.isControlDown()) {
-                        sidebarBtns.selectToggle(shortcutsBtn);
-                        contentArea.requestFocus();
-                    }
-                }
-                case F2 -> {
-                    darkMode.setSelected(!darkMode.isSelected());
-                    ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());
-                }
-            }
+            }));
         });
+
+    }
+
+    private void setShortcuts(Map<KeyCodeCombination, Runnable> shortcuts) {
+        activeShortcuts.clear();
+        activeShortcuts.putAll(adminShortcuts);
+        activeShortcuts.putAll(shortcuts);
     }
 
     @FXML

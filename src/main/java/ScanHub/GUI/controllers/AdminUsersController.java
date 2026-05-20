@@ -8,6 +8,7 @@ import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.TableLoader;
@@ -21,32 +22,25 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
-public class AdminUsersController implements Initializable {
+public class AdminUsersController implements Initializable, IShortcutHandler {
 
-    @FXML private VBox userTableBox, clientTableBox;
+    @FXML private VBox userTableBox;
     @FXML private TextField txtFldUserSearch;
-    @FXML private Pagination pgUsers, pgClients;
+    @FXML private Pagination pgUsers;
     private List<User> currentUsers = new ArrayList<>();
     private boolean userAscending = true;
 
     private final ModelFacade modelFacade;
     private User selectedUser = null;
-    private Client selectedClient = null;
     private HBox selectedUserRow = null;
-    private HBox selectedClientRow = null;
     private Role selectedRole = null;
     private Stage currentStage;
 
@@ -60,13 +54,9 @@ public class AdminUsersController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadUsers();
-        loadClients();
         txtFldUserSearch.textProperty().addListener((observable, oldValue, newValue) -> filterUsers(newValue));
 
         pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> loadUsers()));
-        pgClients.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> loadClients()));
-
-        javafx.application.Platform.runLater(this::registerUserShortcuts);
     }
 
     private void loadUsers() {
@@ -85,66 +75,16 @@ public class AdminUsersController implements Initializable {
         }
     }
 
-    private void loadClients() {
-        try {
-            selectedClient = null;
-            selectedClientRow = null;
-
-            List<Client> clients = modelFacade.getClientModel().getClients();
-            TableLoader.loadTable(clientTableBox, pgClients, TOTAL_TABLE_SIZE, clients, item -> {
-                Client client = (Client) item;
-                return RowMaker.addClientRow(client, this::selectClient);
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertHelper.showError("Load Error", "Failed to load users.");
-        }
-    }
-
-    private void registerUserShortcuts() {
-        Scene scene = userTableBox.getScene();
-
-        if (scene == null) return;
-
-        scene.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
-            if (userTableBox.getScene() == null) return;
-
-            if (event.isControlDown()) {
-                switch (event.getCode()) {
-                    case N -> onClickCreateUser();
-                    case E -> onClickUpdateUser();
-                }
-        }
-            if (event.getCode() == javafx.scene.input.KeyCode.DELETE) {
-                onClickDeleteUser(null);
-                event.consume();
-            }
-        });
-    }
-
     private void selectUser(User user, HBox rowHBox) {
         if (selectedUserRow != null) {
             selectedUserRow.getStyleClass().remove("row-selected");
-            selectedClient = null;
-            selectedClientRow = null;
+            selectedUser = null;
+            selectedUserRow = null;
             return;
         }
 
         selectedUser = user;
         selectedUserRow = rowHBox;
-        rowHBox.getStyleClass().add("row-selected");
-    }
-
-    private void selectClient(Client client, HBox rowHBox) {
-        if (selectedClientRow != null) {
-            selectedClientRow.getStyleClass().remove("row-selected");
-            selectedClient = null;
-            selectedClientRow = null;
-            return;
-        }
-
-        selectedClient = client;
-        selectedClientRow = rowHBox;
         rowHBox.getStyleClass().add("row-selected");
     }
 
@@ -191,34 +131,6 @@ public class AdminUsersController implements Initializable {
         });
     }
 
-    @FXML private void onClickCreateClient() {openClientForm(null);}
-
-    @FXML private void onClickUpdateClient() {
-        if (selectedClient == null) {
-            AlertHelper.showError("No Selection", "Please select a client to edit.");
-            return;
-        }
-        openClientForm(selectedClient);
-    }
-
-    @FXML private void onClickDeleteClient() {
-        if (selectedClient == null) {
-            AlertHelper.showError("No Selection", "Please select a client to delete.");
-            return;
-        }
-
-        AlertHelper.showConfirmation("Delete Client", "Are you sure you want to delete \"" + selectedClient.getClientName() + "\"? This action cannot be undone.", () -> {
-            try {
-                modelFacade.getClientModel().deleteClient(selectedClient);
-                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedClient.getClientId(), EntityType.CLIENT, LogAction.DELETE, LocalDateTime.now()));
-                loadClients();
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertHelper.showError("Delete Failed", "Failed to delete client. Please try again.");
-            }
-        });
-    }
-
     private void openUserForm(User user) { // TODO
         try {
             ViewHandler handler = user == null ? ViewHandler.CREATE_USER : ViewHandler.EDIT_USER;
@@ -244,32 +156,6 @@ public class AdminUsersController implements Initializable {
         }
     }
 
-    private void openClientForm(Client client) { // TODO
-        try {
-            ViewHandler handler = client == null ? ViewHandler.CREATE_CLIENT : ViewHandler.EDIT_CLIENT;
-            handler.reset();
-            handler.preLoad();
-
-            ClientFormController controller = handler.getController();
-            Stage stage = handler.prepareStage();
-            controller.setModel(stage, modelFacade, client);
-
-            stage.getScene().setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.ESCAPE) {
-                    stage.close();
-                    event.consume();
-                }
-            });
-
-            stage.showAndWait();
-
-            loadClients(); // refresh the list after the form closes
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertHelper.showError("Error", "Failed to open the user form. Please try again.");
-        }
-    }
-
     private void filterUsers(String search) { // TODO: needs rework
         // loops through every row in user table
         for (var node : userTableBox.getChildren()) {
@@ -286,6 +172,15 @@ public class AdminUsersController implements Initializable {
             row.setVisible(matching && matchingRole);
             row.setManaged(matching && matchingRole);
         }
+    }
+
+    @Override
+    public Map<KeyCodeCombination, Runnable> getShortcuts() {
+        return Map.of(
+                new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateUser,
+                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), this::onClickUpdateUser,
+                new KeyCodeCombination(KeyCode.DELETE), () -> onClickDeleteUser(null)
+        );
     }
 
     @FXML

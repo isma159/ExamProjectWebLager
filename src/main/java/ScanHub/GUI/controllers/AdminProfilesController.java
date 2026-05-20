@@ -6,6 +6,7 @@ import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.TableLoader;
@@ -17,9 +18,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -27,12 +26,9 @@ import javafx.stage.Stage;
 // java imports
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
-public class AdminProfilesController implements Initializable {
+public class AdminProfilesController implements Initializable, IShortcutHandler {
 
     @FXML private VBox profileTableBox;
     @FXML private TextField txtFldSearchProfiles;
@@ -188,6 +184,15 @@ public class AdminProfilesController implements Initializable {
             row.setVisible(matching && matchingStatus);
             row.setManaged(matching && matchingStatus);
         }
+    }
+
+    @Override
+    public Map<KeyCodeCombination, Runnable> getShortcuts() {
+        return Map.of(
+                new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateProfile,
+                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), this::onClickUpdateProfile,
+                new KeyCodeCombination(KeyCode.DELETE), () -> onClickDeleteProfile(null)
+        );
     }
 
     @FXML

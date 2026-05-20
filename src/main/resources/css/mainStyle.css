@@ -923,6 +923,25 @@
 
 }
 
+.primary-navigation-btn:selected .label {
+
+    -fx-text-fill: #ffffff;
+
+}
+
+.primary-navigation-btn:selected .side-bar-shortcut {
+
+    -fx-background-color: #24C79F;
+
+}
+
+.primary-navigation-btn:selected .side-bar-shortcut .label {
+
+    -fx-text-fill: #2d3d4f;
+
+}
+
+/*
 .primary-navigation-btn:focused {
     -fx-background-color: #2d3d4f;
     -fx-borderwidth: 2;
@@ -932,7 +951,7 @@
 
 .primary-navigation-btn:selected:focused {
     -fx-border-color: #ffffff;
-}
+}*/
 
 .user-row:hover {
     -fx-background-color: #F1F5F9;
@@ -1053,8 +1072,33 @@
     -fx-padding: 8;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 24, 0.2, 0, 4);
 }
-.shortcut-label {
+.shortcut-container {
+    -fx-background-color: WHITE;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1;
+
+    -fx-border-color: #BFBFBF;
+    -fx-border-width: 2;
+    -fx-border-radius: 3px;
+}
+
+.shortcut-container .label {
+
     -fx-font-size: 9px;
-    -fx-text-fill: #888888;
-    -fx-alignment: center;
+
+}
+
+.side-bar-shortcut {
+
+    -fx-background-color: #2d3d4f;
+    -fx-background-radius: 3px;
+
+}
+
+.side-bar-shortcut .label {
+
+    -fx-font-size: 9px;
+    -fx-text-fill: #24C79F;
+    -fx-font-family: "Montserrat SemiBold";
+
 }

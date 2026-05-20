@@ -2,20 +2,25 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.BE.BoxMetadata;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
-public class AdminMetadataController implements Initializable {
+public class AdminMetadataController implements Initializable, IShortcutHandler {
 
     @FXML private VBox metadataTableBox;
     @FXML private TextField txtFldSearchMetadata;
@@ -76,9 +81,10 @@ public class AdminMetadataController implements Initializable {
         }
     }
 
-
-
-
+    @Override
+    public Map<KeyCodeCombination, Runnable> getShortcuts() {
+        return Map.of();
+    }
 
     // TODO: needs to be removed properly
     @FXML private void onTbAllMetadataClick()   { loadMetadata(); }

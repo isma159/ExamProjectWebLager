@@ -6,6 +6,7 @@ import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 import ScanHub.GUI.util.ViewHandler;
@@ -16,6 +17,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -29,10 +33,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class AdminLogsController implements Initializable {
+public class AdminLogsController implements Initializable, IShortcutHandler {
 
     @FXML private TextField txtFldSearchLogs;
     @FXML private DatePicker dtPickerFrom, dtPickerTo;
@@ -177,5 +182,11 @@ public class AdminLogsController implements Initializable {
             e.printStackTrace();
             // TODO Alert View?
         }
+    }
+
+    @Override
+    public Map<KeyCodeCombination, Runnable> getShortcuts() {
+        // TODO implement shortcut for export
+        return Map.of();
     }
 }
