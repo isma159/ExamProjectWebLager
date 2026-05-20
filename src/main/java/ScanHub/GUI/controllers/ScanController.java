@@ -11,6 +11,7 @@ import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -81,6 +82,9 @@ public class ScanController implements Initializable, IViewController {
     private static final double ZOOM_MIN  = 0.40;
     private static final double ZOOM_MAX  = 3.00;
 
+    private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
+            (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
+
     @Override
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
@@ -129,7 +133,7 @@ public class ScanController implements Initializable, IViewController {
         treeView.setShowRoot(false);
 
         treeView.getRoot().addEventHandler(TreeItem.childrenModificationEvent(), e -> expandAll(treeView.getRoot()));
-        treeView.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> onTreeSelectionChanged(newValue));
+        treeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
 
         treeView.setCellFactory(tv -> new TreeCell<>() {
             {
@@ -227,15 +231,6 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
-    /**
-     * TODO: Create shortcuts - only a template from the demo
-     * ---- Ideas  ----
-     * Arrows up and down: move through the Tree
-     * Ctrl + c: copy a file or document with all files
-     * Ctrl + v: past a file or document with all files
-     * Ctrl + z: undo
-     * Backspace: delete a file or document with all files
-     */
     private void initializeKeyboardShortcuts() {
         pageGrid.sceneProperty().addListener((obs, oldScene, scene) -> {
             if (scene == null) return;
@@ -579,6 +574,8 @@ public class ScanController implements Initializable, IViewController {
     @FXML private void onNavNext(ActionEvent e)  { navigateTo(currentPageIndex() + 1); }
     @FXML private void onNavLast(ActionEvent e)  { navigateTo(allPages().size() - 1); }
 
+    private boolean navigating = false;
+
     private void navigateTo(int index) {
         List<File> all = allPages();
         if (all.isEmpty()) return;
@@ -590,7 +587,12 @@ public class ScanController implements Initializable, IViewController {
                 break;
             }
         }
+
+        // Detach listener, sync tree, then reattach — prevents selection event snapping back
+        boxTreeView.getSelectionModel().selectedItemProperty().removeListener(treeSelectionListener);
         rebuildPreviewCard();
+        syncTreeSelection();
+        boxTreeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
     }
 
     @FXML
@@ -668,6 +670,7 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void onTreeSelectionChanged(TreeItem<TreeNode> item) {
+        if (navigating) return;
         if (item == null || item.getParent() == null || item.getValue() == null) return;
 
         TreeNode value = item.getValue();
@@ -743,15 +746,14 @@ public class ScanController implements Initializable, IViewController {
     private void rebuildPreviewCard() {
         pageGrid.getChildren().clear();
 
-        File previewFile = (selectedFile == null && selectedDocument != null && !selectedDocument.getFiles().isEmpty())
-                ? selectedDocument.getFiles().getFirst() : selectedFile;
-
-        if (selectedDocument != null && previewFile != null) {
-            pageGrid.getChildren().add(buildPageCard(selectedDocument, previewFile));
+        if (selectedDocument != null && selectedFile != null) {
+            pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedFile));
+        } else if (selectedDocument != null && !selectedDocument.getFiles().isEmpty()) {
+            pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedDocument.getFiles().getFirst()));
         }
 
         updatePageInfoLabel();
-        lblEmptyState.setVisible(previewFile == null);
+        lblEmptyState.setVisible(pageGrid.getChildren().isEmpty());
     }
 
     private void refreshTree() {
@@ -785,11 +787,13 @@ public class ScanController implements Initializable, IViewController {
                 for (TreeItem<TreeNode> fileItem : docItem.getChildren()) {
                     if (fileItem.getValue() == selectedFile) {
                         boxTreeView.getSelectionModel().select(fileItem);
+                        boxTreeView.scrollTo(boxTreeView.getSelectionModel().getSelectedIndex());
                         return;
                     }
                 }
             } else if (selectedDocument != null && doc == selectedDocument) {
                 boxTreeView.getSelectionModel().select(docItem);
+                boxTreeView.scrollTo(boxTreeView.getSelectionModel().getSelectedIndex());
                 return;
             }
         }
