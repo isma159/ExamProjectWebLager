@@ -241,17 +241,88 @@ public class ScanController implements Initializable, IViewController {
             if (scene == null) return;
 
             scene.setOnKeyPressed(e -> {
-                KeyCode code = e.getCode();
-                if      (code == KeyCode.SPACE)         { onScan(null);                  e.consume(); }
-                else if (code == KeyCode.LEFT)          { onNavPrev(null);               e.consume(); }
-                else if (code == KeyCode.RIGHT)         { onNavNext(null);               e.consume(); }
-                else if (code == KeyCode.HOME)          { onNavFirst(null);              e.consume(); }
-                else if (code == KeyCode.END)           { onNavLast(null);               e.consume(); }
-                else if (code == KeyCode.OPEN_BRACKET)  { onRotateLeft(null);            e.consume(); }
-                else if (code == KeyCode.CLOSE_BRACKET) { onRotateRight(null);           e.consume(); }
-                else if (code == KeyCode.DELETE)        { onDeleteFileOrDocument(null);  e.consume(); }
-                else if (code == KeyCode.N && !e.isControlDown()) { onNewDocument(null); e.consume(); }
-                else if (code == KeyCode.E && e.isControlDown())  { onExport(null);      e.consume(); }
+                switch (e.getCode()) {
+                    case SPACE -> {
+                        onScan(null);
+                        e.consume();
+                    }
+                    case LEFT -> {
+                        if (e.isControlDown()) {
+                            onRotateLeft(null);
+                        } else {
+                            onNavPrev(null);
+                        }
+                        e.consume();
+                    }
+                    case RIGHT -> {
+                        if (e.isControlDown()) {
+                            onRotateRight(null);
+                        } else {
+                            onNavNext(null);
+                        }
+                        e.consume();
+                    }
+                    case PAGE_UP -> {
+                        onNavFirst(null);
+                        e.consume();
+                    }
+                    case PAGE_DOWN -> {
+                        onNavLast(null);
+                        e.consume();
+                    }
+                    case DELETE -> {
+                        onDeleteFileOrDocument(null);
+                        e.consume();
+                    }
+                    case N -> {
+                        if (e.isControlDown()) {
+                            onNewDocument(null);
+                            e.consume();
+                        }
+                    }
+                    case E -> {
+                        if (e.isControlDown()) {
+                            onExport(null);
+                            e.consume();
+                        }
+                    }
+                    case S -> {
+                        if (e.isControlDown()) {
+                            onSessionStartup(null);
+                            e.consume();
+                        }
+                    }
+                    case ESCAPE -> {
+                        onStop(null);
+                        e.consume();
+                    }
+                    case UP -> {
+                        onNavPrev(null);
+                        e.consume();
+                    }
+                    case DOWN -> {
+                        onNavNext(null);
+                        e.consume();
+                    }
+                    case F2 -> {
+                        darkMode.setSelected(!darkMode.isSelected());
+                        ThemeManager.toggle(scene, darkMode.isSelected());;
+                    }
+                    case PLUS, ADD -> {
+                        if (e.isControlDown()) {
+                            onZoomIn(null);
+                            e.consume();
+                        }
+                    }
+                    case MINUS, SUBTRACT -> {
+                        if (e.isControlDown()) {
+                            onZoomOut(null);
+                            e.consume();
+                        }
+                    }
+
+                }
+
             });
         });
     }

@@ -167,7 +167,7 @@
                             </styleClass>
                             <children>
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbAllUsersClick" prefHeight="30.0" prefWidth="75.0" selected="true" text="All Users">
+                                <ToggleButton mnemonicParsing="false" onAction="#onTbAllUsersClick" prefHeight="32.0" prefWidth="151.0" selected="true" text="All Users" HBox.hgrow="ALWAYS">
                                     <toggleGroup>
                                         <ToggleGroup fx:id="userFilter" />
                                     </toggleGroup>
@@ -176,21 +176,21 @@
                                         <String fx:value="lbl" />
                                     </styleClass>
                                 </ToggleButton>
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbAdminsClick" prefHeight="30.0" prefWidth="75.0" text="Admins" toggleGroup="$userFilter">
+                                <ToggleButton mnemonicParsing="false" onAction="#onTbAdminsClick" prefHeight="28.0" prefWidth="148.0" text="Admins" toggleGroup="$userFilter" HBox.hgrow="ALWAYS">
                                     <styleClass>
                                         <String fx:value="filter-btn" />
                                         <String fx:value="lbl" />
                                     </styleClass>
                                 </ToggleButton>
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbUsersClick" prefHeight="30.0" prefWidth="75.0" text="Users" toggleGroup="$userFilter">
+                                <ToggleButton mnemonicParsing="false" onAction="#onTbUsersClick" prefHeight="28.0" prefWidth="145.0" text="Users" toggleGroup="$userFilter" HBox.hgrow="ALWAYS">
                                     <styleClass>
                                         <String fx:value="filter-btn" />
                                         <String fx:value="lbl" />
                                     </styleClass>
                                 </ToggleButton>
                                 <Separator orientation="VERTICAL" prefHeight="200.0" styleClass="grey-separator" />
-                                <Region layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <TextField fx:id="txtFldUserSearch" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for specific user" styleClass="container" />
+                                <Region layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="28.0" prefWidth="0.0" />
+                                <TextField fx:id="txtFldUserSearch" minWidth="-Infinity" prefHeight="30.0" prefWidth="146.0" promptText="Search for specific user" styleClass="container" />
                         <Separator prefWidth="468.0" />
                             </children>
                      <VBox.margin>
