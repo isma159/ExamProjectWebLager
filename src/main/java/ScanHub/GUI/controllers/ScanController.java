@@ -11,6 +11,7 @@ import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -81,6 +82,9 @@ public class ScanController implements Initializable, IViewController {
     private static final double ZOOM_MIN  = 0.40;
     private static final double ZOOM_MAX  = 3.00;
 
+    private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
+            (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
+
     @Override
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
@@ -135,7 +139,7 @@ public class ScanController implements Initializable, IViewController {
         treeView.setShowRoot(false);
 
         treeView.getRoot().addEventHandler(TreeItem.childrenModificationEvent(), e -> expandAll(treeView.getRoot()));
-        treeView.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> onTreeSelectionChanged(newValue));
+        treeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
 
         treeView.setCellFactory(tv -> new TreeCell<>() {
             {
@@ -233,31 +237,93 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
-    /**
-     * TODO: Create shortcuts - only a template from the demo
-     * ---- Ideas  ----
-     * Arrows up and down: move through the Tree
-     * Ctrl + c: copy a file or document with all files
-     * Ctrl + v: past a file or document with all files
-     * Ctrl + z: undo
-     * Backspace: delete a file or document with all files
-     */
     private void initializeKeyboardShortcuts() {
         pageGrid.sceneProperty().addListener((obs, oldScene, scene) -> {
             if (scene == null) return;
 
             scene.setOnKeyPressed(e -> {
-                KeyCode code = e.getCode();
-                if      (code == KeyCode.SPACE)         { onScan(null);                  e.consume(); }
-                else if (code == KeyCode.LEFT)          { onNavPrev(null);               e.consume(); }
-                else if (code == KeyCode.RIGHT)         { onNavNext(null);               e.consume(); }
-                else if (code == KeyCode.HOME)          { onNavFirst(null);              e.consume(); }
-                else if (code == KeyCode.END)           { onNavLast(null);               e.consume(); }
-                else if (code == KeyCode.OPEN_BRACKET)  { onRotateLeft(null);            e.consume(); }
-                else if (code == KeyCode.CLOSE_BRACKET) { onRotateRight(null);           e.consume(); }
-                else if (code == KeyCode.DELETE)        { onDeleteFileOrDocument(null);  e.consume(); }
-                else if (code == KeyCode.N && !e.isControlDown()) { onNewDocument(null); e.consume(); }
-                else if (code == KeyCode.E && e.isControlDown())  { onExport(null);      e.consume(); }
+                switch (e.getCode()) {
+                    case SPACE -> {
+                        onScan(null);
+                        e.consume();
+                    }
+                    case LEFT -> {
+                        if (e.isControlDown()) {
+                            onRotateLeft(null);
+                        } else {
+                            onNavPrev(null);
+                        }
+                        e.consume();
+                    }
+                    case RIGHT -> {
+                        if (e.isControlDown()) {
+                            onRotateRight(null);
+                        } else {
+                            onNavNext(null);
+                        }
+                        e.consume();
+                    }
+                    case PAGE_UP -> {
+                        onNavFirst(null);
+                        e.consume();
+                    }
+                    case PAGE_DOWN -> {
+                        onNavLast(null);
+                        e.consume();
+                    }
+                    case DELETE -> {
+                        onDeleteFileOrDocument(null);
+                        e.consume();
+                    }
+                    case N -> {
+                        if (e.isControlDown()) {
+                            onNewDocument(null);
+                            e.consume();
+                        }
+                    }
+                    case E -> {
+                        if (e.isControlDown()) {
+                            onExport(null);
+                            e.consume();
+                        }
+                    }
+                    case S -> {
+                        if (e.isControlDown()) {
+                            onSessionStartup(null);
+                            e.consume();
+                        }
+                    }
+                    case ESCAPE -> {
+                        onStop(null);
+                        e.consume();
+                    }
+                    case UP -> {
+                        onNavPrev(null);
+                        e.consume();
+                    }
+                    case DOWN -> {
+                        onNavNext(null);
+                        e.consume();
+                    }
+                    case F2 -> {
+                        darkMode.setSelected(!darkMode.isSelected());
+                        ThemeManager.toggle(scene, darkMode.isSelected());;
+                    }
+                    case PLUS, ADD -> {
+                        if (e.isControlDown()) {
+                            onZoomIn(null);
+                            e.consume();
+                        }
+                    }
+                    case MINUS, SUBTRACT -> {
+                        if (e.isControlDown()) {
+                            onZoomOut(null);
+                            e.consume();
+                        }
+                    }
+
+                }
+
             });
         });
     }
@@ -514,6 +580,8 @@ public class ScanController implements Initializable, IViewController {
     @FXML private void onNavNext(ActionEvent e)  { navigateTo(currentPageIndex() + 1); }
     @FXML private void onNavLast(ActionEvent e)  { navigateTo(allPages().size() - 1); }
 
+    private boolean navigating = false;
+
     private void navigateTo(int index) {
         List<File> all = allPages();
         if (all.isEmpty()) return;
@@ -525,7 +593,12 @@ public class ScanController implements Initializable, IViewController {
                 break;
             }
         }
+
+        // Detach listener, sync tree, then reattach — prevents selection event snapping back
+        boxTreeView.getSelectionModel().selectedItemProperty().removeListener(treeSelectionListener);
         rebuildPreviewCard();
+        syncTreeSelection();
+        boxTreeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
     }
 
     @FXML
@@ -603,6 +676,7 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void onTreeSelectionChanged(TreeItem<TreeNode> item) {
+        if (navigating) return;
         if (item == null || item.getParent() == null || item.getValue() == null) return;
 
         TreeNode value = item.getValue();
@@ -678,15 +752,14 @@ public class ScanController implements Initializable, IViewController {
     private void rebuildPreviewCard() {
         pageGrid.getChildren().clear();
 
-        File previewFile = (selectedFile == null && selectedDocument != null && !selectedDocument.getFiles().isEmpty())
-                ? selectedDocument.getFiles().getFirst() : selectedFile;
-
-        if (selectedDocument != null && previewFile != null) {
-            pageGrid.getChildren().add(buildPageCard(selectedDocument, previewFile));
+        if (selectedDocument != null && selectedFile != null) {
+            pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedFile));
+        } else if (selectedDocument != null && !selectedDocument.getFiles().isEmpty()) {
+            pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedDocument.getFiles().getFirst()));
         }
 
         updatePageInfoLabel();
-        lblEmptyState.setVisible(previewFile == null);
+        lblEmptyState.setVisible(pageGrid.getChildren().isEmpty());
     }
 
     private void refreshTree() {
@@ -720,11 +793,13 @@ public class ScanController implements Initializable, IViewController {
                 for (TreeItem<TreeNode> fileItem : docItem.getChildren()) {
                     if (fileItem.getValue() == selectedFile) {
                         boxTreeView.getSelectionModel().select(fileItem);
+                        boxTreeView.scrollTo(boxTreeView.getSelectionModel().getSelectedIndex());
                         return;
                     }
                 }
             } else if (selectedDocument != null && doc == selectedDocument) {
                 boxTreeView.getSelectionModel().select(docItem);
+                boxTreeView.scrollTo(boxTreeView.getSelectionModel().getSelectedIndex());
                 return;
             }
         }

@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import org.controlsfx.control.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.SearchableComboBox?>
+<?import org.controlsfx.control.ToggleSwitch?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
    <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
       <top>
          <VBox>
@@ -34,6 +49,9 @@
                      <HBox.margin>
                         <Insets right="12.0" />
                      </HBox.margin>
+                     <tooltip>
+                        <Tooltip text="F2 for dark mode" />
+                     </tooltip>
                   </ToggleSwitch>
                   <VBox alignment="CENTER_RIGHT" spacing="3.0">
                      <children>
@@ -111,6 +129,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Ctrl + S to start session" />
+                              </tooltip>
                            </Button>
 
                            <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
@@ -129,6 +150,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Space to start scanning" />
+                              </tooltip>
                            </Button>
 
                            <Button fx:id="btnStop" mnemonicParsing="false" onAction="#onStop" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
@@ -145,6 +169,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Esc to stop scanning" />
+                              </tooltip>
                            </Button>
 
                            <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
@@ -163,6 +190,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Left arrow to rotate left" />
+                              </tooltip>
                            </Button>
 
                            <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
@@ -179,6 +209,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Right arrow to rotate right" />
+                              </tooltip>
                            </Button>
 
                            <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
@@ -197,6 +230,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Ctrl + N to create new document" />
+                              </tooltip>
                            </Button>
 
                            <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#onDeleteFileOrDocument" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
@@ -213,6 +249,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Del to delete document/page" />
+                              </tooltip>
                            </Button>
 
                            <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#onUndo" prefHeight="33.0" prefWidth="75.0" styleClass="secondary-btn">
@@ -247,6 +286,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Ctrl + E to export documents" />
+                              </tooltip>
                            </Button>
 
                            <ComboBox fx:id="comboBoxExport" prefHeight="30.0" prefWidth="163.0" styleClass="container" />
@@ -304,6 +346,9 @@
                         <HBox.margin>
                            <Insets left="3.0" right="3.0" />
                         </HBox.margin>
+                        <tooltip>
+                           <Tooltip text="Ctrl + - to zoom out" />
+                        </tooltip>
                      </Button>
 
                      <Button fx:id="btnZoomIn" mnemonicParsing="false" onAction="#onZoomIn" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
@@ -316,6 +361,9 @@
                         <HBox.margin>
                            <Insets left="3.0" right="3.0" />
                         </HBox.margin>
+                        <tooltip>
+                           <Tooltip text="Ctrl + + to zoom in" />
+                        </tooltip>
                      </Button>
                   </children>
 

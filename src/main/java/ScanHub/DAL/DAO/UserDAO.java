@@ -121,9 +121,6 @@ public class UserDAO implements IDataAccess<User> {
                     if (!user.getClients().contains(client)) {
                         user.getClients().add(client);
                     }
-                    else {
-                        System.out.println("Duplicate client, ignoring.");
-                    }
                 }
             }
         } catch (SQLException e) {
