@@ -112,7 +112,8 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void initializeProfileComboBox() {
-        if (modelFacade == null) return;
+        User user = modelFacade.getSessionModel().getCurrentUser();
+        if (modelFacade == null || user.getProfiles().isEmpty() && !user.isAdmin()) return;
         comboBoxProfiles.setItems(modelFacade.getProfileModel().getProfiles());
         if (!comboBoxProfiles.getItems().isEmpty()) {
             comboBoxProfiles.getSelectionModel().selectFirst();
@@ -242,7 +243,8 @@ public class ScanController implements Initializable, IViewController {
             scene.setOnKeyPressed(e -> {
                 switch (e.getCode()) {
                     case SPACE -> {
-                        onScan(null);
+                        if (scanning) onScan(null);
+                        else onStop(null);
                         e.consume();
                     }
                     case LEFT -> {
@@ -895,7 +897,7 @@ public class ScanController implements Initializable, IViewController {
     private double cardWidth() { return 520 * zoomLevel; }
     private double cardHeight() { return 700 * zoomLevel; }
 
-    // ------ HELPERS ------
+    // ---------- HELPERS ----------
 
     private void updateProfileAdjustmentsFields(Profile profile) {
         FileAdjustmentSettings settings = profile.getFileAdjustmentSettings();

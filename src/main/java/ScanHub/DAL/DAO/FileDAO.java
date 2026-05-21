@@ -115,8 +115,6 @@ public class FileDAO {
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
-            } finally {
-                conn.setAutoCommit(true);
             }
         }
     }
