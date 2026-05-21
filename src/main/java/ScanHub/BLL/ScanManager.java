@@ -259,76 +259,51 @@ public class ScanManager {
         return rotateFile(colorAdjusted, settings.getRotation());
     }
 
-    /**
-     * Applies brightness, contrast, hue, and saturation adjustments pixel-by-pixel.
-     * Explained in-depth in method cause there's A LOT of new going on
-     */
+    /** Applies brightness, contrast, hue, and saturation adjustments pixel-by-pixel. */
     private BufferedImage applyColorAdjustments(BufferedImage source, FileAdjustmentSettings settings) {
 
-        // original image dimensions
         int width = source.getWidth();
         int height = source.getHeight();
+        int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB; // preserve transparency (alpha) if present
 
-        // preserve alpha channel support if the source image contains transparency
-        int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+        BufferedImage result = new BufferedImage(width, height, type); // destination image that will contain the adjusted pixels
 
-        // destination image that will contain the adjusted pixels
-        BufferedImage result = new BufferedImage(width, height, type);
+        double contrastFactor = 1.0 + (settings.getContrast() / 100.0); // 0 (1.0) = unchanged, 100 (2.0) = stronger contrast, -50 (0.5) = reduced contrast
+        float saturationFactor = (float) (1.0 + (settings.getSaturation() / 100.0)); // 0 (1.0) = unchanged, 100 (2.0) = more vivid/saturated colors, -50 (0.5) = more gray/desaturated
+        float brightnessShift = (float) (settings.getBrightness() / 100.0); // positive values brighten, negative values darken
+        float hueShift = (float) (settings.getHue() / 100.0); // positive/negative values rotate colors around the color wheel as Hue is circular
 
-        // Contrast multiplier: 0 -> 1.0 (no change), 100 -> 2.0 (stronger contrast), -50 -> 0.5 (reduced contrast)
-        double contrastFactor = 1.0 + (settings.getContrast() / 100.0);
-
-        // Hue is stored in HSB as a circular value between 0.0-1.0 (positive/negative values rotate colors around the color wheel)
-        float hueShift = (float) (settings.getHue() / 100.0);
-
-        // Saturation multiplier: 1.0 = unchanged, >1 = more vivid/saturated colors, <1 = more gray/desaturated
-        float saturationFactor = (float) (1.0 + (settings.getSaturation() / 100.0));
-
-        // Brightness offset: positive values brighten, negative values darken
-        float brightnessShift = (float) (settings.getBrightness() / 100.0);
-
-        // walk through every pixel in the image
+        // loop through every pixel in the image
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
 
-                // read the packed ARGB integer from the source image
-                int argb = source.getRGB(x, y);
+                int argb = source.getRGB(x, y); // read the packed ARGB integer from the source image
 
-                // extract each 8-bit color channel using bit shifting
+                // extract each 8-bit color channel using bit shifting (splits ARGB)
                 int alpha = (argb >>> 24) & 0xff;
                 int red = (argb >>> 16) & 0xff;
                 int green = (argb >>> 8) & 0xff;
                 int blue = argb & 0xff;
 
-                // convert RGB to HSB because hue/saturation/brightness are easier to manipulate independently in HSB space
-                float[] hsb = Color.RGBtoHSB(red, green, blue, null);
+                float[] hsb = Color.RGBtoHSB(red, green, blue, null); // hue/saturation/brightness are easier to manipulate independently in HSB space
 
-                // Shift hue around the color wheel (Hue is circular, unlike Brightness, Saturation and Contrast (which is linear) so values must wrap instead of clamp
-                hsb[0] = ((hsb[0] + hueShift) % 1.0f + 1.0f) % 1.0f;
+                hsb[0] = ((hsb[0] + hueShift) % 1.0f + 1.0f) % 1.0f; // adjust hue (wrap around - shift)
+                hsb[1] = Math.clamp(hsb[1] * saturationFactor, 0.0f, 1.0f); // adjust saturation (clamp keeps the value inside the valid 0.0-1.0 HSB range)
+                hsb[2] = Math.clamp(hsb[2] + brightnessShift, 0.0f, 1.0f); // adjust brightness (clamp keeps the value inside the valid 0.0-1.0 HSB range)
 
-                // increase/decrease saturation - clamp keeps the value inside the valid 0.0-1.0 HSB range
-                hsb[1] = Math.clamp(hsb[1] * saturationFactor, 0.0f, 1.0f);
-
-                // increase/decrease brightness - clamp prevents invalid brightness values
-                hsb[2] = Math.clamp(hsb[2] + brightnessShift, 0.0f, 1.0f);
-
-                // convert adjusted HSB values back into packed RGB format
+                // convert adjusted HSB values back into packed RGB format and update RGB
                 int adjustedRgb = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-
-                // extract adjusted RGB channels from the packed integer
                 red = (adjustedRgb >>> 16) & 0xff;
                 green = (adjustedRgb >>> 8) & 0xff;
                 blue = adjustedRgb & 0xff;
 
-                // apply contrast around midpoint 128 (RGB channels are integer-based): values above 128 become brighter, values below 128 become darker
+                // apply contrast to each RGB around midpoint 128 (RGB channels are integer-based) - values above 128 become brighter, values below 128 become darker
                 red = Math.clamp(Math.round(((red - 128) * contrastFactor) + 128), 0, 255);
                 green = Math.clamp(Math.round(((green - 128) * contrastFactor) + 128), 0, 255);
                 blue = Math.clamp(Math.round(((blue - 128) * contrastFactor) + 128), 0, 255);
 
-                // repack ARGB channels back into a single integer pixel value
+                // repack ARGB channels back into a single integer pixel value and write it into the destination image
                 int adjustedArgb = (alpha << 24) | (red << 16) | (green << 8) | blue;
-
-                // write the adjusted pixel into the destination image
                 result.setRGB(x, y, adjustedArgb);
             }
         }

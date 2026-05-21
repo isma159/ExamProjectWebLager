@@ -663,7 +663,7 @@ public class ScanController implements Initializable, IViewController {
             scanModel.save(); // persist staged data first
             scanModel.export(exportDirectory, mode);
             rebuild();
-            AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
+            lblSessionStatus.setText("Files saved to: " + exportDirectory.getAbsolutePath()); // TODO show in some other way
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Export Failed", "Could not export documents. Please try again.");
