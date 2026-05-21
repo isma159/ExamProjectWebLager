@@ -26,7 +26,6 @@ public class LogDAO implements IDataAccess<Log> {
             SELECT l.logsId, l.userId AS logUserId, l.entityId, l.entityType, l.action, l.log_timestamp, u.userId AS userId, u.username, u.passwordHash, u.role
             FROM Logs l
             JOIN Users u ON l.userId = u.userId
-            WHERE l.deleted_at IS NULL
             ORDER BY l.log_timestamp ASC
         """;
 
@@ -61,29 +60,31 @@ public class LogDAO implements IDataAccess<Log> {
 
     @Override
     public Log createData(Log log) throws Exception {
-        String sql = "INSERT INTO Logs (userId, entityId, entityType, action, log_timestamp) VALUES (?, ?, ?, ?, GETDATE())";
+        String sql = """
+                INSERT INTO Logs (userId, entityId, entityType, action, log_timestamp)
+                OUTPUT INSERTED.logsId, INSERTED.log_timestamp
+                VALUES (?, ?, ?, ?, SYSUTCDATETIME())
+                """;
 
         try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, log.getUser().getUserId());
             ps.setInt(2, log.getEntityId());
             ps.setString(3, log.getEntityType().toString());
             ps.setString(4, log.getAction().toString());
-            ps.executeUpdate();
-
-            ResultSet rs = ps.getGeneratedKeys();
-            Log newLog = null;
-
-            if (rs.next()) {
-                newLog = new Log(rs.getInt(1),
-                        log.getUser(), log.getEntityId(),
-                        log.getEntityType(),
-                        log.getAction(),
-                        log.getTimestamp());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Log(rs.getInt("logsId"),
+                            log.getUser(),
+                            log.getEntityId(),
+                            log.getEntityType(),
+                            log.getAction(),
+                            rs.getTimestamp("log_timestamp").toLocalDateTime());
+                }
             }
 
-            return newLog;
+            throw new SQLException("Insert returned no logsId");
 
         } catch (SQLException e) {
             throw new Exception("Could not create log", e);

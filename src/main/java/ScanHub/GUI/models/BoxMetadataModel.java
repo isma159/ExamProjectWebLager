@@ -18,7 +18,9 @@ public class BoxMetadataModel {
 
     public void createMetadata(BoxMetadata metadata) throws Exception {
         BoxMetadata created = manager.createMetadata(metadata);
-        metadataObservableList.add(created);
+        if (created != null) {
+            metadataObservableList.add(created);
+        }
     }
 
     public ObservableList<BoxMetadata> getAllMetadata() { return metadataObservableList; }

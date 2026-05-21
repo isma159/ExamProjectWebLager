@@ -87,6 +87,7 @@ public class BoxManager {
             DocumentDAO documentDAO = new DocumentDAO();
             List<Document> docs = documentDAO.getDocumentsWithFilesByBoxId(existing.getBoxId());
             existing.getDocuments().addAll(docs);
+            applyProfileDefaults(existing);
 
             return existing;
         }
@@ -96,5 +97,17 @@ public class BoxManager {
         box.setProfileId(profile.getProfileId());
         box.setProfile(profile);
         return createBox(box);
+    }
+
+    private void applyProfileDefaults(Box box) {
+        if (box == null || box.getProfile() == null) return;
+
+        for (Document document : box.getDocuments()) {
+            for (ScanHub.BE.File file : document.getFiles()) {
+                if (!file.hasCustomFileSettings()) {
+                    file.applyDefaultFileSettings(box.getProfile().getFileAdjustmentSettings());
+                }
+            }
+        }
     }
 }

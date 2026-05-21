@@ -20,6 +20,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -40,7 +41,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -50,7 +50,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private BorderPane workspaceView;
     @FXML private Label lblUsername, lblRole, lblEmptyState;
     @FXML private ToggleSwitch darkMode;
-    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnDelete, btnUndo, btnExport, btnZoomOut, btnZoomIn;
+    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnSplitDoc, btnDelete, btnUndo, btnExport, btnZoomOut, btnZoomIn;
     @FXML private ComboBox<ExportMode> comboBoxExport;
     @FXML private FlowPane pageGrid;
     @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel;
@@ -59,8 +59,11 @@ public class ScanController implements Initializable, IViewController {
     // Session startup popup
     @FXML private StackPane sessionPopupOverlay;
     @FXML private SearchableComboBox<Profile> comboBoxProfiles;
-    @FXML private TextField txtFldBoxId;
-    @FXML private Spinner<Integer> spinnerGlobalRotation;
+    @FXML private TextField txtFldBoxId, txtFldGlobalRotation, txtFldGlobalHue, txtFldGlobalBrightness, txtFldGlobalContrast, txtFldGlobalSaturation;
+
+    // File adjustment menu
+    @FXML private StackPane sessionPopupOverlay1;
+    @FXML private TextField txtFldIndividualFileRotation, txtFldIndividualFileHue, txtFldIndividualFileBrightness, txtFldIndividualFileContrast, txtFldIndividualFileSaturation;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -104,6 +107,7 @@ public class ScanController implements Initializable, IViewController {
         initializeExportComboBoxes();
         spinnerGlobalRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 90));
         spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 270, 90, 90));
+        comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
 
         setSessionControlsDisabled(true);
         lblSessionStatus.setText("Press Session Startup to configure and begin.");
@@ -112,11 +116,13 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void initializeProfileComboBox() {
-        if (modelFacade == null) return;
+        User user = modelFacade.getSessionModel().getCurrentUser();
+        if (modelFacade == null || user.getProfiles().isEmpty() && !user.isAdmin()) return;
         comboBoxProfiles.setItems(modelFacade.getProfileModel().getProfiles());
         if (!comboBoxProfiles.getItems().isEmpty()) {
             comboBoxProfiles.getSelectionModel().selectFirst();
         }
+        updateProfileAdjustmentsFields(comboBoxProfiles.getValue());
     }
 
     private void initializeExportComboBoxes() {
@@ -241,7 +247,8 @@ public class ScanController implements Initializable, IViewController {
             scene.setOnKeyPressed(e -> {
                 switch (e.getCode()) {
                     case SPACE -> {
-                        onScan(null);
+                        if (scanning) onScan(null);
+                        else onStop(null);
                         e.consume();
                     }
                     case LEFT -> {
@@ -356,68 +363,25 @@ public class ScanController implements Initializable, IViewController {
             return;
         }
 
-        // check whether this profile already owns a box
-        Box existingBox = modelFacade.getBoxModel().getBoxes().stream()
-                .filter(b -> b.getProfileId() == profile.getProfileId())
-                .findFirst()
-                .orElse(null);
+        try {
+            Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
+            scanModel = new ScanModel(activeBox);
+            syncDocumentsFromModel();
 
-        if (existingBox != null) {
-            // if Box id (name) matches a Box name already in db then fetch it
-            if (existingBox.getBoxName().trim().equalsIgnoreCase(boxInput)) {
-                try {
-                    launchSession(boxInput, profile);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    AlertHelper.showError("Session Setup", "Could not open the existing box.");
-                }
-                return;
-            }
+            sessionActive = true;
+            selectedDocument = null;
+            selectedFile = null;
 
-            String message = "Profile \"" + profile.getProfileName() + "\" already has a box assigned."
-                    + "\n\nBox ID: " + existingBox.getBoxName()
-                    + "\nCreated: " + existingBox.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                    + "\n\nDo you want to delete this box and create \"" + boxInput + "\" instead?";
-
-            AlertHelper.showConfirmation("Box Already Exists", message, () -> {
-                try {
-                    modelFacade.getBoxModel().deleteBox(existingBox);
-                    launchSession(boxInput, profile);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    AlertHelper.showError("Session Setup", "Could not replace the existing box.");
-                }
-            });
-
-        } else {
-            try {
-                launchSession(boxInput, profile);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                AlertHelper.showError("Session Setup", "Could not start scan session.");
-            }
+            setSessionControlsDisabled(false);
+            lblSessionStatus.setText("Profile: " + profile.getProfileName() + "   Box: " + activeBox.getBoxName());
+            sessionPopupOverlay.setVisible(false);
+            sessionPopupOverlay.setDisable(true);
+            workspaceView.setDisable(false);
+            rebuild();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Session Setup", "Could not start scan session.");
         }
-    }
-
-    /**
-     * Shared entry point that resolves (or creates) the session box,
-     * wires up the ScanModel and opens the scan UI.
-     */
-    private void launchSession(String boxInput, Profile profile) throws Exception {
-        Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
-        scanModel = new ScanModel(activeBox);
-        syncDocumentsFromModel();
-
-        sessionActive = true;
-        selectedDocument = null;
-        selectedFile = null;
-
-        setSessionControlsDisabled(false);
-        lblSessionStatus.setText("Profile: " + profile.getProfileName() + " – Box: " + activeBox.getBoxName());
-        sessionPopupOverlay.setVisible(false);
-        sessionPopupOverlay.setDisable(true);
-        workspaceView.setDisable(false);
-        rebuild();
     }
 
     /**
@@ -434,12 +398,10 @@ public class ScanController implements Initializable, IViewController {
         scanning = true;
         btnScan.setDisable(true);
 
-        int rotation = spinnerGlobalRotation.getValue();
-
         scanThread = new Thread(() -> {
             while (scanning) {
                 try {
-                    ScanManager.StoredScan result = scanModel.fetchScan(rotation);
+                    ScanManager.StoredScan result = scanModel.fetchScan();
 
                     if (!scanning) break; // stop was pressed during fetch (leave loop)
 
@@ -490,9 +452,6 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
-    /**
-     * TODO: prompt a before or after split while selecting a file
-     */
     @FXML
     private void onNewDocument(ActionEvent e) {
         if (!sessionActive || scanModel == null) return;
@@ -510,6 +469,14 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("New Document Failed", "Could not create a new document. Please try again.");
         }
+    }
+
+    /**
+     * TODO: prompt a before or after split while selecting a file
+     */
+    @FXML
+    private void onSplitDocument(ActionEvent actionEvent) {
+        // TODO: implement split
     }
 
     @FXML
@@ -557,6 +524,67 @@ public class ScanController implements Initializable, IViewController {
 
     @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-1); }
     @FXML private void onRotateRight(ActionEvent e) { rotatePage(1); }
+    @FXML
+    private void onFileAdjustments(ActionEvent actionEvent) {
+        if (selectedFile == null || scanModel == null) return;
+        populateFileAdjustmentsFields(selectedFile);
+        sessionPopupOverlay1.setVisible(true);
+        sessionPopupOverlay1.setDisable(false);
+        workspaceView.setDisable(true);
+    }
+
+    @FXML
+    private void onFileAdjustmentsClose(ActionEvent e) {
+        sessionPopupOverlay1.setVisible(false);
+        sessionPopupOverlay1.setDisable(true);
+        workspaceView.setDisable(false);
+    }
+
+    @FXML
+    private void onApplyFileAdjustments(ActionEvent e) {
+        if (selectedFile == null || scanModel == null) return;
+        try {
+            int rotation = parseRotationField(txtFldIndividualFileRotation);
+            double hue = parseDoubleField(txtFldIndividualFileHue,"Hue",-1.0, 1.0);
+            double brightness = parseDoubleField(txtFldIndividualFileBrightness,"Brightness",-1.0,1.0);
+            double contrast = parseDoubleField(txtFldIndividualFileContrast,"Contrast",-1.0,1.0);
+            double saturation = parseDoubleField(txtFldIndividualFileSaturation,"Saturation",-1.0,1.0);
+
+            FileAdjustmentSettings settings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation);
+            scanModel.updateFileSettings(selectedFile, settings);
+            rebuildPreviewCard();
+            onFileAdjustmentsClose(null);
+        } catch (IllegalArgumentException ex) {
+            AlertHelper.showError("Invalid Input", ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Settings Failed", "Could not apply file settings. Please try again.");
+        }
+    }
+
+    private int parseRotationField(TextField field) {
+        try {
+            return Integer.parseInt(field.getText().trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Rotation must be a whole number (0, 90, 180 or 270).");
+        }
+    }
+
+    private double parseDoubleField(TextField field, String name, double min, double max) {
+        double value;
+        try {
+            value = Double.parseDouble(field.getText().trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(name + " must be a number between " + min + " and " + max + ".");
+        }
+        if (value < min || value > max) {
+            throw new IllegalArgumentException(name + " must be between " + min + " and " + max + ".");
+        }
+        return value;
+    }
+
+    @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-90); }
+    @FXML private void onRotateRight(ActionEvent e) { rotatePage(90); }
 
     private void rotatePage(int direction) {
         if (selectedFile == null || scanModel == null) return;
@@ -832,6 +860,7 @@ public class ScanController implements Initializable, IViewController {
         thumb.setFitWidth(cw - 8);
         thumb.setFitHeight(ch - 44);
         thumb.setPreserveRatio(true);
+        thumb.setEffect(new ColorAdjust(file.getHue() / 100, file.getSaturation() / 100, file.getBrightness() / 100, file.getContrast() / 100));
 
         Label nameLabel = new Label(fileLabel(file));
         nameLabel.getStyleClass().add("lbl");
@@ -875,7 +904,33 @@ public class ScanController implements Initializable, IViewController {
     private double cardWidth() { return 520 * zoomLevel; }
     private double cardHeight() { return 700 * zoomLevel; }
 
-    // Helpers
+    // ---------- HELPERS ----------
+
+    private void updateProfileAdjustmentsFields(Profile profile) {
+        FileAdjustmentSettings settings = profile.getFileAdjustmentSettings();
+        if (settings == null) {
+            txtFldGlobalRotation.clear();
+            txtFldGlobalHue.clear();
+            txtFldGlobalBrightness.clear();
+            txtFldGlobalContrast.clear();
+            txtFldGlobalSaturation.clear();
+            return;
+        }
+
+        txtFldGlobalRotation.setText(String.valueOf(settings.getRotation()));
+        txtFldGlobalHue.setText(String.valueOf(settings.getHue()));
+        txtFldGlobalBrightness.setText(String.valueOf(settings.getBrightness()));
+        txtFldGlobalContrast.setText(String.valueOf(settings.getContrast()));
+        txtFldGlobalSaturation.setText(String.valueOf(settings.getSaturation()));
+    }
+
+    private void populateFileAdjustmentsFields(File file) {
+        txtFldIndividualFileRotation.setText(String.valueOf(file.getRotation()));
+        txtFldIndividualFileHue.setText(String.valueOf(file.getHue()));
+        txtFldIndividualFileBrightness.setText(String.valueOf(file.getBrightness()));
+        txtFldIndividualFileContrast.setText(String.valueOf(file.getContrast()));
+        txtFldIndividualFileSaturation.setText(String.valueOf(file.getSaturation()));
+    }
 
     private void selectPage(Document document, File file) {
         selectedDocument = document;
@@ -901,6 +956,7 @@ public class ScanController implements Initializable, IViewController {
         btnRotLeft.setDisable(disabled);
         btnRotRight.setDisable(disabled);
         btnNewDoc.setDisable(disabled);
+        btnSplitDoc.setDisable(disabled);
         btnDelete.setDisable(disabled);
         btnUndo.setDisable(disabled);
         btnExport.setDisable(disabled);

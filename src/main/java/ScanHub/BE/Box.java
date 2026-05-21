@@ -49,7 +49,4 @@ public class Box implements TreeNode {
 
     @Override
     public String toString() { return this.boxName; }
-
-    @Override
-    public String getDisplayName() { return "\uE9D9" + " " + boxName; }
 }
