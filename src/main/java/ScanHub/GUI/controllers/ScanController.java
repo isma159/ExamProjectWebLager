@@ -123,6 +123,11 @@ public class ScanController implements Initializable, IViewController {
 
         comboBoxProfiles.getItems().addAll(user.getProfiles());
 
+        // Set a default selected profile if not already selected
+        if (comboBoxProfiles.getValue() == null && !comboBoxProfiles.getItems().isEmpty()) {
+            comboBoxProfiles.getSelectionModel().select(0);
+        }
+
         updateProfileAdjustmentsFields(comboBoxProfiles.getValue());
     }
 
@@ -246,9 +251,8 @@ public class ScanController implements Initializable, IViewController {
 
             scene.setOnKeyPressed(e -> {
                 switch (e.getCode()) {
-                    case SPACE -> {
-                        if (scanning) onScan(null);
-                        else onStop(null);
+                    case ENTER -> {
+                        onScan(null);
                         e.consume();
                     }
                     case LEFT -> {
@@ -297,6 +301,10 @@ public class ScanController implements Initializable, IViewController {
                             e.consume();
                         }
                     }
+                    case ESCAPE -> {
+                        onStop(null);
+                        e.consume();
+                    }
                     case UP -> {
                         onNavPrev(null);
                         e.consume();
@@ -327,6 +335,7 @@ public class ScanController implements Initializable, IViewController {
             });
         });
     }
+
 
     // Session Startup popup
     @FXML
