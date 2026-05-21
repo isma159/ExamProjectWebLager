@@ -1,133 +1,238 @@
-create table Clients
+CREATE TABLE Clients
 (
-    clientId   int identity
-        primary key,
-    clientName varchar(100) not null,
-    deleted_at datetime2
+    clientId   INT IDENTITY CONSTRAINT PK_Clients PRIMARY KEY,
+    clientName VARCHAR(100) NOT NULL,
+    deleted_at DATETIME2
 )
-    go
+GO
 
-create table Profiles
+CREATE TABLE Profiles
 (
-    profileId     int identity
-        primary key,
-    clientId      int           not null
-        references Clients,
-    profileName   varchar(100)  not null
-        unique,
-    splitBehavior varchar(50)   not null
-        check ([splitBehavior] = 'BARCODE' OR [splitBehavior] = 'NONE'),
-    status        varchar(25)   not null
-        check ([status] = 'INACTIVE' OR [status] = 'ACTIVE'),
-    exportLabel   varchar(50)   not null,
-    deleted_at    datetime2,
-    brightness    int default 0 not null,
-    contrast      int default 0 not null
-)
-    go
+    profileId     INT IDENTITY CONSTRAINT PK_Profiles PRIMARY KEY,
+    clientId      INT NOT NULL,
+    profileName   VARCHAR(100) NOT NULL,
 
-create table Boxes
-(
-    boxId       int identity
-        primary key,
-    boxName     varchar(100)                    not null,
-    profileId   int                             not null
-        references Profiles,
-    created_at  datetime2 default sysdatetime() not null,
-    modified_at datetime2,
-    deleted_at  datetime2
-)
-    go
+    status        VARCHAR(25) NOT NULL
+        CONSTRAINT CK_Profiles_Status CHECK (status IN ('INACTIVE', 'ACTIVE')),
 
-create table BoxMetadata
-(
-    metadataId    int identity
-        primary key,
-    boxId         int           not null
-        references Boxes,
-    profileName   varchar(100)  not null,
-    boxName       varchar(100)  not null,
-    documentCount int default 0 not null,
-    fileCount     int default 0 not null,
-    boxCreatedAt  datetime2     not null,
-    deleted_at    datetime2
-)
-    go
+    exportLabel   VARCHAR(50) NOT NULL,
 
-create table Documents
-(
-    documentId  int identity
-        primary key,
-    boxId       int                             not null
-        references Boxes,
-    created_at  datetime2 default sysdatetime() not null,
-    modified_at datetime2,
-    deleted_at  datetime2
-)
-    go
+    rotation   INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_Profiles_Rotation CHECK (rotation IN (0, 90, 180, 270)),
 
-create table Files
-(
-    fileId        int identity
-        primary key,
-    documentId    int                             not null
-        references Documents,
-    referenceId   int                             not null,
-    sortId        int                             not null,
-    imageData     varbinary(max)                  not null,
-    fileSizeBytes int,
-    created_at    datetime2 default sysdatetime() not null,
-    rotation      int       default 0             not null
-        check ([rotation] = 0 OR [rotation] = 90 OR [rotation] = 180 OR [rotation] = 270),
-    deleted_at    datetime2,
-    brightness    int       default 0,
-    contrast      int       default 0
-)
-    go
+    hue        INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_Profiles_Hue CHECK (hue BETWEEN -100 AND 100),
 
-create table Users
-(
-    userId       int identity
-        primary key,
-    username     varchar(50)  not null
-        unique,
-    passwordHash varchar(255) not null,
-    role         varchar(20)  not null
-        check ([role] = 'ADMIN' OR [role] = 'USER'),
-    deleted_at   datetime2
-)
-    go
+    brightness INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_Profiles_Brightness CHECK (brightness BETWEEN -100 AND 100),
 
-create table Logs
-(
-    logsId        int identity
-        primary key,
-    userId        int                             not null
-        references Users,
-    entityId      int,
-    entityType    varchar(50),
-    action        varchar(100)                    not null,
-    log_timestamp datetime2 default sysdatetime() not null,
-    deleted_at    datetime2
-)
-    go
+    contrast   INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_Profiles_Contrast CHECK (contrast BETWEEN -100 AND 100),
 
-create table UserClients
-(
-    userId   int not null
-        references Users,
-    clientId int not null
-        references Clients,
-    primary key (userId, clientId)
-)
-    go
+    saturation INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_Profiles_Saturation CHECK (saturation BETWEEN -100 AND 100),
 
-create table UserProfiles
-(
-    userId    int not null
-        references Users,
-    profileId int not null
-        references Profiles,
-    primary key (userId, profileId)
+    created_at DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    deleted_at DATETIME2,
+
+    CONSTRAINT FK_Profiles_Client
+        FOREIGN KEY (clientId) REFERENCES Clients(clientId),
+
+    CONSTRAINT UX_Profiles_Client_ProfileName
+        UNIQUE (clientId, profileName)
 )
-    go
+GO
+
+CREATE INDEX IX_Profiles_ClientId ON Profiles(clientId)
+GO
+
+CREATE TABLE Boxes
+(
+    boxId       INT IDENTITY CONSTRAINT PK_Boxes PRIMARY KEY,
+    boxName     VARCHAR(100) NOT NULL,
+    profileId   INT NOT NULL,
+
+    created_at  DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    modified_at DATETIME2,
+    deleted_at  DATETIME2,
+
+    CONSTRAINT FK_Boxes_Profile
+        FOREIGN KEY (profileId) REFERENCES Profiles(profileId)
+)
+GO
+
+CREATE INDEX IX_Boxes_ProfileId ON Boxes(profileId)
+GO
+
+CREATE TABLE Documents
+(
+    documentId INT IDENTITY CONSTRAINT PK_Documents PRIMARY KEY,
+    boxId      INT NOT NULL,
+
+    created_at DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    modified_at DATETIME2,
+    deleted_at  DATETIME2,
+
+    CONSTRAINT FK_Documents_Box
+        FOREIGN KEY (boxId) REFERENCES Boxes(boxId)
+)
+GO
+
+CREATE INDEX IX_Documents_BoxId ON Documents(boxId)
+GO
+
+CREATE TABLE Files
+(
+    fileId        INT IDENTITY CONSTRAINT PK_Files PRIMARY KEY,
+    documentId    INT NOT NULL,
+
+    referenceId   INT NOT NULL,
+    sortId        INT NOT NULL,
+
+    imageData     VARBINARY(MAX) NOT NULL,
+    fileSizeBytes INT NOT NULL,
+
+    created_at    DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    deleted_at    DATETIME2,
+
+    CONSTRAINT FK_Files_Document
+        FOREIGN KEY (documentId) REFERENCES Documents(documentId)
+)
+GO
+
+CREATE UNIQUE INDEX UX_Files_Document_Sort_Active
+ON Files(documentId, sortId)
+WHERE deleted_at IS NULL
+GO
+
+CREATE INDEX IX_Files_DocumentId ON Files(documentId)
+GO
+
+CREATE TABLE FileAdjustmentSettings
+(
+    fileAdjustmentSettingsId INT IDENTITY CONSTRAINT PK_FileAdjustmentSettings PRIMARY KEY,
+    fileId INT NOT NULL,
+
+    rotation   INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_FileAdj_Rotation CHECK (rotation IN (0, 90, 180, 270)),
+
+    hue        INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_FileAdj_Hue CHECK (hue BETWEEN -100 AND 100),
+
+    brightness INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_FileAdj_Brightness CHECK (brightness BETWEEN -100 AND 100),
+
+    contrast   INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_FileAdj_Contrast CHECK (contrast BETWEEN -100 AND 100),
+
+    saturation INT NOT NULL DEFAULT 0
+        CONSTRAINT CK_FileAdj_Saturation CHECK (saturation BETWEEN -100 AND 100),
+
+    created_at  DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    modified_at DATETIME2,
+    deleted_at  DATETIME2,
+
+    CONSTRAINT FK_FileAdj_File
+        FOREIGN KEY (fileId) REFERENCES Files(fileId),
+
+    CONSTRAINT UX_FileAdj_File UNIQUE (fileId)
+)
+GO
+
+CREATE TABLE Users
+(
+    userId       INT IDENTITY CONSTRAINT PK_Users PRIMARY KEY,
+    username     VARCHAR(50) NOT NULL UNIQUE,
+    passwordHash VARCHAR(255) NOT NULL,
+
+    role VARCHAR(20) NOT NULL
+        CONSTRAINT CK_Users_Role CHECK (role IN ('ADMIN', 'USER')),
+
+    deleted_at DATETIME2
+)
+GO
+
+CREATE TABLE Logs
+(
+    logsId        INT IDENTITY CONSTRAINT PK_Logs PRIMARY KEY,
+    userId        INT NOT NULL,
+
+    entityId      INT NULL,
+    entityType    VARCHAR(50) NOT NULL
+        CONSTRAINT CK_Logs_EntityType
+        CHECK (entityType IN ('CLIENT', 'PROFILE', 'BOX', 'DOCUMENT', 'FILE', 'USER')),
+
+    action        VARCHAR(100) NOT NULL,
+    log_timestamp DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+
+    CONSTRAINT FK_Logs_User
+        FOREIGN KEY (userId) REFERENCES Users(userId)
+)
+GO
+
+CREATE INDEX IX_Logs_UserId ON Logs(userId)
+GO
+
+CREATE TABLE UserClients
+(
+    userId   INT NOT NULL,
+    clientId INT NOT NULL,
+
+    CONSTRAINT PK_UserClients PRIMARY KEY (userId, clientId),
+
+    CONSTRAINT FK_UserClients_User
+        FOREIGN KEY (userId) REFERENCES Users(userId),
+
+    CONSTRAINT FK_UserClients_Client
+        FOREIGN KEY (clientId) REFERENCES Clients(clientId)
+)
+GO
+
+CREATE INDEX IX_UserClients_ClientId ON UserClients(clientId)
+GO
+
+CREATE TABLE UserProfiles
+(
+    userId    INT NOT NULL,
+    profileId INT NOT NULL,
+
+    CONSTRAINT PK_UserProfiles PRIMARY KEY (userId, profileId),
+
+    CONSTRAINT FK_UserProfiles_User
+        FOREIGN KEY (userId) REFERENCES Users(userId),
+
+    CONSTRAINT FK_UserProfiles_Profile
+        FOREIGN KEY (profileId) REFERENCES Profiles(profileId)
+)
+GO
+
+CREATE INDEX IX_UserProfiles_ProfileId ON UserProfiles(profileId)
+GO
+
+CREATE VIEW vw_BoxMetadata
+AS
+SELECT
+    b.boxId,
+    p.profileName,
+    b.boxName,
+
+    COUNT(DISTINCT d.documentId) AS documentCount,
+    COUNT(DISTINCT f.fileId)     AS fileCount,
+
+    b.created_at
+FROM Boxes b
+JOIN Profiles p
+    ON p.profileId = b.profileId
+LEFT JOIN Documents d
+    ON d.boxId = b.boxId
+   AND d.deleted_at IS NULL
+LEFT JOIN Files f
+    ON f.documentId = d.documentId
+   AND f.deleted_at IS NULL
+WHERE b.deleted_at IS NULL
+GROUP BY
+    b.boxId,
+    p.profileName,
+    b.boxName,
+    b.created_at
+GO

@@ -77,7 +77,7 @@ public class DocumentDAO {
     }
 
     public void deleteDocument(int documentId) throws SQLException {
-        String sql = "UPDATE Documents SET deleted_at = SYSDATETIME() WHERE documentId = ?";
+        String sql = "UPDATE Documents SET deleted_at = SYSUTCDATETIME() WHERE documentId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
