@@ -105,7 +105,6 @@ public class ScanController implements Initializable, IViewController {
         initializeTreeView(boxTreeView);
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
-        spinnerGlobalRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 90));
         spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 270, 90, 90));
         comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
 
@@ -579,9 +578,6 @@ public class ScanController implements Initializable, IViewController {
         }
         return value;
     }
-
-    @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-90); }
-    @FXML private void onRotateRight(ActionEvent e) { rotatePage(90); }
 
     private void rotatePage(int direction) {
         if (selectedFile == null || scanModel == null) return;
