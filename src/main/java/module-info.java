@@ -13,6 +13,7 @@ module scanhub {
     requires javafx.base;
     requires com.twelvemonkeys.imageio.tiff;
     requires javafx.graphics;
+    requires jdk.compiler;
 
     exports ScanHub.GUI.controllers;
     opens ScanHub.GUI.controllers to javafx.fxml;

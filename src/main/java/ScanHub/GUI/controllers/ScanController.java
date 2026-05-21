@@ -10,6 +10,7 @@ import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
+import com.sun.source.tree.Tree;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -68,10 +69,11 @@ public class ScanController implements Initializable, IViewController {
     private Stage currentStage;
     private ModelFacade modelFacade;
     private ScanModel scanModel;
-
+    private TreeItem<TreeNode> root = new TreeItem<>();
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
     private Document selectedDocument;
     private File selectedFile;
+    private Box selectedBox;
     private boolean sessionActive;
 
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
@@ -102,7 +104,6 @@ public class ScanController implements Initializable, IViewController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initializeTreeView(boxTreeView);
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
         spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 270, 90, 90));
@@ -121,9 +122,7 @@ public class ScanController implements Initializable, IViewController {
 
         if (user.isAdmin()) { user.setProfiles(modelFacade.getProfileModel().getProfiles()); }
 
-        comboBoxProfiles.getItems().addAll(user.getProfiles());
-
-        updateProfileAdjustmentsFields(comboBoxProfiles.getValue());
+        comboBoxProfiles.setItems(FXCollections.observableArrayList(user.getProfiles()));
     }
 
     private void initializeExportComboBoxes() {
@@ -137,8 +136,9 @@ public class ScanController implements Initializable, IViewController {
      *
      * todo explain with inline comments
      */
-    private void initializeTreeView(TreeView<TreeNode> treeView) {
-        TreeItem<TreeNode> root = new TreeItem<>();
+    private void initializeTreeView(TreeView<TreeNode> treeView, Box rootBox) {
+        TreeItem<TreeNode> root = new TreeItem<>(rootBox);
+        root.getChildren().clear();
         treeView.setRoot(root);
         treeView.setShowRoot(true);
 
@@ -209,11 +209,10 @@ public class ScanController implements Initializable, IViewController {
 
                 Label icon = new Label();
                 icon.getStyleClass().add("icon");
-
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
-                    setText(box.getBoxName());
+                    setText(comboBoxProfiles.getValue().getExportLabel() + box.getBoxName());
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
                     icon.getStyleClass().add("tree-cell-doc");
@@ -247,7 +246,7 @@ public class ScanController implements Initializable, IViewController {
             scene.setOnKeyPressed(e -> {
                 switch (e.getCode()) {
                     case SPACE -> {
-                        if (scanning) onScan(null);
+                        if (!scanning) onScan(null);
                         else onStop(null);
                         e.consume();
                     }
@@ -321,9 +320,7 @@ public class ScanController implements Initializable, IViewController {
                             e.consume();
                         }
                     }
-
                 }
-
             });
         });
     }
@@ -361,12 +358,15 @@ public class ScanController implements Initializable, IViewController {
 
         try {
             Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
+            root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
             syncDocumentsFromModel();
+            initializeTreeView(boxTreeView, activeBox);
 
             sessionActive = true;
             selectedDocument = null;
             selectedFile = null;
+            selectedBox = null;
 
             setSessionControlsDisabled(false);
             lblSessionStatus.setText("Profile: " + profile.getProfileName() + "   Box: " + activeBox.getBoxName());
@@ -508,7 +508,12 @@ public class ScanController implements Initializable, IViewController {
                 syncDocumentsFromModel();
                 selectedDocument = null;
                 selectedFile = null;
-            } else return;
+            } else if (selectedBox != null) {
+                scanModel.deleteBox(selectedBox);
+                selectedBox = null;
+                selectedDocument = null;
+                selectedFile = null;
+            }else return;
 
             rebuild();
         } catch (Exception ex) {
@@ -702,6 +707,7 @@ public class ScanController implements Initializable, IViewController {
         if (value instanceof Document document) {
             selectedDocument = document;
             selectedFile = null;
+            selectedBox = null;
         } else if (value instanceof File file) {
             for (Document document : documents) {
                 if (document.getFiles().contains(file)) {
@@ -709,6 +715,12 @@ public class ScanController implements Initializable, IViewController {
                     break;
                 }
             }
+        } else if (value instanceof Box box) {
+
+            selectedBox = box;
+            selectedDocument = null;
+            selectedFile = null;
+
         }
 
         rebuildPreviewCard();
@@ -900,8 +912,7 @@ public class ScanController implements Initializable, IViewController {
     // ---------- HELPERS ----------
 
     private void updateProfileAdjustmentsFields(Profile profile) {
-        FileAdjustmentSettings settings = profile.getFileAdjustmentSettings();
-        if (settings == null) {
+        if (profile == null || profile.getFileAdjustmentSettings() == null) {
             txtFldGlobalRotation.clear();
             txtFldGlobalHue.clear();
             txtFldGlobalBrightness.clear();
@@ -909,7 +920,7 @@ public class ScanController implements Initializable, IViewController {
             txtFldGlobalSaturation.clear();
             return;
         }
-
+        FileAdjustmentSettings settings = profile.getFileAdjustmentSettings();
         txtFldGlobalRotation.setText(String.valueOf(settings.getRotation()));
         txtFldGlobalHue.setText(String.valueOf(settings.getHue()));
         txtFldGlobalBrightness.setText(String.valueOf(settings.getBrightness()));

@@ -172,7 +172,6 @@ public class AdminController implements IViewController, Initializable {
                 }
             }));
         });
-
     }
 
     private void setShortcuts(Map<KeyCodeCombination, Runnable> shortcuts) {
