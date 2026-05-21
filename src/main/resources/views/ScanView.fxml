@@ -8,7 +8,7 @@
 <?import javafx.scene.text.*?>
 <?import org.controlsfx.control.*?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
    <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
       <top>
          <VBox>
@@ -34,6 +34,9 @@
                      <HBox.margin>
                         <Insets right="12.0" />
                      </HBox.margin>
+                     <tooltip>
+                        <Tooltip text="F2 for dark mode" />
+                     </tooltip>
                   </ToggleSwitch>
                   <VBox alignment="CENTER_RIGHT" spacing="3.0">
                      <children>
@@ -111,6 +114,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Ctrl + S to start session" />
+                              </tooltip>
                            </Button>
 
                            <Separator orientation="VERTICAL" styleClass="grey-separator" />
@@ -129,6 +135,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Space to start scanning" />
+                              </tooltip>
                            </Button>
 
                            <Button fx:id="btnStop" mnemonicParsing="false" onAction="#onStop" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
@@ -145,6 +154,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Esc to stop scanning" />
+                              </tooltip>
                            </Button>
 
                            <Separator orientation="VERTICAL" styleClass="grey-separator" />
@@ -163,6 +175,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Left arrow to rotate left" />
+                              </tooltip>
                            </Button>
                            <Button fx:id="btnSplitDoc" mnemonicParsing="false" onAction="#onSplitDocument" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
                               <graphic>
@@ -182,6 +197,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Right arrow to rotate right" />
+                              </tooltip>
                            </Button>
 
                            <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#onDeleteFileOrDocument" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
@@ -198,6 +216,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Ctrl + N to create new document" />
+                              </tooltip>
                            </Button>
 
                            <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#onUndo" prefHeight="33.0" prefWidth="75.0" styleClass="secondary-btn">
@@ -214,6 +235,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Del to delete document/page" />
+                              </tooltip>
                            </Button>
 
                            <Separator orientation="VERTICAL" styleClass="grey-separator" />
@@ -245,6 +269,9 @@
                                     </children>
                                  </HBox>
                               </graphic>
+                              <tooltip>
+                                 <Tooltip text="Ctrl + E to export documents" />
+                              </tooltip>
                            </Button>
                         </children>
 
@@ -300,6 +327,9 @@
                         <HBox.margin>
                            <Insets left="3.0" right="3.0" />
                         </HBox.margin>
+                        <tooltip>
+                           <Tooltip text="Ctrl + - to zoom out" />
+                        </tooltip>
                      </Button>
 
                      <Button fx:id="btnZoomIn" mnemonicParsing="false" onAction="#onZoomIn" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
@@ -360,6 +390,9 @@
                         <HBox.margin>
                            <Insets left="3.0" right="3.0" />
                         </HBox.margin>
+                        <tooltip>
+                           <Tooltip text="Ctrl + + to zoom in" />
+                        </tooltip>
                      </Button>
                   </children>
 
@@ -443,7 +476,7 @@
                <children>
                   <VBox>
                      <children>
-            
+
                         <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Rotation" />
                         <TextField fx:id="txtFldGlobalRotation" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
                            <opaqueInsets>
