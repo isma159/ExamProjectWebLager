@@ -42,9 +42,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class ScanController implements Initializable, IViewController {
 
@@ -76,10 +74,13 @@ public class ScanController implements Initializable, IViewController {
     private Box selectedBox;
     private boolean sessionActive;
 
+    private final Deque<Runnable> undoStack = new ArrayDeque<>(); //
+    private static final int maxUndos = 30;
+
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
     private Thread scanThread; // scan loop is controlled by the volatile boolean 'scanning', not thread interruption
     private volatile boolean scanning = false; // volatile: FX-thread writes are immediately visible to the scan thread
-    private static final long scanDelay = 2000; // milliseconds to wait between successive scans in the scan loop
+    private static final long scanDelay = 1000; // milliseconds to wait between successive scans in the scan loop
 
     // Zoom Level stuff
     private double zoomLevel = 1.0; // default
@@ -106,7 +107,7 @@ public class ScanController implements Initializable, IViewController {
     public void initialize(URL location, ResourceBundle resources) {
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
-        spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 270, 90, 90));
+        spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 360, 5, 1));
         comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
 
         setSessionControlsDisabled(true);
@@ -117,10 +118,13 @@ public class ScanController implements Initializable, IViewController {
 
     private void initializeProfileComboBox() {
         if (modelFacade == null) return;
+
         User user = modelFacade.getSessionModel().getCurrentUser();
         if (user.getProfiles().isEmpty() && !user.isAdmin()) return;
 
-        if (user.isAdmin()) { user.setProfiles(modelFacade.getProfileModel().getProfiles()); }
+        if (user.isAdmin()) {
+            user.setProfiles(modelFacade.getProfileModel().getProfiles());
+        }
 
         comboBoxProfiles.setItems(FXCollections.observableArrayList(user.getProfiles()));
     }
@@ -393,6 +397,7 @@ public class ScanController implements Initializable, IViewController {
 
         scanning = true;
         btnScan.setDisable(true);
+        btnStop.setDisable(false);
 
         scanThread = new Thread(() -> {
             while (scanning) {
@@ -513,7 +518,7 @@ public class ScanController implements Initializable, IViewController {
                 selectedBox = null;
                 selectedDocument = null;
                 selectedFile = null;
-            }else return;
+            } else return;
 
             rebuild();
         } catch (Exception ex) {
@@ -545,7 +550,7 @@ public class ScanController implements Initializable, IViewController {
     private void onApplyFileAdjustments(ActionEvent e) {
         if (selectedFile == null || scanModel == null) return;
         try {
-            int rotation = parseRotationField(txtFldIndividualFileRotation);
+            int rotation = Integer.parseInt(txtFldIndividualFileRotation.getText().trim());
             double hue = parseDoubleField(txtFldIndividualFileHue,"Hue",-1.0, 1.0);
             double brightness = parseDoubleField(txtFldIndividualFileBrightness,"Brightness",-1.0,1.0);
             double contrast = parseDoubleField(txtFldIndividualFileContrast,"Contrast",-1.0,1.0);
@@ -560,14 +565,6 @@ public class ScanController implements Initializable, IViewController {
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Settings Failed", "Could not apply file settings. Please try again.");
-        }
-    }
-
-    private int parseRotationField(TextField field) {
-        try {
-            return Integer.parseInt(field.getText().trim());
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Rotation must be a whole number (0, 90, 180 or 270).");
         }
     }
 
@@ -609,7 +606,7 @@ public class ScanController implements Initializable, IViewController {
     private void navigateTo(int index) {
         List<File> all = allPages();
         if (all.isEmpty()) return;
-        index = Math.max(0, Math.min(index, all.size() - 1));
+        index = Math.clamp(index, 0, all.size() - 1);
         File target = all.get(index);
         for (Document document : documents) {
             if (document.getFiles().contains(target)) {
@@ -660,7 +657,7 @@ public class ScanController implements Initializable, IViewController {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Choose Export Destination");
         java.io.File exportDirectory = chooser.showDialog(currentStage);
-        if (exportDirectory == null) return; // user cancelled
+        if (exportDirectory == null) return; // user canceled
 
         try {
             scanModel.save(); // persist staged data first
@@ -675,7 +672,16 @@ public class ScanController implements Initializable, IViewController {
 
     @FXML
     private void onUndo(ActionEvent e) {
-        // TODO: implement undo
+        if (undoStack.isEmpty()) return;
+        undoStack.pop().run();
+        btnUndo.setDisable(undoStack.isEmpty());
+        rebuild();
+    }
+
+    private void pushUndo(Runnable inverse) {
+        if (undoStack.size() >= maxUndos) undoStack.removeLast();
+        undoStack.push(inverse);
+        btnUndo.setDisable(false);
     }
 
     @FXML
@@ -716,11 +722,9 @@ public class ScanController implements Initializable, IViewController {
                 }
             }
         } else if (value instanceof Box box) {
-
             selectedBox = box;
             selectedDocument = null;
             selectedFile = null;
-
         }
 
         rebuildPreviewCard();
@@ -920,6 +924,7 @@ public class ScanController implements Initializable, IViewController {
             txtFldGlobalSaturation.clear();
             return;
         }
+
         FileAdjustmentSettings settings = profile.getFileAdjustmentSettings();
         txtFldGlobalRotation.setText(String.valueOf(settings.getRotation()));
         txtFldGlobalHue.setText(String.valueOf(settings.getHue()));
@@ -980,7 +985,7 @@ public class ScanController implements Initializable, IViewController {
                 return "Page " + (position + 1);
             }
         }
-        return "Page ?"; // should not happen - something's wrong
+        return "Page ?"; // should not happen
     }
 
     private int currentPageIndex() {
