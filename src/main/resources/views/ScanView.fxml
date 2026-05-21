@@ -274,12 +274,12 @@
                            </Button>
 
                            <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
-                           <Button mnemonicParsing="false" onAction="#onFileAdjustments" prefHeight="33.0" prefWidth="33.0">
+                           <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onFileAdjustments" prefHeight="33.0" prefWidth="33.0" styleClass="clear-btn">
                               <graphic>
-                                 <HBox alignment="CENTER">
+                                 <HBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0">
                                     <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="☰">
-                                          <font><Font size="16.0" /></font>
+                                       <Label alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="icon" text="☰">
+                                          <font><Font size="12.0" /></font>
                                        </Label>
                                     </children>
                                  </HBox>
@@ -383,7 +383,7 @@
                            <Insets left="3.0" right="3.0" />
                         </HBox.margin>
                      </Button>
-                     <Spinner fx:id="spinnerRotation" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                     <Spinner fx:id="spinnerRotation" editable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
 
                      <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
                         <graphic>

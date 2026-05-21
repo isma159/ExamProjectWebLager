@@ -64,6 +64,8 @@ public class ScanModel {
      */
     public void deleteDocument(Document document) throws Exception { scanManager.deleteDocument(document); }
 
+    public void deleteBox(Box box) throws Exception {scanManager.deleteBox(box);}
+
     public Document getCurrentDocument() { return scanManager.getCurrentDocument(); }
 
     public Box getTargetBox() { return scanManager.getTargetBox(); }
