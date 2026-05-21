@@ -74,15 +74,6 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
         rowHBox.getStyleClass().add("row-selected");
     }
 
-    private void registerRow(VBox tableBox, HBox row, Object data, Runnable onFocus) {
-        row.setFocusTraversable(true);
-        row.focusedProperty().addListener((obs, oldVal, focused) -> {
-            if (focused) onFocus.run();
-        });
-        row.setUserData(data);
-        tableBox.getChildren().add(row);
-    }
-
     private void openClientForm(Client client) {
         try {
             ViewHandler handler = client == null ? ViewHandler.CREATE_CLIENT : ViewHandler.EDIT_CLIENT;

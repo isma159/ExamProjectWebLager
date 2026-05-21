@@ -196,7 +196,7 @@ public class UserFormController implements Initializable {
             modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), newUser.getUserId(), EntityType.USER, LogAction.CREATE, LocalDateTime.now()));
             currentStage.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             AlertHelper.showError("Create Failed", "Failed to create user. Please try again.");
         }
     }

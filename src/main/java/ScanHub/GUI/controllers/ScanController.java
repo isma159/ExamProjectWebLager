@@ -114,8 +114,7 @@ public class ScanController implements Initializable, IViewController {
 
         comboBoxProfiles.getSelectionModel().clearSelection();
 
-        if (user.isAdmin()) { comboBoxProfiles.setItems(modelFacade.getProfileModel().getProfiles()); }
-        else { comboBoxProfiles.setItems(FXCollections.observableArrayList(user.getProfiles())); }
+        if (user.isAdmin()) { user.setProfiles(modelFacade.getProfileModel().getProfiles()); }
 
         if (!comboBoxProfiles.getItems().isEmpty()) {
             comboBoxProfiles.getSelectionModel().selectFirst();
@@ -136,7 +135,7 @@ public class ScanController implements Initializable, IViewController {
     private void initializeTreeView(TreeView<TreeNode> treeView) {
         TreeItem<TreeNode> root = new TreeItem<>();
         treeView.setRoot(root);
-        treeView.setShowRoot(false);
+        treeView.setShowRoot(true);
 
         treeView.getRoot().addEventHandler(TreeItem.childrenModificationEvent(), e -> expandAll(treeView.getRoot()));
         treeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
@@ -210,7 +209,6 @@ public class ScanController implements Initializable, IViewController {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
                     setText(box.getBoxName());
-                    setStyle("");
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
                     icon.getStyleClass().add("tree-cell-doc");

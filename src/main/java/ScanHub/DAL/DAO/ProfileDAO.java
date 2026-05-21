@@ -48,9 +48,6 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 connection.rollback();
                 throw new Exception("Failed to create profile in database", e);
             }
-            finally {
-                connection.setAutoCommit(true);
-            }
 
         } catch (SQLException e) {
             throw new Exception("Could not create profile", e);
