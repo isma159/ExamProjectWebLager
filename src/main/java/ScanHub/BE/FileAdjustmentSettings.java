@@ -44,10 +44,6 @@ public class FileAdjustmentSettings {
     public void setSaturation(double saturation) { this.saturation = saturation; }
 
     private int normaliseRotation(int rotation) {
-        int normalised = ((rotation % 360) + 360) % 360;
-        return switch (normalised) {
-            case 90, 180, 270 -> normalised;
-            default -> 0;
-        };
+        return ((rotation % 360) + 360) % 360;
     }
 }

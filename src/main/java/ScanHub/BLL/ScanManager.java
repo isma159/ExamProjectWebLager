@@ -336,55 +336,38 @@ public class ScanManager {
         return result;
     }
 
-    /**
-     * Applies rotation (by 90, 180, 270 degrees for now) and smoothes the pixels when rotated
-     * Explained in-depth in method cause there's A LOT of new stuff going on.
-     */
+    /** Applies rotation and smoothes the pixels when rotated while preserving the full visible bounds. */
     private BufferedImage rotateFile(BufferedImage source, int rotation) {
 
-        // normalize rotation so only valid values remain: 0/90/180/270
         int normalised = normaliseRotation(rotation);
+        if (normalised == 0) return source; // no rotation needed
 
-        // no rotation needed
-        if (normalised == 0) return source;
-
-        // original image dimensions
         int width = source.getWidth();
         int height = source.getHeight();
 
-        // rotating 90 or 270 degrees swaps width/height
-        int rotatedWidth = normalised == 180 ? width : height;
-        int rotatedHeight = normalised == 180 ? height : width;
+        double radians = Math.toRadians(normalised); // Java’s math and rotation functions only understand radians
+        double sin = Math.abs(Math.sin(radians)); // tells how much the image “leans” vertically after rotation, used for sizing the new canvas
+        double cos = Math.abs(Math.cos(radians)); // tells how much the image “stays horizontal” after rotation, also used for sizing the new canvas
 
-        // keeps transparency (like PNG see-through areas) if the image has it (people online said it was a good idea)
-        int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+        // compute bounding box of rotated image
+        int rotatedWidth = (int) Math.floor(width * cos + height * sin); // calculates the maximum possible width after rotation
+        int rotatedHeight = (int) Math.floor(height * cos + width * sin); // calculates the maximum possible height after rotation
 
-        // destination image that will contain the rotated result
-        BufferedImage rotated = new BufferedImage(rotatedWidth, rotatedHeight, type);
+        int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB; // keeps transparency if the image has it
 
-        // tool used to draw the image onto the new rotated canvas
-        Graphics2D graphics = rotated.createGraphics();
+        BufferedImage rotated = new BufferedImage(rotatedWidth, rotatedHeight, type); // destination image that will contain the rotated result
 
-        // use higher-quality interpolation during rotation = image looks smoother and less pixelated when rotated (without the image will becoming jagged or blocky)
-        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        // quality ensuring
+        Graphics2D graphics = rotated.createGraphics(); // used for drawing the image onto the new rotated canvas
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC); // smoother rotation/resizing
+        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY); // quality > speed
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // smooths jagged edges in rotated graphics
 
-        // defines how the image should be transformed when drawn (rotation + translation)
+        // define how the image should be transformed when drawn (rotation + translation)
         AffineTransform transform = new AffineTransform();
-        switch (normalised) {
-            case 90 -> {
-                transform.translate(height, 0); // move drawing origin right so rotated image stays visible
-                transform.rotate(Math.toRadians(90)); // rotate 90 degrees around origin to the right
-            }
-            case 180 -> {
-                transform.translate(width, height); // move image into positive coordinate space after rotation
-                transform.rotate(Math.toRadians(180)); // rotate image upside down
-            }
-            case 270 -> {
-                transform.translate(0, width); // move drawing origin downward after rotation
-                transform.rotate(Math.toRadians(270)); // rotate 270 degrees (or 90 to the left)
-            }
-            default -> { }
-        }
+        transform.rotate(radians); // rotate around center
+        transform.translate(rotatedWidth / 2.0, rotatedHeight / 2.0); // move image center into destination canvas center
+        transform.translate(-width / 2.0, -height / 2.0); // move original image center to origin before rotation
 
         graphics.drawImage(source, transform, null); // draw the source image using the configured transformation
         graphics.dispose(); // Release native graphics resources
@@ -548,10 +531,6 @@ public class ScanManager {
     }
 
     private static int normaliseRotation(int rotation) {
-        int normalised = ((rotation % 360) + 360) % 360;
-        return switch (normalised) {
-            case 90, 180, 270 -> normalised;
-            default -> 0;
-        };
+        return ((rotation % 360) + 360) % 360;
     }
 }
