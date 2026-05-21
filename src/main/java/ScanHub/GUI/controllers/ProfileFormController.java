@@ -153,7 +153,7 @@ public class ProfileFormController implements Initializable {
         editingProfile.setClient(selectedClient);
         editingProfile.setStatus(status);
         editingProfile.setExportLabel(newExportLabel);
-        editingProfile.setFileSettings(buildFileSettings());
+        editingProfile.setFileAdjustmentSettings(buildFileSettings());
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);
@@ -174,11 +174,11 @@ public class ProfileFormController implements Initializable {
         searchableComboBoxClient.getSelectionModel().select(profile.getClient());
 
         // Populate slider values from existing profile
-        sliderHue.setValue(profile.getFileSettings().getHue());
-        sliderBrightness.setValue(profile.getFileSettings().getBrightness());
-        sliderContrast.setValue(profile.getFileSettings().getContrast());
-        sliderSaturation.setValue(profile.getFileSettings().getSaturation());
-        sliderRotation.setValue(profile.getFileSettings().getRotation());
+        sliderHue.setValue(profile.getFileAdjustmentSettings().getHue());
+        sliderBrightness.setValue(profile.getFileAdjustmentSettings().getBrightness());
+        sliderContrast.setValue(profile.getFileAdjustmentSettings().getContrast());
+        sliderSaturation.setValue(profile.getFileAdjustmentSettings().getSaturation());
+        sliderRotation.setValue(profile.getFileAdjustmentSettings().getRotation());
     }
 
     private void bindSlider(Slider slider, Spinner<Integer> spinner, DoubleConsumer setter) {
@@ -223,8 +223,8 @@ public class ProfileFormController implements Initializable {
         vboxStatus.getStyleClass().remove("error-border");
     }
 
-    private FileSettings buildFileSettings() {
-        return new FileSettings(
+    private FileAdjustmentSettings buildFileSettings() {
+        return new FileAdjustmentSettings(
                 rotation,
                 hue,
                 brightness,

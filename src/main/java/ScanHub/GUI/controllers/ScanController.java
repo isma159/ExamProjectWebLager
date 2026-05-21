@@ -19,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -39,7 +40,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -59,6 +59,10 @@ public class ScanController implements Initializable, IViewController {
     @FXML private StackPane sessionPopupOverlay;
     @FXML private SearchableComboBox<Profile> comboBoxProfiles;
     @FXML private TextField txtFldBoxId, txtFldGlobalRotation, txtFldGlobalHue, txtFldGlobalBrightness, txtFldGlobalContrast, txtFldGlobalSaturation;
+
+    // File adjustment menu
+    @FXML private StackPane sessionPopupOverlay1;
+    @FXML private TextField txtFldIndividualFileRotation, txtFldIndividualFileHue, txtFldIndividualFileBrightness, txtFldIndividualFileContrast, txtFldIndividualFileSaturation;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -95,7 +99,7 @@ public class ScanController implements Initializable, IViewController {
         initializeTreeView(boxTreeView);
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
-        //spinnerGlobalRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 90));
+        comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
 
         setSessionControlsDisabled(true);
         lblSessionStatus.setText("Press Session Startup to configure and begin.");
@@ -109,6 +113,7 @@ public class ScanController implements Initializable, IViewController {
         if (!comboBoxProfiles.getItems().isEmpty()) {
             comboBoxProfiles.getSelectionModel().selectFirst();
         }
+        updateProfileAdjustmentsFields(comboBoxProfiles.getValue());
     }
 
     private void initializeExportComboBoxes() {
@@ -321,17 +326,10 @@ public class ScanController implements Initializable, IViewController {
         scanning = true;
         btnScan.setDisable(true);
 
-        Profile currentProfile = comboBoxProfiles.getValue();
-        int rotation = currentProfile.getFileSettings().getRotation();
-        double hue = currentProfile.getFileSettings().getHue();
-        double brightness = currentProfile.getFileSettings().getBrightness();
-        double contrast = currentProfile.getFileSettings().getContrast();
-        double saturation = currentProfile.getFileSettings().getSaturation();
-
         scanThread = new Thread(() -> {
             while (scanning) {
                 try {
-                    ScanManager.StoredScan result = scanModel.fetchScan(rotation, hue, brightness, contrast, saturation);
+                    ScanManager.StoredScan result = scanModel.fetchScan();
 
                     if (!scanning) break; // stop was pressed during fetch (leave loop)
 
@@ -406,7 +404,7 @@ public class ScanController implements Initializable, IViewController {
      */
     @FXML
     private void onSplitDocument(ActionEvent actionEvent) {
-
+        // TODO: implement split
     }
 
     @FXML
@@ -450,6 +448,65 @@ public class ScanController implements Initializable, IViewController {
             AlertHelper.showError("Delete Failed", "Could not delete the selected "
                     + (selectedFile != null ? "file." : "document. ") + "Please try again.");
         }
+    }
+
+    @FXML
+    private void onFileAdjustments(ActionEvent actionEvent) {
+        if (selectedFile == null || scanModel == null) return;
+        populateFileAdjustmentsFields(selectedFile);
+        sessionPopupOverlay1.setVisible(true);
+        sessionPopupOverlay1.setDisable(false);
+        workspaceView.setDisable(true);
+    }
+
+    @FXML
+    private void onFileAdjustmentsClose(ActionEvent e) {
+        sessionPopupOverlay1.setVisible(false);
+        sessionPopupOverlay1.setDisable(true);
+        workspaceView.setDisable(false);
+    }
+
+    @FXML
+    private void onApplyFileAdjustments(ActionEvent e) {
+        if (selectedFile == null || scanModel == null) return;
+        try {
+            int rotation = parseRotationField(txtFldIndividualFileRotation);
+            double hue = parseDoubleField(txtFldIndividualFileHue,"Hue",-1.0, 1.0);
+            double brightness = parseDoubleField(txtFldIndividualFileBrightness,"Brightness",-1.0,1.0);
+            double contrast = parseDoubleField(txtFldIndividualFileContrast,"Contrast",-1.0,1.0);
+            double saturation = parseDoubleField(txtFldIndividualFileSaturation,"Saturation",-1.0,1.0);
+
+            FileAdjustmentSettings settings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation);
+            scanModel.updateFileSettings(selectedFile, settings);
+            rebuildPreviewCard();
+            onFileAdjustmentsClose(null);
+        } catch (IllegalArgumentException ex) {
+            AlertHelper.showError("Invalid Input", ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Settings Failed", "Could not apply file settings. Please try again.");
+        }
+    }
+
+    private int parseRotationField(TextField field) {
+        try {
+            return Integer.parseInt(field.getText().trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Rotation must be a whole number (0, 90, 180 or 270).");
+        }
+    }
+
+    private double parseDoubleField(TextField field, String name, double min, double max) {
+        double value;
+        try {
+            value = Double.parseDouble(field.getText().trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(name + " must be a number between " + min + " and " + max + ".");
+        }
+        if (value < min || value > max) {
+            throw new IllegalArgumentException(name + " must be between " + min + " and " + max + ".");
+        }
+        return value;
     }
 
     @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-90); }
@@ -719,6 +776,7 @@ public class ScanController implements Initializable, IViewController {
         thumb.setFitWidth(cw - 8);
         thumb.setFitHeight(ch - 44);
         thumb.setPreserveRatio(true);
+        thumb.setEffect(new ColorAdjust(file.getHue() / 100, file.getSaturation() / 100, file.getBrightness() / 100, file.getContrast() / 100));
 
         Label nameLabel = new Label(fileLabel(file));
         nameLabel.getStyleClass().add("lbl");
@@ -762,7 +820,33 @@ public class ScanController implements Initializable, IViewController {
     private double cardWidth() { return 520 * zoomLevel; }
     private double cardHeight() { return 700 * zoomLevel; }
 
-    // Helpers
+    // ------ HELPERS ------
+
+    private void updateProfileAdjustmentsFields(Profile profile) {
+        FileAdjustmentSettings settings = profile.getFileAdjustmentSettings();
+        if (settings == null) {
+            txtFldGlobalRotation.clear();
+            txtFldGlobalHue.clear();
+            txtFldGlobalBrightness.clear();
+            txtFldGlobalContrast.clear();
+            txtFldGlobalSaturation.clear();
+            return;
+        }
+
+        txtFldGlobalRotation.setText(String.valueOf(settings.getRotation()));
+        txtFldGlobalHue.setText(String.valueOf(settings.getHue()));
+        txtFldGlobalBrightness.setText(String.valueOf(settings.getBrightness()));
+        txtFldGlobalContrast.setText(String.valueOf(settings.getContrast()));
+        txtFldGlobalSaturation.setText(String.valueOf(settings.getSaturation()));
+    }
+
+    private void populateFileAdjustmentsFields(File file) {
+        txtFldIndividualFileRotation.setText(String.valueOf(file.getRotation()));
+        txtFldIndividualFileHue.setText(String.valueOf(file.getHue()));
+        txtFldIndividualFileBrightness.setText(String.valueOf(file.getBrightness()));
+        txtFldIndividualFileContrast.setText(String.valueOf(file.getContrast()));
+        txtFldIndividualFileSaturation.setText(String.valueOf(file.getSaturation()));
+    }
 
     private void selectPage(Document document, File file) {
         selectedDocument = document;

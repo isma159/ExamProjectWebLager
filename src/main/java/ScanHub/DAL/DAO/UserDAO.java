@@ -23,25 +23,27 @@ public class UserDAO implements IDataAccess<User> {
 
     @Override
     public User createData(User newUser) throws Exception {
-        String sql = "INSERT INTO Users (username, passwordHash, role) VALUES (?, ?, ?)";
+        String sql = """
+                INSERT INTO Users (username, passwordHash, role)
+                OUTPUT INSERTED.userId
+                VALUES (?, ?, ?)
+                """;
         String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
         String insertUserClientSQL = "INSERT INTO UserClients (userId, clientId) VALUES (?, ?)";
 
         try (Connection connection = dbConnector.getConnection()) {
             connection.setAutoCommit(false);
 
-            try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            try (PreparedStatement ps = connection.prepareStatement(sql);
                  PreparedStatement profilePS = connection.prepareStatement(insertJunctionSQL);
                  PreparedStatement clientPS = connection.prepareStatement(insertUserClientSQL)) {
 
                 ps.setString(1, newUser.getUsername());
                 ps.setString(2, newUser.getPasswordHash());
                 ps.setString(3, newUser.getRole().toString());
-                ps.executeUpdate();
-
-                try (ResultSet rs = ps.getGeneratedKeys()) {
+                try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        newUser.setUserId(rs.getInt(1));
+                        newUser.setUserId(rs.getInt("userId"));
                     } else {
                         throw new SQLException("No generated userId returned");
                     }
@@ -78,17 +80,15 @@ public class UserDAO implements IDataAccess<User> {
     public List<User> getData() throws Exception {
         Map<Integer, User> usersById = new HashMap<>();
 
-        // 1. Added brightness and contrast to SELECT
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
                        p.profileId, p.clientId, p.profileName,
-                       p.exportLabel, p.status, p.fileSettingsId,
-                       c.clientName, fs.hue, fs.brightness,
-                       fs.contrast, fs.saturation, fs.globalRotation
+                       p.exportLabel, p.status, p.rotation,
+                       p.hue, p.brightness, p.contrast, p.saturation,
+                       c.clientName
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
-                LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 WHERE u.deleted_at IS NULL
                 ORDER BY u.username, p.profileName
@@ -133,17 +133,14 @@ public class UserDAO implements IDataAccess<User> {
     }
 
     public User getDataFromName(String name) throws Exception {
-        // 1. Added brightness and contrast to SELECT
         String sql = """
                 SELECT u.userId, u.username, u.passwordHash, u.role,
                        p.profileId, p.clientId, c.clientName, p.profileName,
-                       p.exportLabel, p.status, p.fileSettingsId,
-                       fs.hue, fs.brightness, fs.contrast, fs.saturation,
-                       fs.globalRotation
+                       p.exportLabel, p.status, p.rotation,
+                       p.hue, p.brightness, p.contrast, p.saturation
                 FROM Users u
                 LEFT JOIN UserProfiles up ON u.userId = up.userId
                 LEFT JOIN Profiles p ON up.profileId = p.profileId AND p.deleted_at IS NULL
-                LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 WHERE u.username = ? AND u.deleted_at IS NULL
                 """;
@@ -166,7 +163,6 @@ public class UserDAO implements IDataAccess<User> {
 
                     rs.getInt("profileId");
                     if (!rs.wasNull()) {
-                        // 2. Updated constructor call with 8 arguments
                         Client client = new Client(rs.getInt("clientId"), rs.getString("clientName"));
                         Profile profile = mapProfile(rs, client);
 
@@ -243,7 +239,7 @@ public class UserDAO implements IDataAccess<User> {
 
     @Override
     public void deleteData(User selectedUser) throws Exception {
-        String sql = "UPDATE Users SET deleted_at = GETDATE() WHERE userId = ?";
+        String sql = "UPDATE Users SET deleted_at = SYSUTCDATETIME() WHERE userId = ?";
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
         String deleteUserClientsSQL = "DELETE FROM UserClients WHERE userId = ?";
 
@@ -282,12 +278,12 @@ public class UserDAO implements IDataAccess<User> {
                 rs.getString("profileName"),
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
-                new FileSettings(rs.getInt("fileSettingsId"),
-                        rs.getInt("globalRotation"),
-                        rs.getDouble("hue"),
-                        rs.getDouble("brightness"),
-                        rs.getDouble("contrast"),
-                        rs.getDouble("saturation"))
+                new FileAdjustmentSettings(
+                        rs.getInt("rotation"),
+                        rs.getInt("hue"),
+                        rs.getInt("brightness"),
+                        rs.getInt("contrast"),
+                        rs.getInt("saturation"))
         );
     }
 }

@@ -1,7 +1,7 @@
 package ScanHub.DAL.DAO;
 
 import ScanHub.BE.Client;
-import ScanHub.BE.FileSettings;
+import ScanHub.BE.FileAdjustmentSettings;
 import ScanHub.BE.Profile;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.DAL.DB.DBConnector;
@@ -23,21 +23,25 @@ public class ClientDAO implements IDataAccess<Client> {
 
     @Override
     public Client createData(Client client) throws Exception {
-        String sql = "INSERT INTO Clients (clientName) VALUES (?)";
+        String sql = """
+                INSERT INTO Clients (clientName)
+                OUTPUT INSERTED.clientId
+                VALUES (?)
+                """;
 
         try (Connection connection = dbConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, client.getClientName());
-            ps.executeUpdate();
 
-            try (ResultSet rs = ps.getGeneratedKeys()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    client.setClientId(rs.getInt(1));
+                    client.setClientId(rs.getInt("clientId"));
+                    return client;
                 }
             }
 
-            return client;
+            throw new SQLException("Insert returned no clientId");
         } catch (SQLException e) {
             throw new Exception("Could not create client", e);
         }
@@ -49,11 +53,10 @@ public class ClientDAO implements IDataAccess<Client> {
         String sql = "SELECT clientId, clientName FROM Clients WHERE deleted_at IS NULL ORDER BY clientName";
         String selectProfilesSQL = """
                                        SELECT p.profileId, p.profileName,
-                                              p.exportLabel, p.status, p.fileSettingsId, fs.hue,
-                                              fs.brightness, fs.contrast, fs.saturation,
-                                              fs.globalRotation
+                                              p.exportLabel, p.status, p.rotation,
+                                              p.hue, p.brightness, p.contrast,
+                                              p.saturation
                                        FROM Profiles p
-                                       LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
                                        WHERE p.clientId = ? AND p.deleted_at IS NULL
                                        """;
 
@@ -66,8 +69,6 @@ public class ClientDAO implements IDataAccess<Client> {
             while (rs.next()) {
 
                 Client client = mapRow(rs);
-                Client tempClient = mapRow(rs);
-
                 ps2.setInt(1, client.getClientId());
                 try (ResultSet rs2 = ps2.executeQuery()) {
 
@@ -76,7 +77,7 @@ public class ClientDAO implements IDataAccess<Client> {
 
                         rs2.getInt("profileId");
                         if (!rs2.wasNull()) {
-                            Profile profile = mapProfile(rs2, tempClient);
+                            Profile profile = mapProfile(rs2, client);
                             client.getProfiles().add(profile);
                         }
 
@@ -97,12 +98,11 @@ public class ClientDAO implements IDataAccess<Client> {
         String sql = "SELECT clientId, clientName FROM Clients WHERE clientName = ? AND deleted_at IS NULL";
         String selectProfilesSQL = """
                                        SELECT p.profileId, p.profileName,
-                                              p.exportLabel, p.status, p.fileSettingsId, fs.hue,
-                                              fs.brightness, fs.contrast, fs.saturation,
-                                              fs.globalRotation
+                                              p.exportLabel, p.status, p.rotation,
+                                              p.hue, p.brightness, p.contrast,
+                                              p.saturation
                                        FROM Profiles p
-                                       LEFT JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
-                                       WHERE p.clientId = ?
+                                       WHERE p.clientId = ? AND p.deleted_at IS NULL
                                        """;
 
         try (Connection connection = dbConnector.getConnection();
@@ -115,15 +115,13 @@ public class ClientDAO implements IDataAccess<Client> {
             if (rs.next()) {
 
                 Client client = mapRow(rs);
-                Client tempClient = mapRow(rs);
-
                 ps2.setInt(1, client.getClientId());
                 try (ResultSet rs2 = ps2.executeQuery()) {
 
                     while (rs2.next()) {
                         rs2.getInt("profileId");
                         if (!rs2.wasNull()) {
-                            Profile profile = mapProfile(rs2, tempClient);
+                            Profile profile = mapProfile(rs2, client);
                             client.getProfiles().add(profile);
                         }
                     }
@@ -156,7 +154,7 @@ public class ClientDAO implements IDataAccess<Client> {
 
     @Override
     public void deleteData(Client client) throws Exception {
-        String sql = "UPDATE Clients SET deleted_at = SYSDATETIME() WHERE clientId = ?";
+        String sql = "UPDATE Clients SET deleted_at = SYSUTCDATETIME() WHERE clientId = ?";
         String deleteUserClientsSql = "DELETE FROM UserClients WHERE clientId = ?";
 
         try (Connection connection = dbConnector.getConnection()) {
@@ -193,13 +191,12 @@ public class ClientDAO implements IDataAccess<Client> {
                 rs.getString("profileName"),
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
-                new FileSettings(
-                        rs.getInt("fileSettingsId"),
-                        rs.getInt("globalRotation"),
-                        rs.getDouble("hue"),
-                        rs.getDouble("brightness"),
-                        rs.getDouble("contrast"),
-                        rs.getDouble("saturation"))
+                new FileAdjustmentSettings(
+                        rs.getInt("rotation"),
+                        rs.getInt("hue"),
+                        rs.getInt("brightness"),
+                        rs.getInt("contrast"),
+                        rs.getInt("saturation"))
         );
 
     }

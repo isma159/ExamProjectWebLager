@@ -3,6 +3,7 @@ package ScanHub.GUI.models;
 import ScanHub.BE.Box;
 import ScanHub.BE.Document;
 import ScanHub.BE.File;
+import ScanHub.BE.FileAdjustmentSettings;
 import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.ScanManager;
 import ScanHub.DAL.ApiClient.ScanApiClient;
@@ -23,14 +24,8 @@ public class ScanModel {
      * Fetches the next page and holds it in memory.
      * For an empty box the very first fetch is always a barcode page (enforced by ScanManager).
      *
-     * @param rotation initial rotation in degrees (0, 90, 180, 270)
-     * @param hue initial hue (-100 to 100)
-     * @param brightness initial brightness (-100 to 100)
-     * @param contrast initial contrast (-100 to 100)
-     * @param saturation initial saturation (-100 to 100)
-     * @return a StoredScan record with the File, its Document, and a barcode-split flag
      */
-    public ScanManager.StoredScan fetchScan(int rotation, double hue, double brightness, double contrast, double saturation) throws Exception { return scanManager.fetchScan(rotation, hue, brightness, contrast, saturation); }
+    public ScanManager.StoredScan fetchScan() throws Exception { return scanManager.fetchScan(); }
 
     /** Persists all staged documents and files in one pass, then refreshes metadata. */
     public void save() throws Exception { scanManager.commitAll(); }
@@ -52,6 +47,9 @@ public class ScanModel {
      * otherwise only updates the in-memory File.
      */
     public void updateFileRotation(File file, int rotation) throws Exception { scanManager.updateFileRotation(file, rotation); }
+
+    /** Persists all individual File adjustment overrides for the given File if it already exists in the DB. */
+    public void updateFileSettings(File file, FileAdjustmentSettings settings) throws Exception { scanManager.updateFileSettings(file, settings); }
 
     /**
      * Soft-deletes the given File from the DB if not staged;

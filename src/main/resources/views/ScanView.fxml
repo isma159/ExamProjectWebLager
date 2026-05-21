@@ -235,6 +235,17 @@
                            </Button>
 
                            <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
+                           <Button mnemonicParsing="false" onAction="#onFileAdjustments" prefHeight="33.0" prefWidth="33.0">
+                              <graphic>
+                                  <HBox alignment="CENTER">
+                                    <children>
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="☰">
+                                          <font><Font size="16.0" /></font>
+                                       </Label>
+                                    </children>
+                                 </HBox>
+                              </graphic>
+                           </Button>
                         </children>
 
                         <VBox.margin>
@@ -502,5 +513,94 @@
             <Separator />
          </children>
       </VBox>
+   </StackPane>
+   <StackPane fx:id="sessionPopupOverlay1" disable="true" layoutX="460.0" layoutY="180.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false">
+      <children>
+         <VBox spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
+            <padding>
+               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label styleClass="h2" text="Current Image Adjustment Settings" />
+                     <Region HBox.hgrow="ALWAYS" />
+                     <Button mnemonicParsing="false" onAction="#onFileAdjustmentsClose" prefHeight="28.0" styleClass="secondary-btn" text="✕" />
+                  </children>
+               </HBox>
+               <HBox alignment="CENTER" spacing="9.0">
+                  <children>
+                     <VBox>
+                        <children>
+                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Rotation" />
+                           <TextField fx:id="txtFldIndividualFileRotation" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                              <opaqueInsets>
+                                 <Insets />
+                              </opaqueInsets>
+                           </TextField>
+                        </children>
+                        <opaqueInsets>
+                           <Insets />
+                        </opaqueInsets>
+                     </VBox>
+                     <VBox layoutX="10.0" layoutY="10.0">
+                        <children>
+                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Hue" />
+                           <TextField fx:id="txtFldIndividualFileHue" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                              <opaqueInsets>
+                                 <Insets />
+                              </opaqueInsets>
+                           </TextField>
+                        </children>
+                        <opaqueInsets>
+                           <Insets />
+                        </opaqueInsets>
+                     </VBox>
+                     <VBox layoutX="79.0" layoutY="10.0">
+                        <children>
+                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Brightness" />
+                           <TextField fx:id="txtFldIndividualFileBrightness" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                              <opaqueInsets>
+                                 <Insets />
+                              </opaqueInsets>
+                           </TextField>
+                        </children>
+                        <opaqueInsets>
+                           <Insets />
+                        </opaqueInsets>
+                     </VBox>
+                     <VBox layoutX="79.0" layoutY="10.0">
+                        <children>
+                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Contrast" />
+                           <TextField fx:id="txtFldIndividualFileContrast" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                              <opaqueInsets>
+                                 <Insets />
+                              </opaqueInsets>
+                           </TextField>
+                        </children>
+                        <opaqueInsets>
+                           <Insets />
+                        </opaqueInsets>
+                     </VBox>
+                     <VBox layoutX="79.0" layoutY="10.0">
+                        <children>
+                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Saturation" />
+                           <TextField fx:id="txtFldIndividualFileSaturation" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                              <opaqueInsets>
+                                 <Insets />
+                              </opaqueInsets>
+                           </TextField>
+                        </children>
+                        <opaqueInsets>
+                           <Insets />
+                        </opaqueInsets>
+                     </VBox>
+                  </children>
+               </HBox>
+               <Separator />
+               <Button mnemonicParsing="false" onAction="#onApplyFileAdjustments" styleClass="primary-btn" text="Apply" />
+            </children>
+         </VBox>
+      </children>
    </StackPane>
 </StackPane>

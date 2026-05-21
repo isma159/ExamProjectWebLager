@@ -2,7 +2,7 @@ package ScanHub.DAL.DAO;
 
 import ScanHub.BE.Box;
 import ScanHub.BE.Client;
-import ScanHub.BE.FileSettings;
+import ScanHub.BE.FileAdjustmentSettings;
 import ScanHub.BE.Profile;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.DAL.DB.DBConnector;
@@ -57,7 +57,7 @@ public class BoxDAO implements IDataAccess<Box> {
     @Override
     public List<Box> getData() throws Exception {
         List<Box> boxes = new ArrayList<>();
-        String sql = baseSelectSql() + " WHERE b.deleted_at IS NULL ORDER BY b.created_at DESC";
+        String sql = getSelectSql() + " WHERE b.deleted_at IS NULL ORDER BY b.created_at DESC";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
@@ -75,7 +75,7 @@ public class BoxDAO implements IDataAccess<Box> {
 
     @Override
     public Box getDataFromName(String name) throws Exception {
-        String sql = baseSelectSql() + " WHERE b.boxName = ? AND b.deleted_at IS NULL";
+        String sql = getSelectSql() + " WHERE b.boxName = ? AND b.deleted_at IS NULL";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -90,7 +90,7 @@ public class BoxDAO implements IDataAccess<Box> {
     }
 
     public Box getDataFromId(int boxId) throws Exception {
-        String sql = baseSelectSql() + " WHERE b.boxId = ? AND b.deleted_at IS NULL";
+        String sql = getSelectSql() + " WHERE b.boxId = ? AND b.deleted_at IS NULL";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -106,7 +106,7 @@ public class BoxDAO implements IDataAccess<Box> {
 
     @Override
     public void updateData(Box box) throws Exception {
-        String sql = "UPDATE Boxes SET boxName = ?, profileId = ?, modified_at = SYSDATETIME() WHERE boxId = ? AND deleted_at IS NULL";
+        String sql = "UPDATE Boxes SET boxName = ?, profileId = ?, modified_at = SYSUTCDATETIME() WHERE boxId = ? AND deleted_at IS NULL";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -122,7 +122,7 @@ public class BoxDAO implements IDataAccess<Box> {
 
     @Override
     public void deleteData(Box box) throws Exception {
-        String sql = "UPDATE Boxes SET deleted_at = SYSDATETIME() WHERE boxId = ?";
+        String sql = "UPDATE Boxes SET deleted_at = SYSUTCDATETIME() WHERE boxId = ?";
 
         try (Connection connection = dbConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -134,15 +134,14 @@ public class BoxDAO implements IDataAccess<Box> {
         }
     }
 
-    private String baseSelectSql() {
+    private String getSelectSql() {
         return """
                 SELECT b.boxId, b.boxName, b.profileId, b.created_at, b.modified_at,
-                       p.clientId, p.profileName, p.status, p.exportLabel, p.fileSettingsId,
-                       c.clientName, fs.hue, fs.brightness, fs.contrast, fs.saturation,
-                       fs.globalRotation
+                       p.clientId, p.profileName, p.status, p.exportLabel,
+                       p.rotation, p.hue, p.brightness, p.contrast, p.saturation,
+                       c.clientName
                 FROM Boxes b
-                JOIN Profiles p ON b.profileId = p.profileId
-                JOIN FileSettings fs ON p.fileSettingsId = fs.fileSettingsId
+                JOIN Profiles p ON b.profileId = p.profileId AND p.deleted_at IS NULL
                 LEFT JOIN Clients c ON p.clientId = c.clientId
                 """;
     }
@@ -152,17 +151,16 @@ public class BoxDAO implements IDataAccess<Box> {
 
         Profile profile = new Profile(
                 rs.getInt("profileId"),
-                new Client(rs.getInt("clientId"),
-                        rs.getString("clientName")),
+                new Client(rs.getInt("clientId"), rs.getString("clientName")),
                 rs.getString("profileName"),
                 ProfileStatus.valueOf(rs.getString("status")),
                 rs.getString("exportLabel"),
-                new FileSettings(rs.getInt("fileSettingsId"),
-                        rs.getInt("globalRotation"),
-                        rs.getDouble("hue"),
-                        rs.getDouble("brightness"),
-                        rs.getDouble("contrast"),
-                        rs.getDouble("saturation"))
+                new FileAdjustmentSettings(
+                        rs.getInt("rotation"),
+                        rs.getInt("hue"),
+                        rs.getInt("brightness"),
+                        rs.getInt("contrast"),
+                        rs.getInt("saturation"))
         );
 
         box.setProfile(profile);

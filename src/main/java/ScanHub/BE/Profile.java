@@ -13,23 +13,23 @@ public class Profile implements CheckTreeNode {
     private String profileName;
     private ProfileStatus status;
     private String exportLabel;
-    private FileSettings fileSettings;
+    private FileAdjustmentSettings fileAdjustmentSettings;
 
-    public Profile(int profileId, Client client, String profileName, ProfileStatus status, String exportLabel, FileSettings fileSettings) {
+    public Profile(int profileId, Client client, String profileName, ProfileStatus status, String exportLabel, FileAdjustmentSettings fileAdjustmentSettings) {
         this.profileId = profileId;
         this.client = client;
         this.profileName = profileName;
         this.status = status;
         this.exportLabel = exportLabel;
-        this.fileSettings = fileSettings;
+        this.fileAdjustmentSettings = fileAdjustmentSettings;
     }
 
-    public Profile(Client client, String profileName, ProfileStatus status, String exportLabel, FileSettings fileSettings) {
+    public Profile(Client client, String profileName, ProfileStatus status, String exportLabel, FileAdjustmentSettings fileAdjustmentSettings) {
         this.client = client;
         this.profileName = profileName;
         this.status = status;
         this.exportLabel = exportLabel;
-        this.fileSettings = fileSettings;
+        this.fileAdjustmentSettings = fileAdjustmentSettings;
     }
 
     public int getProfileId() { return profileId; }
@@ -38,7 +38,7 @@ public class Profile implements CheckTreeNode {
     public String getProfileName() { return profileName; }
     public ProfileStatus getStatus() { return status; }
     public String getExportLabel() { return exportLabel; }
-    public FileSettings getFileSettings() { return fileSettings; }
+    public FileAdjustmentSettings getFileAdjustmentSettings() { return fileAdjustmentSettings; }
 
     public void setProfileId(int profileId) { this.profileId = profileId; }
     public void setClientId(int clientId) { this.clientId = clientId; }
@@ -46,7 +46,7 @@ public class Profile implements CheckTreeNode {
     public void setProfileName(String profileName) { this.profileName = profileName; }
     public void setStatus(ProfileStatus status) { this.status = status; }
     public void setExportLabel(String exportLabel) { this.exportLabel = exportLabel; }
-    public void setFileSettings(FileSettings fileSettings) { this.fileSettings = fileSettings; }
+    public void setFileAdjustmentSettings(FileAdjustmentSettings fileAdjustmentSettings) { this.fileAdjustmentSettings = fileAdjustmentSettings; }
 
     @Override
     public String toString() { return this.profileName; }
