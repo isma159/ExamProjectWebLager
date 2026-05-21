@@ -325,9 +325,8 @@ public class ScanManager {
         double cos = Math.abs(Math.cos(radians)); // tells how much the image “stays horizontal” after rotation, also used for sizing the new canvas
 
         // compute bounding box of rotated image
-        int rotatedWidth = (int) Math.floor(width * cos + height * sin); // calculates the maximum possible width after rotation
-        int rotatedHeight = (int) Math.floor(height * cos + width * sin); // calculates the maximum possible height after rotation
-
+        int rotatedWidth = (int) Math.ceil(width * cos + height * sin); // calculates the maximum possible width after rotation (rounded up)
+        int rotatedHeight = (int) Math.ceil(height * cos + width * sin); // calculates the maximum possible height after rotation (rounded up)
         int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB; // keeps transparency if the image has it
 
         BufferedImage rotated = new BufferedImage(rotatedWidth, rotatedHeight, type); // destination image that will contain the rotated result
@@ -340,8 +339,8 @@ public class ScanManager {
 
         // define how the image should be transformed when drawn (rotation + translation)
         AffineTransform transform = new AffineTransform();
-        transform.rotate(radians); // rotate around center
         transform.translate(rotatedWidth / 2.0, rotatedHeight / 2.0); // move image center into destination canvas center
+        transform.rotate(radians); // rotate around center
         transform.translate(-width / 2.0, -height / 2.0); // move original image center to origin before rotation
 
         graphics.drawImage(source, transform, null); // draw the source image using the configured transformation
