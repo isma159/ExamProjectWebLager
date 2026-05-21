@@ -84,6 +84,8 @@ public class ScanController implements Initializable, IViewController {
 
     private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
             (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
+    @FXML
+    private Spinner<Integer> spinnerRotation;
 
     @Override
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
@@ -101,6 +103,7 @@ public class ScanController implements Initializable, IViewController {
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
         spinnerGlobalRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 90));
+        spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 270, 90, 90));
 
         setSessionControlsDisabled(true);
         lblSessionStatus.setText("Press Session Startup to configure and begin.");
@@ -552,12 +555,13 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
-    @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-90); }
-    @FXML private void onRotateRight(ActionEvent e) { rotatePage(90); }
+    @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-1); }
+    @FXML private void onRotateRight(ActionEvent e) { rotatePage(1); }
 
-    private void rotatePage(int degrees) {
+    private void rotatePage(int direction) {
         if (selectedFile == null || scanModel == null) return;
 
+        int degrees = spinnerRotation.getValue() * direction;
         int rotation = normaliseRotation(selectedFile.getRotation() + degrees);
         try {
             scanModel.updateFileRotation(selectedFile, rotation);
@@ -929,10 +933,6 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private int normaliseRotation(int rotation) {
-        int normalised = ((rotation % 360) + 360) % 360;
-        return switch (normalised) {
-            case 90, 180, 270 -> normalised;
-            default -> 0;
-        };
+        return ((rotation % 360) + 360) % 360;
     }
 }

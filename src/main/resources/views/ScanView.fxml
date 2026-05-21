@@ -194,6 +194,11 @@
                                  <Tooltip text="Left arrow to rotate left" />
                               </tooltip>
                            </Button>
+                            <Spinner fx:id="spinnerRotation" editable="true" prefHeight="33.0" prefWidth="80.0" styleClass="container">
+                                <tooltip>
+                                    <Tooltip text="Rotation degrees per click" />
+                                </tooltip>
+                            </Spinner>
 
                            <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
                               <graphic>
