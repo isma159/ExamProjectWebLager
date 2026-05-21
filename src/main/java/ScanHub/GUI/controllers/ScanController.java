@@ -105,7 +105,6 @@ public class ScanController implements Initializable, IViewController {
         initializeTreeView(boxTreeView);
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
-        spinnerGlobalRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 90));
         spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 270, 90, 90));
         comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
 
@@ -116,12 +115,14 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void initializeProfileComboBox() {
+        if (modelFacade == null) return;
         User user = modelFacade.getSessionModel().getCurrentUser();
-        if (modelFacade == null || user.getProfiles().isEmpty() && !user.isAdmin()) return;
-        comboBoxProfiles.setItems(modelFacade.getProfileModel().getProfiles());
-        if (!comboBoxProfiles.getItems().isEmpty()) {
-            comboBoxProfiles.getSelectionModel().selectFirst();
-        }
+        if (user.getProfiles().isEmpty() && !user.isAdmin()) return;
+
+        if (user.isAdmin()) { user.setProfiles(modelFacade.getProfileModel().getProfiles()); }
+
+        comboBoxProfiles.getItems().addAll(user.getProfiles());
+
         updateProfileAdjustmentsFields(comboBoxProfiles.getValue());
     }
 
@@ -139,7 +140,7 @@ public class ScanController implements Initializable, IViewController {
     private void initializeTreeView(TreeView<TreeNode> treeView) {
         TreeItem<TreeNode> root = new TreeItem<>();
         treeView.setRoot(root);
-        treeView.setShowRoot(false);
+        treeView.setShowRoot(true);
 
         treeView.getRoot().addEventHandler(TreeItem.childrenModificationEvent(), e -> expandAll(treeView.getRoot()));
         treeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
@@ -213,7 +214,6 @@ public class ScanController implements Initializable, IViewController {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
                     setText(box.getBoxName());
-                    setStyle("");
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
                     icon.getStyleClass().add("tree-cell-doc");
@@ -296,10 +296,6 @@ public class ScanController implements Initializable, IViewController {
                             onSessionStartup(null);
                             e.consume();
                         }
-                    }
-                    case ESCAPE -> {
-                        onStop(null);
-                        e.consume();
                     }
                     case UP -> {
                         onNavPrev(null);
@@ -582,9 +578,6 @@ public class ScanController implements Initializable, IViewController {
         }
         return value;
     }
-
-    @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-90); }
-    @FXML private void onRotateRight(ActionEvent e) { rotatePage(90); }
 
     private void rotatePage(int direction) {
         if (selectedFile == null || scanModel == null) return;

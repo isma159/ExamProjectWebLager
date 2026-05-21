@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import org.controlsfx.control.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.SearchableComboBox?>
+<?import org.controlsfx.control.ToggleSwitch?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
    <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
       <top>
          <VBox>
@@ -179,13 +194,6 @@
                                  <Tooltip text="Left arrow to rotate left" />
                               </tooltip>
                            </Button>
-                            <Spinner fx:id="spinnerRotation" editable="true" prefHeight="33.0" prefWidth="80.0" styleClass="container">
-                                <tooltip>
-                                    <Tooltip text="Rotation degrees per click" />
-                                </tooltip>
-                            </Spinner>
-
-                           <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
                            <Button fx:id="btnSplitDoc" mnemonicParsing="false" onAction="#onSplitDocument" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
                               <graphic>
                                  <HBox alignment="CENTER">
@@ -268,7 +276,7 @@
                            <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
                            <Button mnemonicParsing="false" onAction="#onFileAdjustments" prefHeight="33.0" prefWidth="33.0">
                               <graphic>
-                                  <HBox alignment="CENTER">
+                                 <HBox alignment="CENTER">
                                     <children>
                                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="☰">
                                           <font><Font size="16.0" /></font>
@@ -375,6 +383,7 @@
                            <Insets left="3.0" right="3.0" />
                         </HBox.margin>
                      </Button>
+                     <Spinner fx:id="spinnerRotation" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
 
                      <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
                         <graphic>

@@ -2,9 +2,11 @@ package ScanHub.GUI.controllers;
 
 // project imports
 import ScanHub.BE.*;
+import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
+import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
 
@@ -14,20 +16,22 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Pagination;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.controlsfx.control.SearchableComboBox;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
-public class AdminDashboardController implements Initializable {
+public class AdminDashboardController implements Initializable, IShortcutHandler {
 
     @FXML private VBox userTableBox, profileTableBox, logTableBox;
     @FXML private Pagination pgUsers, pgProfiles, pgLogs;
+    @FXML private SearchableComboBox<LogAction> cbFilter;
 
     private boolean userAscending;
     private boolean profileAscending;
@@ -43,6 +47,9 @@ public class AdminDashboardController implements Initializable {
     private HBox selectedProfileRow = null;
     private ProfileStatus selectedStatus = null;
 
+    private List<Log> currentLogs = new ArrayList<>();
+    private LogAction selectedAction = LogAction.ALL;
+
     private final Stage currentStage;
 
     private final int TOTAL_TABLE_SIZE = 6;
@@ -54,20 +61,23 @@ public class AdminDashboardController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        loadUsers();
-        loadProfiles();
-        loadLogs();
+        filterUsers();
+        filterProfiles();
+        filterLogs();
 
-        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { loadUsers(); }));
-        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { loadProfiles(); }));
-        pgLogs.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { loadLogs(); }));
+        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { filterUsers(); }));
+        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { filterProfiles(); }));
+        pgLogs.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> { filterLogs(); }));
+
+        cbFilter.getItems().addAll(LogAction.values());
+        cbFilter.getSelectionModel().select(LogAction.ALL);
+
+        cbFilter.valueProperty().addListener(((observable, oldValue, newValue) -> {selectedAction = newValue; filterLogs();}));
     }
 
-    private void loadUsers() {
+    private void loadUsers(List<User> users) {
         userTableBox.getChildren().clear();
         try {
-            List<User> users = modelFacade.getUserModel().getUsers();
-
             pgUsers.setPageCount(Math.ceilDiv(users.size(), TOTAL_TABLE_SIZE));
 
             int startIndex = pgUsers.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
@@ -85,10 +95,9 @@ public class AdminDashboardController implements Initializable {
         }
     }
 
-    private void loadProfiles() {
+    private void loadProfiles(List<Profile> profiles) {
         profileTableBox.getChildren().clear();
         try {
-            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
 
             pgProfiles.setPageCount(Math.ceilDiv(profiles.size(), TOTAL_TABLE_SIZE));
 
@@ -108,10 +117,9 @@ public class AdminDashboardController implements Initializable {
         }
     }
 
-    private void loadLogs() {
+    private void loadLogs(List<Log> logs) {
         logTableBox.getChildren().clear();
         try {
-            List<Log> logs = modelFacade.getLogModel().getLogs();
 
             pgLogs.setPageCount(Math.ceilDiv(logs.size(), TOTAL_TABLE_SIZE));
 
@@ -149,15 +157,16 @@ public class AdminDashboardController implements Initializable {
         filterUsers();
     }
 
-    private void filterUsers() { // TODO: needs rework
-        for (var node : userTableBox.getChildren()) {
-            HBox row = (HBox) node;
-            User user = (User) row.getUserData();
-            boolean matchingRole = selectedRole ==  null || user.getRole() == selectedRole;
+    private void filterUsers() {
+        List<User> users = modelFacade.getUserModel().getUsers();
 
-            row.setVisible(matchingRole);
-            row.setManaged(matchingRole);
-        }
+        users = users.stream().filter(user -> {
+            if (selectedRole == null) {return true;}
+            return user.getRole() == selectedRole;
+        }).toList();
+
+        loadUsers(users);
+
     }
 
     @FXML
@@ -168,17 +177,6 @@ public class AdminDashboardController implements Initializable {
         currentUsers.sort(userAscending ? Comparator.comparing(User::getUsername) : Comparator.comparing(User::getUsername).reversed());
         userTableBox.getChildren().clear();
 
-        for (User user : currentUsers) {
-            HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
-                if (selectedUser != null) selectedUserRow.getStyleClass().remove("row-selected");
-                if (selectedUser == clickedUser) { selectedUser = null; selectedUserRow = null; return;}
-                selectedUser = clickedUser;
-                selectedUserRow = rowHBox;
-                rowHBox.getStyleClass().add("row-selected");
-            });
-            row.setUserData(user);
-            userTableBox.getChildren().add(row);
-        }
         filterUsers();
     }
 
@@ -201,15 +199,28 @@ public class AdminDashboardController implements Initializable {
         filterProfiles();
     }
 
-    private void filterProfiles() { // TODO: needs rework
-        for (var node : profileTableBox.getChildren()) {
-            HBox row = (HBox) node;
-            Profile profile = (Profile) row.getUserData();
+    private void filterProfiles() {
+        List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
 
-            boolean matchingStatus = selectedStatus == null || profile.getStatus() == selectedStatus;
-            row.setVisible(matchingStatus);
-            row.setManaged(matchingStatus);
-        }
+        profiles = profiles.stream().filter(profile -> {
+            if (selectedStatus == null) {return true;}
+            return profile.getStatus() == selectedStatus;
+        }).toList();
+
+        loadProfiles(profiles);
+    }
+
+    private void filterLogs() {
+        List<Log> logs = modelFacade.getLogModel().getLogs();
+
+        logs = logs.stream().filter(log -> {
+            if (selectedAction == LogAction.ALL) {return true;}
+            return log.getAction() == selectedAction;
+        }).toList();
+
+
+
+        loadLogs(logs);
     }
 
     @FXML
@@ -230,5 +241,10 @@ public class AdminDashboardController implements Initializable {
             profileTableBox.getChildren().add(row);
         }
         filterProfiles();
+    }
+
+    @Override
+    public Map<KeyCodeCombination, Runnable> getShortcuts() {
+        return Map.of();
     }
 }

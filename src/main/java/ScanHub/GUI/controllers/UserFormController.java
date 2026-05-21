@@ -16,6 +16,7 @@ import ScanHub.GUI.util.AlertHelper;
 
 // java imports
 import ScanHub.GUI.util.TreeViewInitializer;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -69,11 +70,25 @@ public class UserFormController implements Initializable {
             passwordHint.setText("Enter a password only to change the current one.");
             saveButton.setText("Save Changes");
             populateFields(editingUser);
+            clientTreeView.setDisable(editingUser.isAdmin());
         }
 
         ThemeManager.apply(currentStage.getScene());
         applyFilters();
+
         txtFldClientSearch.textProperty().addListener(((obs, oldVal, newVal) -> applyFilters()));
+
+        toggleGroupRole.selectedToggleProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue == radioADMIN) {
+                Platform.runLater(() -> {
+                    clientTreeView.getCheckModel().checkAll();
+                    clientTreeView.getCheckModel().clearChecks();
+                    clientTreeView.refresh();
+                });
+            }
+
+            clientTreeView.setDisable(newValue == radioADMIN);
+        }));
     }
 
     private void loadClientsAndProfiles(List<Client> clients) {
@@ -181,7 +196,7 @@ public class UserFormController implements Initializable {
             modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), newUser.getUserId(), EntityType.USER, LogAction.CREATE, LocalDateTime.now()));
             currentStage.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             AlertHelper.showError("Create Failed", "Failed to create user. Please try again.");
         }
     }

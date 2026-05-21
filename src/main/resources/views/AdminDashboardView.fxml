@@ -10,8 +10,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.SearchableComboBox?>
 
-<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminDashboardController">
+<HBox prefHeight="720.0" prefWidth="1371.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminDashboardController">
    <children>
       <VBox prefHeight="200.0" prefWidth="1550.0">
          <children>
@@ -171,42 +172,15 @@
                               <Label styleClass="h2" text="Activity Logs" />
                            </children>
                         </HBox>
-                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
                            <styleClass>
                               <String fx:value="box-card" />
                               <String fx:value="second-card-bg" />
                            </styleClass>
                            <children>
                               <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" selected="true" text="Scan">
-                                 <toggleGroup>
-                                    <ToggleGroup fx:id="logFilter" />
-                                 </toggleGroup>
-                                 <styleClass>
-                                    <String fx:value="lbl" />
-                                    <String fx:value="filter-btn" />
-                                 </styleClass>
-                              </ToggleButton>
-                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Create" toggleGroup="$logFilter">
-                                 <styleClass>
-                                    <String fx:value="filter-btn" />
-                                    <String fx:value="lbl" />
-                                 </styleClass></ToggleButton>
-                              <ToggleButton mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Delete" toggleGroup="$logFilter">
-                                 <styleClass>
-                                    <String fx:value="filter-btn" />
-                                    <String fx:value="lbl" />
-                                 </styleClass></ToggleButton>
-                              <ToggleButton layoutX="175.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Export" toggleGroup="$logFilter">
-                                 <styleClass>
-                                    <String fx:value="filter-btn" />
-                                    <String fx:value="lbl" />
-                                 </styleClass></ToggleButton>
-                              <ToggleButton layoutX="250.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Login" toggleGroup="$logFilter">
-                                 <styleClass>
-                                    <String fx:value="filter-btn" />
-                                    <String fx:value="lbl" />
-                                 </styleClass></ToggleButton>
+                              <Label maxWidth="-Infinity" minWidth="-Infinity" prefWidth="60.0" styleClass="bold-lbl" text="Filter by:" />
+                              <SearchableComboBox fx:id="cbFilter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="150.0" />
                            </children>
                         </HBox>
                         <ScrollPane fitToWidth="true" prefHeight="600.0" styleClass="box-card">

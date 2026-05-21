@@ -12,16 +12,17 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/26.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
+<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
     <children>
         <VBox HBox.hgrow="ALWAYS">
             <children>
                 <VBox styleClass="shadow" VBox.vgrow="ALWAYS">
                     <children>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="510.0">
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0">
                             <styleClass>
                                 <String fx:value="half-card" />
                                 <String fx:value="card-bg" />
@@ -34,16 +35,27 @@
 
                                 <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
                                     <graphic>
-                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateProfile" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
-                                            <children>
-                                                <Region prefHeight="200.0" prefWidth="6.0" />
-                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
-                                                <Region prefHeight="200.0" prefWidth="6.0" />
-                                                <Label alignment="CENTER" styleClass="lbl" text="Add" textFill="WHITE">
-                                                    <font><Font size="12.0" /></font>
-                                                </Label>
-                                            </children>
-                                        </HBox>
+                              <StackPane>
+                                 <children>
+                                              <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickCreateProfile" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn" translateY="-9.0">
+                                                  <children>
+                                                      <Region prefHeight="200.0" prefWidth="6.0" />
+                                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
+                                                      <Region prefHeight="200.0" prefWidth="6.0" />
+                                                      <Label alignment="CENTER" styleClass="lbl" text="Add" textFill="WHITE">
+                                                          <font>
+                                                <Font size="12.0" />
+                                             </font>
+                                                      </Label>
+                                                  </children>
+                                              </HBox>
+                                    <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="18.0" prefWidth="45.0" translateY="18.0">
+                                       <children>
+                                          <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Ctrl + N" textFill="#888888" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </StackPane>
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Create a new profile (Ctrl + N)" />
@@ -54,16 +66,27 @@
 
                                 <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
                                     <graphic>
-                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickUpdateProfile" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn">
-                                            <children>
-                                                <Region prefHeight="200.0" prefWidth="6.0" />
-                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
-                                                <Region prefHeight="200.0" prefWidth="6.0" />
-                                                <Label alignment="CENTER" styleClass="lbl" text="Edit" textFill="WHITE">
-                                                    <font><Font size="12.0" /></font>
-                                                </Label>
-                                            </children>
-                                        </HBox>
+                              <StackPane>
+                                 <children>
+                                              <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickUpdateProfile" prefHeight="33.0" prefWidth="90.0" styleClass="primary-btn" translateY="-9.0">
+                                                  <children>
+                                                      <Region prefHeight="200.0" prefWidth="6.0" />
+                                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
+                                                      <Region prefHeight="200.0" prefWidth="6.0" />
+                                                      <Label alignment="CENTER" styleClass="lbl" text="Edit" textFill="WHITE">
+                                                          <font>
+                                                <Font size="12.0" />
+                                             </font>
+                                                      </Label>
+                                                  </children>
+                                              </HBox>
+                                    <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="18.0" prefWidth="45.0" translateY="18.0">
+                                       <children>
+                                          <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Ctrl + E" textFill="#888888" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </StackPane>
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Edit the selected profile (Ctrl + E)" />
@@ -74,16 +97,27 @@
 
                                 <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
                                     <graphic>
-                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteProfile" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn">
-                                            <children>
-                                                <Region prefHeight="200.0" prefWidth="6.0" />
-                                                <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
-                                                <Region prefHeight="200.0" prefWidth="6.0" />
-                                                <Label alignment="CENTER" styleClass="lbl" text="Delete" textFill="WHITE">
-                                                    <font><Font size="12.0" /></font>
-                                                </Label>
-                                            </children>
-                                        </HBox>
+                              <StackPane>
+                                 <children>
+                                              <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onClickDeleteProfile" prefHeight="33.0" prefWidth="90.0" styleClass="destructive-btn" translateY="-9.0">
+                                                  <children>
+                                                      <Region prefHeight="200.0" prefWidth="6.0" />
+                                                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="" />
+                                                      <Region prefHeight="200.0" prefWidth="6.0" />
+                                                      <Label alignment="CENTER" styleClass="lbl" text="Delete" textFill="WHITE">
+                                                          <font>
+                                                <Font size="12.0" />
+                                             </font>
+                                                      </Label>
+                                                  </children>
+                                              </HBox>
+                                    <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="18.0" prefWidth="45.0" translateY="18.0">
+                                       <children>
+                                          <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Delete" textFill="#888888" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </StackPane>
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Delete the selected profile (Delete)" />
