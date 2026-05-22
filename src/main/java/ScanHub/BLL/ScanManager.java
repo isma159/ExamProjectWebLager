@@ -114,18 +114,21 @@ public class ScanManager {
 
         pendingDeleteDocumentIds.clear();
 
-        // persist staged files and documents
+        // persist staged files and documents. Also handles files moved to new documents
 
-        Box savedBox = daoFacade.getBoxDAO().createData(targetBox);
-        targetBox.setBoxId(savedBox.getBoxId());
-        targetBox.setStaged(false);
+        if (targetBox.isStaged()) {
+            Box savedBox = daoFacade.getBoxDAO().createData(targetBox);
+            targetBox.setBoxId(savedBox.getBoxId());
+            targetBox.setStaged(false);
+        }
 
         for (Document document : targetBox.getDocuments()) {
-            if (document.isStaged()) {
-                Document persisted = daoFacade.getDocumentDAO().createDocument(savedBox.getBoxId());
+            if (document.isStaged() || document.isModified()) {
+                Document persisted = daoFacade.getDocumentDAO().createDocument(targetBox.getBoxId());
                 document.setDocumentId(persisted.getDocumentId());
                 document.setCreatedAt(persisted.getCreatedAt());
                 document.setStaged(false);
+                document.setModified(false);
             }
 
             for (File file : document.getFiles()) {
@@ -143,6 +146,10 @@ public class ScanManager {
                         daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
                     }
                     file.setStaged(false);
+                }
+                else if (file.getDocumentId() != document.getDocumentId()) {
+                    daoFacade.getFileDAO().moveFile(file.getFileId(), document.getDocumentId());
+                    file.setDocumentId(document.getDocumentId());
                 }
             }
         }

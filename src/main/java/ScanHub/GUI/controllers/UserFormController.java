@@ -10,7 +10,7 @@ import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.enums.Role;
 import ScanHub.BE.User;
 import ScanHub.BE.interfaces.CheckTreeNode;
-import ScanHub.GUI.util.ThemeManager;
+import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 
@@ -73,7 +73,7 @@ public class UserFormController implements Initializable {
             clientTreeView.setDisable(editingUser.isAdmin());
         }
 
-        ThemeManager.apply(currentStage.getScene());
+        ThemeHandler.apply(currentStage.getScene());
         applyFilters();
 
         txtFldClientSearch.textProperty().addListener(((obs, oldVal, newVal) -> applyFilters()));

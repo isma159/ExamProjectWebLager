@@ -4,9 +4,9 @@ package ScanHub.GUI.util;
 import javafx.scene.Scene;
 import java.util.Objects;
 
-public class ThemeManager {
+public class ThemeHandler {
 
-    private static final String DARK = Objects.requireNonNull(ThemeManager.class.getResource("/css/darkStyle.css")).toExternalForm();
+    private static final String DARK = Objects.requireNonNull(ThemeHandler.class.getResource("/css/darkStyle.css")).toExternalForm();
     public static boolean darkMode;
 
     public static void apply(Scene scene) {
