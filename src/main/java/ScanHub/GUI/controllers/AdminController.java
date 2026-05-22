@@ -201,7 +201,7 @@ public class AdminController implements IViewController, Initializable {
         ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());
     }
 
-    public void onClickOpenScanView(MouseEvent mouseEvent) {
+    public void onClickOpenScanView() {
         try {
             ViewHandler handler = ViewHandler.SCAN_VIEW;
             handler.reset();

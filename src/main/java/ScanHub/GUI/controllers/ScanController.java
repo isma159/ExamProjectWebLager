@@ -703,6 +703,8 @@ public class ScanController implements Initializable, IViewController {
         try {
             scanModel.save(); // persist staged data first
             scanModel.export(exportDirectory, mode);
+            User currentUser = modelFacade.getSessionModel().getCurrentUser();
+            modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
             rebuild();
             AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
         } catch (Exception ex) {
