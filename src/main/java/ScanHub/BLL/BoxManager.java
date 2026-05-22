@@ -7,40 +7,37 @@ import ScanHub.BE.Profile;
 import ScanHub.DAL.DAO.BoxDAO;
 import ScanHub.DAL.DAO.DocumentDAO;
 import ScanHub.DAL.interfaces.IDataAccess;
+import ScanHub.GUI.facade.DAOFacade;
 
 import java.util.List;
 
 public class BoxManager {
-    private final IDataAccess<Box> dataAccess;
-    private final BoxDAO boxDAO;
+    private final DAOFacade daoFacade = DAOFacade.getInstance();
 
-    public BoxManager() throws Exception {
-        boxDAO = new BoxDAO();
-        dataAccess = boxDAO;
-    }
+    public BoxManager() {}
 
     public Box createBox(Box box) throws Exception {
-        return dataAccess.createData(box);
+        return daoFacade.getBoxDAO().createData(box);
     }
 
     public List<Box> getBoxes() throws Exception {
-        return dataAccess.getData();
+        return daoFacade.getBoxDAO().getData();
     }
 
     public Box getBoxFromName(String name) throws Exception {
-        return dataAccess.getDataFromName(name);
+        return daoFacade.getBoxDAO().getDataFromName(name);
     }
 
     public Box getBoxFromId(int boxId) throws Exception {
-        return boxDAO.getDataFromId(boxId);
+        return daoFacade.getBoxDAO().getDataFromId(boxId);
     }
 
     public void updateBox(Box box) throws Exception {
-        dataAccess.updateData(box);
+        daoFacade.getBoxDAO().updateData(box);
     }
 
     public void deleteBox(Box box) throws Exception {
-        dataAccess.deleteData(box);
+        daoFacade.getBoxDAO().deleteData(box);
     }
 
     /**
@@ -96,7 +93,9 @@ public class BoxManager {
         box.setBoxName(boxInput);
         box.setProfileId(profile.getProfileId());
         box.setProfile(profile);
-        return createBox(box);
+        box.setStaged(true);
+
+        return box;
     }
 
     private void applyProfileDefaults(Box box) {

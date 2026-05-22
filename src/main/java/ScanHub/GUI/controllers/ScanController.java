@@ -1,7 +1,9 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.*;
+import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.ExportMode;
+import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.interfaces.TreeNode;
 import ScanHub.BLL.ScanManager;
 import ScanHub.GUI.util.ThemeManager;
@@ -42,6 +44,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -213,6 +216,7 @@ public class ScanController implements Initializable, IViewController {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
                     setText(comboBoxProfiles.getValue().getExportLabel() + box.getBoxName());
+                    setStyle(box.isStaged() ? "-fx-font-weight: bold;" : "");
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
                     icon.getStyleClass().add("tree-cell-doc");
@@ -360,6 +364,8 @@ public class ScanController implements Initializable, IViewController {
             Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
             root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
+            User currentUser = modelFacade.getSessionModel().getCurrentUser();
+            modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
             syncDocumentsFromModel();
             initializeTreeView(boxTreeView, activeBox);
 
@@ -509,10 +515,8 @@ public class ScanController implements Initializable, IViewController {
                 selectedDocument = null;
                 selectedFile = null;
             } else if (selectedBox != null) {
-                scanModel.deleteBox(selectedBox);
-                selectedBox = null;
-                selectedDocument = null;
-                selectedFile = null;
+                System.out.println("DELETING BOX");
+                onDeleteBox();
             }else return;
 
             rebuild();
@@ -561,6 +565,40 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("Settings Failed", "Could not apply file settings. Please try again.");
         }
+    }
+
+    private void onDeleteBox() {
+
+        AlertHelper.showConfirmation("Delete Box", "Are you sure you want to delete this box?\n"
+        + "This action is permanent and cannot be undone.", () -> {
+            try {
+                scanModel.deleteBox();
+                modelFacade.getBoxModel().deleteBox(scanModel.getTargetBox());
+                User currentUser = modelFacade.getSessionModel().getCurrentUser();
+                modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.DELETE, LocalDateTime.now()));
+                boxTreeView.setShowRoot(false);
+
+                sessionActive = false;
+                scanModel = null;
+                documents.clear();
+                selectedBox = null;
+                selectedDocument = null;
+                selectedFile = null;
+
+                setSessionControlsDisabled(true);
+                sessionPopupOverlay.setVisible(true);
+                sessionPopupOverlay.setDisable(false);
+                workspaceView.setDisable(true);
+                lblSessionStatus.setText("");
+
+                rebuild();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+
     }
 
     private int parseRotationField(TextField field) {
@@ -701,14 +739,17 @@ public class ScanController implements Initializable, IViewController {
 
     private void onTreeSelectionChanged(TreeItem<TreeNode> item) {
         if (navigating) return;
-        if (item == null || item.getParent() == null || item.getValue() == null) return;
+        if (item == null || item.getValue() == null) return;
 
         TreeNode value = item.getValue();
+        System.out.println(value.getClass());
         if (value instanceof Document document) {
+            System.out.println("SELECTED DOCUMENT");
             selectedDocument = document;
             selectedFile = null;
             selectedBox = null;
         } else if (value instanceof File file) {
+            System.out.println("SELECTED FILE");
             for (Document document : documents) {
                 if (document.getFiles().contains(file)) {
                     selectPage(document, file);
@@ -716,11 +757,14 @@ public class ScanController implements Initializable, IViewController {
                 }
             }
         } else if (value instanceof Box box) {
-
+            System.out.println("SELECTED BOX");
             selectedBox = box;
             selectedDocument = null;
             selectedFile = null;
 
+        }
+        else {
+            System.out.println(value.getClass());
         }
 
         rebuildPreviewCard();

@@ -14,9 +14,7 @@ import java.util.List;
 
 public class LogDAO implements IDataAccess<Log> {
 
-    DBConnector dbConnector = new DBConnector();
-
-    public LogDAO() throws IOException {}
+    public LogDAO() {}
 
     @Override
     public List<Log> getData() throws Exception {
@@ -29,7 +27,7 @@ public class LogDAO implements IDataAccess<Log> {
             ORDER BY l.log_timestamp ASC
         """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -45,6 +43,11 @@ public class LogDAO implements IDataAccess<Log> {
 
     @Override
     public Log getDataFromName(String name) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Log getDataFromId(int id) throws Exception {
         return null;
     }
 
@@ -66,7 +69,7 @@ public class LogDAO implements IDataAccess<Log> {
                 VALUES (?, ?, ?, ?, SYSUTCDATETIME())
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, log.getUser().getUserId());

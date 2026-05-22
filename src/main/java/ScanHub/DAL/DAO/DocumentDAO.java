@@ -15,11 +15,7 @@ import java.util.List;
 
 public class DocumentDAO {
 
-    private final DBConnector dbConnector;
-
-    public DocumentDAO() throws IOException {
-        this.dbConnector = new DBConnector();
-    }
+    public DocumentDAO() {}
 
     public Document createDocument(int boxId) throws SQLException {
         String sql = """
@@ -28,7 +24,7 @@ public class DocumentDAO {
                 VALUES (?)
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, boxId);
@@ -52,7 +48,7 @@ public class DocumentDAO {
                 ORDER BY documentId
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, boxId);
@@ -79,7 +75,7 @@ public class DocumentDAO {
     public void deleteDocument(int documentId) throws SQLException {
         String sql = "UPDATE Documents SET deleted_at = SYSUTCDATETIME() WHERE documentId = ?";
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, documentId);
@@ -90,7 +86,7 @@ public class DocumentDAO {
     public int countDocumentsForBox(int boxId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Documents WHERE boxId = ? AND deleted_at IS NULL";
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, boxId);
