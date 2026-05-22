@@ -53,12 +53,12 @@ public class ScanController implements Initializable, IViewController {
     @FXML private TreeView<TreeNode> boxTreeView;
     @FXML private Spinner<Integer> spinnerRotation;
 
-    // Session startup popup
+    // Session Startup Popup
     @FXML private StackPane sessionPopupOverlay;
     @FXML private SearchableComboBox<Profile> comboBoxProfiles;
     @FXML private TextField txtFldBoxId, txtFldGlobalRotation, txtFldGlobalHue, txtFldGlobalBrightness, txtFldGlobalContrast, txtFldGlobalSaturation;
 
-    // File adjustment menu
+    // File Adjustment Menu
     @FXML private StackPane fileAdjustmentSideMenu;
     @FXML private Spinner<Integer> spinnerIndividualFileRotation;
     @FXML private Spinner<Double> spinnerIndividualFileHue, spinnerIndividualFileBrightness, spinnerIndividualFileContrast, spinnerIndividualFileSaturation;
@@ -76,7 +76,7 @@ public class ScanController implements Initializable, IViewController {
             (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
 
-    private final Deque<Runnable> undoStack = new ArrayDeque<>(); //
+    private final Deque<Runnable> undoStack = new ArrayDeque<>();
     private static final int maxUndos = 25;
 
     private Thread scanThread; // scan loop is controlled by the volatile boolean 'scanning', not thread interruption
@@ -133,8 +133,6 @@ public class ScanController implements Initializable, IViewController {
     /**
      * Initializes the left-panel tree view with icons for Box, Documents, and Files,
      * drag-and-drop functions, reordering, and auto-expand on structural changes.
-     *
-     * todo explain with inline comments
      */
     private void initializeTreeView(TreeView<TreeNode> treeView, Box rootBox) {
         TreeItem<TreeNode> root = new TreeItem<>(rootBox);
@@ -303,7 +301,6 @@ public class ScanController implements Initializable, IViewController {
         GlobalKeyHandler.getInstance().setLayer(shortcuts);
     }
 
-    // Session Startup popup
     @FXML
     private void onSessionStartup(ActionEvent e) {
         initializeProfileComboBox();
@@ -312,7 +309,8 @@ public class ScanController implements Initializable, IViewController {
         workspaceView.setDisable(true);
     }
 
-    @FXML private void onSessionPopupClose(ActionEvent e) {
+    @FXML
+    private void onSessionPopupClose(ActionEvent e) {
         sessionPopupOverlay.setVisible(false);
         sessionPopupOverlay.setDisable(true);
         workspaceView.setDisable(false);
@@ -347,7 +345,7 @@ public class ScanController implements Initializable, IViewController {
             selectedBox = null;
 
             setSessionControlsDisabled(false);
-            lblSessionStatus.setText("Profile: " + profile.getProfileName() + "   Box: " + activeBox.getBoxName());
+            lblSessionStatus.setText(""); // TODO display something or nah?
             sessionPopupOverlay.setVisible(false);
             sessionPopupOverlay.setDisable(true);
             workspaceView.setDisable(false);
@@ -364,6 +362,9 @@ public class ScanController implements Initializable, IViewController {
      * A {@value scanDelay} ms delay is inserted after each successful scan
      * so the scanner hardware has time to advance the next page.
      * The first scan of an empty box always fetches a barcode page (enforced by ScanManager).
+     * <p>
+     * Each scan result pushes one undo entry. The undo removes the scanned file.
+     * If a new document was created by a barcode split undo removes that document too.
      */
     @FXML
     private void onScan(ActionEvent e) {
@@ -381,9 +382,42 @@ public class ScanController implements Initializable, IViewController {
                     if (!scanning) break; // stop was pressed during fetch (leave loop)
 
                     Platform.runLater(() -> {
+                        // snapshot document list before sync to detect newly created documents
+                        Set<Document> documentsBefore = new HashSet<>(documents);
+
                         syncDocumentsFromModel();
                         selectPage(result.document(), result.file());
                         rebuild();
+
+                        // determine whether fetchScan created a brand-new document
+                        Document scannedDocument = result.document();
+                        File scannedFile = result.file();
+                        boolean newDocumentCreated = !documentsBefore.contains(scannedDocument);
+
+                        pushUndo(() -> {
+                            scannedDocument.getFiles().remove(scannedFile);
+
+                            // if a new document was created by a barcode split, remove it too
+                            if (newDocumentCreated) {
+                                try {
+                                    scanModel.deleteDocument(scannedDocument);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+
+                            syncDocumentsFromModel();
+
+                            // move selection to the last remaining page or clear it
+                            List<File> remaining = allPages();
+                            if (remaining.isEmpty()) {
+                                selectedDocument = null;
+                                selectedFile = null;
+                            } else {
+                                selectedFile = remaining.getLast();
+                                selectedDocument = findOwnerDocument(selectedFile);
+                            }
+                        });
                     });
 
                     Thread.sleep(scanDelay);
@@ -426,17 +460,29 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
+    /** Creates a new empty document and selects it. */
     @FXML
     private void onNewDocument(ActionEvent e) {
         if (!sessionActive || scanModel == null) return;
 
         try {
-            Document newDoc = scanModel.manualSplit();
+            Document newDocument = scanModel.manualSplit();
             syncDocumentsFromModel();
 
-            // select the new document so the tree highlights it;
-            selectedDocument = newDoc;
+            // select the new document so the tree highlights it
+            selectedDocument = newDocument;
             selectedFile = null;
+
+            pushUndo(() -> {
+                try {
+                    scanModel.deleteDocument(newDocument);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                syncDocumentsFromModel();
+                selectedDocument = null;
+                selectedFile = null;
+            });
 
             rebuild();
         } catch (Exception ex) {
@@ -445,16 +491,15 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
-    /**
-     * TODO: prompt a before or after split while selecting a file
-     */
     @FXML
     private void onSplitDocument(ActionEvent actionEvent) {
         if (selectedFile == null || selectedDocument == null || scanModel == null || !sessionActive) return;
 
         List<File> files = selectedDocument.getFiles();
         int splitIndex = files.indexOf(selectedFile);
+
         if (splitIndex <= 0) return; // nothing to split if it's the first page
+
         final int[] choice = {0}; // 0=cancel, 1=before, 2=after
         AlertHelper.showSplitDialog(
                 "Split at page " + (splitIndex + 1),
@@ -465,20 +510,36 @@ public class ScanController implements Initializable, IViewController {
         int actualSplitIndex = choice[0] == 1 ? splitIndex : splitIndex + 1;
 
         try {
-            // collect all files from the split point onwards
-            List<File> toMove = new ArrayList<>(files.subList(splitIndex, files.size()));
+            List<File> toMove = new ArrayList<>(files.subList(actualSplitIndex, files.size()));
+            Document originalDocument = selectedDocument;
 
-            Document newDoc = scanModel.manualSplit();
+            Document newDocument = scanModel.manualSplit();
             syncDocumentsFromModel();
 
             // move files into the new document
             for (File file : toMove) {
-                selectedDocument.getFiles().remove(file);
-                newDoc.getFiles().add(file);
+                originalDocument.getFiles().remove(file);
+                newDocument.getFiles().add(file);
             }
 
-            selectedDocument = newDoc;
+            selectedDocument = newDocument;
             selectedFile = toMove.getFirst();
+
+            pushUndo(() -> {
+                // return every moved file to the original document in order
+                for (File file : toMove) {
+                    newDocument.getFiles().remove(file);
+                    originalDocument.getFiles().add(file);
+                }
+                try {
+                    scanModel.deleteDocument(newDocument);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                syncDocumentsFromModel();
+                selectedDocument = originalDocument;
+                selectedFile = toMove.getFirst();
+            });
 
             rebuild();
         } catch (Exception ex) {
@@ -487,55 +548,125 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
+    /**
+     * Deletes the currently selected file, document, or box.
+     * <p>
+     * File deletion also deletes any documents that are left empty afterward.
+     * <p>
+     * Undo for a file re-inserts it at its original index in its owner document,
+     * and re-inserts any documents that were auto-removed because they became empty.
+     * Undo for a document re-inserts the entire document (with its files) at its
+     * original position in the list.
+     */
     @FXML
     private void onDeleteFileOrDocument(ActionEvent e) {
         if (scanModel == null || !sessionActive) return;
 
         try {
             if (selectedFile != null) {
-                int deletedIndex = currentPageIndex();
-                scanModel.deleteFile(selectedFile);
+                Document ownerDoc = findOwnerDocument(selectedFile);
+                if (ownerDoc == null) return;
 
-                List<Document> emptyDocuments = new ArrayList<>(documents);
-                emptyDocuments.removeIf(document -> !document.getFiles().isEmpty());
-                for (Document emptyDocument : emptyDocuments) {
-                    scanModel.deleteDocument(emptyDocument);
+                // capture position before any changes
+                final int fileIndex  = ownerDoc.getFiles().indexOf(selectedFile);
+                final File capturedFile = selectedFile;
+                final Document capturedOwnerDoc = ownerDoc;
+
+                // snapshot every document that will be auto-removed after the file deletion
+                final List<AbstractMap.SimpleEntry<Integer, Document>> docsToRestore = new ArrayList<>();
+                for (int i = 0; i < documents.size(); i++) {
+                    Document doc = documents.get(i);
+                    if (doc.getFiles().isEmpty() || (doc == ownerDoc && doc.getFiles().size() == 1)) {
+                        docsToRestore.add(new AbstractMap.SimpleEntry<>(i, doc));
+                    }
                 }
 
-                syncDocumentsFromModel(); // resync the observable list so that it matches the models
+                int deletedPageIndex = currentPageIndex();
+                scanModel.deleteFile(capturedFile);
 
-                // clear selection if nothing left, else select nearest file
+                List<Document> emptyDocuments = new ArrayList<>(documents);
+                emptyDocuments.removeIf(doc -> !doc.getFiles().isEmpty());
+                for (Document emptyDoc : emptyDocuments) {
+                    scanModel.deleteDocument(emptyDoc);
+                }
+
+                syncDocumentsFromModel();
+
                 List<File> remaining = allPages();
                 if (remaining.isEmpty()) {
                     selectedDocument = null;
                     selectedFile = null;
                 } else {
-                    int next = Math.min(deletedIndex, remaining.size() - 1);
+                    int next = Math.min(deletedPageIndex, remaining.size() - 1);
                     selectedFile = remaining.get(Math.max(next, 0));
                     selectedDocument = findOwnerDocument(selectedFile);
                 }
 
+                pushUndo(() -> {
+                    List<Document> modelDocs = scanModel.getTargetBox().getDocuments();
+
+                    // re-insert auto-removed documents at their original positions
+                    docsToRestore.sort(Comparator.comparingInt(AbstractMap.SimpleEntry::getKey));
+                    for (AbstractMap.SimpleEntry<Integer, Document> entry : docsToRestore) {
+                        if (!modelDocs.contains(entry.getValue())) {
+                            int idx = Math.min(entry.getKey(), modelDocs.size());
+                            modelDocs.add(idx, entry.getValue());
+                        }
+                    }
+
+                    // re-insert the deleted file into its owner document
+                    if (!capturedOwnerDoc.getFiles().contains(capturedFile)) {
+                        int insertIdx = Math.min(fileIndex, capturedOwnerDoc.getFiles().size());
+                        capturedOwnerDoc.getFiles().add(insertIdx, capturedFile);
+                    }
+
+                    syncDocumentsFromModel();
+                    selectPage(capturedOwnerDoc, capturedFile);
+                });
+
             } else if (selectedDocument != null) {
-                scanModel.deleteDocument(selectedDocument);
+                final int docIndex = documents.indexOf(selectedDocument);
+                final Document capturedDoc = selectedDocument;
+                // snapshot the file list so undo can restore the full document contents
+                final List<File> capturedFiles = new ArrayList<>(selectedDocument.getFiles());
+
+                scanModel.deleteDocument(capturedDoc);
                 syncDocumentsFromModel();
                 selectedDocument = null;
                 selectedFile = null;
+
+                pushUndo(() -> {
+                    List<Document> modelDocs = scanModel.getTargetBox().getDocuments();
+                    if (!modelDocs.contains(capturedDoc)) {
+                        // restore files onto the document object before re-inserting
+                        capturedDoc.getFiles().clear();
+                        capturedDoc.getFiles().addAll(capturedFiles);
+                        int idx = Math.min(docIndex, modelDocs.size());
+                        modelDocs.add(idx, capturedDoc);
+                    }
+                    syncDocumentsFromModel();
+                    selectedDocument = capturedDoc;
+                    selectedFile = capturedFiles.isEmpty() ? null : capturedFiles.getFirst();
+                });
+
             } else if (selectedBox != null) {
                 scanModel.deleteBox(selectedBox);
                 selectedBox = null;
                 selectedDocument = null;
                 selectedFile = null;
+
             } else return;
 
             rebuild();
         } catch (Exception ex) {
             ex.printStackTrace();
-            AlertHelper.showError("Delete Failed", "Could not delete the selected "
-                    + (selectedFile != null ? "file." : "document. ") + "Please try again.");
+            String itemType = selectedFile != null ? "selected file" : selectedDocument != null ? "selected document" : "box";
+            AlertHelper.showError("Delete Failed", "Could not delete the "
+                    + itemType + ". Please try again.");
         }
     }
 
-    @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-1); }
+    @FXML private void onRotateLeft(ActionEvent e) { rotatePage(-1); }
     @FXML private void onRotateRight(ActionEvent e) { rotatePage(1); }
 
     @FXML
@@ -554,6 +685,7 @@ public class ScanController implements Initializable, IViewController {
         workspaceView.setDisable(false);
     }
 
+    /** Applies spinner values as a new {@link FileAdjustmentSettings} to the selected file. */
     @FXML
     private void onApplyFileAdjustments(ActionEvent e) {
         if (selectedFile == null || scanModel == null) return;
@@ -564,8 +696,21 @@ public class ScanController implements Initializable, IViewController {
             double contrast = Double.parseDouble(String.valueOf(spinnerIndividualFileContrast.getValue()));
             double saturation = Double.parseDouble(String.valueOf(spinnerIndividualFileSaturation.getValue()));
 
-            FileAdjustmentSettings settings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation);
-            scanModel.updateFileSettings(selectedFile, settings);
+            // snapshot old settings into a copy before any mutation
+            FileAdjustmentSettings oldSettings = new FileAdjustmentSettings(selectedFile.getRotation(), selectedFile.getHue(), selectedFile.getBrightness(), selectedFile.getContrast(), selectedFile.getSaturation());
+            FileAdjustmentSettings newSettings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation);
+
+            final File capturedFile = selectedFile;
+            scanModel.updateFileSettings(capturedFile, newSettings);
+
+            pushUndo(() -> {
+                try {
+                    scanModel.updateFileSettings(capturedFile, oldSettings);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+
             rebuildPreviewCard();
             onFileAdjustmentsClose(null);
         } catch (IllegalArgumentException ex) {
@@ -577,13 +722,26 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
+    /** Rotates the selected file by {@code spinnerRotation} degrees in the given direction. */
     private void rotatePage(int direction) {
         if (selectedFile == null || scanModel == null) return;
 
         int degrees = spinnerRotation.getValue() * direction;
-        int rotation = normaliseRotation(selectedFile.getRotation() + degrees);
+        int oldRotation = selectedFile.getRotation();
+        int newRotation = normaliseRotation(oldRotation + degrees);
+
         try {
-            scanModel.updateFileRotation(selectedFile, rotation);
+            final File capturedFile = selectedFile;
+            scanModel.updateFileRotation(capturedFile, newRotation);
+
+            pushUndo(() -> {
+                try {
+                    scanModel.updateFileRotation(capturedFile, oldRotation);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+
             rebuildPreviewCard();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -593,11 +751,9 @@ public class ScanController implements Initializable, IViewController {
 
     // TreeView navigation
     @FXML private void onNavFirst(ActionEvent e) { navigateTo(0); }
-    @FXML private void onNavPrev(ActionEvent e)  { navigateTo(currentPageIndex() - 1); }
-    @FXML private void onNavNext(ActionEvent e)  { navigateTo(currentPageIndex() + 1); }
-    @FXML private void onNavLast(ActionEvent e)  { navigateTo(allPages().size() - 1); }
-
-    private boolean navigating = false;
+    @FXML private void onNavPrev(ActionEvent e) { navigateTo(currentPageIndex() - 1); }
+    @FXML private void onNavNext(ActionEvent e) { navigateTo(currentPageIndex() + 1); }
+    @FXML private void onNavLast(ActionEvent e) { navigateTo(allPages().size() - 1); }
 
     private void navigateTo(int index) {
         List<File> all = allPages();
@@ -611,7 +767,7 @@ public class ScanController implements Initializable, IViewController {
             }
         }
 
-        // Detach listener, sync tree, then reattach — prevents selection event snapping back
+        // detach listener, sync tree, then reattach - prevents selection event snapping back
         boxTreeView.getSelectionModel().selectedItemProperty().removeListener(treeSelectionListener);
         rebuildPreviewCard();
         syncTreeSelection();
@@ -650,14 +806,13 @@ public class ScanController implements Initializable, IViewController {
             return;
         }
 
-        // ask user where to save the export
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Choose Export Destination");
         java.io.File exportDirectory = chooser.showDialog(currentStage);
         if (exportDirectory == null) return; // user canceled
 
         try {
-            scanModel.save(); // persist staged data first
+            scanModel.save();
             scanModel.export(exportDirectory, mode);
             rebuild();
             AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
@@ -703,7 +858,6 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void onTreeSelectionChanged(TreeItem<TreeNode> item) {
-        if (navigating) return;
         if (item == null || item.getParent() == null || item.getValue() == null) return;
 
         TreeNode value = item.getValue();
@@ -727,16 +881,27 @@ public class ScanController implements Initializable, IViewController {
         rebuildPreviewCard();
     }
 
+    /** Moves {@code file} to the end of {@code target}'s file list. */
     private boolean moveFileToDocument(File file, Document target) {
         Document source = findOwnerDocument(file);
         if (source == null || source == target) return false;
 
+        final int originalIndex = source.getFiles().indexOf(file);
         source.getFiles().remove(file);
         target.getFiles().add(file);
         persistFileMoved(file, target);
+
+        pushUndo(() -> {
+            target.getFiles().remove(file);
+            int restoreIdx = Math.min(originalIndex, source.getFiles().size());
+            source.getFiles().add(restoreIdx, file);
+            persistFileMoved(file, source);
+        });
+
         return true;
     }
 
+    /** Inserts {@code dragged} immediately before {@code targetFile}, possibly moving it to a different document. */
     private boolean moveFileBefore(File dragged, File targetFile) {
         if (dragged == targetFile) return false;
 
@@ -744,19 +909,40 @@ public class ScanController implements Initializable, IViewController {
         Document targetOwner  = findOwnerDocument(targetFile);
         if (draggedOwner == null || targetOwner == null) return false;
 
+        final int originalIndex = draggedOwner.getFiles().indexOf(dragged);
+        final Document originalOwner = draggedOwner;
+
         draggedOwner.getFiles().remove(dragged);
         int insertIndex = targetOwner.getFiles().indexOf(targetFile);
         targetOwner.getFiles().add(insertIndex, dragged);
         persistFileMoved(dragged, targetOwner);
+
+        pushUndo(() -> {
+            targetOwner.getFiles().remove(dragged);
+            int restoreIdx = Math.min(originalIndex, originalOwner.getFiles().size());
+            originalOwner.getFiles().add(restoreIdx, dragged);
+            persistFileMoved(dragged, originalOwner);
+        });
+
         return true;
     }
 
+    /** Moves {@code dragged} immediately before {@code target} in the document list. */
     private boolean reorderDocument(Document dragged, Document target) {
         if (dragged == target) return false;
+
+        final int originalIndex = documents.indexOf(dragged);
 
         documents.remove(dragged);
         int insertIndex = documents.indexOf(target);
         documents.add(insertIndex, dragged);
+
+        pushUndo(() -> {
+            documents.remove(dragged);
+            int restoreIdx = Math.min(originalIndex, documents.size());
+            documents.add(restoreIdx, dragged);
+        });
+
         return true;
     }
 
@@ -807,7 +993,6 @@ public class ScanController implements Initializable, IViewController {
             root.getChildren().add(docItem);
         }
 
-        // Sync tree selection with selectedFile / selectedDocument
         syncTreeSelection();
     }
 
@@ -935,7 +1120,7 @@ public class ScanController implements Initializable, IViewController {
         spinnerIndividualFileHue.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getHue(), 1));
         spinnerIndividualFileBrightness.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getBrightness(), 1));
         spinnerIndividualFileContrast.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getContrast(), 1));
-        spinnerIndividualFileSaturation.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getContrast(), 1));
+        spinnerIndividualFileSaturation.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getSaturation(), 1));
     }
 
     private void selectPage(Document document, File file) {
