@@ -13,11 +13,7 @@ import java.util.List;
 
 public class FileDAO {
 
-    private final DBConnector dbConnector;
-
-    public FileDAO() throws IOException {
-        this.dbConnector = new DBConnector();
-    }
+    public FileDAO() {}
 
     /**
      * Inserts a new scanned TIFF file into the Files table.
@@ -30,7 +26,7 @@ public class FileDAO {
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, documentId);
@@ -61,7 +57,7 @@ public class FileDAO {
      */
     public byte[] loadImageData(int fileId) throws SQLException {
         String sql = "SELECT imageData FROM Files WHERE fileId = ? AND deleted_at IS NULL";
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, fileId);
             ResultSet rs = ps.executeQuery();
@@ -89,7 +85,7 @@ public class FileDAO {
                 VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
-        try (Connection conn = dbConnector.getConnection()) {
+        try (Connection conn = DBConnector.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
                 updatePs.setInt(1, normalizeRotation(settings.getRotation()));
@@ -133,7 +129,7 @@ public class FileDAO {
             ORDER BY f.sortId
             """;
 
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, documentId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -166,7 +162,7 @@ public class FileDAO {
     public void deleteFile(int fileId) throws SQLException {
         String sql = "UPDATE Files SET deleted_at = SYSUTCDATETIME() WHERE fileId = ?";
 
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, fileId);
@@ -176,7 +172,7 @@ public class FileDAO {
 
     public void moveFile(int fileId, int newDocumentId) throws SQLException {
         String sql = "UPDATE Files SET documentId = ? WHERE fileId = ?";
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, newDocumentId);
             ps.setInt(2, fileId);

@@ -4,31 +4,30 @@ package ScanHub.BLL;
 import ScanHub.BE.Profile;
 import ScanHub.DAL.DAO.ProfileDAO;
 import ScanHub.DAL.interfaces.IDataAccess;
+import ScanHub.GUI.facade.DAOFacade;
 
 // java imports
 import java.util.Collections;
 import java.util.List;
 
 public class ProfileManager {
-    private IDataAccess<Profile> dataAccess;
+    private final DAOFacade daoFacade = DAOFacade.getInstance();
 
-    public ProfileManager() throws Exception {
-        dataAccess = new ProfileDAO();
-    }
+    public ProfileManager() {}
 
     public Profile createProfile(Profile newProfile) throws Exception {
-        return dataAccess.createData(newProfile);
+        return daoFacade.getProfileDAO().createData(newProfile);
     }
 
     public List<Profile> getProfiles() throws Exception {
-        return dataAccess.getData();
+        return daoFacade.getProfileDAO().getData();
     }
 
     public void updateProfile(Profile updatedProfile) throws Exception {
-        dataAccess.updateData(updatedProfile);
+        daoFacade.getProfileDAO().updateData(updatedProfile);
     }
 
     public void deleteProfile(Profile selectedProfile) throws Exception {
-        dataAccess.deleteData(selectedProfile);
+        daoFacade.getProfileDAO().deleteData(selectedProfile);
     }
 }

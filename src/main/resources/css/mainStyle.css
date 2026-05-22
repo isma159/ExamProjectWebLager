@@ -29,6 +29,45 @@
 
 }
 
+.context-menu {
+
+    -fx-background-color: WHITE;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 1;
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2;
+
+}
+
+.menu-item {
+
+    -fx-background-color: TRANSPARENT;
+    -fx-text-fill: #2D3D4F;
+
+}
+
+.menu-item:focused {
+    -fx-background-color: TRANSPARENT;
+}
+.menu-item:focused .label {
+    -fx-text-fill: #2D3D4F;
+}
+
+.menu-item:hover {
+
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #2D3D4F;
+
+}
+
+.menu-item:hover .label {
+
+    -fx-text-fill: #2D3D4F;
+
+}
+
 .chip {
 
     -fx-background-radius: 3px;

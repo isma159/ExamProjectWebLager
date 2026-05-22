@@ -4,13 +4,11 @@ package ScanHub.GUI.controllers;
 
 import ScanHub.BE.Client;
 import ScanHub.BE.Log;
-import ScanHub.BE.User;
 import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.LogAction;
-import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
-import ScanHub.GUI.util.ThemeManager;
+import ScanHub.GUI.util.ThemeHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -48,7 +46,7 @@ public class ClientFormController implements Initializable {
             populateFields(editingClient);
         }
 
-        ThemeManager.apply(currentStage.getScene());
+        ThemeHandler.apply(currentStage.getScene());
     }
 
     /**
