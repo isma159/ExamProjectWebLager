@@ -10,7 +10,6 @@ import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
-import com.sun.source.tree.Tree;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -26,7 +25,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -54,6 +52,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private FlowPane pageGrid;
     @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel;
     @FXML private TreeView<TreeNode> boxTreeView;
+    @FXML private Spinner<Integer> spinnerRotation;
 
     // Session startup popup
     @FXML private StackPane sessionPopupOverlay;
@@ -62,22 +61,25 @@ public class ScanController implements Initializable, IViewController {
 
     // File adjustment menu
     @FXML private StackPane sessionPopupOverlay1;
-    @FXML private TextField txtFldIndividualFileRotation, txtFldIndividualFileHue, txtFldIndividualFileBrightness, txtFldIndividualFileContrast, txtFldIndividualFileSaturation;
+    @FXML private Spinner<Integer> spinnerIndividualFileRotation;
+    @FXML private Spinner<Double> spinnerIndividualFileHue, spinnerIndividualFileBrightness, spinnerIndividualFileContrast, spinnerIndividualFileSaturation;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
     private ScanModel scanModel;
-    private TreeItem<TreeNode> root = new TreeItem<>();
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
     private Document selectedDocument;
     private File selectedFile;
     private Box selectedBox;
     private boolean sessionActive;
+    private final TreeItem<TreeNode> root = new TreeItem<>();
+    private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
+            (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
+    private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
 
     private final Deque<Runnable> undoStack = new ArrayDeque<>(); //
     private static final int maxUndos = 30;
 
-    private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
     private Thread scanThread; // scan loop is controlled by the volatile boolean 'scanning', not thread interruption
     private volatile boolean scanning = false; // volatile: FX-thread writes are immediately visible to the scan thread
     private static final long scanDelay = 1000; // milliseconds to wait between successive scans in the scan loop
@@ -87,11 +89,6 @@ public class ScanController implements Initializable, IViewController {
     private static final double ZOOM_STEP = 0.15;
     private static final double ZOOM_MIN  = 0.40;
     private static final double ZOOM_MAX  = 3.00;
-
-    private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
-            (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
-    @FXML
-    private Spinner<Integer> spinnerRotation;
 
     @Override
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
@@ -217,16 +214,17 @@ public class ScanController implements Initializable, IViewController {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
                     setText(comboBoxProfiles.getValue().getExportLabel() + box.getBoxName());
+                    setStyle(box.isStaged() || box.isModified() ? "-fx-font-weight: bold;" : "");
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
                     icon.getStyleClass().add("tree-cell-doc");
                     setText(documentLabel(document));
-                    setStyle(document.isStaged() || document.isModified() ? "-fx-font-weight: bold;" : ""); // styling of text for whether they are staged, modified or persisted
+                    setStyle(document.isStaged() || document.isModified() ? "-fx-font-weight: bold;" : "");
                 } else if (object instanceof File file) {
                     icon.setText("\ue958");
                     icon.getStyleClass().add("tree-cell-file");
                     setText(fileLabel(file));
-                    setStyle(file.isStaged() ? "-fx-font-weight: bold;" : ""); // styling of text for whether they are staged or persisted
+                    setStyle(file.isStaged() ? "-fx-font-weight: bold;" : "");
                 }
 
                 setGraphic(icon);
@@ -550,11 +548,11 @@ public class ScanController implements Initializable, IViewController {
     private void onApplyFileAdjustments(ActionEvent e) {
         if (selectedFile == null || scanModel == null) return;
         try {
-            int rotation = Integer.parseInt(txtFldIndividualFileRotation.getText().trim());
-            double hue = parseDoubleField(txtFldIndividualFileHue,"Hue",-1.0, 1.0);
-            double brightness = parseDoubleField(txtFldIndividualFileBrightness,"Brightness",-1.0,1.0);
-            double contrast = parseDoubleField(txtFldIndividualFileContrast,"Contrast",-1.0,1.0);
-            double saturation = parseDoubleField(txtFldIndividualFileSaturation,"Saturation",-1.0,1.0);
+            int rotation = Integer.parseInt(String.valueOf(spinnerIndividualFileRotation.getValue()));
+            double hue = Double.parseDouble(String.valueOf(spinnerIndividualFileHue.getValue()));
+            double brightness = Double.parseDouble(String.valueOf(spinnerIndividualFileBrightness.getValue()));
+            double contrast = Double.parseDouble(String.valueOf(spinnerIndividualFileContrast.getValue()));
+            double saturation = Double.parseDouble(String.valueOf(spinnerIndividualFileSaturation.getValue()));
 
             FileAdjustmentSettings settings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation);
             scanModel.updateFileSettings(selectedFile, settings);
@@ -566,19 +564,6 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("Settings Failed", "Could not apply file settings. Please try again.");
         }
-    }
-
-    private double parseDoubleField(TextField field, String name, double min, double max) {
-        double value;
-        try {
-            value = Double.parseDouble(field.getText().trim());
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(name + " must be a number between " + min + " and " + max + ".");
-        }
-        if (value < min || value > max) {
-            throw new IllegalArgumentException(name + " must be between " + min + " and " + max + ".");
-        }
-        return value;
     }
 
     private void rotatePage(int direction) {
@@ -934,11 +919,11 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void populateFileAdjustmentsFields(File file) {
-        txtFldIndividualFileRotation.setText(String.valueOf(file.getRotation()));
-        txtFldIndividualFileHue.setText(String.valueOf(file.getHue()));
-        txtFldIndividualFileBrightness.setText(String.valueOf(file.getBrightness()));
-        txtFldIndividualFileContrast.setText(String.valueOf(file.getContrast()));
-        txtFldIndividualFileSaturation.setText(String.valueOf(file.getSaturation()));
+        spinnerIndividualFileRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, file.getRotation(), 1));
+        spinnerIndividualFileHue.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getHue(), 1));
+        spinnerIndividualFileBrightness.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getBrightness(), 1));
+        spinnerIndividualFileContrast.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getContrast(), 1));
+        spinnerIndividualFileSaturation.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getContrast(), 1));
     }
 
     private void selectPage(Document document, File file) {

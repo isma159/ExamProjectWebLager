@@ -1,29 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.Spinner?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.TreeView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import org.controlsfx.control.SearchableComboBox?>
-<?import org.controlsfx.control.ToggleSwitch?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.*?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
    <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
       <top>
          <VBox>
@@ -240,7 +225,7 @@
                               <graphic>
                                  <HBox alignment="CENTER">
                                     <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="↩">
                                           <font><Font size="16.0" /></font>
                                        </Label>
                                        <Region prefWidth="3.0" />
@@ -563,7 +548,7 @@
          </children>
       </VBox>
    </StackPane>
-   <StackPane fx:id="sessionPopupOverlay1" disable="true" layoutX="460.0" layoutY="180.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false">
+   <StackPane fx:id="sessionPopupOverlay1" disable="true" layoutX="460.0" layoutY="180.0" maxHeight="-Infinity" maxWidth="-Infinity" visible="false">
       <children>
          <VBox spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
             <padding>
@@ -572,80 +557,87 @@
             <children>
                <HBox alignment="CENTER_LEFT">
                   <children>
-                     <Label styleClass="h2" text="Current Image Adjustment Settings" />
-                     <Region HBox.hgrow="ALWAYS" />
+                     <Label styleClass="h2" text="Current File Adjustment" />
+                     <Region prefWidth="15.0" HBox.hgrow="ALWAYS" />
                      <Button mnemonicParsing="false" onAction="#onFileAdjustmentsClose" prefHeight="28.0" styleClass="secondary-btn" text="✕" />
                   </children>
                </HBox>
-               <HBox alignment="CENTER" spacing="9.0">
+               <Separator />
+               <VBox spacing="12">
+                  <padding>
+                     <Insets bottom="14" left="14" right="14" top="14" />
+                  </padding>
+                  <styleClass>
+                     <String fx:value="card" />
+                     <String fx:value="second-card-bg" />
+                  </styleClass>
                   <children>
-                     <VBox>
+                     <VBox spacing="4">
                         <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Rotation" />
-                           <TextField fx:id="txtFldIndividualFileRotation" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
+                           <HBox alignment="CENTER_LEFT" spacing="8">
+                              <children>
+                                 <Label prefWidth="120.0" styleClass="lbl" text="Hue" HBox.hgrow="ALWAYS" />
+                                 <Region HBox.hgrow="ALWAYS" />
+                                 <Spinner fx:id="spinnerIndividualFileHue" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                              </children>
+                           </HBox>
+                           <Slider fx:id="sliderHue" blockIncrement="1" max="100" min="-100" minorTickCount="1" prefHeight="30" snapToTicks="true" value="0" />
                         </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
                      </VBox>
-                     <VBox layoutX="10.0" layoutY="10.0">
+                     <Separator />
+                     <VBox spacing="4">
                         <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Hue" />
-                           <TextField fx:id="txtFldIndividualFileHue" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
+                           <HBox alignment="CENTER_LEFT" spacing="8">
+                              <children>
+                                 <Label prefWidth="120.0" styleClass="lbl" text="Brightness" HBox.hgrow="ALWAYS" />
+                                 <Region HBox.hgrow="ALWAYS" />
+                                 <Spinner fx:id="spinnerIndividualFileBrightness" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                              </children>
+                           </HBox>
+                           <Slider fx:id="sliderBrightness" blockIncrement="1" max="100" min="-100" snapToTicks="true" value="0" />
                         </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
                      </VBox>
-                     <VBox layoutX="79.0" layoutY="10.0">
+                     <Separator />
+                     <VBox spacing="4">
                         <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Brightness" />
-                           <TextField fx:id="txtFldIndividualFileBrightness" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
+                           <HBox alignment="CENTER_LEFT" spacing="8">
+                              <children>
+                                 <Label prefWidth="120.0" styleClass="lbl" text="Contrast" HBox.hgrow="ALWAYS" />
+                                 <Region HBox.hgrow="ALWAYS" />
+                                 <Spinner fx:id="spinnerIndividualFileContrast" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                              </children>
+                           </HBox>
+                           <Slider fx:id="sliderContrast" blockIncrement="1" max="100" min="-100" snapToTicks="true" value="0" />
                         </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
                      </VBox>
-                     <VBox layoutX="79.0" layoutY="10.0">
+                     <Separator />
+                     <VBox spacing="4">
                         <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Contrast" />
-                           <TextField fx:id="txtFldIndividualFileContrast" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
+                           <HBox alignment="CENTER_LEFT" spacing="8">
+                              <children>
+                                 <Label prefWidth="120.0" styleClass="lbl" text="Saturation" HBox.hgrow="ALWAYS" />
+                                 <Region HBox.hgrow="ALWAYS" />
+                                 <Spinner fx:id="spinnerIndividualFileSaturation" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                              </children>
+                           </HBox>
+                           <Slider fx:id="sliderSaturation" blockIncrement="1" max="100" min="-100" snapToTicks="true" value="0" />
                         </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
                      </VBox>
-                     <VBox layoutX="79.0" layoutY="10.0">
+                     <Separator layoutX="26.0" layoutY="263.0" />
+                     <VBox spacing="4.0">
                         <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Saturation" />
-                           <TextField fx:id="txtFldIndividualFileSaturation" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
+                           <HBox alignment="CENTER_LEFT" spacing="8">
+                              <children>
+                                 <Label prefWidth="120.0" styleClass="lbl" text="Rotation" HBox.hgrow="ALWAYS" />
+                                 <Region HBox.hgrow="ALWAYS" />
+                                 <Spinner fx:id="spinnerIndividualFileRotation" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                              </children>
+                           </HBox>
+                           <Slider fx:id="sliderRotation" blockIncrement="5.0" majorTickUnit="90.0" max="270.0" min="-270.0" minorTickCount="5" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="0" />
                         </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
                      </VBox>
                   </children>
-               </HBox>
+               </VBox>
                <Separator />
                <Button mnemonicParsing="false" onAction="#onApplyFileAdjustments" styleClass="primary-btn" text="Apply" />
             </children>

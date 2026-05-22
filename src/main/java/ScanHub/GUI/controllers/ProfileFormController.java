@@ -224,13 +224,7 @@ public class ProfileFormController implements Initializable {
     }
 
     private FileAdjustmentSettings buildFileSettings() {
-        return new FileAdjustmentSettings(
-                rotation,
-                hue,
-                brightness,
-                contrast,
-                saturation
-        );
+        return new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation);
     }
 
     private String buildExportLabel(String profileName, String clientName) {
