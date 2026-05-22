@@ -5,6 +5,7 @@ import ScanHub.BE.enums.ExportMode;
 import ScanHub.BE.interfaces.TreeNode;
 import ScanHub.BLL.ScanManager;
 import ScanHub.GUI.util.ThemeManager;
+import ScanHub.GUI.util.GlobalKeyHandler;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
@@ -23,9 +24,7 @@ import javafx.scene.control.*;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
@@ -242,89 +241,66 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void initializeKeyboardShortcuts() {
-        pageGrid.sceneProperty().addListener((obs, oldScene, scene) -> {
-            if (scene == null) return;
+        // Build the shortcut map for the Scan workspace
+        Map<KeyCodeCombination, Runnable> shortcuts = new HashMap<>();
 
-            scene.setOnKeyPressed(e -> {
-                switch (e.getCode()) {
-                    case SPACE -> {
-                        if (!scanning) onScan(null);
-                        else onStop(null);
-                        e.consume();
-                    }
-                    case LEFT -> {
-                        if (e.isControlDown()) {
-                            onRotateLeft(null);
-                        } else {
-                            onNavPrev(null);
-                        }
-                        e.consume();
-                    }
-                    case RIGHT -> {
-                        if (e.isControlDown()) {
-                            onRotateRight(null);
-                        } else {
-                            onNavNext(null);
-                        }
-                        e.consume();
-                    }
-                    case PAGE_UP -> {
-                        onNavFirst(null);
-                        e.consume();
-                    }
-                    case PAGE_DOWN -> {
-                        onNavLast(null);
-                        e.consume();
-                    }
-                    case DELETE -> {
-                        onDeleteFileOrDocument(null);
-                        e.consume();
-                    }
-                    case N -> {
-                        if (e.isControlDown()) {
-                            onNewDocument(null);
-                            e.consume();
-                        }
-                    }
-                    case E -> {
-                        if (e.isControlDown()) {
-                            onExport(null);
-                            e.consume();
-                        }
-                    }
-                    case S -> {
-                        if (e.isControlDown()) {
-                            onSessionStartup(null);
-                            e.consume();
-                        }
-                    }
-                    case UP -> {
-                        onNavPrev(null);
-                        e.consume();
-                    }
-                    case DOWN -> {
-                        onNavNext(null);
-                        e.consume();
-                    }
-                    case F2 -> {
-                        darkMode.setSelected(!darkMode.isSelected());
-                        ThemeManager.toggle(scene, darkMode.isSelected());;
-                    }
-                    case PLUS, ADD -> {
-                        if (e.isControlDown()) {
-                            onZoomIn(null);
-                            e.consume();
-                        }
-                    }
-                    case MINUS, SUBTRACT -> {
-                        if (e.isControlDown()) {
-                            onZoomOut(null);
-                            e.consume();
-                        }
-                    }
-                }
-            });
-        });
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.ENTER),
+                () -> { if (!scanning) onScan(null); else onStop(null); });
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.LEFT),
+                () -> onNavPrev(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.LEFT,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onRotateLeft(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.RIGHT),
+                () -> onNavNext(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.RIGHT,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onRotateRight(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.UP),
+                () -> onNavPrev(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.DOWN),
+                () -> onNavNext(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.PAGE_UP),
+                () -> onNavFirst(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.PAGE_DOWN),
+                () -> onNavLast(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.DELETE),
+                () -> onDeleteFileOrDocument(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.N,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onNewDocument(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.E,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onExport(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.S,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onSessionStartup(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.F2),
+                () -> { darkMode.setSelected(!darkMode.isSelected());
+                    ThemeManager.toggle(pageGrid.getScene(), darkMode.isSelected()); });
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.PLUS,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onZoomIn(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.ADD,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onZoomIn(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.MINUS,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onZoomOut(null));
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.SUBTRACT,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onZoomOut(null));
+        shortcuts.put(new KeyCodeCombination(KeyCode.ESCAPE),
+                () -> { if (scanning) onStop(null); });
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.D,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onSplitDocument(null));
+
+        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.Z,
+                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                () -> onUndo(null));
+
+        GlobalKeyHandler.getInstance().setLayer(shortcuts);
     }
 
     // Session Startup popup
@@ -475,7 +451,41 @@ public class ScanController implements Initializable, IViewController {
      */
     @FXML
     private void onSplitDocument(ActionEvent actionEvent) {
-        // TODO: implement split
+        if (selectedFile == null || selectedDocument == null || scanModel == null || !sessionActive) return;
+
+        List<File> files = selectedDocument.getFiles();
+        int splitIndex = files.indexOf(selectedFile);
+        if (splitIndex <= 0) return; // nothing to split if it's the first page
+        final int[] choice = {0}; // 0=cancel, 1=before, 2=after
+        AlertHelper.showSplitDialog(
+                "Split at page " + (splitIndex + 1),
+                () -> choice[0] = 1,
+                () -> choice[0] = 2
+        );
+        if (choice[0] == 0) return;
+        int actualSplitIndex = choice[0] == 1 ? splitIndex : splitIndex + 1;
+
+        try {
+            // collect all files from the split point onwards
+            List<File> toMove = new ArrayList<>(files.subList(splitIndex, files.size()));
+
+            Document newDoc = scanModel.manualSplit();
+            syncDocumentsFromModel();
+
+            // move files into the new document
+            for (File file : toMove) {
+                selectedDocument.getFiles().remove(file);
+                newDoc.getFiles().add(file);
+            }
+
+            selectedDocument = newDoc;
+            selectedFile = toMove.getFirst();
+
+            rebuild();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertHelper.showError("Split Failed", "Could not split the document. Please try again.");
+        }
     }
 
     @FXML
@@ -648,7 +658,7 @@ public class ScanController implements Initializable, IViewController {
             scanModel.save(); // persist staged data first
             scanModel.export(exportDirectory, mode);
             rebuild();
-            lblSessionStatus.setText("Files saved to: " + exportDirectory.getAbsolutePath()); // TODO show in some other way
+            AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Export Failed", "Could not export documents. Please try again.");

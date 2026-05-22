@@ -60,6 +60,7 @@ public enum ViewHandler {
             loader = new FXMLLoader(getClass().getResource(path));
             scene = new Scene(loader.load());
             scene.getRoot().getStyleClass().add("dark"); // lets us apply dark mode
+            GlobalKeyHandler.getInstance().attach(scene); // attach global key handler
         }
         return scene;
     }

@@ -5,5 +5,6 @@ public enum AlertTypes {
     INFORMATION,
     WARNING,
     SAVE,
-    CONFIRMATION
+    CONFIRMATION,
+    SPLIT
 }
