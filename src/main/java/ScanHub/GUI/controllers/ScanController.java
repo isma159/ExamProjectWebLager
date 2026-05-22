@@ -46,7 +46,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private BorderPane workspaceView;
     @FXML private Label lblUsername, lblRole, lblEmptyState;
     @FXML private ToggleSwitch darkMode;
-    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnNewDoc, btnSplitDoc, btnDelete, btnUndo, btnExport, btnZoomOut, btnZoomIn;
+    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnUndo, btnExport, btnZoomOut, btnZoomIn;
     @FXML private ComboBox<ExportMode> comboBoxExport;
     @FXML private FlowPane pageGrid;
     @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel;
@@ -59,7 +59,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private TextField txtFldBoxId, txtFldGlobalRotation, txtFldGlobalHue, txtFldGlobalBrightness, txtFldGlobalContrast, txtFldGlobalSaturation;
 
     // File adjustment menu
-    @FXML private StackPane sessionPopupOverlay1;
+    @FXML private StackPane fileAdjustmentSideMenu;
     @FXML private Spinner<Integer> spinnerIndividualFileRotation;
     @FXML private Spinner<Double> spinnerIndividualFileHue, spinnerIndividualFileBrightness, spinnerIndividualFileContrast, spinnerIndividualFileSaturation;
 
@@ -77,7 +77,7 @@ public class ScanController implements Initializable, IViewController {
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
 
     private final Deque<Runnable> undoStack = new ArrayDeque<>(); //
-    private static final int maxUndos = 30;
+    private static final int maxUndos = 25;
 
     private Thread scanThread; // scan loop is controlled by the volatile boolean 'scanning', not thread interruption
     private volatile boolean scanning = false; // volatile: FX-thread writes are immediately visible to the scan thread
@@ -396,8 +396,7 @@ public class ScanController implements Initializable, IViewController {
                     Platform.runLater(() -> {
                         btnScan.setDisable(false);
                         btnStop.setDisable(true);
-                        AlertHelper.showError("Scan Failed",
-                                "Scanning stopped. Could not fetch the next page. Please try again.");
+                        AlertHelper.showError("Scan Failed", "Scanning stopped. Could not fetch the next page. Please try again.");
                     });
                     return;
                 }
@@ -538,19 +537,20 @@ public class ScanController implements Initializable, IViewController {
 
     @FXML private void onRotateLeft(ActionEvent e)  { rotatePage(-1); }
     @FXML private void onRotateRight(ActionEvent e) { rotatePage(1); }
+
     @FXML
     private void onFileAdjustments(ActionEvent actionEvent) {
         if (selectedFile == null || scanModel == null) return;
         populateFileAdjustmentsFields(selectedFile);
-        sessionPopupOverlay1.setVisible(true);
-        sessionPopupOverlay1.setDisable(false);
+        fileAdjustmentSideMenu.setVisible(true);
+        fileAdjustmentSideMenu.setDisable(false);
         workspaceView.setDisable(true);
     }
 
     @FXML
     private void onFileAdjustmentsClose(ActionEvent e) {
-        sessionPopupOverlay1.setVisible(false);
-        sessionPopupOverlay1.setDisable(true);
+        fileAdjustmentSideMenu.setVisible(false);
+        fileAdjustmentSideMenu.setDisable(true);
         workspaceView.setDisable(false);
     }
 
@@ -570,6 +570,7 @@ public class ScanController implements Initializable, IViewController {
             onFileAdjustmentsClose(null);
         } catch (IllegalArgumentException ex) {
             AlertHelper.showError("Invalid Input", ex.getMessage());
+            // TODO add visual feedback
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Settings Failed", "Could not apply file settings. Please try again.");
@@ -645,6 +646,7 @@ public class ScanController implements Initializable, IViewController {
         ExportMode mode = comboBoxExport.getValue();
         if (mode == null) {
             AlertHelper.showError("Export", "Please select an export mode.");
+            // TODO add visual feedback
             return;
         }
 
@@ -959,9 +961,6 @@ public class ScanController implements Initializable, IViewController {
         btnStop.setDisable(disabled);
         btnRotLeft.setDisable(disabled);
         btnRotRight.setDisable(disabled);
-        btnNewDoc.setDisable(disabled);
-        btnSplitDoc.setDisable(disabled);
-        btnDelete.setDisable(disabled);
         btnUndo.setDisable(disabled);
         btnExport.setDisable(disabled);
         btnZoomOut.setDisable(disabled);
