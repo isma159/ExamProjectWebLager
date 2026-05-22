@@ -106,6 +106,7 @@ public class ScanManager {
         for (int fileId : pendingDeleteFileIds) {
             fileDAO.deleteFile(fileId);
         }
+
         pendingDeleteFileIds.clear();
 
         for (int documentId : pendingDeleteDocumentIds) {
@@ -481,6 +482,12 @@ public class ScanManager {
         }
 
         refreshNeedsBarcodeFirst();
+    }
+
+    public void deleteBox(Box box) {
+
+        
+
     }
 
     public Document getCurrentDocument() { return currentDocument; }
