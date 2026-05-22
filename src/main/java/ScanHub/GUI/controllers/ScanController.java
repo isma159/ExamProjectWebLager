@@ -1,10 +1,12 @@
 package ScanHub.GUI.controllers;
 
 import ScanHub.BE.*;
+import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.ExportMode;
+import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.interfaces.TreeNode;
 import ScanHub.BLL.ScanManager;
-import ScanHub.GUI.util.ThemeManager;
+import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.util.GlobalKeyHandler;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
@@ -25,10 +27,7 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.controlsfx.control.SearchableComboBox;
@@ -39,6 +38,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class ScanController implements Initializable, IViewController {
@@ -107,7 +108,6 @@ public class ScanController implements Initializable, IViewController {
         comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
 
         setSessionControlsDisabled(true);
-        lblSessionStatus.setText("Press Session Startup to configure and begin.");
         refreshStatusBar();
         updatePageInfoLabel();
     }
@@ -202,29 +202,58 @@ public class ScanController implements Initializable, IViewController {
                     setText(null);
                     setGraphic(null);
                     setStyle("");
+                    setContextMenu(null);
                     return;
                 }
 
                 Label icon = new Label();
                 icon.getStyleClass().add("icon");
+
+                // TODO remove inline css and replace with other solution
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
                     setText(comboBoxProfiles.getValue().getExportLabel() + box.getBoxName());
                     setStyle(box.isStaged() || box.isModified() ? "-fx-font-weight: bold;" : "");
+
+                    ContextMenu contextMenu = new ContextMenu();
+
+                    MenuItem deleteBox = menuItemSetup("Delete Box", "Delete", () -> onDeleteFileOrDocument(null));
+                    MenuItem newDoc = menuItemSetup("New Document", "Ctrl + N", () -> onNewDocument(null));
+
+                    contextMenu.getItems().addAll(deleteBox, newDoc);
+                    setContextMenu(contextMenu);
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
                     icon.getStyleClass().add("tree-cell-doc");
                     setText(documentLabel(document));
                     setStyle(document.isStaged() || document.isModified() ? "-fx-font-weight: bold;" : "");
+
+                    ContextMenu contextMenu = new ContextMenu();
+
+                    MenuItem deleteDoc = menuItemSetup("Delete Document", "Delete", () -> onDeleteFileOrDocument(null));
+
+                    contextMenu.getItems().add(deleteDoc);
+                    setContextMenu(contextMenu);
                 } else if (object instanceof File file) {
                     icon.setText("\ue958");
                     icon.getStyleClass().add("tree-cell-file");
                     setText(fileLabel(file));
                     setStyle(file.isStaged() ? "-fx-font-weight: bold;" : "");
+
+                    // context menu :)
+                    ContextMenu contextMenu = new ContextMenu();
+
+                    MenuItem splitBefore = menuItemSetup("Split Before", "Ctrl + A", () -> onSplitDocument(0));
+                    MenuItem splitAfter = menuItemSetup("Split After", "Ctrl + D", () -> onSplitDocument(1));
+
+                    MenuItem deleteFile = menuItemSetup("Delete File", "Delete", () -> onDeleteFileOrDocument(null));
+
+                    contextMenu.getItems().addAll(splitBefore, splitAfter, deleteFile);
+                    setContextMenu(contextMenu);
                 }
 
-                setGraphic(icon);
+                //setGraphic(icon);
             }
         });
     }
@@ -242,61 +271,63 @@ public class ScanController implements Initializable, IViewController {
         // Build the shortcut map for the Scan workspace
         Map<KeyCodeCombination, Runnable> shortcuts = new HashMap<>();
 
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.ENTER),
+        shortcuts.put(new KeyCodeCombination(KeyCode.ENTER),
                 () -> { if (!scanning) onScan(null); else onStop(null); });
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.LEFT),
+        shortcuts.put(new KeyCodeCombination(KeyCode.LEFT),
                 () -> onNavPrev(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.LEFT,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.LEFT,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onRotateLeft(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.RIGHT),
+        shortcuts.put(new KeyCodeCombination(KeyCode.RIGHT),
                 () -> onNavNext(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.RIGHT,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.RIGHT,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onRotateRight(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.UP),
+        shortcuts.put(new KeyCodeCombination(KeyCode.UP),
                 () -> onNavPrev(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.DOWN),
                 () -> onNavNext(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.PAGE_UP),
+        shortcuts.put(new KeyCodeCombination(KeyCode.PAGE_UP),
                 () -> onNavFirst(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.PAGE_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.PAGE_DOWN),
                 () -> onNavLast(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.DELETE),
+        shortcuts.put(new KeyCodeCombination(KeyCode.DELETE),
                 () -> onDeleteFileOrDocument(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.N,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.N,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onNewDocument(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.E,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.A,
+                KeyCombination.CONTROL_DOWN),
+                () -> onSplitDocument(0));
+        shortcuts.put(new KeyCodeCombination(KeyCode.D,
+                        KeyCombination.CONTROL_DOWN),
+                () -> onSplitDocument(1));
+        shortcuts.put(new KeyCodeCombination(KeyCode.E,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onExport(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.S,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.S,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onSessionStartup(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.F2),
+        shortcuts.put(new KeyCodeCombination(KeyCode.F2),
                 () -> { darkMode.setSelected(!darkMode.isSelected());
-                    ThemeManager.toggle(pageGrid.getScene(), darkMode.isSelected()); });
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.PLUS,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+                    ThemeHandler.toggle(pageGrid.getScene(), darkMode.isSelected()); });
+        shortcuts.put(new KeyCodeCombination(KeyCode.PLUS,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onZoomIn(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.ADD,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.ADD,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onZoomIn(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.MINUS,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.MINUS,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onZoomOut(null));
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.SUBTRACT,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.SUBTRACT,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onZoomOut(null));
-        shortcuts.put(new KeyCodeCombination(KeyCode.ESCAPE),
-                () -> { if (scanning) onStop(null); });
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.D,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
-                () -> onSplitDocument(null));
-
-        shortcuts.put(new KeyCodeCombination(javafx.scene.input.KeyCode.Z,
-                        javafx.scene.input.KeyCombination.CONTROL_DOWN),
+        shortcuts.put(new KeyCodeCombination(KeyCode.Z,
+                        KeyCombination.CONTROL_DOWN),
                 () -> onUndo(null));
+        shortcuts.put(new KeyCodeCombination(KeyCode.ESCAPE),
+                () -> onExit(null));
 
         GlobalKeyHandler.getInstance().setLayer(shortcuts);
     }
@@ -336,6 +367,8 @@ public class ScanController implements Initializable, IViewController {
             Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
             root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
+            User currentUser = modelFacade.getSessionModel().getCurrentUser();
+            modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
             syncDocumentsFromModel();
             initializeTreeView(boxTreeView, activeBox);
 
@@ -491,31 +524,24 @@ public class ScanController implements Initializable, IViewController {
         }
     }
 
-    @FXML
-    private void onSplitDocument(ActionEvent actionEvent) {
+    /**
+     * TODO: prompt a before or after split while selecting a file
+     */
+    private void onSplitDocument(int choice) {
         if (selectedFile == null || selectedDocument == null || scanModel == null || !sessionActive) return;
 
         List<File> files = selectedDocument.getFiles();
         int splitIndex = files.indexOf(selectedFile);
-
         if (splitIndex <= 0) return; // nothing to split if it's the first page
-
-        final int[] choice = {0}; // 0=cancel, 1=before, 2=after
-        AlertHelper.showSplitDialog(
-                "Split at page " + (splitIndex + 1),
-                () -> choice[0] = 1,
-                () -> choice[0] = 2
-        );
-        if (choice[0] == 0) return;
-        int actualSplitIndex = choice[0] == 1 ? splitIndex : splitIndex + 1;
+        int actualSplitIndex = choice == 0 ? splitIndex : splitIndex + 1;
 
         try {
+            // collect all files from the split point onwards
             List<File> toMove = new ArrayList<>(files.subList(actualSplitIndex, files.size()));
             Document originalDocument = selectedDocument;
 
             Document newDocument = scanModel.manualSplit();
             syncDocumentsFromModel();
-
             // move files into the new document
             for (File file : toMove) {
                 originalDocument.getFiles().remove(file);
@@ -546,6 +572,36 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("Split Failed", "Could not split the document. Please try again.");
         }
+    }
+
+    private MenuItem menuItemSetup(String command, String shortcut, Runnable onSelected) {
+
+        MenuItem menuItem = new MenuItem();
+
+        Label commandLbl = new Label(command);
+        commandLbl.setMinWidth(120);
+        commandLbl.setMaxWidth(120);
+        commandLbl.setAlignment(Pos.CENTER_LEFT);
+
+        Region growingSpacer = new Region();
+        growingSpacer.setMinWidth(30);
+        HBox.setHgrow(growingSpacer, Priority.ALWAYS);
+
+        Label shortcutLbl = new Label(shortcut);
+        shortcutLbl.setMinWidth(45);
+        shortcutLbl.setAlignment(Pos.CENTER_RIGHT);
+
+        HBox container = new HBox(commandLbl, growingSpacer, shortcutLbl);
+
+        menuItem.setGraphic(container);
+
+        menuItem.setOnAction(e -> {
+            onSelected.run();
+            e.consume();
+        });
+
+        return menuItem;
+
     }
 
     /**
@@ -650,12 +706,8 @@ public class ScanController implements Initializable, IViewController {
                 });
 
             } else if (selectedBox != null) {
-                scanModel.deleteBox(selectedBox);
-                selectedBox = null;
-                selectedDocument = null;
-                selectedFile = null;
-
-            } else return;
+                onDeleteBox();
+            }else return;
 
             rebuild();
         } catch (Exception ex) {
@@ -720,6 +772,39 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("Settings Failed", "Could not apply file settings. Please try again.");
         }
+    }
+
+    private void onDeleteBox() {
+        AlertHelper.showConfirmation("Delete Box", "Are you sure you want to delete this box?\n"
+        + "This action is permanent and cannot be undone.", () -> {
+            try {
+                scanModel.deleteBox();
+                modelFacade.getBoxModel().deleteBox(scanModel.getTargetBox());
+                User currentUser = modelFacade.getSessionModel().getCurrentUser();
+                modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.DELETE, LocalDateTime.now()));
+                boxTreeView.setShowRoot(false);
+
+                sessionActive = false;
+                scanModel = null;
+                documents.clear();
+                selectedBox = null;
+                selectedDocument = null;
+                selectedFile = null;
+
+                setSessionControlsDisabled(true);
+                sessionPopupOverlay.setVisible(true);
+                sessionPopupOverlay.setDisable(false);
+                workspaceView.setDisable(true);
+                lblSessionStatus.setText("Press Session Startup to configure and begin.");
+
+                rebuild();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+
     }
 
     /** Rotates the selected file by {@code spinnerRotation} degrees in the given direction. */
@@ -814,6 +899,8 @@ public class ScanController implements Initializable, IViewController {
         try {
             scanModel.save();
             scanModel.export(exportDirectory, mode);
+            User currentUser = modelFacade.getSessionModel().getCurrentUser();
+            modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
             rebuild();
             AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
         } catch (Exception ex) {
@@ -837,7 +924,7 @@ public class ScanController implements Initializable, IViewController {
     }
 
     @FXML
-    private void onDarkModeToggle() { ThemeManager.toggle(currentStage.getScene(), darkMode.isSelected()); }
+    private void onDarkModeToggle() { ThemeHandler.toggle(currentStage.getScene(), darkMode.isSelected()); }
 
     @FXML
     private void onExit(ActionEvent actionEvent) {
@@ -858,7 +945,7 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void onTreeSelectionChanged(TreeItem<TreeNode> item) {
-        if (item == null || item.getParent() == null || item.getValue() == null) return;
+        if (item == null || item.getValue() == null) return;
 
         TreeNode value = item.getValue();
         if (value instanceof Document document) {
@@ -1164,7 +1251,7 @@ public class ScanController implements Initializable, IViewController {
                 return "Page " + (position + 1);
             }
         }
-        return "Page ?"; // should not happen
+        return "Page ?"; // should not happen :o
     }
 
     private int currentPageIndex() {

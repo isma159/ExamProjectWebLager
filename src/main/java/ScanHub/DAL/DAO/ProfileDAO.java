@@ -13,9 +13,7 @@ import java.util.List;
 
 public class ProfileDAO implements IDataAccess<Profile> {
 
-    private final DBConnector dbConnector = new DBConnector();
-
-    public ProfileDAO() throws IOException {}
+    public ProfileDAO() {}
 
     @Override
     public Profile createData(Profile newProfile) throws Exception {
@@ -26,7 +24,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             FileAdjustmentSettings settings = safeSettings(newProfile.getFileAdjustmentSettings());
@@ -62,7 +60,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 ORDER BY c.clientName, p.profileName
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(selectProfileSQL);
              ResultSet rs = ps.executeQuery()) {
 
@@ -88,7 +86,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 ORDER BY c.clientName, p.profileName
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name);
@@ -102,6 +100,11 @@ public class ProfileDAO implements IDataAccess<Profile> {
     }
 
     @Override
+    public Profile getDataFromId(int id) throws Exception {
+        return null;
+    }
+
+    @Override
     public void updateData(Profile newData) throws Exception {
         String sql = """
                 UPDATE Profiles
@@ -110,7 +113,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 WHERE profileId = ? AND deleted_at IS NULL
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             FileAdjustmentSettings settings = safeSettings(newData.getFileAdjustmentSettings());
@@ -131,7 +134,7 @@ public class ProfileDAO implements IDataAccess<Profile> {
         String sql = "UPDATE Profiles SET deleted_at = SYSUTCDATETIME() WHERE profileId = ?";
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE profileId = ?";
 
-        try (Connection connection = dbConnector.getConnection()) {
+        try (Connection connection = DBConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);

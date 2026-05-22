@@ -10,6 +10,8 @@ import ScanHub.DAL.ApiClient.ScanResult;
 import ScanHub.DAL.DAO.DocumentDAO;
 import ScanHub.DAL.DAO.FileDAO;
 import ScanHub.DAL.interfaces.IScanSource;
+import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.GUI.util.AlertHelper;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -36,11 +38,10 @@ import java.util.List;
 public class ScanManager {
 
     private final IScanSource scanSource;
-    private final DocumentDAO documentDAO;
-    private final FileDAO fileDAO;
+    private final DAOFacade daoFacade = DAOFacade.getInstance();
 
     private Document currentDocument;
-    private final Box targetBox;
+    private Box targetBox;
     private int referenceCounter = 0;
 
     public boolean needsBarcodeFirst; // true when box has no files and documents
@@ -52,8 +53,6 @@ public class ScanManager {
     public ScanManager(IScanSource scanSource, Box targetBox) throws Exception {
         this.scanSource = scanSource;
         this.targetBox = targetBox;
-        this.documentDAO = new DocumentDAO();
-        this.fileDAO = new FileDAO();
 
         if (targetBox.getProfile() == null) {
             throw new IllegalArgumentException("A scan session box must have a profile");
@@ -104,29 +103,38 @@ public class ScanManager {
     public void commitAll() throws Exception {
         // delete
         for (int fileId : pendingDeleteFileIds) {
-            fileDAO.deleteFile(fileId);
+            daoFacade.getFileDAO().deleteFile(fileId);
         }
 
         pendingDeleteFileIds.clear();
 
         for (int documentId : pendingDeleteDocumentIds) {
-            documentDAO.deleteDocument(documentId);
+            daoFacade.getDocumentDAO().deleteDocument(documentId);
         }
+
         pendingDeleteDocumentIds.clear();
 
-        // persist staged files and documents
+        // persist staged files and documents. Also handles files moved to new documents
+
+        if (targetBox.isStaged()) {
+            Box savedBox = daoFacade.getBoxDAO().createData(targetBox);
+            targetBox.setBoxId(savedBox.getBoxId());
+            targetBox.setStaged(false);
+        }
+
         for (Document document : targetBox.getDocuments()) {
-            if (document.isStaged()) {
-                Document persisted = documentDAO.createDocument(targetBox.getBoxId());
+            if (document.isStaged() || document.isModified()) {
+                Document persisted = daoFacade.getDocumentDAO().createDocument(targetBox.getBoxId());
                 document.setDocumentId(persisted.getDocumentId());
                 document.setCreatedAt(persisted.getCreatedAt());
                 document.setStaged(false);
+                document.setModified(false);
             }
 
             for (File file : document.getFiles()) {
                 if (file.isStaged()) {
                     file.setDocumentId(document.getDocumentId());
-                    File persisted = fileDAO.createFile(
+                    File persisted = daoFacade.getFileDAO().createFile(
                             document.getDocumentId(),
                             file.getReferenceId(),
                             file.getSortId(),
@@ -135,9 +143,13 @@ public class ScanManager {
                     file.setFileId(persisted.getFileId());
                     file.setCreatedAt(persisted.getCreatedAt());
                     if (file.hasCustomFileSettings()) {
-                        fileDAO.upsertFileSettings(file.getFileId(), file.getFileSettings());
+                        daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
                     }
                     file.setStaged(false);
+                }
+                else if (file.getDocumentId() != document.getDocumentId()) {
+                    daoFacade.getFileDAO().moveFile(file.getFileId(), document.getDocumentId());
+                    file.setDocumentId(document.getDocumentId());
                 }
             }
         }
@@ -233,7 +245,7 @@ public class ScanManager {
     private byte[] resolveImageData(File file) throws Exception {
         if (file.getImageData() != null) return file.getImageData();
         if (!file.isStaged() && file.getFileId() > 0) {
-            return fileDAO.loadImageData(file.getFileId());
+            return daoFacade.getFileDAO().loadImageData(file.getFileId());
         }
         return null;
     }
@@ -370,7 +382,7 @@ public class ScanManager {
     public void updateFileSettings(File file, FileAdjustmentSettings settings) throws Exception {
         file.applyCustomFileSettings(settings);
         if (!file.isStaged()) {
-            fileDAO.upsertFileSettings(file.getFileId(), file.getFileSettings());
+            daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
         }
     }
 
@@ -409,13 +421,14 @@ public class ScanManager {
      * nearest preceding document so the next scan lands in the right place.
      * {@code needsBarcodeFirst} is re-evaluated after removal (if everything is deleted the first file should be a barcode).
      */
-    public void deleteDocument(Document document) throws Exception {
+    public void deleteDocument(Document document) {
         // queue all persisted files for deletion
         for (File file : new ArrayList<>(document.getFiles())) {
             if (!file.isStaged() && file.getFileId() > 0) {
                 pendingDeleteFileIds.add(file.getFileId());
             }
         }
+
         document.getFiles().clear();
 
         // queue the document row for deletion
@@ -441,10 +454,25 @@ public class ScanManager {
         refreshNeedsBarcodeFirst();
     }
 
-    public void deleteBox(Box box) {
+    public void deleteBox() throws Exception {
 
-        
+        for (Document document : targetBox.getDocuments()) {
 
+            for (File file : document.getFiles()) {
+                if (!file.isStaged() && file.getFileId() > 0) {
+                    daoFacade.getFileDAO().deleteFile(file.getFileId());
+                }
+            }
+            if (!document.isStaged() && document.getDocumentId() > 0) {
+                daoFacade.getDocumentDAO().deleteDocument(document.getDocumentId());
+            }
+        }
+
+        if (!targetBox.isStaged() && targetBox.getBoxId() > 0) {
+            daoFacade.getBoxDAO().deleteData(targetBox);
+        }
+
+        targetBox.getDocuments().clear();
     }
 
     public Document getCurrentDocument() { return currentDocument; }

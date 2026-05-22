@@ -3,7 +3,7 @@ package ScanHub.GUI.controllers;
 // project imports
 import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.GlobalKeyHandler;
-import ScanHub.GUI.util.ThemeManager;
+import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
@@ -15,12 +15,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.net.URL;
@@ -83,7 +81,7 @@ public class AdminController implements IViewController, Initializable {
         );
         adminShortcuts.put(
                 new KeyCodeCombination(KeyCode.F2),
-                () -> {darkMode.setSelected(!darkMode.isSelected()); ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());}
+                () -> {darkMode.setSelected(!darkMode.isSelected()); ThemeHandler.toggle(contentArea.getScene(), darkMode.isSelected());}
         );
 
         sidebarBtns.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
@@ -146,6 +144,7 @@ public class AdminController implements IViewController, Initializable {
             // Merge admin-level + page-level shortcuts into GlobalKeyHandler
             Map<KeyCodeCombination, Runnable> merged = new HashMap<>(adminShortcuts);
             merged.putAll(controller.getShortcuts());
+
             GlobalKeyHandler.getInstance().setLayer(merged);
 
             if (darkMode.isSelected()) {
@@ -177,10 +176,10 @@ public class AdminController implements IViewController, Initializable {
 
     @FXML
     private void onDarkModeToggle() {
-        ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());
+        ThemeHandler.toggle(contentArea.getScene(), darkMode.isSelected());
     }
 
-    public void onClickOpenScanView(MouseEvent mouseEvent) {
+    public void onClickOpenScanView() {
         try {
             ViewHandler handler = ViewHandler.SCAN_VIEW;
             handler.reset();

@@ -11,9 +11,7 @@ import java.util.List;
 
 public class BoxMetadataDAO implements IMetadataDataAccess {
 
-    DBConnector dbConnector = new DBConnector();
-
-    public BoxMetadataDAO() throws IOException {}
+    public BoxMetadataDAO() {}
 
     @Override
     public BoxMetadata createData(BoxMetadata metadata) throws Exception {
@@ -30,7 +28,7 @@ public class BoxMetadataDAO implements IMetadataDataAccess {
                 ORDER BY created_at DESC
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -58,7 +56,7 @@ public class BoxMetadataDAO implements IMetadataDataAccess {
                 WHERE boxId = ?
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, boxId);

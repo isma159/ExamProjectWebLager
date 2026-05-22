@@ -6,7 +6,7 @@ import javafx.scene.input.KeyEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-
+// TODO read through and remove obvious AI comments
 /**
  * GlobalKeyHandler manages keyboard shortcuts for a JavaFX Scene.
  *

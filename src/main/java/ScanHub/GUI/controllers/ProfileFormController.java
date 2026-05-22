@@ -4,7 +4,7 @@ import ScanHub.BE.*;
 import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
-import ScanHub.GUI.util.ThemeManager;
+import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import javafx.event.ActionEvent;
@@ -50,7 +50,7 @@ public class ProfileFormController implements Initializable {
         this.modelFacade = modelFacade;
         this.editingProfile = profile;
 
-        ThemeManager.apply(currentStage.getScene());
+        ThemeHandler.apply(currentStage.getScene());
 
         searchableComboBoxClient.setItems(modelFacade.getClientModel().getClients());
 

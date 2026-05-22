@@ -15,18 +15,18 @@ public class DBConnector {
     private static final String PROP_FILE = "config/config.settings";
     private static SQLServerDataSource dataSource;
 
-    public DBConnector() throws IOException
-    {
-        synchronized (DBConnector.class) {
-            if (dataSource == null) {
-                dataSource = createDataSource();
-            }
+    static {
+        try {
+            dataSource = createDataSource();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private static SQLServerDataSource createDataSource() throws IOException {
         Properties databaseProperties = new Properties();
-        try (FileInputStream inputStream = new FileInputStream(new File(PROP_FILE))) {
+        try (FileInputStream inputStream = new FileInputStream(PROP_FILE)) {
             databaseProperties.load(inputStream);
         }
 
@@ -40,7 +40,7 @@ public class DBConnector {
         return dataSource;
     }
 
-    public Connection getConnection() throws SQLServerException {
+    public static Connection getConnection() throws SQLServerException {
         return dataSource.getConnection();
     }
 
