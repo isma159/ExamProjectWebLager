@@ -88,7 +88,7 @@ public class FileDAO {
         try (Connection conn = DBConnector.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
-                updatePs.setInt(1, normalizeRotation(settings.getRotation()));
+                updatePs.setInt(1, settings.getRotation());
                 updatePs.setInt(2, settingValue(settings.getHue()));
                 updatePs.setInt(3, settingValue(settings.getBrightness()));
                 updatePs.setInt(4, settingValue(settings.getContrast()));
@@ -99,7 +99,7 @@ public class FileDAO {
                 if (updated == 0) {
                     try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
                         insertPs.setInt(1, fileId);
-                        insertPs.setInt(2, normalizeRotation(settings.getRotation()));
+                        insertPs.setInt(2, settings.getRotation());
                         insertPs.setInt(3, settingValue(settings.getHue()));
                         insertPs.setInt(4, settingValue(settings.getBrightness()));
                         insertPs.setInt(5, settingValue(settings.getContrast()));
@@ -178,14 +178,6 @@ public class FileDAO {
             ps.setInt(2, fileId);
             ps.executeUpdate();
         }
-    }
-
-    private int normalizeRotation(int rotation) {
-        int normalized = ((rotation % 360) + 360) % 360;
-        return switch (normalized) {
-            case 90, 180, 270 -> normalized;
-            default -> 0;
-        };
     }
 
     private int settingValue(double value) { return (int) Math.round(value); }
