@@ -72,7 +72,7 @@ public class ProfileFormController implements Initializable {
         spnBrightness.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
         spnContrast.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
         spnSaturation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
-        spnRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 1));
+        spnRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-360, 360, 0, 1));
 
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
 

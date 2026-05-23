@@ -33,10 +33,6 @@ import javafx.stage.Stage;
 import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.ToggleSwitch;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -60,8 +56,8 @@ public class ScanController implements Initializable, IViewController {
 
     // File Adjustment Menu
     @FXML private StackPane fileAdjustmentSideMenu;
-    @FXML private Spinner<Integer> spinnerIndividualFileRotation;
-    @FXML private Spinner<Double> spinnerIndividualFileHue, spinnerIndividualFileBrightness, spinnerIndividualFileContrast, spinnerIndividualFileSaturation;
+    @FXML private Spinner<Integer> spinnerFileAdjustmentRotation, spinnerFileAdjustmentHue, spinnerFileAdjustmentBrightness, spinnerFileAdjustmentContrast, spinnerFileAdjustmentSaturation;
+    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderRotation;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -110,12 +106,17 @@ public class ScanController implements Initializable, IViewController {
         spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 360, 5, 1));
         comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
 
-        ChangeListener<Number> previewListener = (obs, o, n) -> applySpinnerPreview();
-        spinnerIndividualFileRotation.valueProperty().addListener(previewListener);
-        spinnerIndividualFileHue.valueProperty().addListener(previewListener);
-        spinnerIndividualFileBrightness.valueProperty().addListener(previewListener);
-        spinnerIndividualFileContrast.valueProperty().addListener(previewListener);
-        spinnerIndividualFileSaturation.valueProperty().addListener(previewListener);
+        spinnerFileAdjustmentRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-360, 360, 0, 1));
+        spinnerFileAdjustmentHue.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spinnerFileAdjustmentBrightness.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spinnerFileAdjustmentContrast.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spinnerFileAdjustmentSaturation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+
+        bindSlider(sliderHue, spinnerFileAdjustmentHue);
+        bindSlider(sliderBrightness, spinnerFileAdjustmentBrightness);
+        bindSlider(sliderContrast, spinnerFileAdjustmentContrast);
+        bindSlider(sliderSaturation, spinnerFileAdjustmentSaturation);
+        bindSlider(sliderRotation, spinnerFileAdjustmentRotation);
 
         setSessionControlsDisabled(true);
         refreshStatusBar();
@@ -730,28 +731,27 @@ public class ScanController implements Initializable, IViewController {
     @FXML private void onRotateRight(ActionEvent e) { rotatePage(1); }
 
     @FXML
-    private void onOpenFileAdjustments(ActionEvent actionEvent) {
-        populateFileAdjustmentsFields(selectedFile);
-        fileAdjustmentSideMenu.setManaged(true);
-        fileAdjustmentSideMenu.setVisible(true);
+    private void onToggleFileAdjustments(ActionEvent actionEvent) {
+        if (!fileAdjustmentSideMenu.isVisible()) {
+            populateFileAdjustmentsFields(selectedFile);
+            fileAdjustmentSideMenu.setManaged(true);
+            fileAdjustmentSideMenu.setVisible(true);
+        } else {
+            fileAdjustmentSideMenu.setManaged(false);
+            fileAdjustmentSideMenu.setVisible(false);
+        }
     }
 
-    @FXML
-    private void onCloseFileAdjustments(ActionEvent e) {
-        fileAdjustmentSideMenu.setManaged(false);
-        fileAdjustmentSideMenu.setVisible(false);
-    }
-
-    /** Applies spinner values as a new {@link FileAdjustmentSettings} to the selected file. */
+    /** Applies slider values as a new {@link FileAdjustmentSettings} to the selected file. */
     @FXML
     private void onApplyFileAdjustments(ActionEvent e) {
         if (selectedFile == null || scanModel == null) return;
         try {
-            int rotation = Integer.parseInt(String.valueOf(spinnerIndividualFileRotation.getValue()));
-            double hue = Double.parseDouble(String.valueOf(spinnerIndividualFileHue.getValue()));
-            double brightness = Double.parseDouble(String.valueOf(spinnerIndividualFileBrightness.getValue()));
-            double contrast = Double.parseDouble(String.valueOf(spinnerIndividualFileContrast.getValue()));
-            double saturation = Double.parseDouble(String.valueOf(spinnerIndividualFileSaturation.getValue()));
+            int rotation = (int) sliderRotation.getValue();
+            double hue = sliderHue.getValue();
+            double brightness = sliderBrightness.getValue();
+            double contrast = sliderContrast.getValue();
+            double saturation = sliderSaturation.getValue();
 
             // snapshot old settings into a copy before any mutation
             FileAdjustmentSettings oldSettings = new FileAdjustmentSettings(selectedFile.getRotation(), selectedFile.getHue(), selectedFile.getBrightness(), selectedFile.getContrast(), selectedFile.getSaturation());
@@ -816,7 +816,7 @@ public class ScanController implements Initializable, IViewController {
 
         int degrees = spinnerRotation.getValue() * direction;
         int oldRotation = selectedFile.getRotation();
-        int newRotation = normaliseRotation(oldRotation + degrees);
+        int newRotation = normalizeRotation(oldRotation + degrees);
 
         try {
             final File capturedFile = selectedFile;
@@ -1227,25 +1227,48 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void populateFileAdjustmentsFields(File file) {
-        spinnerIndividualFileRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, file.getRotation(), 1));
-        spinnerIndividualFileHue.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getHue(), 1));
-        spinnerIndividualFileBrightness.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getBrightness(), 1));
-        spinnerIndividualFileContrast.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getContrast(), 1));
-        spinnerIndividualFileSaturation.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getSaturation(), 1));
+        sliderHue.setValue(file.getHue());
+        sliderBrightness.setValue(file.getBrightness());
+        sliderContrast.setValue(file.getContrast());
+        sliderSaturation.setValue(file.getSaturation());
+        sliderRotation.setValue(file.getRotation());
     }
 
-    private void applySpinnerPreview() {
+    /**
+     * Wires a slider and spinner together so they stay in sync
+     * and triggers a live preview on every slider change.
+     *
+     * @param slider the slider to listen on
+     * @param spinner the spinner to keep in sync with the slider
+     */
+    private void bindSlider(Slider slider, Spinner<Integer> spinner) {
+        slider.valueProperty().addListener((obs, o, newValue) -> {
+            spinner.getValueFactory().setValue(newValue.intValue());
+            applySliderPreview();
+        });
+        spinner.getEditor().textProperty().addListener((obs, o, newValue) -> {
+            try {
+                slider.setValue(Integer.parseInt(newValue));
+            } catch (NumberFormatException ignored) {}
+        });
+    }
+
+    /**
+     * Applies the current slider values as a live preview on the selected File's
+     * image without persisting anything to the File object.
+     */
+    private void applySliderPreview() {
         if (!fileAdjustmentSideMenu.isVisible() || currentPreviewImageView == null) return;
 
         currentPreviewImageView.setEffect(new ColorAdjust(
-                spinnerIndividualFileHue.getValue() / 100,
-                spinnerIndividualFileSaturation.getValue() / 100,
-                spinnerIndividualFileBrightness.getValue() / 100,
-                spinnerIndividualFileContrast.getValue() / 100
+                sliderHue.getValue() / 100,
+                sliderSaturation.getValue() / 100,
+                sliderBrightness.getValue() / 100,
+                sliderContrast.getValue() / 100
         ));
 
         if (!pageGrid.getChildren().isEmpty()) {
-            pageGrid.getChildren().getFirst().setRotate(spinnerIndividualFileRotation.getValue());
+            pageGrid.getChildren().getFirst().setRotate(sliderRotation.getValue());
         }
     }
 
@@ -1302,7 +1325,7 @@ public class ScanController implements Initializable, IViewController {
         return documents.stream().filter(document -> document.getFiles().contains(file)).findFirst().orElse(null);
     }
 
-    private int normaliseRotation(int rotation) {
+    private int normalizeRotation(int rotation) {
         return ((rotation % 360) + 360) % 360;
     }
 }
