@@ -387,7 +387,7 @@
             </HBox>
         </bottom>
       <right>
-         <StackPane fx:id="fileAdjustmentSideMenu" managed="true" prefWidth="240.0" visible="true">
+         <StackPane fx:id="fileAdjustmentSideMenu" managed="false" prefWidth="240.0" visible="false">
             <children>
                <VBox spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
                   <children>
