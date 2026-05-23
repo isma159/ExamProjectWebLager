@@ -8,7 +8,7 @@
 <?import javafx.scene.text.*?>
 <?import org.controlsfx.control.*?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
     <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
         <top>
             <VBox>
@@ -22,14 +22,14 @@
                                 <Image url="@../images/Green/LogoGreen2H.png" />
                             </image>
                         </ImageView>
-                  <Region prefWidth="300.0" />
+                  <Region HBox.hgrow="ALWAYS" />
                         <VBox alignment="CENTER" spacing="4.0">
                             <children>
                                 <Label styleClass="h1" text="Scanning Workspace" />
                                 <Label fx:id="lblSessionStatus" alignment="CENTER" prefWidth="240.0" styleClass="lbl" text="–" />
                             </children>
                         </VBox>
-                  <Region prefHeight="43.0" prefWidth="225.0" />
+                  <Region HBox.hgrow="ALWAYS" />
                         <ToggleSwitch fx:id="darkMode" onMouseClicked="#onDarkModeToggle" prefHeight="30.0" prefWidth="60.0" scaleX="1.25" scaleY="1.25" scaleZ="1.25" text="Dark Mode ">
                             <HBox.margin>
                                 <Insets right="12.0" />
@@ -202,7 +202,7 @@
                                     </Button>
 
                                     <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
-                                    <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onFileAdjustments" prefHeight="33.0" prefWidth="33.0" styleClass="clear-btn">
+                                    <Button fx:id="btnFileAdjustments" managed="false" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onOpenFileAdjustments" prefHeight="33.0" prefWidth="33.0" styleClass="clear-btn" visible="false">
                                         <graphic>
                                             <HBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0">
                                                 <children>
@@ -291,11 +291,15 @@
                             </Button>
 
                             <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
-                     <Label fx:id="pageInfoLabel" text="0 / 0">
+                     <VBox alignment="CENTER">
                         <HBox.margin>
-                           <Insets left="3.0" right="3.0" />
+                           <Insets left="6.0" right="6.0" />
                         </HBox.margin>
-                     </Label>
+                        <children>
+                           <Label fx:id="lblCurrentPage" text="Page: 0 / 0" />
+                           <Label fx:id="lblCurrentDocument" text="Doc: 0" />
+                        </children>
+                     </VBox>
                      <Separator layoutX="393.0" layoutY="22.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
 
                             <Button fx:id="btnRotLeft" mnemonicParsing="false" onAction="#onRotateLeft" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
@@ -383,7 +387,7 @@
             </HBox>
         </bottom>
       <right>
-         <StackPane fx:id="fileAdjustmentSideMenu" prefWidth="240.0">
+         <StackPane fx:id="fileAdjustmentSideMenu" managed="false" prefWidth="240.0" visible="false">
             <children>
                <VBox spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
                   <children>

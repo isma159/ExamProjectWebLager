@@ -7,11 +7,8 @@ import ScanHub.BE.FileAdjustmentSettings;
 import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.util.BarcodeDetector;
 import ScanHub.DAL.ApiClient.ScanResult;
-import ScanHub.DAL.DAO.DocumentDAO;
-import ScanHub.DAL.DAO.FileDAO;
 import ScanHub.DAL.interfaces.IScanSource;
 import ScanHub.GUI.facade.DAOFacade;
-import ScanHub.GUI.util.AlertHelper;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;

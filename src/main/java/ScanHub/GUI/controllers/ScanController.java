@@ -38,7 +38,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -47,10 +46,10 @@ public class ScanController implements Initializable, IViewController {
     @FXML private BorderPane workspaceView;
     @FXML private Label lblUsername, lblRole, lblEmptyState;
     @FXML private ToggleSwitch darkMode;
-    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnUndo, btnExport, btnZoomOut, btnZoomIn;
+    @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnUndo, btnExport, btnZoomOut, btnZoomIn, btnFileAdjustments;
     @FXML private ComboBox<ExportMode> comboBoxExport;
     @FXML private FlowPane pageGrid;
-    @FXML private Label lblSessionStatus, pageInfoLabel, stDocsLabel, stPagesLabel;
+    @FXML private Label lblSessionStatus, lblCurrentPage, lblCurrentDocument, stDocsLabel, stPagesLabel;
     @FXML private TreeView<TreeNode> boxTreeView;
     @FXML private Spinner<Integer> spinnerRotation;
 
@@ -67,10 +66,12 @@ public class ScanController implements Initializable, IViewController {
     private Stage currentStage;
     private ModelFacade modelFacade;
     private ScanModel scanModel;
+    private User currentUser = null;
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
     private Document selectedDocument;
     private File selectedFile;
     private Box selectedBox;
+    private ImageView currentPreviewImageView;
     private boolean sessionActive;
     private final TreeItem<TreeNode> root = new TreeItem<>();
     private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
@@ -78,7 +79,7 @@ public class ScanController implements Initializable, IViewController {
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
 
     private final Deque<Runnable> undoStack = new ArrayDeque<>();
-    private static final int maxUndos = 25;
+    private static final int maxUndos = 30;
 
     private Thread scanThread; // scan loop is controlled by the volatile boolean 'scanning', not thread interruption
     private volatile boolean scanning = false; // volatile: FX-thread writes are immediately visible to the scan thread
@@ -94,10 +95,12 @@ public class ScanController implements Initializable, IViewController {
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
         this.currentStage = currentStage;
-        initializeProfileComboBox();
 
-        lblUsername.setText(modelFacade.getSessionModel().getCurrentUser().getUsername());
-        lblRole.setText("Role: " + modelFacade.getSessionModel().getCurrentUser().getRole().toString());
+        currentUser = modelFacade.getSessionModel().getCurrentUser();
+        lblUsername.setText(currentUser.getUsername());
+        lblRole.setText("Role: " + currentUser.getRole().toString());
+
+        initializeProfileComboBox();
     }
 
     @Override
@@ -107,22 +110,29 @@ public class ScanController implements Initializable, IViewController {
         spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 360, 5, 1));
         comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
 
+        ChangeListener<Number> previewListener = (obs, o, n) -> applySpinnerPreview();
+        spinnerIndividualFileRotation.valueProperty().addListener(previewListener);
+        spinnerIndividualFileHue.valueProperty().addListener(previewListener);
+        spinnerIndividualFileBrightness.valueProperty().addListener(previewListener);
+        spinnerIndividualFileContrast.valueProperty().addListener(previewListener);
+        spinnerIndividualFileSaturation.valueProperty().addListener(previewListener);
+
         setSessionControlsDisabled(true);
         refreshStatusBar();
-        updatePageInfoLabel();
+        updateCurrentPageLabel();
+        updateCurrentDocumentLabel();
     }
 
     private void initializeProfileComboBox() {
         if (modelFacade == null) return;
 
-        User user = modelFacade.getSessionModel().getCurrentUser();
-        if (user.getProfiles().isEmpty() && !user.isAdmin()) return;
+        if (currentUser.getProfiles().isEmpty() && !currentUser.isAdmin()) return;
 
-        if (user.isAdmin()) {
-            user.setProfiles(modelFacade.getProfileModel().getProfiles());
+        if (currentUser.isAdmin()) {
+            currentUser.setProfiles(modelFacade.getProfileModel().getProfiles());
         }
 
-        comboBoxProfiles.setItems(FXCollections.observableArrayList(user.getProfiles()));
+        comboBoxProfiles.setItems(FXCollections.observableArrayList(currentUser.getProfiles()));
     }
 
     private void initializeExportComboBoxes() {
@@ -209,7 +219,6 @@ public class ScanController implements Initializable, IViewController {
                 Label icon = new Label();
                 icon.getStyleClass().add("icon");
 
-                // TODO remove inline css and replace with other solution
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
@@ -271,7 +280,7 @@ public class ScanController implements Initializable, IViewController {
         // Build the shortcut map for the Scan workspace
         Map<KeyCodeCombination, Runnable> shortcuts = new HashMap<>();
 
-        shortcuts.put(new KeyCodeCombination(KeyCode.ENTER),
+        shortcuts.put(new KeyCodeCombination(KeyCode.SPACE),
                 () -> { if (!scanning) onScan(null); else onStop(null); });
         shortcuts.put(new KeyCodeCombination(KeyCode.LEFT),
                 () -> onNavPrev(null));
@@ -367,7 +376,6 @@ public class ScanController implements Initializable, IViewController {
             Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
             root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
-            User currentUser = modelFacade.getSessionModel().getCurrentUser();
             modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
             syncDocumentsFromModel();
             initializeTreeView(boxTreeView, activeBox);
@@ -681,7 +689,7 @@ public class ScanController implements Initializable, IViewController {
                 });
 
             } else if (selectedDocument != null) {
-                final int docIndex = documents.indexOf(selectedDocument);
+                final int documentIndex = documents.indexOf(selectedDocument);
                 final Document capturedDoc = selectedDocument;
                 // snapshot the file list so undo can restore the full document contents
                 final List<File> capturedFiles = new ArrayList<>(selectedDocument.getFiles());
@@ -697,7 +705,7 @@ public class ScanController implements Initializable, IViewController {
                         // restore files onto the document object before re-inserting
                         capturedDoc.getFiles().clear();
                         capturedDoc.getFiles().addAll(capturedFiles);
-                        int idx = Math.min(docIndex, modelDocs.size());
+                        int idx = Math.min(documentIndex, modelDocs.size());
                         modelDocs.add(idx, capturedDoc);
                     }
                     syncDocumentsFromModel();
@@ -722,19 +730,16 @@ public class ScanController implements Initializable, IViewController {
     @FXML private void onRotateRight(ActionEvent e) { rotatePage(1); }
 
     @FXML
-    private void onFileAdjustments(ActionEvent actionEvent) {
-        if (selectedFile == null || scanModel == null) return;
+    private void onOpenFileAdjustments(ActionEvent actionEvent) {
         populateFileAdjustmentsFields(selectedFile);
+        fileAdjustmentSideMenu.setManaged(true);
         fileAdjustmentSideMenu.setVisible(true);
-        fileAdjustmentSideMenu.setDisable(false);
-        workspaceView.setDisable(true);
     }
 
     @FXML
-    private void onFileAdjustmentsClose(ActionEvent e) {
+    private void onCloseFileAdjustments(ActionEvent e) {
+        fileAdjustmentSideMenu.setManaged(false);
         fileAdjustmentSideMenu.setVisible(false);
-        fileAdjustmentSideMenu.setDisable(true);
-        workspaceView.setDisable(false);
     }
 
     /** Applies spinner values as a new {@link FileAdjustmentSettings} to the selected file. */
@@ -764,7 +769,6 @@ public class ScanController implements Initializable, IViewController {
             });
 
             rebuildPreviewCard();
-            onFileAdjustmentsClose(null);
         } catch (IllegalArgumentException ex) {
             AlertHelper.showError("Invalid Input", ex.getMessage());
             // TODO add visual feedback
@@ -780,7 +784,6 @@ public class ScanController implements Initializable, IViewController {
             try {
                 scanModel.deleteBox();
                 modelFacade.getBoxModel().deleteBox(scanModel.getTargetBox());
-                User currentUser = modelFacade.getSessionModel().getCurrentUser();
                 modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.DELETE, LocalDateTime.now()));
                 boxTreeView.setShowRoot(false);
 
@@ -899,7 +902,6 @@ public class ScanController implements Initializable, IViewController {
         try {
             scanModel.save();
             scanModel.export(exportDirectory, mode);
-            User currentUser = modelFacade.getSessionModel().getCurrentUser();
             modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
             rebuild();
             AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
@@ -931,8 +933,7 @@ public class ScanController implements Initializable, IViewController {
         AlertHelper.showConfirmation("Exit Window", "Are you sure you want to exit?\n"
                 + "Any unsaved progress will be deleted.", () -> {
             try {
-                User user = modelFacade.getSessionModel().getCurrentUser();
-                ViewHandler handler = user.isAdmin() ? ViewHandler.ADMIN : ViewHandler.LOGIN;
+                ViewHandler handler = currentUser.isAdmin() ? ViewHandler.ADMIN : ViewHandler.LOGIN;
                 handler.reset();
                 handler.show(modelFacade);
                 modelFacade.getSessionModel().logout();
@@ -1063,8 +1064,22 @@ public class ScanController implements Initializable, IViewController {
             pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedDocument.getFiles().getFirst()));
         }
 
-        updatePageInfoLabel();
-        lblEmptyState.setVisible(pageGrid.getChildren().isEmpty());
+        if (selectedFile != null) {
+            btnFileAdjustments.setManaged(true);
+            btnFileAdjustments.setVisible(true);
+            if (fileAdjustmentSideMenu.isVisible()) {
+                populateFileAdjustmentsFields(selectedFile);
+            }
+        } else {
+            fileAdjustmentSideMenu.setManaged(false);
+            fileAdjustmentSideMenu.setVisible(false);
+            btnFileAdjustments.setManaged(false);
+            btnFileAdjustments.setVisible(false);
+        }
+
+        updateCurrentPageLabel();
+        updateCurrentDocumentLabel();
+        lblEmptyState.setVisible(pageGrid.getChildren().isEmpty()); // setVisible(true) if pageGrid.getChildren().isEmpty() else false
     }
 
     private void refreshTree() {
@@ -1114,14 +1129,34 @@ public class ScanController implements Initializable, IViewController {
         stPagesLabel.setText("Files: " + totalPageCount());
     }
 
-    private void updatePageInfoLabel() {
-        List<File> all = allPages();
-        int index = currentPageIndex();
-        if (all.isEmpty() || index < 0) {
-            pageInfoLabel.setText("0 / 0");
+    private void updateCurrentPageLabel() {
+        if (selectedFile == null || selectedDocument == null) {
+            lblCurrentPage.setText("Page: 0 / 0");
             return;
         }
-        pageInfoLabel.setText((index + 1) + " / " + all.size());
+
+        int pageIndex = selectedDocument.getFiles().indexOf(selectedFile);
+        int pageCount = selectedDocument.getFiles().size();
+
+        if (pageIndex < 0) {
+            lblCurrentPage.setText("Page: 0 / 0");
+            return;
+        }
+
+        lblCurrentPage.setText("Page: " + (pageIndex + 1) + " / " + pageCount);
+    }
+
+    private void updateCurrentDocumentLabel() {
+        if (selectedDocument == null || documents.isEmpty()) {
+            lblCurrentDocument.setText("Doc: 0");
+            return;
+        }
+        int docIndex = documents.indexOf(selectedDocument);
+        if (docIndex < 0) {
+            lblCurrentDocument.setText("Doc: 0");
+            return;
+        }
+        lblCurrentDocument.setText("Doc: " + (docIndex + 1));
     }
 
     private VBox buildPageCard(Document document, File file) {
@@ -1129,12 +1164,14 @@ public class ScanController implements Initializable, IViewController {
         double ch = cardHeight();
 
         ImageView thumb = new ImageView();
+        currentPreviewImageView = thumb;
         if (file.getImageData() != null) {
-            Image image = createPreviewImage(file.getImageData(), cw - 8, ch - 44);
+            Image image = file.getPreviewImage(cw - 8, ch - 44);
             if (!image.isError()) {
                 thumb.setImage(image);
             }
         }
+
         thumb.setFitWidth(cw - 8);
         thumb.setFitHeight(ch - 44);
         thumb.setPreserveRatio(true);
@@ -1159,24 +1196,11 @@ public class ScanController implements Initializable, IViewController {
         card.setUserData(file);
         card.setOnMouseClicked(event -> {
             selectPage(document, file);
-            updatePageInfoLabel();
+            updateCurrentPageLabel();
+            updateCurrentDocumentLabel();
         });
 
         return card;
-    }
-
-    private Image createPreviewImage(byte[] imageData, double width, double height) {
-        try {
-            ImageIO.scanForPlugins();
-            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
-            if (bufferedImage != null) {
-                ByteArrayOutputStream pngOut = new ByteArrayOutputStream();
-                ImageIO.write(bufferedImage, "png", pngOut);
-                return new Image(new ByteArrayInputStream(pngOut.toByteArray()), width, height, true, true);
-            }
-        } catch (Exception ignored) {}
-
-        return new Image(new ByteArrayInputStream(imageData), width, height, true, true);
     }
 
     private double cardWidth() { return 520 * zoomLevel; }
@@ -1210,6 +1234,21 @@ public class ScanController implements Initializable, IViewController {
         spinnerIndividualFileSaturation.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, file.getSaturation(), 1));
     }
 
+    private void applySpinnerPreview() {
+        if (!fileAdjustmentSideMenu.isVisible() || currentPreviewImageView == null) return;
+
+        currentPreviewImageView.setEffect(new ColorAdjust(
+                spinnerIndividualFileHue.getValue() / 100,
+                spinnerIndividualFileSaturation.getValue() / 100,
+                spinnerIndividualFileBrightness.getValue() / 100,
+                spinnerIndividualFileContrast.getValue() / 100
+        ));
+
+        if (!pageGrid.getChildren().isEmpty()) {
+            pageGrid.getChildren().getFirst().setRotate(spinnerIndividualFileRotation.getValue());
+        }
+    }
+
     private void selectPage(Document document, File file) {
         selectedDocument = document;
         selectedFile = file;
@@ -1231,12 +1270,12 @@ public class ScanController implements Initializable, IViewController {
     private void setSessionControlsDisabled(boolean disabled) {
         btnScan.setDisable(disabled);
         btnStop.setDisable(disabled);
-        btnRotLeft.setDisable(disabled);
-        btnRotRight.setDisable(disabled);
         btnUndo.setDisable(disabled);
         btnExport.setDisable(disabled);
         btnZoomOut.setDisable(disabled);
         btnZoomIn.setDisable(disabled);
+        btnRotLeft.setDisable(disabled);
+        btnRotRight.setDisable(disabled);
     }
 
     private String documentLabel(Document document) {
@@ -1245,8 +1284,8 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private String fileLabel(File file) {
-        for (Document doc : documents) {
-            int position = doc.getFiles().indexOf(file);
+        for (Document document : documents) {
+            int position = document.getFiles().indexOf(file);
             if (position >= 0) {
                 return "Page " + (position + 1);
             }

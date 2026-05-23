@@ -1,8 +1,14 @@
 package ScanHub.BE;
 
 // java imports
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import ScanHub.BE.interfaces.TreeNode;
+import javafx.scene.image.Image;
+
+import javax.imageio.ImageIO;
 
 public class File implements TreeNode {
 
@@ -16,6 +22,11 @@ public class File implements TreeNode {
     private boolean staged = false;
     private FileAdjustmentSettings fileAdjustmentSettings;
     private boolean customFileSettings = false;
+
+    // transient = only runtime cache - it isn't persisted
+    private transient Image cachedPreview;
+    private transient double cachedWidth;
+    private transient double cachedHeight;
 
     public File() {
         fileAdjustmentSettings = new FileAdjustmentSettings();
@@ -61,7 +72,8 @@ public class File implements TreeNode {
     public void setSaturation(double saturation)      { fileAdjustmentSettings.setSaturation(saturation); }
     public void setStaged(boolean staged)             { this.staged = staged; }
     public void setFileSettings(FileAdjustmentSettings fileAdjustmentSettings) {
-        this.fileAdjustmentSettings = fileAdjustmentSettings == null ? new FileAdjustmentSettings() : FileAdjustmentSettings.copyOf(fileAdjustmentSettings);
+        this.fileAdjustmentSettings = fileAdjustmentSettings == null ?
+                new FileAdjustmentSettings() : FileAdjustmentSettings.copyOf(fileAdjustmentSettings);
     }
     public void setCustomFileSettings(boolean customFileSettings) { this.customFileSettings = customFileSettings; }
 
@@ -73,6 +85,36 @@ public class File implements TreeNode {
     public void applyCustomFileSettings(FileAdjustmentSettings customSettings) {
         setFileSettings(customSettings);
         setCustomFileSettings(true);
+    }
+
+    public Image getPreviewImage(double width, double height) {
+        if (cachedPreview != null && cachedWidth == width && cachedHeight == height) {
+            return cachedPreview;
+        }
+        try {
+            ImageIO.scanForPlugins();
+            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
+            if (bufferedImage != null) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "png", output);
+                cachedPreview = new Image(new ByteArrayInputStream(output.toByteArray()), width, height, true, true);
+                cachedWidth = width;
+                cachedHeight = height;
+                return cachedPreview;
+            }
+        } catch (Exception ignored) {}
+
+        // fallback if ImageIO fails
+        cachedPreview = new Image(new ByteArrayInputStream(imageData), width, height, true, true);
+        cachedWidth = width;
+        cachedHeight = height;
+        return cachedPreview;
+    }
+
+    public void clearCache() {
+        cachedPreview = null;
+        cachedWidth = 0;
+        cachedHeight = 0;
     }
 
     @Override
