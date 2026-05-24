@@ -38,8 +38,6 @@ public class AdminDashboardController implements Initializable, IShortcutHandler
     private final ModelFacade modelFacade;
 
     private List<User> currentUsers =  new ArrayList<>();
-    private User selectedUser = null;
-    private HBox selectedUserRow = null;
     private Role selectedRole = null;
 
     private List<Profile> currentProfiles =  new ArrayList<>();

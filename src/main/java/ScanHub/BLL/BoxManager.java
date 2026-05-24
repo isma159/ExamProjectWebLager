@@ -4,10 +4,8 @@ package ScanHub.BLL;
 import ScanHub.BE.Box;
 import ScanHub.BE.Document;
 import ScanHub.BE.Profile;
-import ScanHub.DAL.DAO.BoxDAO;
 import ScanHub.DAL.DAO.DocumentDAO;
-import ScanHub.DAL.interfaces.IDataAccess;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.BLL.facade.DAOFacade;
 
 import java.util.List;
 
@@ -72,7 +70,7 @@ public class BoxManager {
             throw new IllegalArgumentException("A profile is required to start a scan session");
         }
 
-        Box existing = tryGetExistingBox(boxInput);
+        Box existing = tryGetExistingBox(profile.getExportLabel() + boxInput);
         if (existing != null) {
             existing.setProfile(profile);
             if (existing.getProfileId() != profile.getProfileId()) {
@@ -83,6 +81,7 @@ public class BoxManager {
             // load persisted documents + files into the in-memory box
             DocumentDAO documentDAO = new DocumentDAO();
             List<Document> docs = documentDAO.getDocumentsWithFilesByBoxId(existing.getBoxId());
+            existing.getDocuments().clear();
             existing.getDocuments().addAll(docs);
             applyProfileDefaults(existing);
 
@@ -90,7 +89,7 @@ public class BoxManager {
         }
 
         Box box = new Box();
-        box.setBoxName(boxInput);
+        box.setBoxName(profile.getExportLabel() + boxInput);
         box.setProfileId(profile.getProfileId());
         box.setProfile(profile);
         box.setStaged(true);

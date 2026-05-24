@@ -8,7 +8,7 @@ import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.util.BarcodeDetector;
 import ScanHub.DAL.ApiClient.ScanResult;
 import ScanHub.DAL.interfaces.IScanSource;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.BLL.facade.DAOFacade;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -20,6 +20,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
@@ -27,6 +29,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleConsumer;
 
 /**
  * Core scanning logic: fetches pages from the scan source, stages them in memory,
@@ -167,15 +170,21 @@ public class ScanManager {
      *   exportDir/boxName/Document_1/Document_1.tiff
      * </pre>
      */
-    public void exportToDirectory(java.io.File exportDirectory, ExportMode mode) throws Exception {
+    public void exportToDirectory(java.io.File exportDirectory, ExportMode mode, DoubleConsumer progressCallback) throws Exception {
         ImageIO.scanForPlugins(); // ensure TwelveMonkeys TIFF writer/reader is registered
 
         Path boxRoot = exportDirectory.toPath().resolve(targetBox.getBoxName());
         Files.createDirectories(boxRoot);
 
         int documentIndex = 1;
-        for (Document document : targetBox.getDocuments()) {
-            if (document.getFiles().isEmpty()) { documentIndex++; continue; }
+
+        List<Document> documents = targetBox.getDocuments().stream().filter(doc -> !doc.getFiles().isEmpty()).toList();
+
+        int totaLFiles = documents.stream().mapToInt(d -> d.getFiles().size()).sum();
+        int processed = 0;
+
+
+        for (Document document : documents) {
 
             String documentFolderName = "Document" + documentIndex;
             Path docDirectory = boxRoot.resolve(documentFolderName);
@@ -187,6 +196,8 @@ public class ScanManager {
                 exportMultiPage(document, docDirectory, documentFolderName);
             }
 
+            processed += document.getFiles().size();
+            progressCallback.accept((double) processed / totaLFiles);
             documentIndex++;
         }
     }
@@ -281,6 +292,7 @@ public class ScanManager {
         float saturationFactor = (float) (1.0 + (settings.getSaturation() / 100.0)); // 0 (1.0) = unchanged, 100 (2.0) = more vivid/saturated colors, -50 (0.5) = more gray/desaturated
         float brightnessShift = (float) (settings.getBrightness() / 100.0); // positive values brighten, negative values darken
         float hueShift = (float) (settings.getHue() / 100.0); // positive/negative values rotate colors around the color wheel as Hue is circular
+        float sharpness = (float) settings.getSharpness() / 100;
 
         // loop through every pixel in the image
         for (int y = 0; y < height; y++) {
@@ -317,7 +329,23 @@ public class ScanManager {
             }
         }
 
-        return result;
+        return sharpen(result, sharpness);
+    }
+
+    public BufferedImage sharpen(BufferedImage source, float strength) {
+        float center = 1 + (4 * strength);
+        float edge = -strength;
+
+        float[] kernelInfo = {
+                0f, edge, 0f,
+                edge, center, edge,
+                0f, edge, 0f
+        };
+
+        Kernel kernel = new Kernel(3, 3, kernelInfo);
+        ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+
+        return op.filter(source, null);
     }
 
     /** Applies rotation and smoothes the pixels when rotated while preserving the full visible bounds. */

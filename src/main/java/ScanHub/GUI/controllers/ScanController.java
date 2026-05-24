@@ -13,10 +13,13 @@ import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,9 +33,15 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.ToggleSwitch;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -48,6 +57,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private Label lblSessionStatus, lblCurrentPage, lblCurrentDocument, stDocsLabel, stPagesLabel;
     @FXML private TreeView<TreeNode> boxTreeView;
     @FXML private Spinner<Integer> spinnerRotation;
+    @FXML private ProgressBar progressBarExport;
 
     // Session Startup Popup
     @FXML private StackPane sessionPopupOverlay;
@@ -56,8 +66,9 @@ public class ScanController implements Initializable, IViewController {
 
     // File Adjustment Menu
     @FXML private StackPane fileAdjustmentSideMenu;
-    @FXML private Spinner<Integer> spinnerFileAdjustmentRotation, spinnerFileAdjustmentHue, spinnerFileAdjustmentBrightness, spinnerFileAdjustmentContrast, spinnerFileAdjustmentSaturation;
-    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderRotation;
+    @FXML private Spinner<Integer> spinnerFileAdjustmentRotation, spinnerFileAdjustmentHue, spinnerFileAdjustmentBrightness,
+            spinnerFileAdjustmentContrast, spinnerFileAdjustmentSaturation, spinnerFileAdjustmentSharpness;
+    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderRotation, sliderSharpness;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -73,7 +84,6 @@ public class ScanController implements Initializable, IViewController {
     private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
             (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
-
     private final Deque<Runnable> undoStack = new ArrayDeque<>();
     private static final int maxUndos = 30;
 
@@ -97,6 +107,11 @@ public class ScanController implements Initializable, IViewController {
         lblRole.setText("Role: " + currentUser.getRole().toString());
 
         initializeProfileComboBox();
+
+        currentStage.setOnCloseRequest(event -> {
+            event.consume();
+            onExit(null);
+        });
     }
 
     @Override
@@ -111,12 +126,16 @@ public class ScanController implements Initializable, IViewController {
         spinnerFileAdjustmentBrightness.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
         spinnerFileAdjustmentContrast.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
         spinnerFileAdjustmentSaturation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spinnerFileAdjustmentSharpness.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
 
         bindSlider(sliderHue, spinnerFileAdjustmentHue);
         bindSlider(sliderBrightness, spinnerFileAdjustmentBrightness);
         bindSlider(sliderContrast, spinnerFileAdjustmentContrast);
         bindSlider(sliderSaturation, spinnerFileAdjustmentSaturation);
         bindSlider(sliderRotation, spinnerFileAdjustmentRotation);
+        bindSlider(sliderSharpness, spinnerFileAdjustmentSharpness);
+
+        sliderSharpness.setOnMouseReleased(e -> applySharpnessToPreview((float) sliderSharpness.getValue() / 100f));
 
         setSessionControlsDisabled(true);
         refreshStatusBar();
@@ -223,13 +242,13 @@ public class ScanController implements Initializable, IViewController {
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
-                    setText(comboBoxProfiles.getValue().getExportLabel() + box.getBoxName());
+                    setText(box.getBoxName());
                     setStyle(box.isStaged() || box.isModified() ? "-fx-font-weight: bold;" : "");
 
                     ContextMenu contextMenu = new ContextMenu();
 
                     MenuItem deleteBox = menuItemSetup("Delete Box", "Delete", () -> onDeleteFileOrDocument(null));
-                    MenuItem newDoc = menuItemSetup("New Document", "Ctrl + N", () -> onNewDocument(null));
+                    MenuItem newDoc = menuItemSetup("New Document", "Ctrl + N", () -> onNewDocument());
 
                     contextMenu.getItems().addAll(deleteBox, newDoc);
                     setContextMenu(contextMenu);
@@ -305,7 +324,7 @@ public class ScanController implements Initializable, IViewController {
                 () -> onDeleteFileOrDocument(null));
         shortcuts.put(new KeyCodeCombination(KeyCode.N,
                         KeyCombination.CONTROL_DOWN),
-                () -> onNewDocument(null));
+                 this::onNewDocument);
         shortcuts.put(new KeyCodeCombination(KeyCode.A,
                 KeyCombination.CONTROL_DOWN),
                 () -> onSplitDocument(0));
@@ -374,17 +393,28 @@ public class ScanController implements Initializable, IViewController {
         }
 
         try {
+            if (scanModel != null) {
+                scanModel.getTargetBox().getDocuments().clear();
+                endScanSession();
+            }
+
             Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
+
+            modelFacade.getSessionModel().cleanup();
+
+            boolean locked = modelFacade.getSessionModel().tryStartScanSession(profile.getExportLabel() + boxInput);
+            if (!locked) {
+                AlertHelper.showError("Box In Use", "This box is currently open in another session.");
+                return;
+            }
+
             root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
-            modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
+            //modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
             syncDocumentsFromModel();
             initializeTreeView(boxTreeView, activeBox);
 
             sessionActive = true;
-            selectedDocument = null;
-            selectedFile = null;
-            selectedBox = null;
 
             setSessionControlsDisabled(false);
             lblSessionStatus.setText(""); // TODO display something or nah?
@@ -503,8 +533,7 @@ public class ScanController implements Initializable, IViewController {
     }
 
     /** Creates a new empty document and selects it. */
-    @FXML
-    private void onNewDocument(ActionEvent e) {
+    private void onNewDocument() {
         if (!sessionActive || scanModel == null) return;
 
         try {
@@ -531,6 +560,25 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("New Document Failed", "Could not create a new document. Please try again.");
         }
+    }
+
+    private void endScanSession() {
+        if (!sessionActive || scanModel == null) {return;}
+
+        try {
+            modelFacade.getSessionModel().endScanSession(scanModel.getTargetBox().getBoxName());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        sessionActive = false;
+        scanModel = null;
+        documents.clear();
+        selectedBox = null;
+        selectedDocument = null;
+        selectedFile = null;
+        undoStack.clear();
     }
 
     /**
@@ -752,10 +800,11 @@ public class ScanController implements Initializable, IViewController {
             double brightness = sliderBrightness.getValue();
             double contrast = sliderContrast.getValue();
             double saturation = sliderSaturation.getValue();
+            double sharpness = sliderSharpness.getValue();
 
             // snapshot old settings into a copy before any mutation
-            FileAdjustmentSettings oldSettings = new FileAdjustmentSettings(selectedFile.getRotation(), selectedFile.getHue(), selectedFile.getBrightness(), selectedFile.getContrast(), selectedFile.getSaturation());
-            FileAdjustmentSettings newSettings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation);
+            FileAdjustmentSettings oldSettings = new FileAdjustmentSettings(selectedFile.getRotation(), selectedFile.getHue(), selectedFile.getBrightness(), selectedFile.getContrast(), selectedFile.getSaturation(), selectedFile.getSharpness());
+            FileAdjustmentSettings newSettings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation, sharpness);
 
             final File capturedFile = selectedFile;
             scanModel.updateFileSettings(capturedFile, newSettings);
@@ -769,6 +818,8 @@ public class ScanController implements Initializable, IViewController {
             });
 
             rebuildPreviewCard();
+
+            applySharpnessToPreview((float) newSettings.getSharpness() / 100f);
         } catch (IllegalArgumentException ex) {
             AlertHelper.showError("Invalid Input", ex.getMessage());
             // TODO add visual feedback
@@ -787,12 +838,7 @@ public class ScanController implements Initializable, IViewController {
                 modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.DELETE, LocalDateTime.now()));
                 boxTreeView.setShowRoot(false);
 
-                sessionActive = false;
-                scanModel = null;
-                documents.clear();
-                selectedBox = null;
-                selectedDocument = null;
-                selectedFile = null;
+                endScanSession();
 
                 setSessionControlsDisabled(true);
                 sessionPopupOverlay.setVisible(true);
@@ -899,16 +945,41 @@ public class ScanController implements Initializable, IViewController {
         java.io.File exportDirectory = chooser.showDialog(currentStage);
         if (exportDirectory == null) return; // user canceled
 
-        try {
-            scanModel.save();
-            scanModel.export(exportDirectory, mode);
-            modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
+        Task<Void> exportTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                scanModel.save();
+                scanModel.export(exportDirectory, mode, progress -> updateProgress(progress * 100, 100));
+                return null;
+            }
+        };
+
+        progressBarExport.progressProperty().bind(exportTask.progressProperty());
+        progressBarExport.setVisible(true);
+        progressBarExport.setManaged(true);
+
+        exportTask.setOnSucceeded(event -> {
+            try {
+                progressBarExport.progressProperty().unbind();
+                modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
+                rebuild();
+                AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
+            }
+            catch (Exception exception) {
+                AlertHelper.showInformation("Log Failed", "Log failed to be sent to database due to " + exception.getMessage());
+            }
+        });
+
+        exportTask.setOnFailed(event -> {
+            progressBarExport.progressProperty().unbind();
             rebuild();
-            AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
-        } catch (Exception ex) {
-            ex.printStackTrace();
             AlertHelper.showError("Export Failed", "Could not export documents. Please try again.");
-        }
+        });
+
+        Thread thread = new Thread(exportTask);
+        thread.setDaemon(true);
+        thread.start();
+
     }
 
     @FXML
@@ -935,8 +1006,18 @@ public class ScanController implements Initializable, IViewController {
             try {
                 ViewHandler handler = currentUser.isAdmin() ? ViewHandler.ADMIN : ViewHandler.LOGIN;
                 handler.reset();
-                handler.show(modelFacade);
-                modelFacade.getSessionModel().logout();
+
+                endScanSession();
+
+                Stage stage = new Stage();
+                if (!currentUser.isAdmin()) {
+                    modelFacade.getSessionModel().logout();
+                }
+                else {
+                    stage.setMinWidth(1366);
+                    stage.setMinHeight(768);
+                }
+                handler.show(modelFacade, stage);
                 currentStage.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1170,6 +1251,7 @@ public class ScanController implements Initializable, IViewController {
             if (!image.isError()) {
                 thumb.setImage(image);
             }
+
         }
 
         thumb.setFitWidth(cw - 8);
@@ -1232,6 +1314,15 @@ public class ScanController implements Initializable, IViewController {
         sliderContrast.setValue(file.getContrast());
         sliderSaturation.setValue(file.getSaturation());
         sliderRotation.setValue(file.getRotation());
+        sliderSharpness.setValue(file.getSharpness());
+        applySharpnessToPreview((float) sliderSharpness.getValue() / 100f);
+    }
+
+    private BufferedImage scaleToPreviewSize(BufferedImage source, int width, int height) {
+        java.awt.Image scaled = source.getScaledInstance(width, height, java.awt.Image.SCALE_FAST);
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        result.getGraphics().drawImage(scaled, 0, 0, null);
+        return result;
     }
 
     /**
@@ -1270,6 +1361,28 @@ public class ScanController implements Initializable, IViewController {
         if (!pageGrid.getChildren().isEmpty()) {
             pageGrid.getChildren().getFirst().setRotate(sliderRotation.getValue());
         }
+    }
+
+    private void applySharpnessToPreview(float strength) {
+        if (selectedFile == null || currentPreviewImageView == null || selectedFile.getImageData() == null) return;
+        try {
+            BufferedImage scaled = ImageIO.read(new ByteArrayInputStream(selectedFile.getImageData()));
+
+            BufferedImage preview = scanModel.sharpen(scaleToPreviewSize(scaled, (int) cardWidth() - 8, (int) cardHeight() - 44), strength);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ImageIO.write(preview, "png", out);
+
+            Image image = new Image(new ByteArrayInputStream(out.toByteArray()));
+
+            if (!image.isError()) {
+                currentPreviewImageView.setImage(image);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void selectPage(Document document, File file) {

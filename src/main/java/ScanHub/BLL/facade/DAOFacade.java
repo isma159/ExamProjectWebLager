@@ -1,4 +1,4 @@
-package ScanHub.GUI.facade;
+package ScanHub.BLL.facade;
 
 import ScanHub.BE.*;
 import ScanHub.DAL.DAO.*;
@@ -13,10 +13,10 @@ public class DAOFacade {
     private final IDataAccess<Client> clientDAO;
     private final IDataAccess<Log> logDAO;
     private final IDataAccess<Box> boxDAO;
-    // skal muligvis implementeres IDataAcess?
     private final DocumentDAO documentDAO;
     private final FileDAO fileDAO;
     private final BoxMetadataDAO boxMetadataDAO;
+    private final SessionDAO sessionDAO;
 
     private DAOFacade() {
         userDAO = new UserDAO();
@@ -27,6 +27,7 @@ public class DAOFacade {
         documentDAO = new DocumentDAO();
         fileDAO = new FileDAO();
         boxMetadataDAO = new BoxMetadataDAO();
+        sessionDAO = new SessionDAO();
     }
 
     public static DAOFacade getInstance() {return daoFacade;}
@@ -39,5 +40,6 @@ public class DAOFacade {
     public DocumentDAO getDocumentDAO() {return documentDAO;}
     public FileDAO getFileDAO() {return fileDAO;}
     public BoxMetadataDAO getBoxMetadataDAO() {return boxMetadataDAO;}
+    public SessionDAO getSessionDAO() {return sessionDAO;}
 
 }
