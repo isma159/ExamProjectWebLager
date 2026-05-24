@@ -8,7 +8,7 @@ import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.util.BarcodeDetector;
 import ScanHub.DAL.ApiClient.ScanResult;
 import ScanHub.DAL.interfaces.IScanSource;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.BLL.facade.DAOFacade;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleConsumer;
 
 /**
  * Core scanning logic: fetches pages from the scan source, stages them in memory,
@@ -167,15 +168,21 @@ public class ScanManager {
      *   exportDir/boxName/Document_1/Document_1.tiff
      * </pre>
      */
-    public void exportToDirectory(java.io.File exportDirectory, ExportMode mode) throws Exception {
+    public void exportToDirectory(java.io.File exportDirectory, ExportMode mode, DoubleConsumer progressCallback) throws Exception {
         ImageIO.scanForPlugins(); // ensure TwelveMonkeys TIFF writer/reader is registered
 
         Path boxRoot = exportDirectory.toPath().resolve(targetBox.getBoxName());
         Files.createDirectories(boxRoot);
 
         int documentIndex = 1;
-        for (Document document : targetBox.getDocuments()) {
-            if (document.getFiles().isEmpty()) { documentIndex++; continue; }
+
+        List<Document> documents = targetBox.getDocuments().stream().filter(doc -> !doc.getFiles().isEmpty()).toList();
+
+        int totaLFiles = documents.stream().mapToInt(d -> d.getFiles().size()).sum();
+        int processed = 0;
+
+
+        for (Document document : documents) {
 
             String documentFolderName = "Document" + documentIndex;
             Path docDirectory = boxRoot.resolve(documentFolderName);
@@ -187,6 +194,8 @@ public class ScanManager {
                 exportMultiPage(document, docDirectory, documentFolderName);
             }
 
+            processed += document.getFiles().size();
+            progressCallback.accept((double) processed / totaLFiles);
             documentIndex++;
         }
     }

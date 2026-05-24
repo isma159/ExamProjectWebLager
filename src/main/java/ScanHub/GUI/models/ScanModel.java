@@ -8,6 +8,8 @@ import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.ScanManager;
 import ScanHub.DAL.ApiClient.ScanApiClient;
 
+import java.util.function.DoubleConsumer;
+
 /**
  * Created via startSession() in ScanController and discarded when the session ends.
  * Thin facade over ScanManager - keeps the controller free of BLL details.
@@ -35,8 +37,8 @@ public class ScanModel {
      * Single-Page TIFF: each file in its own sub-folder.
      * Multi-Page TIFF: all pages of a document merged into one TIFF.
      */
-    public void export(java.io.File exportDirectory, ExportMode mode) throws Exception {
-        scanManager.exportToDirectory(exportDirectory, mode);
+    public void export(java.io.File exportDirectory, ExportMode mode, DoubleConsumer progressCallback) throws Exception {
+        scanManager.exportToDirectory(exportDirectory, mode, progressCallback);
     }
 
     /** Creates a new empty staged Document in the current Box (manual split). */

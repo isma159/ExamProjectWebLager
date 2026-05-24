@@ -17,6 +17,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -48,6 +49,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private Label lblSessionStatus, lblCurrentPage, lblCurrentDocument, stDocsLabel, stPagesLabel;
     @FXML private TreeView<TreeNode> boxTreeView;
     @FXML private Spinner<Integer> spinnerRotation;
+    @FXML private ProgressBar progressBarExport;
 
     // Session Startup Popup
     @FXML private StackPane sessionPopupOverlay;
@@ -97,6 +99,11 @@ public class ScanController implements Initializable, IViewController {
         lblRole.setText("Role: " + currentUser.getRole().toString());
 
         initializeProfileComboBox();
+
+        currentStage.setOnCloseRequest(event -> {
+            event.consume();
+            onExit(null);
+        });
     }
 
     @Override
@@ -223,13 +230,13 @@ public class ScanController implements Initializable, IViewController {
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
                     icon.getStyleClass().add("tree-cell-box");
-                    setText(comboBoxProfiles.getValue().getExportLabel() + box.getBoxName());
+                    setText(box.getBoxName());
                     setStyle(box.isStaged() || box.isModified() ? "-fx-font-weight: bold;" : "");
 
                     ContextMenu contextMenu = new ContextMenu();
 
                     MenuItem deleteBox = menuItemSetup("Delete Box", "Delete", () -> onDeleteFileOrDocument(null));
-                    MenuItem newDoc = menuItemSetup("New Document", "Ctrl + N", () -> onNewDocument(null));
+                    MenuItem newDoc = menuItemSetup("New Document", "Ctrl + N", () -> onNewDocument());
 
                     contextMenu.getItems().addAll(deleteBox, newDoc);
                     setContextMenu(contextMenu);
@@ -305,7 +312,7 @@ public class ScanController implements Initializable, IViewController {
                 () -> onDeleteFileOrDocument(null));
         shortcuts.put(new KeyCodeCombination(KeyCode.N,
                         KeyCombination.CONTROL_DOWN),
-                () -> onNewDocument(null));
+                 this::onNewDocument);
         shortcuts.put(new KeyCodeCombination(KeyCode.A,
                 KeyCombination.CONTROL_DOWN),
                 () -> onSplitDocument(0));
@@ -374,17 +381,28 @@ public class ScanController implements Initializable, IViewController {
         }
 
         try {
+            if (scanModel != null) {
+                scanModel.getTargetBox().getDocuments().clear();
+                endScanSession();
+            }
+
             Box activeBox = modelFacade.getBoxModel().getOrCreateSessionBox(boxInput, profile);
+
+            modelFacade.getSessionModel().cleanup();
+
+            boolean locked = modelFacade.getSessionModel().tryStartScanSession(profile.getExportLabel() + boxInput);
+            if (!locked) {
+                AlertHelper.showError("Box In Use", "This box is currently open in another session.");
+                return;
+            }
+
             root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
-            modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
+            //modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
             syncDocumentsFromModel();
             initializeTreeView(boxTreeView, activeBox);
 
             sessionActive = true;
-            selectedDocument = null;
-            selectedFile = null;
-            selectedBox = null;
 
             setSessionControlsDisabled(false);
             lblSessionStatus.setText(""); // TODO display something or nah?
@@ -503,8 +521,7 @@ public class ScanController implements Initializable, IViewController {
     }
 
     /** Creates a new empty document and selects it. */
-    @FXML
-    private void onNewDocument(ActionEvent e) {
+    private void onNewDocument() {
         if (!sessionActive || scanModel == null) return;
 
         try {
@@ -531,6 +548,25 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("New Document Failed", "Could not create a new document. Please try again.");
         }
+    }
+
+    private void endScanSession() {
+        if (!sessionActive || scanModel == null) {return;}
+
+        try {
+            modelFacade.getSessionModel().endScanSession(scanModel.getTargetBox().getBoxName());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        sessionActive = false;
+        scanModel = null;
+        documents.clear();
+        selectedBox = null;
+        selectedDocument = null;
+        selectedFile = null;
+        undoStack.clear();
     }
 
     /**
@@ -787,12 +823,7 @@ public class ScanController implements Initializable, IViewController {
                 modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.DELETE, LocalDateTime.now()));
                 boxTreeView.setShowRoot(false);
 
-                sessionActive = false;
-                scanModel = null;
-                documents.clear();
-                selectedBox = null;
-                selectedDocument = null;
-                selectedFile = null;
+                endScanSession();
 
                 setSessionControlsDisabled(true);
                 sessionPopupOverlay.setVisible(true);
@@ -899,16 +930,41 @@ public class ScanController implements Initializable, IViewController {
         java.io.File exportDirectory = chooser.showDialog(currentStage);
         if (exportDirectory == null) return; // user canceled
 
-        try {
-            scanModel.save();
-            scanModel.export(exportDirectory, mode);
-            modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
+        Task<Void> exportTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                scanModel.save();
+                scanModel.export(exportDirectory, mode, progress -> updateProgress(progress * 100, 100));
+                return null;
+            }
+        };
+
+        progressBarExport.progressProperty().bind(exportTask.progressProperty());
+        progressBarExport.setVisible(true);
+        progressBarExport.setManaged(true);
+
+        exportTask.setOnSucceeded(event -> {
+            try {
+                progressBarExport.progressProperty().unbind();
+                modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
+                rebuild();
+                AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
+            }
+            catch (Exception exception) {
+                AlertHelper.showInformation("Log Failed", "Log failed to be sent to database due to " + exception.getMessage());
+            }
+        });
+
+        exportTask.setOnFailed(event -> {
+            progressBarExport.progressProperty().unbind();
             rebuild();
-            AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
-        } catch (Exception ex) {
-            ex.printStackTrace();
             AlertHelper.showError("Export Failed", "Could not export documents. Please try again.");
-        }
+        });
+
+        Thread thread = new Thread(exportTask);
+        thread.setDaemon(true);
+        thread.start();
+
     }
 
     @FXML
@@ -935,8 +991,18 @@ public class ScanController implements Initializable, IViewController {
             try {
                 ViewHandler handler = currentUser.isAdmin() ? ViewHandler.ADMIN : ViewHandler.LOGIN;
                 handler.reset();
-                handler.show(modelFacade);
-                modelFacade.getSessionModel().logout();
+
+                endScanSession();
+
+                Stage stage = new Stage();
+                if (!currentUser.isAdmin()) {
+                    modelFacade.getSessionModel().logout();
+                }
+                else {
+                    stage.setMinWidth(1366);
+                    stage.setMinHeight(768);
+                }
+                handler.show(modelFacade, stage);
                 currentStage.close();
             } catch (Exception e) {
                 e.printStackTrace();

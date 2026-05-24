@@ -1,9 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.BoxMetadata;
-import ScanHub.DAL.DAO.BoxMetadataDAO;
-import ScanHub.DAL.interfaces.IMetadataDataAccess;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.BLL.facade.DAOFacade;
 
 import java.util.List;
 

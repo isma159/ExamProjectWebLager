@@ -1,9 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.Client;
-import ScanHub.DAL.DAO.ClientDAO;
-import ScanHub.DAL.interfaces.IDataAccess;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.BLL.facade.DAOFacade;
 
 import java.util.List;
 

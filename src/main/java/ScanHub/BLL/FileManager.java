@@ -2,9 +2,7 @@ package ScanHub.BLL;
 
 // project imports
 import ScanHub.BE.File;
-import ScanHub.DAL.DAO.FileDAO;
-import ScanHub.DAL.interfaces.IDataAccess;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.BLL.facade.DAOFacade;
 
 public class FileManager {
 
