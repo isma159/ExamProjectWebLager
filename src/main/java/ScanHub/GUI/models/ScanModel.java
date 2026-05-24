@@ -5,6 +5,9 @@ import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.ScanManager;
 import ScanHub.DAL.ApiClient.ScanApiClient;
 
+import java.awt.image.BufferedImage;
+import java.util.function.DoubleConsumer;
+
 /** Created via startSession() in ScanController and discarded when the session ends. */
 public class ScanModel {
 
@@ -20,8 +23,8 @@ public class ScanModel {
 
     public void save() throws Exception { scanManager.commitAll(); }
 
-    public void export(java.io.File exportDirectory, ExportMode mode) throws Exception {
-        scanManager.exportToDirectory(exportDirectory, mode);
+    public void export(java.io.File exportDirectory, ExportMode mode, DoubleConsumer progressCallback) throws Exception {
+        scanManager.exportToDirectory(exportDirectory, mode, progressCallback);
     }
 
     public Document manualSplit() { return scanManager.manualSplit(); }
@@ -37,4 +40,8 @@ public class ScanModel {
     public void deleteBox() throws Exception {scanManager.deleteBox();}
 
     public Box getTargetBox() { return scanManager.getTargetBox(); }
+
+    public BufferedImage sharpen(BufferedImage source, float strength) {
+        return scanManager.sharpen(source, strength);
+    }
 }

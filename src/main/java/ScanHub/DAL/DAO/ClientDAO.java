@@ -199,7 +199,9 @@ public class ClientDAO implements IDataAccess<Client> {
                         rs.getInt("hue"),
                         rs.getInt("brightness"),
                         rs.getInt("contrast"),
-                        rs.getInt("saturation"))
+                        rs.getInt("saturation"),
+                        0
+                )
         );
 
     }

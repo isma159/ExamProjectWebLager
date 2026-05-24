@@ -53,18 +53,17 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        loadUsers();
-        txtFldUserSearch.textProperty().addListener((observable, oldValue, newValue) -> filterUsers(newValue));
+        filterUsers();
+        txtFldUserSearch.textProperty().addListener((observable, oldValue, newValue) -> filterUsers());
 
-        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> loadUsers()));
+        pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> filterUsers()));
     }
 
-    private void loadUsers() {
+    private void loadUsers(List<User> users) {
         try {
             selectedUser = null;
             selectedUserRow = null;
 
-            List<User> users = modelFacade.getUserModel().getUsers();
             TableLoader.loadTable(userTableBox, pgUsers, TOTAL_TABLE_SIZE, users, item -> {
                 User user = (User) item;
                 return RowMaker.addUserRow(user, this::selectUser);
@@ -114,7 +113,7 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
             try {
                 modelFacade.getUserModel().deleteUser(selectedUser);
                 modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedUser.getUserId(), EntityType.USER, LogAction.DELETE, LocalDateTime.now()));
-                loadUsers();
+                filterUsers();
             } catch (Exception e) {
                 e.printStackTrace();
                 AlertHelper.showError("Delete Failed", "Failed to delete user. Please try again.");
@@ -140,29 +139,30 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
 
             stage.showAndWait();
 
-            loadUsers(); // refresh the list after the form closes
+            filterUsers(); // refresh the list after the form closes
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Error", "Failed to open the user form. Please try again.");
         }
     }
 
-    private void filterUsers(String search) { // TODO: needs rework
-        // loops through every row in user table
-        for (var node : userTableBox.getChildren()) {
-            HBox row = (HBox) node;
-            User user = (User) row.getUserData();
+    private void filterUsers() { // TODO: needs rework
 
-            // checks input matching for username and role
-            boolean matching = search.isBlank()
-            || user.getUsername().toLowerCase().contains(search.toLowerCase());
-            // for the togglebuttons filtering
-            boolean matchingRole = selectedRole ==  null || user.getRole() == selectedRole;
+        String search = txtFldUserSearch.getText();
 
-            // show or hide if matching or not
-            row.setVisible(matching && matchingRole);
-            row.setManaged(matching && matchingRole);
-        }
+        List<User> users = modelFacade.getUserModel().getUsers();
+
+        users = users.stream().filter(u -> {
+
+            boolean roleMatch = selectedRole == null || selectedRole == u.getRole();
+            boolean searchMatch = search.isBlank() || u.getUsername().contains(search);
+
+            return roleMatch && searchMatch;
+
+        }).toList();
+
+        loadUsers(users);
+
     }
 
     @Override
@@ -177,19 +177,19 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
     @FXML
     private void onTbAllUsersClick(ActionEvent actionEvent) {
         selectedRole = null;
-        filterUsers(txtFldUserSearch.getText());
+        filterUsers();
     }
 
     @FXML
     private void onTbAdminsClick(ActionEvent actionEvent) {
         selectedRole = Role.ADMIN;
-        filterUsers(txtFldUserSearch.getText());
+        filterUsers();
     }
 
     @FXML
     private void onTbUsersClick(ActionEvent actionEvent) {
         selectedRole = Role.USER;
-        filterUsers(txtFldUserSearch.getText());
+        filterUsers();
     }
 
     @FXML
@@ -217,6 +217,6 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
             row.setUserData(user);
             userTableBox.getChildren().add(row);
         }
-        filterUsers(txtFldUserSearch.getText());
+        filterUsers();
     }
 }

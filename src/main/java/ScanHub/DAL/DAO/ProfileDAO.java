@@ -174,7 +174,8 @@ public class ProfileDAO implements IDataAccess<Profile> {
                 rs.getInt("hue"),
                 rs.getInt("brightness"),
                 rs.getInt("contrast"),
-                rs.getInt("saturation")
+                rs.getInt("saturation"),
+                0
         );
     }
 

@@ -69,7 +69,7 @@ public class BoxManager {
             throw new IllegalArgumentException("A profile is required to start a scan session");
         }
 
-        Box existing = tryGetExistingBox(boxInput);
+        Box existing = tryGetExistingBox(profile.getExportLabel() + boxInput);
         if (existing != null) {
             existing.setProfile(profile);
             if (existing.getProfileId() != profile.getProfileId()) {
@@ -79,13 +79,14 @@ public class BoxManager {
 
             // load persisted documents + files into the in-memory box
             List<Document> docs = daoFacade.getDocumentDAO().getDocumentsWithFilesByBoxId(existing.getBoxId());
+            existing.getDocuments().clear();
             existing.getDocuments().addAll(docs);
 
             return existing;
         }
 
         Box box = new Box();
-        box.setBoxName(boxInput);
+        box.setBoxName(profile.getExportLabel() + boxInput);
         box.setProfileId(profile.getProfileId());
         box.setProfile(profile);
         box.setStaged(true);

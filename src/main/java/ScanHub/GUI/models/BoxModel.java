@@ -35,11 +35,18 @@ public class BoxModel {
     public Box getOrCreateSessionBox(String boxInput, Profile profile) throws Exception {
         Box box = boxManager.getOrCreateSessionBox(boxInput, profile);
 
+
         // keep the observable list in sync if a new box was just created
-        boolean alreadyTracked = boxObservableList.stream()
-                .anyMatch(b -> b.getBoxId() == box.getBoxId());
-        if (!alreadyTracked) {
-            boxObservableList.addFirst(box); // newest first, matching DAO order
+        boolean replaced = false;
+        for (int i = 0; i < boxObservableList.size(); i++) {
+            if (boxObservableList.get(i).getBoxId() == box.getBoxId()) {
+                boxObservableList.set(i, box);
+                replaced = true;
+                break;
+            }
+        }
+        if (!replaced) {
+            boxObservableList.addFirst(box);
         }
 
         return box;

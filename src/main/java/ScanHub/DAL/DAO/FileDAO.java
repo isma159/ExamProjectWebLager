@@ -123,7 +123,8 @@ public class FileDAO {
             SELECT f.fileId, f.documentId, f.referenceId, f.sortId, f.fileSizeBytes, f.created_at,
                    fas.fileAdjustmentSettingsId, fas.rotation AS adjustmentRotation,
                    fas.hue AS adjustmentHue, fas.brightness AS adjustmentBrightness,
-                   fas.contrast AS adjustmentContrast, fas.saturation AS adjustmentSaturation
+                   fas.contrast AS adjustmentContrast, fas.saturation AS adjustmentSaturation,
+                   fas.sharpness AS adjustmentSharpness
             FROM Files f
             LEFT JOIN FileAdjustmentSettings fas
                 ON f.fileId = fas.fileId AND fas.deleted_at IS NULL
@@ -150,7 +151,8 @@ public class FileDAO {
                                 rs.getDouble("adjustmentHue"),
                                 rs.getDouble("adjustmentBrightness"),
                                 rs.getDouble("adjustmentContrast"),
-                                rs.getDouble("adjustmentSaturation")
+                                rs.getDouble("adjustmentSaturation"),
+                                rs.getDouble("adjustmentSharpness")
                         ));
                     }
                     files.add(file);

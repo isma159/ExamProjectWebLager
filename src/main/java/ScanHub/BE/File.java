@@ -54,6 +54,7 @@ public class File implements TreeNode {
     public double getBrightness()       { return fileAdjustmentSettings.getBrightness(); }
     public double getContrast()         { return fileAdjustmentSettings.getContrast(); }
     public double getSaturation()       { return fileAdjustmentSettings.getSaturation(); }
+    public double getSharpness()        { return fileAdjustmentSettings.getSharpness();}
     public boolean isStaged()           { return staged; }
     public FileAdjustmentSettings getFileSettings() { return fileAdjustmentSettings; }
     public boolean hasCustomFileSettings() { return customFileSettings; }
@@ -70,6 +71,7 @@ public class File implements TreeNode {
     public void setBrightness(double brightness)      { fileAdjustmentSettings.setBrightness(brightness); }
     public void setContrast(double contrast)          { fileAdjustmentSettings.setContrast(contrast); }
     public void setSaturation(double saturation)      { fileAdjustmentSettings.setSaturation(saturation); }
+    public void setSharpness(double sharpness)        { fileAdjustmentSettings.setSharpness(sharpness);}
     public void setStaged(boolean staged)             { this.staged = staged; }
     public void setFileSettings(FileAdjustmentSettings fileAdjustmentSettings) {
         this.fileAdjustmentSettings = fileAdjustmentSettings == null ? new FileAdjustmentSettings()
