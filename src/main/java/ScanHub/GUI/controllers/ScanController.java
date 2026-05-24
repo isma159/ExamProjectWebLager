@@ -13,6 +13,8 @@ import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -31,9 +33,15 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.ToggleSwitch;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -58,8 +66,9 @@ public class ScanController implements Initializable, IViewController {
 
     // File Adjustment Menu
     @FXML private StackPane fileAdjustmentSideMenu;
-    @FXML private Spinner<Integer> spinnerFileAdjustmentRotation, spinnerFileAdjustmentHue, spinnerFileAdjustmentBrightness, spinnerFileAdjustmentContrast, spinnerFileAdjustmentSaturation;
-    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderRotation;
+    @FXML private Spinner<Integer> spinnerFileAdjustmentRotation, spinnerFileAdjustmentHue, spinnerFileAdjustmentBrightness,
+            spinnerFileAdjustmentContrast, spinnerFileAdjustmentSaturation, spinnerFileAdjustmentSharpness;
+    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderRotation, sliderSharpness;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -75,7 +84,6 @@ public class ScanController implements Initializable, IViewController {
     private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
             (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
-
     private final Deque<Runnable> undoStack = new ArrayDeque<>();
     private static final int maxUndos = 30;
 
@@ -118,12 +126,16 @@ public class ScanController implements Initializable, IViewController {
         spinnerFileAdjustmentBrightness.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
         spinnerFileAdjustmentContrast.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
         spinnerFileAdjustmentSaturation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
+        spinnerFileAdjustmentSharpness.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
 
         bindSlider(sliderHue, spinnerFileAdjustmentHue);
         bindSlider(sliderBrightness, spinnerFileAdjustmentBrightness);
         bindSlider(sliderContrast, spinnerFileAdjustmentContrast);
         bindSlider(sliderSaturation, spinnerFileAdjustmentSaturation);
         bindSlider(sliderRotation, spinnerFileAdjustmentRotation);
+        bindSlider(sliderSharpness, spinnerFileAdjustmentSharpness);
+
+        sliderSharpness.setOnMouseReleased(e -> applySharpnessToPreview((float) sliderSharpness.getValue() / 100f));
 
         setSessionControlsDisabled(true);
         refreshStatusBar();
@@ -788,10 +800,11 @@ public class ScanController implements Initializable, IViewController {
             double brightness = sliderBrightness.getValue();
             double contrast = sliderContrast.getValue();
             double saturation = sliderSaturation.getValue();
+            double sharpness = sliderSharpness.getValue();
 
             // snapshot old settings into a copy before any mutation
-            FileAdjustmentSettings oldSettings = new FileAdjustmentSettings(selectedFile.getRotation(), selectedFile.getHue(), selectedFile.getBrightness(), selectedFile.getContrast(), selectedFile.getSaturation());
-            FileAdjustmentSettings newSettings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation);
+            FileAdjustmentSettings oldSettings = new FileAdjustmentSettings(selectedFile.getRotation(), selectedFile.getHue(), selectedFile.getBrightness(), selectedFile.getContrast(), selectedFile.getSaturation(), selectedFile.getSharpness());
+            FileAdjustmentSettings newSettings = new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation, sharpness);
 
             final File capturedFile = selectedFile;
             scanModel.updateFileSettings(capturedFile, newSettings);
@@ -805,6 +818,8 @@ public class ScanController implements Initializable, IViewController {
             });
 
             rebuildPreviewCard();
+
+            applySharpnessToPreview((float) newSettings.getSharpness() / 100f);
         } catch (IllegalArgumentException ex) {
             AlertHelper.showError("Invalid Input", ex.getMessage());
             // TODO add visual feedback
@@ -1236,6 +1251,7 @@ public class ScanController implements Initializable, IViewController {
             if (!image.isError()) {
                 thumb.setImage(image);
             }
+
         }
 
         thumb.setFitWidth(cw - 8);
@@ -1298,6 +1314,15 @@ public class ScanController implements Initializable, IViewController {
         sliderContrast.setValue(file.getContrast());
         sliderSaturation.setValue(file.getSaturation());
         sliderRotation.setValue(file.getRotation());
+        sliderSharpness.setValue(file.getSharpness());
+        applySharpnessToPreview((float) sliderSharpness.getValue() / 100f);
+    }
+
+    private BufferedImage scaleToPreviewSize(BufferedImage source, int width, int height) {
+        java.awt.Image scaled = source.getScaledInstance(width, height, java.awt.Image.SCALE_FAST);
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        result.getGraphics().drawImage(scaled, 0, 0, null);
+        return result;
     }
 
     /**
@@ -1336,6 +1361,28 @@ public class ScanController implements Initializable, IViewController {
         if (!pageGrid.getChildren().isEmpty()) {
             pageGrid.getChildren().getFirst().setRotate(sliderRotation.getValue());
         }
+    }
+
+    private void applySharpnessToPreview(float strength) {
+        if (selectedFile == null || currentPreviewImageView == null || selectedFile.getImageData() == null) return;
+        try {
+            BufferedImage scaled = ImageIO.read(new ByteArrayInputStream(selectedFile.getImageData()));
+
+            BufferedImage preview = scanModel.sharpen(scaleToPreviewSize(scaled, (int) cardWidth() - 8, (int) cardHeight() - 44), strength);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ImageIO.write(preview, "png", out);
+
+            Image image = new Image(new ByteArrayInputStream(out.toByteArray()));
+
+            if (!image.isError()) {
+                currentPreviewImageView.setImage(image);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void selectPage(Document document, File file) {

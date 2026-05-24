@@ -52,22 +52,17 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        loadProfiles();
-        txtFldSearchProfiles.textProperty().addListener((observable, oldValue, newValue) -> filterProfiles(newValue));
-        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            loadProfiles();
-        }));
-
-        javafx.application.Platform.runLater(this::registerProfileShortcuts);
+        filterProfiles();
+        txtFldSearchProfiles.textProperty().addListener((observable, oldValue, newValue) -> filterProfiles());
+        pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> filterProfiles()));
     }
 
-    private void loadProfiles() {
+    private void loadProfiles(List<Profile> profiles) {
         try {
             selectedProfile = null;
             selectedProfileRow = null;
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
-            List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
             TableLoader.loadTable(profileTableBox, pgProfiles, TOTAL_TABLE_SIZE, profiles, item ->{
                 Profile profile = (Profile) item;
                 return RowMaker.addProfileRow(profile, this::selectProfile);
@@ -77,27 +72,6 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
             e.printStackTrace();
             AlertHelper.showError("Load Error", "Failed to load profiles.");
         }
-    }
-
-    private void registerProfileShortcuts() {
-        Scene scene = profileTableBox.getScene();
-
-        if (scene == null) return;
-
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (profileTableBox.getScene() == null) return;
-
-            if (event.isControlDown()) {
-                switch (event.getCode()) {
-                    case N -> onClickCreateProfile();
-                    case E -> onClickUpdateProfile();
-                }
-                if (event.getCode() == javafx.scene.input.KeyCode.DELETE)  {
-                    onClickDeleteProfile(null);
-                    event.consume();
-                }
-            }
-        });
     }
 
     private void selectProfile(Profile profile, HBox rowHBox) {
@@ -140,7 +114,7 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
                         modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedProfile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
                         modelFacade.getClientModel().refreshClients();
                         modelFacade.getUserModel().refreshUsers();
-                        loadProfiles();
+                        filterProfiles();
                     } catch (Exception e) {
                         e.printStackTrace();
                         AlertHelper.showError("Delete Failed", "Failed to delete profile. Please try again.");
@@ -167,23 +141,28 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
 
             stage.showAndWait();
 
-            loadProfiles(); // refresh the list after the form closes
+            filterProfiles(); // refresh the list after the form closes
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Error", "Failed to open the profile form. Please try again.");
         }
     }
 
-    private void filterProfiles(String search) { // TODO: needs rework
-        for (var node : profileTableBox.getChildren()) {
-            HBox row = (HBox) node;
-            Profile profile = (Profile) row.getUserData();
+    private void filterProfiles() { // TODO: needs rework
 
-            boolean matching = search.isBlank() || profile.getProfileName().toLowerCase().contains(search.toLowerCase());
-            boolean matchingStatus = selectedStatus == null || profile.getStatus() == selectedStatus;
-            row.setVisible(matching && matchingStatus);
-            row.setManaged(matching && matchingStatus);
-        }
+        String search = txtFldSearchProfiles.getText().toLowerCase();
+
+        List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
+
+        profiles = profiles.stream().filter(p -> {
+
+            boolean statusMatch = selectedStatus == null || selectedStatus == p.getStatus();
+            boolean searchMatch = search.isBlank() || p.getProfileName().toLowerCase().contains(search);
+
+            return statusMatch && searchMatch;
+        }).toList();
+
+        loadProfiles(profiles);
     }
 
     @Override
@@ -196,22 +175,22 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
     }
 
     @FXML
-    private void onTbAllProfilesClick(){
-    selectedStatus =  null;
-    filterProfiles(txtFldSearchProfiles.getText());
+    private void onTbAllProfilesClick() {
+        selectedStatus =  null;
+        filterProfiles();
     }
 
     @FXML
-    private void onTbActiveClick(){
+    private void onTbActiveClick() {
         selectedStatus = ProfileStatus.ACTIVE;
-        filterProfiles(txtFldSearchProfiles.getText());
+        filterProfiles();
     }
 
 
     @FXML
-    private void onTbInactiveClick()
-    { selectedStatus = ProfileStatus.INACTIVE;
-        filterProfiles(txtFldSearchProfiles.getText());
+    private void onTbInactiveClick() {
+        selectedStatus = ProfileStatus.INACTIVE;
+        filterProfiles();
     }
 
     @FXML
@@ -239,6 +218,6 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
             row.setUserData(profile);
             profileTableBox.getChildren().add(row);
         }
-        filterProfiles(txtFldSearchProfiles.getText());
+        filterProfiles();
     }
 }

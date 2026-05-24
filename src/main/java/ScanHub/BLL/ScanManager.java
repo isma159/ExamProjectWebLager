@@ -20,6 +20,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
@@ -290,6 +292,7 @@ public class ScanManager {
         float saturationFactor = (float) (1.0 + (settings.getSaturation() / 100.0)); // 0 (1.0) = unchanged, 100 (2.0) = more vivid/saturated colors, -50 (0.5) = more gray/desaturated
         float brightnessShift = (float) (settings.getBrightness() / 100.0); // positive values brighten, negative values darken
         float hueShift = (float) (settings.getHue() / 100.0); // positive/negative values rotate colors around the color wheel as Hue is circular
+        float sharpness = (float) settings.getSharpness() / 100;
 
         // loop through every pixel in the image
         for (int y = 0; y < height; y++) {
@@ -326,7 +329,23 @@ public class ScanManager {
             }
         }
 
-        return result;
+        return sharpen(result, sharpness);
+    }
+
+    public BufferedImage sharpen(BufferedImage source, float strength) {
+        float center = 1 + (4 * strength);
+        float edge = -strength;
+
+        float[] kernelInfo = {
+                0f, edge, 0f,
+                edge, center, edge,
+                0f, edge, 0f
+        };
+
+        Kernel kernel = new Kernel(3, 3, kernelInfo);
+        ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+
+        return op.filter(source, null);
     }
 
     /** Applies rotation and smoothes the pixels when rotated while preserving the full visible bounds. */

@@ -284,7 +284,8 @@ public class UserDAO implements IDataAccess<User> {
                         rs.getInt("hue"),
                         rs.getInt("brightness"),
                         rs.getInt("contrast"),
-                        rs.getInt("saturation"))
+                        rs.getInt("saturation"),
+                        0)
         );
     }
 }

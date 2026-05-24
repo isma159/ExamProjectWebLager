@@ -105,7 +105,7 @@
                     </VBox.margin>
                 </TreeView>
                 <BorderPane.margin>
-                    <Insets bottom="3.0" right="3.0" top="3.0" />
+                    <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                 </BorderPane.margin>
             </VBox>
         </left>
@@ -500,6 +500,19 @@
                                  <Slider fx:id="sliderRotation" blockIncrement="5.0" majorTickUnit="90.0" max="360.0" min="-360.0" minorTickCount="5" value="0" />
                               </children>
                            </VBox>
+                           <Separator layoutX="10.0" layoutY="311.0" minWidth="-Infinity" styleClass="grey-separator" />
+                           <VBox layoutX="10.0" layoutY="325.0" spacing="4.0">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <children>
+                                       <Label prefWidth="120.0" styleClass="lbl" text="Sharpness" HBox.hgrow="ALWAYS" />
+                                       <Region HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spinnerFileAdjustmentSharpness" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                 <Slider fx:id="sliderSharpness" blockIncrement="5.0" majorTickUnit="20.0" min="-100.0" minorTickCount="1" snapToTicks="true" value="0" />
+                              </children>
+                           </VBox>
                         </children>
                         <VBox.margin>
                            <Insets left="12.0" right="12.0" />
@@ -518,6 +531,9 @@
             </BorderPane.margin>
          </StackPane>
       </right>
+      <padding>
+         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+      </padding>
     </BorderPane>
 
     <StackPane fx:id="sessionPopupOverlay" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false">
@@ -625,7 +641,4 @@
          </children>
       </VBox>
    </StackPane>
-   <padding>
-      <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-   </padding>
 </StackPane>

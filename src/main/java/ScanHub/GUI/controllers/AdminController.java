@@ -83,6 +83,10 @@ public class AdminController implements IViewController, Initializable {
                 new KeyCodeCombination(KeyCode.F2),
                 () -> {darkMode.setSelected(!darkMode.isSelected()); ThemeHandler.toggle(contentArea.getScene(), darkMode.isSelected());}
         );
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.ESCAPE),
+                () -> onClickLogOut(null)
+        );
 
         sidebarBtns.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {

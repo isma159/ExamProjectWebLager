@@ -8,6 +8,7 @@ import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.ScanManager;
 import ScanHub.DAL.ApiClient.ScanApiClient;
 
+import java.awt.image.BufferedImage;
 import java.util.function.DoubleConsumer;
 
 /**
@@ -71,4 +72,8 @@ public class ScanModel {
     public Document getCurrentDocument() { return scanManager.getCurrentDocument(); }
 
     public Box getTargetBox() { return scanManager.getTargetBox(); }
+
+    public BufferedImage sharpen(BufferedImage source, float strength) {
+        return scanManager.sharpen(source, strength);
+    }
 }
