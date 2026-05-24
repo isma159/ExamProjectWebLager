@@ -2,12 +2,9 @@ package ScanHub.BLL;
 
 // project imports
 import ScanHub.BE.Profile;
-import ScanHub.DAL.DAO.ProfileDAO;
-import ScanHub.DAL.interfaces.IDataAccess;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 // java imports
-import java.util.Collections;
 import java.util.List;
 
 public class ProfileManager {

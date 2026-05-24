@@ -4,10 +4,7 @@ package ScanHub.BLL;
 import ScanHub.BE.Box;
 import ScanHub.BE.Document;
 import ScanHub.BE.Profile;
-import ScanHub.DAL.DAO.BoxDAO;
-import ScanHub.DAL.DAO.DocumentDAO;
-import ScanHub.DAL.interfaces.IDataAccess;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.util.List;
 
@@ -81,10 +78,8 @@ public class BoxManager {
             }
 
             // load persisted documents + files into the in-memory box
-            DocumentDAO documentDAO = new DocumentDAO();
-            List<Document> docs = documentDAO.getDocumentsWithFilesByBoxId(existing.getBoxId());
+            List<Document> docs = daoFacade.getDocumentDAO().getDocumentsWithFilesByBoxId(existing.getBoxId());
             existing.getDocuments().addAll(docs);
-            applyProfileDefaults(existing);
 
             return existing;
         }
@@ -96,17 +91,5 @@ public class BoxManager {
         box.setStaged(true);
 
         return box;
-    }
-
-    private void applyProfileDefaults(Box box) {
-        if (box == null || box.getProfile() == null) return;
-
-        for (Document document : box.getDocuments()) {
-            for (ScanHub.BE.File file : document.getFiles()) {
-                if (!file.hasCustomFileSettings()) {
-                    file.applyDefaultFileSettings(box.getProfile().getFileAdjustmentSettings());
-                }
-            }
-        }
     }
 }

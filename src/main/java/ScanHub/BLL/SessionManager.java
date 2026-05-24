@@ -1,7 +1,6 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.User;
-import ScanHub.GUI.util.AlertHelper;
 
 public class SessionManager {
 
@@ -15,7 +14,6 @@ public class SessionManager {
             return true;
         }
         else {
-            AlertHelper.showError("Session Already Active", "A user is already logged in. Please log out before starting a new session.");
             return false;
         }
     }

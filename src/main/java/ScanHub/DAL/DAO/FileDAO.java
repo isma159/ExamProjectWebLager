@@ -4,6 +4,7 @@ package ScanHub.DAL.DAO;
 import ScanHub.BE.File;
 import ScanHub.BE.FileAdjustmentSettings;
 import ScanHub.DAL.DB.DBConnector;
+import ScanHub.DAL.interfaces.IDataAccess;
 
 // java imports
 import java.io.IOException;
@@ -52,8 +53,9 @@ public class FileDAO {
     }
 
     /**
-     * Loads imageData only when actively needed (viewing/exporting).
-     * The File BE object intentionally omits imageData in list views.
+     * Loads raw image data for preview generation and exporting.
+     * JavaFX Image previews are cached lazily in the File BE object
+     * to avoid repeated TIFF decoding and PNG re-encoding.
      */
     public byte[] loadImageData(int fileId) throws SQLException {
         String sql = "SELECT imageData FROM Files WHERE fileId = ? AND deleted_at IS NULL";
@@ -118,8 +120,8 @@ public class FileDAO {
     public List<File> getFilesForDocument(int documentId) throws SQLException {
         List<File> files = new ArrayList<>();
         String sql = """
-            SELECT f.fileId, f.documentId, f.referenceId, f.sortId, f.imageData, f.fileSizeBytes,
-                   f.created_at, fas.fileAdjustmentSettingsId, fas.rotation AS adjustmentRotation,
+            SELECT f.fileId, f.documentId, f.referenceId, f.sortId, f.fileSizeBytes, f.created_at,
+                   fas.fileAdjustmentSettingsId, fas.rotation AS adjustmentRotation,
                    fas.hue AS adjustmentHue, fas.brightness AS adjustmentBrightness,
                    fas.contrast AS adjustmentContrast, fas.saturation AS adjustmentSaturation
             FROM Files f
@@ -139,7 +141,6 @@ public class FileDAO {
                     file.setDocumentId(rs.getInt("documentId"));
                     file.setReferenceId(rs.getInt("referenceId"));
                     file.setSortId(rs.getInt("sortId"));
-                    file.setImageData(rs.getBytes("imageData")); // loads the TIFF blob
                     file.setFileSizeBytes(rs.getInt("fileSizeBytes"));
                     file.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
 

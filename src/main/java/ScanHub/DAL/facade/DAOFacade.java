@@ -1,4 +1,4 @@
-package ScanHub.GUI.facade;
+package ScanHub.DAL.facade;
 
 import ScanHub.BE.*;
 import ScanHub.DAL.DAO.*;
@@ -13,7 +13,7 @@ public class DAOFacade {
     private final IDataAccess<Client> clientDAO;
     private final IDataAccess<Log> logDAO;
     private final IDataAccess<Box> boxDAO;
-    // skal muligvis implementeres IDataAcess?
+    // todo skal muligvis implementeres IDataAcess?
     private final DocumentDAO documentDAO;
     private final FileDAO fileDAO;
     private final BoxMetadataDAO boxMetadataDAO;

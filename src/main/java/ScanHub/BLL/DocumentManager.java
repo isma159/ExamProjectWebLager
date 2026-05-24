@@ -1,8 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.Document;
-import ScanHub.DAL.DAO.DocumentDAO;
-import ScanHub.GUI.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.util.List;
 

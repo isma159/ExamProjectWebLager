@@ -236,7 +236,7 @@
 
                     <StackPane styleClass="background" VBox.vgrow="ALWAYS">
 
-                        <ScrollPane fitToHeight="false" fitToWidth="true" pannable="true" styleClass="v-card">
+                        <ScrollPane fx:id="scrollPanePageGrid" fitToHeight="false" fitToWidth="true" pannable="true" styleClass="v-card">
                             <content>
                                 <FlowPane fx:id="pageGrid" alignment="CENTER" columnHalignment="CENTER" hgap="16" vgap="16">
                                     <padding>
