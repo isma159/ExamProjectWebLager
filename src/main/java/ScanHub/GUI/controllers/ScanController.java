@@ -57,6 +57,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private TreeView<TreeNode> boxTreeView;
     @FXML private Spinner<Integer> spinnerRotation;
     @FXML private ProgressBar progressBarExport;
+    @FXML private HBox hboxProgressBarExport;
 
     // Session Startup Popup
     @FXML private StackPane sessionPopupOverlay;
@@ -957,12 +958,12 @@ public class ScanController implements Initializable, IViewController {
         };
 
         progressBarExport.progressProperty().bind(exportTask.progressProperty());
-        progressBarExport.setVisible(true);
-        progressBarExport.setManaged(true);
+        setExportInProgress(true);
 
         exportTask.setOnSucceeded(event -> {
             try {
                 progressBarExport.progressProperty().unbind();
+                setExportInProgress(false);
                 modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
                 rebuild();
                 AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
@@ -974,6 +975,7 @@ public class ScanController implements Initializable, IViewController {
 
         exportTask.setOnFailed(event -> {
             progressBarExport.progressProperty().unbind();
+            setExportInProgress(false);
             rebuild();
             AlertHelper.showError("Export Failed", "Could not export documents. Please try again.");
         });
@@ -1311,6 +1313,10 @@ public class ScanController implements Initializable, IViewController {
         return card;
     }
 
+    // A4 ratio
+    private double cardWidth() { return selectedFile != null ? 400 * zoomLevel : 380 * zoomLevel; }
+    private double cardHeight() { return selectedFile != null ? 566 * zoomLevel : 538 * zoomLevel; }
+
     // ---------- HELPERS ----------
 
     private void updateProfileAdjustmentsFields(Profile profile) {
@@ -1435,6 +1441,11 @@ public class ScanController implements Initializable, IViewController {
         btnZoomIn.setDisable(disabled);
         btnRotLeft.setDisable(disabled);
         btnRotRight.setDisable(disabled);
+    }
+
+    private void setExportInProgress(boolean inProgress) {
+        hboxProgressBarExport.setVisible(inProgress);
+        hboxProgressBarExport.setManaged(inProgress);
     }
 
     private String setDocumentLabel(Document document) {

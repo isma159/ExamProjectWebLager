@@ -1,7 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.User;
-import ScanHub.BLL.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
