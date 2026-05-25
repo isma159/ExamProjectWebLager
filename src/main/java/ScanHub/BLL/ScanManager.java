@@ -1,14 +1,11 @@
 package ScanHub.BLL;
 
-import ScanHub.BE.Box;
-import ScanHub.BE.Document;
-import ScanHub.BE.File;
-import ScanHub.BE.FileAdjustmentSettings;
+import ScanHub.BE.*;
 import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.util.BarcodeDetector;
 import ScanHub.DAL.ApiClient.ScanResult;
 import ScanHub.DAL.interfaces.IScanSource;
-import ScanHub.BLL.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -44,11 +41,9 @@ public class ScanManager {
     private Box targetBox;
     private int referenceCounter = 0;
 
-    public boolean needsBarcodeFirst; // true when box has no files and documents
+    private boolean needsBarcodeFirst; // true when box has no files and documents
     private final List<Integer> pendingDeleteFileIds = new ArrayList<>(); // list of file id's to be deleted at the next commit
     private final List<Integer> pendingDeleteDocumentIds = new ArrayList<>(); // list document id's to be deleted at the next commit
-
-    public record StoredScan(File file, Document document, boolean barcodeSplit) {} // record returned to controller after each successful scan
 
     public ScanManager(IScanSource scanSource, Box targetBox) throws Exception {
         this.scanSource = scanSource;
@@ -97,11 +92,26 @@ public class ScanManager {
     }
 
     /**
+     * Returns the image bytes for a file.
+     * Staged files already carry data in memory while persisted files,
+     * fall back to loading from DB if the data is not currently loaded.
+     */
+    public byte[] resolveImageData(File file) throws Exception {
+        if (file.getImageData() != null) return file.getImageData();
+        if (!file.isStaged() && file.getFileId() > 0) {
+            byte[] data = daoFacade.getFileDAO().loadImageData(file.getFileId());
+            file.setImageData(data);
+            return data;
+        }
+        return null;
+    }
+
+    /**
      * Applies all pending in-memory deletes to the DB, then walks every staged
      * document and file in order, persists them and updates their real DB ids.
      */
     public void commitAll() throws Exception {
-        // delete
+
         for (int fileId : pendingDeleteFileIds) {
             daoFacade.getFileDAO().deleteFile(fileId);
         }
@@ -156,33 +166,28 @@ public class ScanManager {
     }
 
     /**
-     * Exports every document in the box to the local filesystem under {@code exportDir}.
+     * Exports all documents to the given directory using the chosen mode.
      * <p>
-     * <b>Single-Page TIFF</b> - each page is its own TIFF inside its own sub-folder:
+     * Single-Page TIFF - each file in its own sub-folder:
      * <pre>
      *   exportDir/boxName/Document1/File1.tiff
      *   exportDir/boxName/Document1/File2.tiff
      * </pre>
-     * <p>
-     * <b>Multi-Page TIFF</b> - all pages of a document are merged into one
-     * multi-frame TIFF placed flat inside the document folder:
+     * Multi-Page TIFF - all pages of a document merged into one TIFF:
      * <pre>
      *   exportDir/boxName/Document_1/Document_1.tiff
      * </pre>
      */
     public void exportToDirectory(java.io.File exportDirectory, ExportMode mode, DoubleConsumer progressCallback) throws Exception {
-        ImageIO.scanForPlugins(); // ensure TwelveMonkeys TIFF writer/reader is registered
-
         Path boxRoot = exportDirectory.toPath().resolve(targetBox.getBoxName());
         Files.createDirectories(boxRoot);
 
         int documentIndex = 1;
 
-        List<Document> documents = targetBox.getDocuments().stream().filter(doc -> !doc.getFiles().isEmpty()).toList();
+        List<Document> documents = targetBox.getDocuments().stream().filter(document -> !document.getFiles().isEmpty()).toList();
 
-        int totaLFiles = documents.stream().mapToInt(d -> d.getFiles().size()).sum();
+        int totalFiles = documents.stream().mapToInt(document -> document.getFiles().size()).sum();
         int processed = 0;
-
 
         for (Document document : documents) {
 
@@ -197,7 +202,7 @@ public class ScanManager {
             }
 
             processed += document.getFiles().size();
-            progressCallback.accept((double) processed / totaLFiles);
+            progressCallback.accept((double) processed / totalFiles); // stores the result of processed / totalFiles in a Consumer, that is used for tracking progress in a Task
             documentIndex++;
         }
     }
@@ -207,7 +212,10 @@ public class ScanManager {
         int fileIndex = 1;
         for (File file : document.getFiles()) {
             byte[] data = renderAdjustedImageData(file);
-            if (data == null) { fileIndex++; continue; }
+            if (data == null) {
+                fileIndex++;
+                continue;
+            }
 
             Path outputFile = documentDirectory.resolve("File" + fileIndex + ".tiff");
             Files.write(outputFile, data);
@@ -246,19 +254,7 @@ public class ScanManager {
         }
     }
 
-    /**
-     * Returns the image bytes for a file.
-     * Staged files already carry data in memory; persisted files are fetched on demand from DB.
-     */
-    private byte[] resolveImageData(File file) throws Exception {
-        if (file.getImageData() != null) return file.getImageData();
-        if (!file.isStaged() && file.getFileId() > 0) {
-            return daoFacade.getFileDAO().loadImageData(file.getFileId());
-        }
-        return null;
-    }
-
-    /** Loads a file image, applies any active adjustments, and returns the rendered TIFF bytes. */
+    /** Loads a file image, applies any active adjustments and returns the rendered TIFF bytes. */
     private byte[] renderAdjustedImageData(File file) throws Exception {
         byte[] sourceData = resolveImageData(file);
         if (sourceData == null) return null;
@@ -351,13 +347,13 @@ public class ScanManager {
     /** Applies rotation and smoothes the pixels when rotated while preserving the full visible bounds. */
     private BufferedImage rotateFile(BufferedImage source, int rotation) {
 
-        int normalised = normaliseRotation(rotation);
-        if (normalised == 0) return source; // no rotation needed
+        int normalize = normalizeRotation(rotation);
+        if (normalize == 0) return source; // no rotation needed
 
         int width = source.getWidth();
         int height = source.getHeight();
 
-        double radians = Math.toRadians(normalised); // Java’s math and rotation functions only understand radians
+        double radians = Math.toRadians(normalize); // Java’s math and rotation functions only understand radians
         double sin = Math.abs(Math.sin(radians)); // tells how much the image “leans” vertically after rotation, used for sizing the new canvas
         double cos = Math.abs(Math.cos(radians)); // tells how much the image “stays horizontal” after rotation, also used for sizing the new canvas
 
@@ -381,7 +377,7 @@ public class ScanManager {
         transform.translate(-width / 2.0, -height / 2.0); // move original image center to origin before rotation
 
         graphics.drawImage(source, transform, null); // draw the source image using the configured transformation
-        graphics.dispose(); // Release native graphics resources
+        graphics.dispose(); // release native graphics resources
         return rotated;
     }
 
@@ -397,7 +393,7 @@ public class ScanManager {
      */
     public void updateFileRotation(File file, int rotation) throws Exception {
         FileAdjustmentSettings settings = FileAdjustmentSettings.copyOf(file.getFileSettings());
-        settings.setRotation(normaliseRotation(rotation));
+        settings.setRotation(normalizeRotation(rotation));
         updateFileSettings(file, settings);
     }
 
@@ -557,7 +553,5 @@ public class ScanManager {
         }
     }
 
-    private static int normaliseRotation(int rotation) {
-        return ((rotation % 360) + 360) % 360;
-    }
+    private static int normalizeRotation(int rotation) { return ((rotation % 360) + 360) % 360; }
 }

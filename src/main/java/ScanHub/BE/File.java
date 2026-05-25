@@ -12,6 +12,8 @@ import javax.imageio.ImageIO;
 
 public class File implements TreeNode {
 
+    static { ImageIO.scanForPlugins(); } // register TwelveMonkeys (for TIFF reading/writing) once when the class is first loaded
+
     private int fileId;
     private int documentId;
     private int referenceId; // scan order (file number) as recieved from API
@@ -25,8 +27,6 @@ public class File implements TreeNode {
 
     // transient = only runtime cache - it isn't persisted
     private transient Image cachedPreview;
-    private transient double cachedWidth;
-    private transient double cachedHeight;
 
     public File() {
         fileAdjustmentSettings = new FileAdjustmentSettings();
@@ -74,8 +74,8 @@ public class File implements TreeNode {
     public void setSharpness(double sharpness)        { fileAdjustmentSettings.setSharpness(sharpness);}
     public void setStaged(boolean staged)             { this.staged = staged; }
     public void setFileSettings(FileAdjustmentSettings fileAdjustmentSettings) {
-        this.fileAdjustmentSettings = fileAdjustmentSettings == null ?
-                new FileAdjustmentSettings() : FileAdjustmentSettings.copyOf(fileAdjustmentSettings);
+        this.fileAdjustmentSettings = fileAdjustmentSettings == null ? new FileAdjustmentSettings()
+                : FileAdjustmentSettings.copyOf(fileAdjustmentSettings);
     }
     public void setCustomFileSettings(boolean customFileSettings) { this.customFileSettings = customFileSettings; }
 
@@ -89,34 +89,26 @@ public class File implements TreeNode {
         setCustomFileSettings(true);
     }
 
-    public Image getPreviewImage(double width, double height) {
-        if (cachedPreview != null && cachedWidth == width && cachedHeight == height) {
-            return cachedPreview;
-        }
+    public Image getPreviewImage() {
+        if (imageData == null) return null;
+        if (cachedPreview != null) return cachedPreview;
+
         try {
-            ImageIO.scanForPlugins();
             BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
             if (bufferedImage != null) {
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
                 ImageIO.write(bufferedImage, "png", output);
-                cachedPreview = new Image(new ByteArrayInputStream(output.toByteArray()), width, height, true, true);
-                cachedWidth = width;
-                cachedHeight = height;
+                cachedPreview = new Image(new ByteArrayInputStream(output.toByteArray()));
                 return cachedPreview;
             }
-        } catch (Exception ignored) {}
-
-        // fallback if ImageIO fails
-        cachedPreview = new Image(new ByteArrayInputStream(imageData), width, height, true, true);
-        cachedWidth = width;
-        cachedHeight = height;
-        return cachedPreview;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void clearCache() {
         cachedPreview = null;
-        cachedWidth = 0;
-        cachedHeight = 0;
     }
 
     @Override

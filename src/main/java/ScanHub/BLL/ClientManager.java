@@ -1,7 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.Client;
-import ScanHub.BLL.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.util.List;
 

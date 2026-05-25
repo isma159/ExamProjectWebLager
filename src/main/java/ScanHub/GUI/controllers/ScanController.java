@@ -5,7 +5,6 @@ import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.ExportMode;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.interfaces.TreeNode;
-import ScanHub.BLL.ScanManager;
 import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.util.GlobalKeyHandler;
 import ScanHub.GUI.facade.ModelFacade;
@@ -58,6 +57,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private TreeView<TreeNode> boxTreeView;
     @FXML private Spinner<Integer> spinnerRotation;
     @FXML private ProgressBar progressBarExport;
+    @FXML private HBox hboxProgressBarExport;
 
     // Session Startup Popup
     @FXML private StackPane sessionPopupOverlay;
@@ -80,10 +80,12 @@ public class ScanController implements Initializable, IViewController {
     private Box selectedBox;
     private ImageView currentPreviewImageView;
     private boolean sessionActive;
+
     private final TreeItem<TreeNode> root = new TreeItem<>();
     private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
             (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
+
     private final Deque<Runnable> undoStack = new ArrayDeque<>();
     private static final int maxUndos = 30;
 
@@ -255,7 +257,7 @@ public class ScanController implements Initializable, IViewController {
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
                     icon.getStyleClass().add("tree-cell-doc");
-                    setText(documentLabel(document));
+                    setText(setDocumentLabel(document));
                     setStyle(document.isStaged() || document.isModified() ? "-fx-font-weight: bold;" : "");
 
                     ContextMenu contextMenu = new ContextMenu();
@@ -267,7 +269,7 @@ public class ScanController implements Initializable, IViewController {
                 } else if (object instanceof File file) {
                     icon.setText("\ue958");
                     icon.getStyleClass().add("tree-cell-file");
-                    setText(fileLabel(file));
+                    setText(setFileLabel(file));
                     setStyle(file.isStaged() ? "-fx-font-weight: bold;" : "");
 
                     // context menu :)
@@ -410,11 +412,12 @@ public class ScanController implements Initializable, IViewController {
 
             root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
-            //modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
+            // todo modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
             syncDocumentsFromModel();
             initializeTreeView(boxTreeView, activeBox);
 
             sessionActive = true;
+            selectedBox = activeBox;
 
             setSessionControlsDisabled(false);
             lblSessionStatus.setText(""); // TODO display something or nah?
@@ -449,7 +452,7 @@ public class ScanController implements Initializable, IViewController {
         scanThread = new Thread(() -> {
             while (scanning) {
                 try {
-                    ScanManager.StoredScan result = scanModel.fetchScan();
+                    StoredScan result = scanModel.fetchScan();
 
                     if (!scanning) break; // stop was pressed during fetch (leave loop)
 
@@ -818,8 +821,8 @@ public class ScanController implements Initializable, IViewController {
             });
 
             rebuildPreviewCard();
-
             applySharpnessToPreview((float) newSettings.getSharpness() / 100f);
+
         } catch (IllegalArgumentException ex) {
             AlertHelper.showError("Invalid Input", ex.getMessage());
             // TODO add visual feedback
@@ -901,7 +904,7 @@ public class ScanController implements Initializable, IViewController {
             }
         }
 
-        // detach listener, sync tree, then reattach - prevents selection event snapping back
+        // prevents bugs with treeSelectionListener sometimes re-selecting the previous selection with onTreeSelectionChanged
         boxTreeView.getSelectionModel().selectedItemProperty().removeListener(treeSelectionListener);
         rebuildPreviewCard();
         syncTreeSelection();
@@ -955,12 +958,12 @@ public class ScanController implements Initializable, IViewController {
         };
 
         progressBarExport.progressProperty().bind(exportTask.progressProperty());
-        progressBarExport.setVisible(true);
-        progressBarExport.setManaged(true);
+        setExportInProgress(true);
 
         exportTask.setOnSucceeded(event -> {
             try {
                 progressBarExport.progressProperty().unbind();
+                setExportInProgress(false);
                 modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
                 rebuild();
                 AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
@@ -972,6 +975,7 @@ public class ScanController implements Initializable, IViewController {
 
         exportTask.setOnFailed(event -> {
             progressBarExport.progressProperty().unbind();
+            setExportInProgress(false);
             rebuild();
             AlertHelper.showError("Export Failed", "Could not export documents. Please try again.");
         });
@@ -1138,11 +1142,16 @@ public class ScanController implements Initializable, IViewController {
      */
     private void rebuildPreviewCard() {
         pageGrid.getChildren().clear();
+        currentPreviewImageView = null;
 
-        if (selectedDocument != null && selectedFile != null) {
-            pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedFile));
-        } else if (selectedDocument != null && !selectedDocument.getFiles().isEmpty()) {
-            pageGrid.getChildren().add(buildPageCard(selectedDocument, selectedDocument.getFiles().getFirst()));
+        for (Document document : documents) {
+            // if no box is selected and this document is not the selected document then skip it
+            if (selectedBox == null && document != selectedDocument) continue;
+            for (File file : document.getFiles()) {
+                // if no file is selected and this file is not the selected file then skip it
+                if (selectedFile != null && file != selectedFile) continue;
+                pageGrid.getChildren().add(buildThumbnailCard(document, file));
+            }
         }
 
         if (selectedFile != null) {
@@ -1160,7 +1169,7 @@ public class ScanController implements Initializable, IViewController {
 
         updateCurrentPageLabel();
         updateCurrentDocumentLabel();
-        lblEmptyState.setVisible(pageGrid.getChildren().isEmpty()); // setVisible(true) if pageGrid.getChildren().isEmpty() else false
+        lblEmptyState.setVisible(pageGrid.getChildren().isEmpty());
     }
 
     private void refreshTree() {
@@ -1212,7 +1221,7 @@ public class ScanController implements Initializable, IViewController {
 
     private void updateCurrentPageLabel() {
         if (selectedFile == null || selectedDocument == null) {
-            lblCurrentPage.setText("Page: 0 / 0");
+            lblCurrentPage.setText("File: 0 / 0");
             return;
         }
 
@@ -1220,11 +1229,11 @@ public class ScanController implements Initializable, IViewController {
         int pageCount = selectedDocument.getFiles().size();
 
         if (pageIndex < 0) {
-            lblCurrentPage.setText("Page: 0 / 0");
+            lblCurrentPage.setText("File: 0 / 0");
             return;
         }
 
-        lblCurrentPage.setText("Page: " + (pageIndex + 1) + " / " + pageCount);
+        lblCurrentPage.setText("File: " + (pageIndex + 1) + " / " + pageCount);
     }
 
     private void updateCurrentDocumentLabel() {
@@ -1240,53 +1249,73 @@ public class ScanController implements Initializable, IViewController {
         lblCurrentDocument.setText("Doc: " + (docIndex + 1));
     }
 
-    private VBox buildPageCard(Document document, File file) {
-        double cw = cardWidth();
-        double ch = cardHeight();
+    private VBox buildThumbnailCard(Document document, File file) {
+        double thumbWidth = selectedFile != null ? 400 * zoomLevel : 380 * zoomLevel; // A4 ratio
+        double thumbHeight = selectedFile != null ? 566 * zoomLevel : 538 * zoomLevel; // A4 ratio
 
-        ImageView thumb = new ImageView();
-        currentPreviewImageView = thumb;
-        if (file.getImageData() != null) {
-            Image image = file.getPreviewImage(cw - 8, ch - 44);
-            if (!image.isError()) {
-                thumb.setImage(image);
+        ImageView thumbnail = new ImageView();
+        thumbnail.setPreserveRatio(true);
+
+        int rotation = file.getRotation();
+        boolean sideways = (rotation == 90 || rotation == 270);
+        thumbnail.setFitWidth(sideways ? thumbHeight - 30 : thumbWidth - 8);
+        thumbnail.setFitHeight(sideways ? thumbWidth - 8 : thumbHeight - (selectedBox != null ? 50 : 30));
+        thumbnail.setRotate(rotation);
+        thumbnail.setEffect(new ColorAdjust(file.getHue() / 100, file.getSaturation() / 100, file.getBrightness() / 100, file.getContrast() / 100));
+
+        // loading screen
+        Thread loader = new Thread(() -> {
+            try {
+                scanModel.loadImageData(file);
+                Image image = file.getPreviewImage();
+                if (image != null && !image.isError()) {
+                    // TODO add somethings to tell its buffering/loading
+                    Platform.runLater(() -> thumbnail.setImage(image));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        });
+        loader.setDaemon(true);
+        loader.start();
 
-        }
+        Label lblFile = new Label(setFileLabel(file));
+        lblFile.getStyleClass().add("lbl");
+        lblFile.setMaxWidth(thumbWidth - 8);
+        lblFile.setVisible((selectedBox != null || selectedDocument != null) && selectedFile == null);
+        lblFile.setManaged((selectedBox != null || selectedDocument != null) && selectedFile == null);
 
-        thumb.setFitWidth(cw - 8);
-        thumb.setFitHeight(ch - 44);
-        thumb.setPreserveRatio(true);
-        thumb.setEffect(new ColorAdjust(file.getHue() / 100, file.getSaturation() / 100, file.getBrightness() / 100, file.getContrast() / 100));
+        Label lblDocument = new Label(setDocumentLabel(document));
+        lblDocument.getStyleClass().add("lbl");
+        lblDocument.setMaxWidth(thumbWidth - 8);
+        lblDocument.setVisible(selectedBox != null && selectedFile == null);
+        lblDocument.setManaged(selectedBox != null && selectedFile == null);
 
-        Label nameLabel = new Label(fileLabel(file));
-        nameLabel.getStyleClass().add("lbl");
-        nameLabel.setMaxWidth(cw - 8);
-
-        Label docLabel = new Label(documentLabel(document));
-        docLabel.getStyleClass().add("lbl");
-        docLabel.setMaxWidth(cw - 8);
-        docLabel.setStyle("-fx-font-size:9;");
-
-        VBox card = new VBox(4, thumb, nameLabel, docLabel);
-        card.setPrefWidth(cw);
-        card.setPrefHeight(ch);
+        VBox card = new VBox(4, thumbnail, lblFile, lblDocument);
+        card.setPrefWidth(thumbWidth);
+        card.setPrefHeight(thumbHeight);
         card.setAlignment(Pos.CENTER);
         card.getStyleClass().addAll("card", "card-bg", "shadow");
         card.setPadding(new Insets(4));
-        card.setRotate(file.getRotation());
         card.setUserData(file);
+
+        if (file == selectedFile) {
+            currentPreviewImageView = thumbnail;
+        }
+
         card.setOnMouseClicked(event -> {
             selectPage(document, file);
             updateCurrentPageLabel();
             updateCurrentDocumentLabel();
+            rebuild();
         });
 
         return card;
     }
 
-    private double cardWidth() { return 520 * zoomLevel; }
-    private double cardHeight() { return 700 * zoomLevel; }
+    // A4 ratio
+    private double cardWidth() { return selectedFile != null ? 400 * zoomLevel : 380 * zoomLevel; }
+    private double cardHeight() { return selectedFile != null ? 566 * zoomLevel : 538 * zoomLevel; }
 
     // ---------- HELPERS ----------
 
@@ -1414,12 +1443,17 @@ public class ScanController implements Initializable, IViewController {
         btnRotRight.setDisable(disabled);
     }
 
-    private String documentLabel(Document document) {
+    private void setExportInProgress(boolean inProgress) {
+        hboxProgressBarExport.setVisible(inProgress);
+        hboxProgressBarExport.setManaged(inProgress);
+    }
+
+    private String setDocumentLabel(Document document) {
         int position = documents.indexOf(document) + 1;
         return "Document " + position;
     }
 
-    private String fileLabel(File file) {
+    private String setFileLabel(File file) {
         for (Document document : documents) {
             int position = document.getFiles().indexOf(file);
             if (position >= 0) {
