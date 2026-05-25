@@ -156,7 +156,7 @@
                                             </HBox>
                                         </graphic>
                                         <tooltip>
-                                            <Tooltip text="Enter to start scanning" />
+                                            <Tooltip text="Space to start scanning" />
                                         </tooltip>
                                     </Button>
 
@@ -175,7 +175,7 @@
                                             </HBox>
                                         </graphic>
                                         <tooltip>
-                                            <Tooltip text="Esc to stop scanning" />
+                                            <Tooltip text="Space to stop scanning" />
                                         </tooltip>
                                     </Button>
 
@@ -233,7 +233,7 @@
                                             </HBox>
                                         </graphic>
                                         <tooltip>
-                                            <Tooltip text="Ctrl + E to export documents" />
+                                            <Tooltip text="Ctrl + F to open file properties" />
                                         </tooltip>
                                     </Button>
                                 </children>

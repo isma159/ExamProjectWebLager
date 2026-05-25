@@ -242,7 +242,7 @@ public class ScanController implements Initializable, IViewController {
 
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
-                    icon.getStyleClass().add("tree-cell-box");
+                    //icon.getStyleClass().add("tree-cell-box");
                     setText(box.getBoxName());
                     setStyle(box.isStaged() || box.isModified() ? "-fx-font-weight: bold;" : "");
 
@@ -255,7 +255,7 @@ public class ScanController implements Initializable, IViewController {
                     setContextMenu(contextMenu);
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
-                    icon.getStyleClass().add("tree-cell-doc");
+                    //icon.getStyleClass().add("tree-cell-doc");
                     setText(setDocumentLabel(document));
                     setStyle(document.isStaged() || document.isModified() ? "-fx-font-weight: bold;" : "");
 
@@ -267,7 +267,7 @@ public class ScanController implements Initializable, IViewController {
                     setContextMenu(contextMenu);
                 } else if (object instanceof File file) {
                     icon.setText("\ue958");
-                    icon.getStyleClass().add("tree-cell-file");
+                    //icon.getStyleClass().add("tree-cell-file");
                     setText(setFileLabel(file));
                     setStyle(file.isStaged() ? "-fx-font-weight: bold;" : "");
 
@@ -283,7 +283,7 @@ public class ScanController implements Initializable, IViewController {
                     setContextMenu(contextMenu);
                 }
 
-                //setGraphic(icon);
+                setGraphic(icon);
             }
         });
     }

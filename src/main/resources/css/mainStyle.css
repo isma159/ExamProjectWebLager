@@ -758,6 +758,16 @@
 
 }
 
+.avatar-success {
+    -fx-background-color: #4CD07D;
+    -fx-background-radius: 6px;
+}
+
+.avatar-error {
+    -fx-background-color: #FF3D32;
+    -fx-background-radius: 6px;
+}
+
 .half-card {
 
     -fx-border-color: #E2E4E8;

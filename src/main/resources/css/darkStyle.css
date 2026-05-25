@@ -365,7 +365,7 @@
 }
 
 .dark .user-row.row-selected {
-    -fx-background-color: #354556;
+    -fx-background-color: #2b3b4f;
 
 }
 
@@ -547,6 +547,10 @@
 .dark .avatar-initial {
     -fx-background-color: #008FF7;
     -fx-background-radius: 6px;
+}
+
+.dark .icon {
+    -fx-text-fill: #ffffff1;
 }
 
 /* ---------- Dark Shortcut ---------- */
@@ -811,6 +815,9 @@
 
 .dark .menu-item {
     -fx-background-color: TRANSPARENT;
+}
+
+.dark .menu-item .label {
     -fx-text-fill: #ffffff;
 }
 
