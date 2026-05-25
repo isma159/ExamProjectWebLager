@@ -2,7 +2,7 @@ package ScanHub.BLL;
 
 // project imports
 import ScanHub.BE.File;
-import ScanHub.BLL.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 public class FileManager {
 

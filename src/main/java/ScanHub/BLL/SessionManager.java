@@ -1,8 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.User;
-import ScanHub.BLL.facade.DAOFacade;
-import ScanHub.GUI.util.AlertHelper;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
@@ -23,7 +22,6 @@ public class SessionManager {
             return true;
         }
         else {
-            AlertHelper.showError("Session Already Active", "A user is already logged in. Please log out before starting a new session.");
             return false;
         }
     }

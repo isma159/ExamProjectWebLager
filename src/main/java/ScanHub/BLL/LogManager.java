@@ -1,7 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.Log;
-import ScanHub.BLL.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -2,7 +2,7 @@ package ScanHub.BLL;
 
 // project imports
 import ScanHub.BE.Profile;
-import ScanHub.BLL.facade.DAOFacade;
+import ScanHub.DAL.facade.DAOFacade;
 
 // java imports
 import java.util.List;
