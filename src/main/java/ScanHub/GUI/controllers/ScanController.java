@@ -109,8 +109,7 @@ public class ScanController implements Initializable, IViewController {
         initializeProfileComboBox();
 
         currentStage.setOnCloseRequest(event -> {
-            event.consume();
-            onExit(null);
+            endScanSession();
         });
     }
 
