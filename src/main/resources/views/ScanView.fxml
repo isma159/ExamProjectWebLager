@@ -39,14 +39,14 @@
                                 <Image url="@../images/Green/LogoGreen2H.png" />
                             </image>
                         </ImageView>
-                  <Region HBox.hgrow="ALWAYS" />
+                        <Region HBox.hgrow="ALWAYS" />
                         <VBox alignment="CENTER" spacing="4.0">
                             <children>
                                 <Label styleClass="h1" text="Scanning Workspace" />
                                 <Label fx:id="lblSessionStatus" alignment="CENTER" prefWidth="240.0" styleClass="lbl" text="–" />
                             </children>
                         </VBox>
-                  <Region HBox.hgrow="ALWAYS" />
+                        <Region HBox.hgrow="ALWAYS" />
                         <ToggleSwitch fx:id="darkMode" onMouseClicked="#onDarkModeToggle" prefHeight="30.0" prefWidth="60.0" scaleX="1.25" scaleY="1.25" scaleZ="1.25" text="Dark Mode ">
                             <HBox.margin>
                                 <Insets right="12.0" />
@@ -74,9 +74,9 @@
                         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                     </VBox.margin>
                 </HBox>
-            <BorderPane.margin>
-               <Insets bottom="3.0" />
-            </BorderPane.margin>
+                <BorderPane.margin>
+                    <Insets bottom="3.0" />
+                </BorderPane.margin>
             </VBox>
         </top>
 
@@ -216,9 +216,9 @@
                                                 </children>
                                             </HBox>
                                         </graphic>
-                              <tooltip>
-                                 <Tooltip text="Ctrl + E to export" />
-                              </tooltip>
+                                        <tooltip>
+                                            <Tooltip text="Ctrl + E to export" />
+                                        </tooltip>
                                     </Button>
 
                                     <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
@@ -233,7 +233,7 @@
                                             </HBox>
                                         </graphic>
                                         <tooltip>
-                                            <Tooltip text="Ctrl + E to export documents" />
+                                            <Tooltip text="Ctrl + F to open file adjustment" />
                                         </tooltip>
                                     </Button>
                                 </children>
@@ -305,22 +305,22 @@
                                 <HBox.margin>
                                     <Insets left="3.0" right="3.0" />
                                 </HBox.margin>
-                        <tooltip>
-                           <Tooltip text="Ctrl + + to zoom in" />
-                        </tooltip>
+                                <tooltip>
+                                    <Tooltip text="Ctrl + + to zoom in" />
+                                </tooltip>
                             </Button>
 
                             <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
-                     <VBox alignment="CENTER">
-                        <HBox.margin>
-                           <Insets left="6.0" right="6.0" />
-                        </HBox.margin>
-                        <children>
-                           <Label fx:id="lblCurrentPage" text="Page: 0 / 0" />
-                           <Label fx:id="lblCurrentDocument" text="Doc: 0" />
-                        </children>
-                     </VBox>
-                     <Separator layoutX="393.0" layoutY="22.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+                            <VBox alignment="CENTER">
+                                <HBox.margin>
+                                    <Insets left="6.0" right="6.0" />
+                                </HBox.margin>
+                                <children>
+                                    <Label fx:id="lblCurrentPage" text="Page: 0 / 0" />
+                                    <Label fx:id="lblCurrentDocument" text="Doc: 0" />
+                                </children>
+                            </VBox>
+                            <Separator layoutX="393.0" layoutY="22.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
 
                             <Button fx:id="btnRotLeft" mnemonicParsing="false" onAction="#onRotateLeft" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
                                 <graphic>
@@ -337,9 +337,9 @@
                                 <HBox.margin>
                                     <Insets left="3.0" right="3.0" />
                                 </HBox.margin>
-                        <tooltip>
-                           <Tooltip text="Ctrl + left arrow to rotate left" />
-                        </tooltip>
+                                <tooltip>
+                                    <Tooltip text="Ctrl + left arrow to rotate left" />
+                                </tooltip>
                             </Button>
                             <Spinner fx:id="spinnerRotation" editable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="45.0" styleClass="arrowless-spinner" />
 
@@ -377,163 +377,163 @@
         </center>
 
         <bottom>
-         <VBox>
-            <BorderPane.margin>
-               <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
-            </BorderPane.margin>
-            <children>
-               <HBox fx:id="hboxProgressBarExport" managed="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="21.0" visible="false">
-                  <VBox.margin>
-                     <Insets bottom="3.0" top="3.0" />
-                  </VBox.margin>
-                  <children>
-                     <ProgressBar fx:id="progressBarExport" maxWidth="1.7976931348623157E308" prefHeight="21.0" progress="0.0" HBox.hgrow="ALWAYS" />
-                  </children>
-               </HBox>
-                  <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="12.0">
-                      <padding>
-                          <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
-                      </padding>
-      
-                      <children>
-                          <Label fx:id="stDocsLabel" styleClass="lbl" text="Documents: 0" />
-                          <Separator orientation="VERTICAL" />
-                          <Label fx:id="stPagesLabel" styleClass="lbl" text="Pages: 0" />
-                          <Region HBox.hgrow="ALWAYS" />
-                          <Label styleClass="lbl" text="Space scan" />
-                          <Label styleClass="lbl" text="←→ nav" />
-                          <Label styleClass="lbl" text="[] rotate" />
-                          <Label styleClass="lbl" text="Del delete" />
-                          <Label styleClass="lbl" text="Ctrl+E export" />
-                          <Label styleClass="lbl" text="Ctrl+Z undo" />
-                      </children>
-      
-                      <styleClass>
-                          <String fx:value="card" />
-                          <String fx:value="card-bg" />
-                          <String fx:value="shadow" />
-                      </styleClass>
-                  </HBox>
-            </children>
-         </VBox>
-        </bottom>
-      <right>
-         <StackPane fx:id="fileAdjustmentSideMenu" managed="false" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0" visible="false">
-            <children>
-               <VBox alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
-                  <children>
-                     <HBox alignment="CENTER">
-                        <children>
-                           <Label styleClass="h3" text="Current File Adjustments" />
-                        </children>
+            <VBox>
+                <BorderPane.margin>
+                    <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                </BorderPane.margin>
+                <children>
+                    <HBox fx:id="hboxProgressBarExport" managed="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="21.0" visible="false">
                         <VBox.margin>
-                           <Insets left="15.0" right="15.0" top="15.0" />
+                            <Insets bottom="3.0" top="3.0" />
                         </VBox.margin>
-                     </HBox>
-                     <Separator styleClass="grey-separator" />
-                     <VBox alignment="TOP_CENTER" spacing="12">
+                        <children>
+                            <ProgressBar fx:id="progressBarExport" maxWidth="1.7976931348623157E308" prefHeight="21.0" progress="0.0" HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="12.0">
                         <padding>
-                           <Insets bottom="15.0" top="15.0" />
+                            <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
                         </padding>
+
                         <children>
-                           <VBox spacing="4">
-                              <children>
-                                 <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <children>
-                                       <Label prefWidth="120.0" styleClass="lbl" text="Hue" HBox.hgrow="ALWAYS" />
-                                       <Region HBox.hgrow="ALWAYS" />
-                                       <Spinner fx:id="spinnerFileAdjustmentHue" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
-                                    </children>
-                                 </HBox>
-                                 <Slider fx:id="sliderHue" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
-                              </children>
-                           </VBox>
-                           <Separator minWidth="-Infinity" styleClass="grey-separator" />
-                           <VBox spacing="4">
-                              <children>
-                                 <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <children>
-                                       <Label prefWidth="120.0" styleClass="lbl" text="Brightness" HBox.hgrow="ALWAYS" />
-                                       <Region HBox.hgrow="ALWAYS" />
-                                       <Spinner fx:id="spinnerFileAdjustmentBrightness" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
-                                    </children>
-                                 </HBox>
-                                 <Slider fx:id="sliderBrightness" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
-                              </children>
-                           </VBox>
-                           <Separator minWidth="-Infinity" styleClass="grey-separator" />
-                           <VBox spacing="4">
-                              <children>
-                                 <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <children>
-                                       <Label prefWidth="120.0" styleClass="lbl" text="Contrast" HBox.hgrow="ALWAYS" />
-                                       <Region HBox.hgrow="ALWAYS" />
-                                       <Spinner fx:id="spinnerFileAdjustmentContrast" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
-                                    </children>
-                                 </HBox>
-                                 <Slider fx:id="sliderContrast" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
-                              </children>
-                           </VBox>
-                           <Separator minWidth="-Infinity" styleClass="grey-separator" />
-                           <VBox spacing="4">
-                              <children>
-                                 <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <children>
-                                       <Label prefWidth="120.0" styleClass="lbl" text="Saturation" HBox.hgrow="ALWAYS" />
-                                       <Region HBox.hgrow="ALWAYS" />
-                                       <Spinner fx:id="spinnerFileAdjustmentSaturation" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
-                                    </children>
-                                 </HBox>
-                                 <Slider fx:id="sliderSaturation" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
-                              </children>
-                           </VBox>
-                           <Separator layoutX="26.0" layoutY="263.0" minWidth="-Infinity" styleClass="grey-separator" />
-                           <VBox spacing="4.0">
-                              <children>
-                                 <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <children>
-                                       <Label prefWidth="120.0" styleClass="lbl" text="Rotation" HBox.hgrow="ALWAYS" />
-                                       <Region HBox.hgrow="ALWAYS" />
-                                       <Spinner fx:id="spinnerFileAdjustmentRotation" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
-                                    </children>
-                                 </HBox>
-                                 <Slider fx:id="sliderRotation" blockIncrement="5.0" majorTickUnit="90.0" max="360.0" min="-360.0" minorTickCount="5" value="0" />
-                              </children>
-                           </VBox>
-                           <Separator layoutX="10.0" layoutY="311.0" minWidth="-Infinity" styleClass="grey-separator" />
-                           <VBox layoutX="10.0" layoutY="325.0" spacing="4.0">
-                              <children>
-                                 <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <children>
-                                       <Label prefWidth="120.0" styleClass="lbl" text="Sharpness" HBox.hgrow="ALWAYS" />
-                                       <Region HBox.hgrow="ALWAYS" />
-                                       <Spinner fx:id="spinnerFileAdjustmentSharpness" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
-                                    </children>
-                                 </HBox>
-                                 <Slider fx:id="sliderSharpness" blockIncrement="5.0" majorTickUnit="20.0" min="-100.0" minorTickCount="1" snapToTicks="true" value="0" />
-                              </children>
-                           </VBox>
+                            <Label fx:id="stDocsLabel" styleClass="lbl" text="Documents: 0" />
+                            <Separator orientation="VERTICAL" />
+                            <Label fx:id="stPagesLabel" styleClass="lbl" text="Pages: 0" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label styleClass="lbl" text="Space scan" />
+                            <Label styleClass="lbl" text="←→ nav" />
+                            <Label styleClass="lbl" text="[] rotate" />
+                            <Label styleClass="lbl" text="Del delete" />
+                            <Label styleClass="lbl" text="Ctrl+E export" />
+                            <Label styleClass="lbl" text="Ctrl+Z undo" />
                         </children>
-                        <VBox.margin>
-                           <Insets left="12.0" right="12.0" />
-                        </VBox.margin>
-                     </VBox>
-                     <Separator maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" styleClass="grey-separator" />
-                     <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onApplyFileAdjustments" prefHeight="30.0" prefWidth="60.0" styleClass="primary-btn" text="Apply">
-                        <VBox.margin>
-                           <Insets />
-                        </VBox.margin></Button>
-                  </children>
-               </VBox>
-            </children>
-            <BorderPane.margin>
-               <Insets bottom="3.0" left="3.0" top="3.0" />
-            </BorderPane.margin>
-         </StackPane>
-      </right>
-      <padding>
-         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-      </padding>
+
+                        <styleClass>
+                            <String fx:value="card" />
+                            <String fx:value="card-bg" />
+                            <String fx:value="shadow" />
+                        </styleClass>
+                    </HBox>
+                </children>
+            </VBox>
+        </bottom>
+        <right>
+            <StackPane fx:id="fileAdjustmentSideMenu" managed="false" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0" visible="false">
+                <children>
+                    <VBox alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
+                        <children>
+                            <HBox alignment="CENTER">
+                                <children>
+                                    <Label styleClass="h3" text="Current File Adjustments" />
+                                </children>
+                                <VBox.margin>
+                                    <Insets left="15.0" right="15.0" top="15.0" />
+                                </VBox.margin>
+                            </HBox>
+                            <Separator styleClass="grey-separator" />
+                            <VBox alignment="TOP_CENTER" spacing="12">
+                                <padding>
+                                    <Insets bottom="15.0" top="15.0" />
+                                </padding>
+                                <children>
+                                    <VBox spacing="4">
+                                        <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                                <children>
+                                                    <Label prefWidth="120.0" styleClass="lbl" text="Hue" HBox.hgrow="ALWAYS" />
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Spinner fx:id="spinnerFileAdjustmentHue" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                                </children>
+                                            </HBox>
+                                            <Slider fx:id="sliderHue" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
+                                        </children>
+                                    </VBox>
+                                    <Separator minWidth="-Infinity" styleClass="grey-separator" />
+                                    <VBox spacing="4">
+                                        <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                                <children>
+                                                    <Label prefWidth="120.0" styleClass="lbl" text="Brightness" HBox.hgrow="ALWAYS" />
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Spinner fx:id="spinnerFileAdjustmentBrightness" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                                </children>
+                                            </HBox>
+                                            <Slider fx:id="sliderBrightness" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
+                                        </children>
+                                    </VBox>
+                                    <Separator minWidth="-Infinity" styleClass="grey-separator" />
+                                    <VBox spacing="4">
+                                        <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                                <children>
+                                                    <Label prefWidth="120.0" styleClass="lbl" text="Contrast" HBox.hgrow="ALWAYS" />
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Spinner fx:id="spinnerFileAdjustmentContrast" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                                </children>
+                                            </HBox>
+                                            <Slider fx:id="sliderContrast" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
+                                        </children>
+                                    </VBox>
+                                    <Separator minWidth="-Infinity" styleClass="grey-separator" />
+                                    <VBox spacing="4">
+                                        <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                                <children>
+                                                    <Label prefWidth="120.0" styleClass="lbl" text="Saturation" HBox.hgrow="ALWAYS" />
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Spinner fx:id="spinnerFileAdjustmentSaturation" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                                </children>
+                                            </HBox>
+                                            <Slider fx:id="sliderSaturation" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
+                                        </children>
+                                    </VBox>
+                                    <Separator layoutX="26.0" layoutY="263.0" minWidth="-Infinity" styleClass="grey-separator" />
+                                    <VBox spacing="4.0">
+                                        <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                                <children>
+                                                    <Label prefWidth="120.0" styleClass="lbl" text="Rotation" HBox.hgrow="ALWAYS" />
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Spinner fx:id="spinnerFileAdjustmentRotation" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                                </children>
+                                            </HBox>
+                                            <Slider fx:id="sliderRotation" blockIncrement="5.0" majorTickUnit="90.0" max="360.0" min="-360.0" minorTickCount="5" value="0" />
+                                        </children>
+                                    </VBox>
+                                    <Separator layoutX="10.0" layoutY="311.0" minWidth="-Infinity" styleClass="grey-separator" />
+                                    <VBox layoutX="10.0" layoutY="325.0" spacing="4.0">
+                                        <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                                <children>
+                                                    <Label prefWidth="120.0" styleClass="lbl" text="Sharpness" HBox.hgrow="ALWAYS" />
+                                                    <Region HBox.hgrow="ALWAYS" />
+                                                    <Spinner fx:id="spinnerFileAdjustmentSharpness" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                                </children>
+                                            </HBox>
+                                            <Slider fx:id="sliderSharpness" blockIncrement="5.0" majorTickUnit="20.0" min="-100.0" minorTickCount="1" snapToTicks="true" value="0" />
+                                        </children>
+                                    </VBox>
+                                </children>
+                                <VBox.margin>
+                                    <Insets left="12.0" right="12.0" />
+                                </VBox.margin>
+                            </VBox>
+                            <Separator maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" styleClass="grey-separator" />
+                            <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onApplyFileAdjustments" prefHeight="30.0" prefWidth="60.0" styleClass="primary-btn" text="Apply">
+                                <VBox.margin>
+                                    <Insets />
+                                </VBox.margin></Button>
+                        </children>
+                    </VBox>
+                </children>
+                <BorderPane.margin>
+                    <Insets bottom="3.0" left="3.0" top="3.0" />
+                </BorderPane.margin>
+            </StackPane>
+        </right>
+        <padding>
+            <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+        </padding>
     </BorderPane>
 
     <StackPane fx:id="sessionPopupOverlay" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false">
@@ -636,9 +636,9 @@
                     </children>
                 </HBox>
 
-            <Button mnemonicParsing="false" onAction="#onStartSession" prefHeight="33.0" styleClass="primary-btn" text="Start Session" />
-            <Separator />
-         </children>
-      </VBox>
-   </StackPane>
+                <Button mnemonicParsing="false" onAction="#onStartSession" prefHeight="33.0" styleClass="primary-btn" text="Start Session" />
+                <Separator />
+            </children>
+        </VBox>
+    </StackPane>
 </StackPane>
