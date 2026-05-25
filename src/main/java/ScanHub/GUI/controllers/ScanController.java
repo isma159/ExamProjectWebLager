@@ -359,6 +359,9 @@ public class ScanController implements Initializable, IViewController {
                 () -> onUndo(null));
         shortcuts.put(new KeyCodeCombination(KeyCode.ESCAPE),
                 () -> onExit(null));
+        shortcuts.put(new KeyCodeCombination(KeyCode.F,
+                        KeyCombination.CONTROL_DOWN),
+                () -> onToggleFileAdjustments(null));
 
         GlobalKeyHandler.getInstance().setLayer(shortcuts);
     }
