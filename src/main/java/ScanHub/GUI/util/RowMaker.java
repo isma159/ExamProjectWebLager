@@ -110,7 +110,10 @@ public class RowMaker {
         dot.setMinWidth(Region.USE_PREF_SIZE);
         dot.setMinHeight(Region.USE_PREF_SIZE);
         dot.setPrefSize(6.0, 6.0);
-        dot.getStyleClass().add("avatar-" + log.getAction().toString().toLowerCase());
+
+        if (log.getAction() == LogAction.CREATE) {dot.getStyleClass().add("avatar-success");}
+        else if (log.getAction() == LogAction.DELETE) {dot.getStyleClass().add("avatar-error");}
+        else {dot.getStyleClass().add("avatar-initial");}
 
         HBox col1 = new HBox(dot);
         col1.setAlignment(Pos.CENTER);

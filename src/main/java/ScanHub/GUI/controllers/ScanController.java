@@ -111,8 +111,7 @@ public class ScanController implements Initializable, IViewController {
         initializeProfileComboBox();
 
         currentStage.setOnCloseRequest(event -> {
-            event.consume();
-            onExit(null);
+            endScanSession();
         });
     }
 
@@ -243,7 +242,6 @@ public class ScanController implements Initializable, IViewController {
 
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
-                    icon.getStyleClass().add("tree-cell-box");
                     setText(box.getBoxName());
                     setStyle(box.isStaged() || box.isModified() ? "-fx-font-weight: bold;" : "");
 
@@ -256,7 +254,6 @@ public class ScanController implements Initializable, IViewController {
                     setContextMenu(contextMenu);
                 } else if (object instanceof Document document) {
                     icon.setText("\ue963");
-                    icon.getStyleClass().add("tree-cell-doc");
                     setText(setDocumentLabel(document));
                     setStyle(document.isStaged() || document.isModified() ? "-fx-font-weight: bold;" : "");
 
@@ -268,7 +265,6 @@ public class ScanController implements Initializable, IViewController {
                     setContextMenu(contextMenu);
                 } else if (object instanceof File file) {
                     icon.setText("\ue958");
-                    icon.getStyleClass().add("tree-cell-file");
                     setText(setFileLabel(file));
                     setStyle(file.isStaged() ? "-fx-font-weight: bold;" : "");
 
@@ -284,7 +280,7 @@ public class ScanController implements Initializable, IViewController {
                     setContextMenu(contextMenu);
                 }
 
-                //setGraphic(icon);
+                setGraphic(icon);
             }
         });
     }
@@ -407,7 +403,7 @@ public class ScanController implements Initializable, IViewController {
 
             modelFacade.getSessionModel().cleanup();
 
-            boolean locked = modelFacade.getSessionModel().tryStartScanSession(profile.getExportLabel() + boxInput);
+            boolean locked = modelFacade.getSessionModel().tryStartScanSession(activeBox.getBoxName());
             if (!locked) {
                 AlertHelper.showError("Box In Use", "This box is currently open in another session.");
                 return;
@@ -569,9 +565,11 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void endScanSession() {
+        System.out.println("endScanSession called - sessionActive: " + sessionActive + " scanModel: " + scanModel);
         if (!sessionActive || scanModel == null) {return;}
 
         try {
+            System.out.println("deleting session for: " + scanModel.getTargetBox().getBoxName());
             modelFacade.getSessionModel().endScanSession(scanModel.getTargetBox().getBoxName());
         }
         catch (Exception e) {
@@ -786,6 +784,7 @@ public class ScanController implements Initializable, IViewController {
 
     @FXML
     private void onToggleFileAdjustments(ActionEvent actionEvent) {
+        if (selectedFile == null) return;
         if (!fileAdjustmentSideMenu.isVisible()) {
             populateFileAdjustmentsFields(selectedFile);
             fileAdjustmentSideMenu.setManaged(true);
@@ -824,8 +823,6 @@ public class ScanController implements Initializable, IViewController {
             });
 
             rebuildPreviewCard();
-            applySharpnessToPreview((float) newSettings.getSharpness() / 100f);
-
         } catch (IllegalArgumentException ex) {
             AlertHelper.showError("Invalid Input", ex.getMessage());
             // TODO add visual feedback
@@ -1023,6 +1020,7 @@ public class ScanController implements Initializable, IViewController {
                 else {
                     stage.setMinWidth(1366);
                     stage.setMinHeight(768);
+                    stage.setMaximized(true);
                 }
                 handler.show(modelFacade, stage);
                 currentStage.close();
@@ -1271,9 +1269,14 @@ public class ScanController implements Initializable, IViewController {
             try {
                 scanModel.loadImageData(file);
                 Image image = file.getPreviewImage();
+
+                if (file.getSharpness() != 0 && file.getImageData() != null) {
+                    image = buildSharpImage(file,(float) file.getSharpness() / 100f);
+                }
+                final Image finalImage = image;
                 if (image != null && !image.isError()) {
                     // TODO add somethings to tell its buffering/loading
-                    Platform.runLater(() -> thumbnail.setImage(image));
+                    Platform.runLater(() -> thumbnail.setImage(finalImage));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1398,15 +1401,7 @@ public class ScanController implements Initializable, IViewController {
     private void applySharpnessToPreview(float strength) {
         if (selectedFile == null || currentPreviewImageView == null || selectedFile.getImageData() == null) return;
         try {
-            BufferedImage scaled = ImageIO.read(new ByteArrayInputStream(selectedFile.getImageData()));
-
-            BufferedImage preview = scanModel.sharpen(scaleToPreviewSize(scaled, (int) cardWidth() - 8, (int) cardHeight() - 44), strength);
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ImageIO.write(preview, "png", out);
-
-            Image image = new Image(new ByteArrayInputStream(out.toByteArray()));
-
+            Image image = buildSharpImage(selectedFile, strength);
             if (!image.isError()) {
                 currentPreviewImageView.setImage(image);
             }
@@ -1415,6 +1410,17 @@ public class ScanController implements Initializable, IViewController {
             e.printStackTrace();
         }
 
+    }
+
+    private Image buildSharpImage(File file, float strength) throws IOException {
+        BufferedImage scaled = ImageIO.read(new ByteArrayInputStream(file.getImageData()));
+
+        BufferedImage preview = scanModel.sharpen(scaleToPreviewSize(scaled, (int) cardWidth() - 8, (int) cardHeight() - 44), strength);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ImageIO.write(preview, "png", out);
+
+        return new Image(new ByteArrayInputStream(out.toByteArray()));
     }
 
     private void selectPage(Document document, File file) {
