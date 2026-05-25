@@ -481,6 +481,12 @@
 
 }
 
+.primary-btn .side-bar-shortcut .label {
+
+    -fx-text-fill: #ffffff;
+
+}
+
 .secondary-btn {
 
     -fx-text-fill: #ffffff;
@@ -646,12 +652,6 @@
 
 }
 
-.destructive-btn:hover {
-
-
-
-}
-
 .primary-btn:hover {
 
     -fx-background-color: #1C252F;
@@ -754,54 +754,6 @@
 .avatar-initial {
 
     -fx-background-radius: 6px;
-    -fx-background-color: #2d3d4f;
-
-}
-
-.avatar-initial {
-
-    -fx-background-radius: 6px;
-    -fx-background-color: #2d3d4f;
-
-}
-
-.avatar-initial,
-.avatar-scan,
-.avatar-login,
-.avatar-create,
-.avatar-delete,
-.avatar-export {
-
-    -fx-background-radius: 6px;
-
-}
-
-.avatar-scan {
-
-    -fx-background-color: #4CD07D;
-
-}
-
-.avatar-login {
-
-    -fx-background-color: #2D3D4F;
-
-}
-
-.avatar-create {
-
-    -fx-background-color: #2d3d4f;
-
-}
-
-.avatar-delete {
-
-    -fx-background-color: #EF4444;
-
-}
-
-.avatar-export {
-
     -fx-background-color: #2d3d4f;
 
 }
@@ -1005,18 +957,6 @@
     -fx-text-fill: #2d3d4f;
 
 }
-
-/*
-.primary-navigation-btn:focused {
-    -fx-background-color: #2d3d4f;
-    -fx-borderwidth: 2;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-}
-
-.primary-navigation-btn:selected:focused {
-    -fx-border-color: #ffffff;
-}*/
 
 .user-row:hover {
     -fx-background-color: #F1F5F9;

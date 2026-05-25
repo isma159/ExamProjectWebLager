@@ -78,13 +78,13 @@ public class FileDAO {
 
         String updateSql = """
                 UPDATE FileAdjustmentSettings
-                SET rotation = ?, hue = ?, brightness = ?, contrast = ?, saturation = ?,
+                SET rotation = ?, hue = ?, brightness = ?, contrast = ?, saturation = ?, sharpness = ?,
                     modified_at = SYSUTCDATETIME(), deleted_at = NULL
                 WHERE fileId = ?
                 """;
         String insertSql = """
-                INSERT INTO FileAdjustmentSettings (fileId, rotation, hue, brightness, contrast, saturation)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO FileAdjustmentSettings (fileId, rotation, hue, brightness, contrast, saturation, sharpness)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conn = DBConnector.getConnection()) {
@@ -95,7 +95,8 @@ public class FileDAO {
                 updatePs.setInt(3, settingValue(settings.getBrightness()));
                 updatePs.setInt(4, settingValue(settings.getContrast()));
                 updatePs.setInt(5, settingValue(settings.getSaturation()));
-                updatePs.setInt(6, fileId);
+                updatePs.setInt(6, settingValue(settings.getSharpness()));
+                updatePs.setInt(7, fileId);
 
                 int updated = updatePs.executeUpdate();
                 if (updated == 0) {
@@ -106,6 +107,7 @@ public class FileDAO {
                         insertPs.setInt(4, settingValue(settings.getBrightness()));
                         insertPs.setInt(5, settingValue(settings.getContrast()));
                         insertPs.setInt(6, settingValue(settings.getSaturation()));
+                        insertPs.setInt(7, settingValue(settings.getSharpness()));
                         insertPs.executeUpdate();
                     }
                 }

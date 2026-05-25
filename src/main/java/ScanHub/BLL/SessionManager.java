@@ -64,7 +64,7 @@ public class SessionManager {
 
     // stops constant method invocation cycle
     private void stopHeartbeat() {
-        if (heartbeat != null || !heartbeat.isShutdown()) {
+        if (heartbeat != null && !heartbeat.isShutdown()) {
             heartbeat.shutdown();
             heartbeat = null;
         }

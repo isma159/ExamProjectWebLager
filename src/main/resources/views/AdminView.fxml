@@ -268,19 +268,25 @@
                                         <Region layoutX="12.0" layoutY="360.0" prefHeight="510.0" prefWidth="230.0" VBox.vgrow="ALWAYS" />
                               <Button mnemonicParsing="false" onAction="#onClickOpenScanView" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
                                  <graphic>
-                                    <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="210.0" styleClass="primary-btn">
+                                    <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="225.0" styleClass="primary-btn">
                                        <children>
-                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="&#xe94b;">
+                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
                                              <font>
                                                 <Font size="16.0" />
                                              </font>
                                           </Label>
-                                          <Region prefHeight="200.0" prefWidth="6.0" />
+                                          <Region prefHeight="200.0" prefWidth="3.0" />
                                           <Label alignment="CENTER" styleClass="lbl" text="Scanning Workshop" textFill="WHITE">
                                              <font>
                                                 <Font size="12.0" />
                                              </font>
                                           </Label>
+                                          <Region layoutX="40.0" layoutY="10.0" prefHeight="200.0" prefWidth="15.0" />
+                                          <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="45.0" styleClass="side-bar-shortcut">
+                                             <children>
+                                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Ctrl + W" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                          </HBox>
                                        </children>
                                     </HBox>
                                  </graphic>
