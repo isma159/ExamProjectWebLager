@@ -15,20 +15,16 @@
 }
 
 .icon {
-    -fx-font-size: 18px;
-    -fx-font-family: "primeicons";
-    -fx-text-fill: #000000;
-}
 
-.icon-selected {
-    -fx-font-size: 18px;
     -fx-font-family: "primeicons";
-    -fx-text-fill: #ffffff;
+    -fx-font-size: 18;
+
 }
 
 .white-icon {
 
     -fx-font-family: "primeicons";
+
     -fx-text-fill: #ffffff;
 
 }
@@ -340,18 +336,6 @@
 
 }
 
-.combo-box-base .arrow-button {
-
-    -fx-background-color: TRANSPARENT;
-
-}
-
-.combo-box-base .text-field {
-
-    -fx-background-color: TRANSPARENT;
-
-}
-
 .searchable-combo-box {
 
     -fx-background-color: WHITE;
@@ -568,19 +552,7 @@
 
 .green-logo-h {
 
-    -fx-image: url("../images/Green/LogoGreenH.png");
-
-}
-
-.scanner-logo-h {
-
     -fx-image: url("../images/Green/LogoGreen2H.png");
-
-}
-
-.green-logo-icon {
-
-    -fx-image: url("../images/Green/WeblagerGreenIcon.png");
 
 }
 
@@ -648,6 +620,17 @@
 
 }
 
+.tree-view-form .tree-cell {
+
+    -fx-font-size: 12;
+
+}
+
+.tree-view-form .tree-cell:focused {
+
+    -fx-text-fill: #000000;
+
+}
 
 .tertiary-btn {
 
@@ -727,13 +710,13 @@
 }
 
 
-.error-border {
+.container.error-border {
 
     -fx-border-color: #FF3D32;
 
 }
 
-.success-border {
+.container.success-border {
 
     -fx-border-color: #4CD07D;
 
@@ -1018,6 +1001,8 @@
 .scroll-pane {
 
     -fx-background-color: #ffffff;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
 
 }
 
@@ -1025,6 +1010,7 @@
 
     -fx-border-color: TRANSPARENT;
     -fx-background-color: TRANSPARENT;
+    -fx-background-radius: 10px;
 
 }
 
@@ -1047,29 +1033,29 @@
 
 }
 
-.scroll-bar {
+.scroll-pane .scroll-bar {
 
     -fx-background-color: TRANSPARENT;
     -fx-pref-width: 18;
 
 }
 
-.scroll-bar .thumb {
+.scroll-pane .scroll-bar .thumb {
 
     -fx-background-color: #BFBFBF;
 
 }
 
-.scroll-bar .increment-button,
-.scroll-bar .decrement-button {
+.scroll-pane .scroll-bar .increment-button,
+.scroll-pane .scroll-bar .decrement-button {
     -fx-padding: 0;
     -fx-shape: null;
     visibility: hidden;
     -fx-text-fill: TRANSPARENT;
 }
 
-.scroll-bar .increment-button .increment-arrow,
-.scroll-bar .decrement-button .decrement-arrow {
+.scroll-pane .scroll-bar .increment-button .increment-arrow,
+.scroll-pane .scroll-bar .decrement-button .decrement-arrow {
     -fx-padding: 0;
     -fx-shape: null;
     visibility: hidden;
@@ -1134,47 +1120,13 @@
     -fx-font-family: "Montserrat SemiBold";
 
 }
-
-/* The keycap "chip". Small element => 3px radius per the styleguide. */
-.kbd {
-
-    -fx-background-color: #F1F5F9;
-    -fx-background-radius: 3px;
+.box-card-bottom {
 
     -fx-border-color: #E2E4E8;
-    -fx-border-radius: 3px;
-    -fx-border-width: 1;
+    -fx-border-radius: 0 0 10 10;
+    -fx-border-width: 0 2 2 2;
+    -fx-border-insets: -2;
 
-    -fx-padding: 1 6 2 6;
-
-    -fx-font-family: "Montserrat SemiBold";
-    -fx-font-size: 10;
-    -fx-font-weight: 600;
-    -fx-text-fill: #2D3D4F;
-
-}
-
-/* The descriptive word next to each keycap. Helper-text scale, de-emphasised. */
-.shortcut-lbl {
-
-    -fx-font-size: 10;
-    -fx-font-weight: 400;
-    -fx-text-fill: #64748B;
-
-}
-
-/* The scroll container that holds the hints; must stay transparent so the
-   status-bar card background shows through. */
-.shortcut-scroll {
-
-    -fx-background-color: transparent;
-    -fx-background-insets: 0;
-    -fx-padding: 0;
-
-}
-
-.shortcut-scroll > .viewport {
-
-    -fx-background-color: transparent;
+    -fx-background-radius: 0 0 10 10;
 
 }

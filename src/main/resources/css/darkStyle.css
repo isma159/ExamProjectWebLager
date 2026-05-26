@@ -880,3 +880,9 @@
     -fx-background-color: transparent;
 
 }
+
+.dark .box-card-bottom {
+
+    -fx-border-color: #2B3B4C;
+
+}
