@@ -88,10 +88,10 @@ public class AdminController implements IViewController, Initializable {
                 () -> onClickLogOut(null)
         );
         adminShortcuts.put(
-                new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN),
-                () -> onClickOpenScanView()
+                new KeyCodeCombination(KeyCode.W,
+                        KeyCombination.CONTROL_DOWN),
+                this::onClickOpenScanView
         );
-
 
         sidebarBtns.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {

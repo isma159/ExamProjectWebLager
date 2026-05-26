@@ -17,6 +17,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -62,7 +63,8 @@ public class ScanController implements Initializable, IViewController {
     // Session Startup Popup
     @FXML private StackPane sessionPopupOverlay;
     @FXML private SearchableComboBox<Profile> comboBoxProfiles;
-    @FXML private TextField txtFldBoxId, txtFldGlobalRotation, txtFldGlobalHue, txtFldGlobalBrightness, txtFldGlobalContrast, txtFldGlobalSaturation;
+    @FXML private ComboBox<String> cbBoxId;
+    @FXML private TextField txtFldGlobalRotation, txtFldGlobalHue, txtFldGlobalBrightness, txtFldGlobalContrast, txtFldGlobalSaturation;
 
     // File Adjustment Menu
     @FXML private StackPane fileAdjustmentSideMenu;
@@ -85,6 +87,8 @@ public class ScanController implements Initializable, IViewController {
     private final ChangeListener<TreeItem<TreeNode>> treeSelectionListener =
             (obs, oldValue, newValue) -> onTreeSelectionChanged(newValue);
     private TreeNode draggedNode; // used for drag detection (gets nulled after drop)
+    private ObservableList<String> source = FXCollections.observableArrayList();
+    private FilteredList<String> filteredBoxIds = new FilteredList<>(source);
 
     private final Deque<Runnable> undoStack = new ArrayDeque<>();
     private static final int maxUndos = 30;
@@ -108,7 +112,7 @@ public class ScanController implements Initializable, IViewController {
         lblUsername.setText(currentUser.getUsername());
         lblRole.setText("Role: " + currentUser.getRole().toString());
 
-        initializeProfileComboBox();
+        initializeProfileCombobox();
 
         currentStage.setOnCloseRequest(event -> {
             endScanSession();
@@ -119,6 +123,31 @@ public class ScanController implements Initializable, IViewController {
     public void initialize(URL location, ResourceBundle resources) {
         initializeKeyboardShortcuts();
         initializeExportComboBoxes();
+
+        cbBoxId.setItems(filteredBoxIds);
+
+        spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 360, 5, 1));
+        comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> {
+            updateProfileAdjustmentsFields(newValue);
+            List<String> boxIds = fetchBoxIdsFromProfile(newValue);
+            source.setAll(boxIds);
+            cbBoxId.getEditor().clear();
+        });
+
+        cbBoxId.getEditor().textProperty().addListener(((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.matches("\\d*")) {
+                cbBoxId.getEditor().setText(newVal.replaceAll("\\D", ""));
+                return;
+            }
+
+            filteredBoxIds.setPredicate(id -> {
+                if (newVal == null || newVal.isBlank()) return true;
+                return id.contains(newVal);
+            });
+
+            cbBoxId.hide();
+            cbBoxId.show();
+        }));
         setFileAdjustmentSideMenu(false);
         setFileAdjustmentBtn(false);
         setExportInProgress(false);
@@ -141,13 +170,28 @@ public class ScanController implements Initializable, IViewController {
 
         sliderSharpness.setOnMouseReleased(e -> applySharpnessToPreview((float) spinnerFileAdjustmentSharpness.getValue() / 100f));
 
+        sliderSharpness.valueProperty().addListener(((observable, oldValue, newValue) -> {
+            spinnerFileAdjustmentSharpness.getValueFactory().setValue(newValue.intValue());
+        }));
+
+        spinnerFileAdjustmentSharpness.getEditor().textProperty().addListener(((observable, oldValue, newValue) -> {
+            try {
+                sliderSharpness.setValue(Integer.parseInt(newValue));
+            }
+            catch (NumberFormatException e) {}
+        }));
+
+        spinnerFileAdjustmentSharpness.getEditor().setOnAction(e-> {
+            applySharpnessToPreview(spinnerFileAdjustmentSharpness.getValue().floatValue() / 100f);
+        });
+
         setSessionControlsDisabled(true);
         refreshStatusBar();
         updateCurrentPageLabel();
         updateCurrentDocumentLabel();
     }
 
-    private void initializeProfileComboBox() {
+    private void initializeProfileCombobox() {
         if (modelFacade == null) return;
 
         if (currentUser.getProfiles().isEmpty() && !currentUser.isAdmin()) return;
@@ -157,6 +201,23 @@ public class ScanController implements Initializable, IViewController {
         }
 
         comboBoxProfiles.setItems(FXCollections.observableArrayList(currentUser.getProfiles()));
+
+    }
+
+    private List<String> fetchBoxIdsFromProfile(Profile profile) {
+
+        List<Box> existingBoxes = modelFacade.getBoxModel().getBoxes().stream().filter(b -> b.getProfile().equals(profile)).toList();
+        List<String> boxIds = new ArrayList<>();
+
+        for (Box box: existingBoxes) {
+            String id = box.getBoxName().split("_")[2];
+            if (!boxIds.contains(id)) {
+                boxIds.add(id);
+            }
+        }
+
+        return boxIds;
+
     }
 
     private void initializeExportComboBoxes() {
@@ -178,6 +239,9 @@ public class ScanController implements Initializable, IViewController {
         treeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
 
         treeView.setCellFactory(tv -> new TreeCell<>() {
+
+            private final Label icon = new Label();
+
             {
                 setOnDragDetected(event -> {
                     TreeItem<TreeNode> item = getTreeItem();
@@ -229,6 +293,18 @@ public class ScanController implements Initializable, IViewController {
                 });
             }
 
+
+
+            {
+                icon.getStyleClass().add("icon");
+                selectedProperty().addListener(((observable, oldValue, newValue) -> {
+                    if (icon != null) {
+                        icon.getStyleClass().removeAll("icon", "icon-selected");
+                        icon.getStyleClass().add(newValue ? "icon-selected" : "icon");
+                    }
+                }));
+            }
+
             @Override
             protected void updateItem(TreeNode object, boolean empty) {
                 super.updateItem(object, empty);
@@ -239,9 +315,6 @@ public class ScanController implements Initializable, IViewController {
                     setContextMenu(null);
                     return;
                 }
-
-                Label icon = new Label();
-                icon.getStyleClass().add("icon");
 
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
@@ -393,7 +466,7 @@ public class ScanController implements Initializable, IViewController {
 
     @FXML
     private void onSessionStartup(ActionEvent e) {
-        initializeProfileComboBox();
+        initializeProfileCombobox();
         sessionPopupOverlay.setVisible(true);
         sessionPopupOverlay.setDisable(false);
         workspaceView.setDisable(true);
@@ -409,16 +482,19 @@ public class ScanController implements Initializable, IViewController {
     @FXML
     private void onStartSession(ActionEvent e) {
         Profile profile = comboBoxProfiles.getValue();
-        String boxInput = txtFldBoxId.getText().trim();
+        String boxInput = cbBoxId.getValue();
+
+        clearError();
 
         if (profile == null) {
-            AlertHelper.showError("Session Setup", "Please select a profile before starting.");
-            // TODO add visual error feedback
-            return;
+            comboBoxProfiles.getStyleClass().add("error-border");
         }
-        if (boxInput.isEmpty()) {
-            AlertHelper.showError("Session Setup", "Please enter a Box ID before starting.");
-            // TODO add visual error feedback
+        if (boxInput == null || boxInput.isEmpty()) {
+            cbBoxId.getStyleClass().add("error-border");
+        }
+
+        if (profile == null || boxInput == null || boxInput.isEmpty()) {
+            AlertHelper.showError("Session Setup", "Please fill all required fields.");
             return;
         }
 
@@ -669,6 +745,43 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("Split Failed", "Could not split the document. Please try again.");
         }
+    }
+
+    private void clearError() {
+
+        cbBoxId.getStyleClass().remove("error-border");
+        comboBoxProfiles.getStyleClass().remove("error-border");
+
+    }
+
+    private MenuItem menuItemSetup(String command, String shortcut, Runnable onSelected) {
+
+        MenuItem menuItem = new MenuItem();
+
+        Label commandLbl = new Label(command);
+        commandLbl.setMinWidth(120);
+        commandLbl.setMaxWidth(120);
+        commandLbl.setAlignment(Pos.CENTER_LEFT);
+
+        Region growingSpacer = new Region();
+        growingSpacer.setMinWidth(30);
+        HBox.setHgrow(growingSpacer, Priority.ALWAYS);
+
+        Label shortcutLbl = new Label(shortcut);
+        shortcutLbl.setMinWidth(45);
+        shortcutLbl.setAlignment(Pos.CENTER_RIGHT);
+
+        HBox container = new HBox(commandLbl, growingSpacer, shortcutLbl);
+
+        menuItem.setGraphic(container);
+
+        menuItem.setOnAction(e -> {
+            onSelected.run();
+            e.consume();
+        });
+
+        return menuItem;
+
     }
 
     /**
@@ -1365,6 +1478,8 @@ public class ScanController implements Initializable, IViewController {
             selectPage(document, file);
             updateCurrentPageLabel();
             updateCurrentDocumentLabel();
+            rebuild();
+            boxTreeView.requestFocus();
             rebuildCard();
 
             // prevents recursive tree selection events
