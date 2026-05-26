@@ -537,8 +537,8 @@ public class ScanController implements Initializable, IViewController {
      * Starts the continuous scan loop on a background thread.
      * <p>
      * A {@value scanDelay} ms delay is inserted after each successful scan
-     * so the scanner has time to advance the next page.
-     * The first scan of an empty box always fetches a barcode page (enforced by ScanManager).
+     * so the scanner has time to advance the next file.
+     * The first scan of an empty box always fetches a barcode file (enforced by ScanManager).
      * <p>
      * Each scan result pushes one undo entry. The undo removes the scanned file.
      * If a new document was created by a barcode split undo removes that document too.
@@ -585,7 +585,7 @@ public class ScanController implements Initializable, IViewController {
 
                             syncDocumentsFromModel();
 
-                            // move selection to the last remaining page or clear it
+                            // move selection to the last remaining file or clear it
                             List<File> remaining = allPages();
                             if (remaining.isEmpty()) {
                                 selectedDocument = null;
@@ -607,7 +607,7 @@ public class ScanController implements Initializable, IViewController {
                     Platform.runLater(() -> {
                         btnScan.setDisable(false);
                         btnStop.setDisable(true);
-                        AlertHelper.showError("Scan Failed", "Scanning stopped. Could not fetch the next page. Please try again.");
+                        AlertHelper.showError("Scan Failed", "Scanning stopped. Could not fetch the next file. Please try again.");
                     });
                     return;
                 }
@@ -1645,10 +1645,10 @@ public class ScanController implements Initializable, IViewController {
         for (Document document : documents) {
             int position = document.getFiles().indexOf(file);
             if (position >= 0) {
-                return "Page " + (position + 1);
+                return "File " + (position + 1);
             }
         }
-        return "Page ?"; // should not happen :o
+        return "File ?"; // should not happen :o
     }
 
     private int currentPageIndex() {
