@@ -367,13 +367,9 @@ public class ScanController implements Initializable, IViewController {
 
         shortcuts.put(new KeyCodeCombination(KeyCode.SPACE),
                 () -> { if (!scanning) onScan(null); else onStop(null); });
-        shortcuts.put(new KeyCodeCombination(KeyCode.LEFT),
-                () -> onNavPrev(null));
         shortcuts.put(new KeyCodeCombination(KeyCode.LEFT,
                         KeyCombination.CONTROL_DOWN),
                 () -> onRotateLeft(null));
-        shortcuts.put(new KeyCodeCombination(KeyCode.RIGHT),
-                () -> onNavNext(null));
         shortcuts.put(new KeyCodeCombination(KeyCode.RIGHT,
                         KeyCombination.CONTROL_DOWN),
                 () -> onRotateRight(null));
@@ -672,6 +668,16 @@ public class ScanController implements Initializable, IViewController {
             Document originalDocument = selectedDocument;
 
             Document newDocument = scanModel.manualSplit();
+
+            // manualSplit() appends the new document to the end of the box.
+            // For a split we want it to appear directly after the document it
+            // was split from, so reposition it in the model before syncing.
+            List<Document> modelDocuments = scanModel.getTargetBox().getDocuments();
+            modelDocuments.remove(newDocument);
+            int originalIndex = modelDocuments.indexOf(originalDocument);
+            int insertIndex = originalIndex < 0 ? modelDocuments.size() : originalIndex + 1;
+            modelDocuments.add(insertIndex, newDocument);
+
             syncDocumentsFromModel();
             // move files into the new document
             for (File file : toMove) {

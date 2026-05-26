@@ -855,3 +855,28 @@
 .dark .menu-item:hover .label {
     -fx-text-fill: #ffffff;
 }
+.dark .kbd {
+
+    -fx-background-color: #465160;
+    -fx-background-radius: 3px;
+
+    -fx-border-color: #2B3B4C;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1;
+
+    -fx-text-fill: white;
+
+}
+
+.dark .shortcut-lbl {
+
+    -fx-text-fill: #BFC6D0;
+
+}
+
+.dark .shortcut-scroll,
+.dark .shortcut-scroll > .viewport {
+
+    -fx-background-color: transparent;
+
+}
