@@ -158,9 +158,23 @@ public class ScanController implements Initializable, IViewController {
         bindSlider(sliderContrast, spinnerFileAdjustmentContrast);
         bindSlider(sliderSaturation, spinnerFileAdjustmentSaturation);
         bindSlider(sliderRotation, spinnerFileAdjustmentRotation);
-        bindSlider(sliderSharpness, spinnerFileAdjustmentSharpness);
 
         sliderSharpness.setOnMouseReleased(e -> applySharpnessToPreview((float) sliderSharpness.getValue() / 100f));
+
+        sliderSharpness.valueProperty().addListener(((observable, oldValue, newValue) -> {
+            spinnerFileAdjustmentSharpness.getValueFactory().setValue(newValue.intValue());
+        }));
+
+        spinnerFileAdjustmentSharpness.getEditor().textProperty().addListener(((observable, oldValue, newValue) -> {
+            try {
+                sliderSharpness.setValue(Integer.parseInt(newValue));
+            }
+            catch (NumberFormatException e) {}
+        }));
+
+        spinnerFileAdjustmentSharpness.getEditor().setOnAction(e-> {
+            applySharpnessToPreview(spinnerFileAdjustmentSharpness.getValue().floatValue() / 100f);
+        });
 
         setSessionControlsDisabled(true);
         refreshStatusBar();
@@ -216,6 +230,9 @@ public class ScanController implements Initializable, IViewController {
         treeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
 
         treeView.setCellFactory(tv -> new TreeCell<>() {
+
+            private final Label icon = new Label();
+
             {
                 setOnDragDetected(event -> {
                     TreeItem<TreeNode> item = getTreeItem();
@@ -267,6 +284,18 @@ public class ScanController implements Initializable, IViewController {
                 });
             }
 
+
+
+            {
+                icon.getStyleClass().add("icon");
+                selectedProperty().addListener(((observable, oldValue, newValue) -> {
+                    if (icon != null) {
+                        icon.getStyleClass().removeAll("icon", "icon-selected");
+                        icon.getStyleClass().add(newValue ? "icon-selected" : "icon");
+                    }
+                }));
+            }
+
             @Override
             protected void updateItem(TreeNode object, boolean empty) {
                 super.updateItem(object, empty);
@@ -277,9 +306,6 @@ public class ScanController implements Initializable, IViewController {
                     setContextMenu(null);
                     return;
                 }
-
-                Label icon = new Label();
-                icon.getStyleClass().add("icon");
 
                 if (object instanceof Box box) {
                     icon.setText("\ue9d9");
@@ -421,16 +447,19 @@ public class ScanController implements Initializable, IViewController {
     @FXML
     private void onStartSession(ActionEvent e) {
         Profile profile = comboBoxProfiles.getValue();
-        String boxInput = String.valueOf(cbBoxId.getValue());
+        String boxInput = cbBoxId.getValue();
+
+        clearError();
 
         if (profile == null) {
-            AlertHelper.showError("Session Setup", "Please select a profile before starting.");
-            // TODO add visual error feedback
-            return;
+            comboBoxProfiles.getStyleClass().add("error-border");
         }
-        if (boxInput.isEmpty()) {
-            AlertHelper.showError("Session Setup", "Please enter a Box ID before starting.");
-            // TODO add visual error feedback
+        if (boxInput == null || boxInput.isEmpty()) {
+            cbBoxId.getStyleClass().add("error-border");
+        }
+
+        if (profile == null || boxInput == null || boxInput.isEmpty()) {
+            AlertHelper.showError("Session Setup", "Please fill all required fields.");
             return;
         }
 
@@ -674,6 +703,13 @@ public class ScanController implements Initializable, IViewController {
             ex.printStackTrace();
             AlertHelper.showError("Split Failed", "Could not split the document. Please try again.");
         }
+    }
+
+    private void clearError() {
+
+        cbBoxId.getStyleClass().remove("error-border");
+        comboBoxProfiles.getStyleClass().remove("error-border");
+
     }
 
     private MenuItem menuItemSetup(String command, String shortcut, Runnable onSelected) {
@@ -1355,6 +1391,7 @@ public class ScanController implements Initializable, IViewController {
             updateCurrentPageLabel();
             updateCurrentDocumentLabel();
             rebuild();
+            boxTreeView.requestFocus();
         });
 
         return card;

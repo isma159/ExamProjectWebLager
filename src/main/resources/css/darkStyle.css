@@ -426,6 +426,14 @@
     -fx-text-fill: #ffffff;
 }
 
+.dark .tree-view-form .tree-cell .text {
+    -fx-fill: #ffffff;
+}
+
+.dark .tree-view-form .tree-cell:focused .text {
+    -fx-fill: #ffffff;
+}
+
 /* ---------- Dark Client/Profile Rows ---------- */
 .dark .client-row {
     -fx-background-color: #354556;
@@ -509,14 +517,14 @@
 }
 
 .dark .progress-bar .bar {
-    -fx-background-color: #24C79F;
+    -fx-background-color: #008FF7;
     -fx-background-radius: 6px;
     -fx-background-insets: 2;
     -fx-padding: 6px;
 }
 
 .dark .progress-bar:indeterminate .bar {
-    -fx-background-color: #24C79F;
+    -fx-background-color: #008FF7;
 }
 
 /* ---------- Dark Chip ---------- */
@@ -550,7 +558,7 @@
 }
 
 .dark .icon {
-    -fx-text-fill: #ffffff1;
+    -fx-text-fill: #ffffff;
 }
 
 /* ---------- Dark Shortcut ---------- */
@@ -580,10 +588,20 @@
 }
 
 /* ---------- Dark Logo ---------- */
+
 .dark .green-logo-h {
-    -fx-image: url("../images/Green/LogoGreenH.png");
+    -fx-image: url("../images/MainBlue/LogoBlueH.png");
 }
 
+.dark .scanner-logo-h {
+    -fx-image: url("../images/DarkmodeBlue/LogoBlue2H.png");
+}
+
+.dark .green-logo-icon {
+
+    -fx-image: url("../images/MainBlue/LogoBlue_Logoicon.png");
+
+}
 /* ---------- Dark Checkbox ---------- */
 .dark .check-box .box {
     -fx-background-color: TRANSPARENT;

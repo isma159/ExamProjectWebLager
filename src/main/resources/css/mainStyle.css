@@ -15,16 +15,20 @@
 }
 
 .icon {
-
+    -fx-font-size: 18px;
     -fx-font-family: "primeicons";
-    -fx-font-size: 18;
+    -fx-text-fill: #000000;
+}
 
+.icon-selected {
+    -fx-font-size: 18px;
+    -fx-font-family: "primeicons";
+    -fx-text-fill: #ffffff;
 }
 
 .white-icon {
 
     -fx-font-family: "primeicons";
-
     -fx-text-fill: #ffffff;
 
 }
@@ -564,7 +568,19 @@
 
 .green-logo-h {
 
+    -fx-image: url("../images/Green/LogoGreenH.png");
+
+}
+
+.scanner-logo-h {
+
     -fx-image: url("../images/Green/LogoGreen2H.png");
+
+}
+
+.green-logo-icon {
+
+    -fx-image: url("../images/Green/WeblagerGreenIcon.png");
 
 }
 
@@ -632,17 +648,6 @@
 
 }
 
-.tree-view-form .tree-cell {
-
-    -fx-font-size: 12;
-
-}
-
-.tree-view-form .tree-cell:focused {
-
-    -fx-text-fill: #000000;
-
-}
 
 .tertiary-btn {
 
@@ -722,13 +727,13 @@
 }
 
 
-.container.error-border {
+.error-border {
 
     -fx-border-color: #FF3D32;
 
 }
 
-.container.success-border {
+.success-border {
 
     -fx-border-color: #4CD07D;
 
@@ -1042,29 +1047,29 @@
 
 }
 
-.scroll-pane .scroll-bar {
+.scroll-bar {
 
     -fx-background-color: TRANSPARENT;
     -fx-pref-width: 18;
 
 }
 
-.scroll-pane .scroll-bar .thumb {
+.scroll-bar .thumb {
 
     -fx-background-color: #BFBFBF;
 
 }
 
-.scroll-pane .scroll-bar .increment-button,
-.scroll-pane .scroll-bar .decrement-button {
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
     -fx-padding: 0;
     -fx-shape: null;
     visibility: hidden;
     -fx-text-fill: TRANSPARENT;
 }
 
-.scroll-pane .scroll-bar .increment-button .increment-arrow,
-.scroll-pane .scroll-bar .decrement-button .decrement-arrow {
+.scroll-bar .increment-button .increment-arrow,
+.scroll-bar .decrement-button .decrement-arrow {
     -fx-padding: 0;
     -fx-shape: null;
     visibility: hidden;
