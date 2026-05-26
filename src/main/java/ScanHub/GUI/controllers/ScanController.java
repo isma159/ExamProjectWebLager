@@ -12,6 +12,7 @@ import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -29,8 +30,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.ToggleSwitch;
 
@@ -51,7 +54,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private Button btnScan, btnStop, btnRotLeft, btnRotRight, btnUndo, btnExport, btnZoomOut, btnZoomIn, btnFileAdjustments;
     @FXML private ComboBox<ExportMode> comboBoxExport;
     @FXML private FlowPane pageGrid;
-    @FXML private Label lblSessionStatus, lblCurrentPage, lblCurrentDocument, stDocsLabel, stPagesLabel;
+    @FXML private Label lblSessionStatus, lblCurrentPage, lblCurrentDocument, lblTotalDocuments, lblTotalPages;
     @FXML private TreeView<TreeNode> boxTreeView;
     @FXML private Spinner<Integer> spinnerRotation;
     @FXML private ProgressBar progressBarExport;
@@ -67,7 +70,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private StackPane fileAdjustmentSideMenu;
     @FXML private Spinner<Integer> spinnerFileAdjustmentRotation, spinnerFileAdjustmentHue, spinnerFileAdjustmentBrightness,
             spinnerFileAdjustmentContrast, spinnerFileAdjustmentSaturation, spinnerFileAdjustmentSharpness;
-    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderRotation, sliderSharpness;
+    @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderSharpness;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -145,6 +148,12 @@ public class ScanController implements Initializable, IViewController {
             cbBoxId.hide();
             cbBoxId.show();
         }));
+        setFileAdjustmentSideMenu(false);
+        setFileAdjustmentBtn(false);
+        setExportInProgress(false);
+
+        comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
+        spinnerRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 360, 5, 1));
 
         spinnerFileAdjustmentRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-360, 360, 0, 1));
         spinnerFileAdjustmentHue.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
@@ -157,9 +166,9 @@ public class ScanController implements Initializable, IViewController {
         bindSlider(sliderBrightness, spinnerFileAdjustmentBrightness);
         bindSlider(sliderContrast, spinnerFileAdjustmentContrast);
         bindSlider(sliderSaturation, spinnerFileAdjustmentSaturation);
-        bindSlider(sliderRotation, spinnerFileAdjustmentRotation);
+        bindSlider(sliderSharpness, spinnerFileAdjustmentSharpness);
 
-        sliderSharpness.setOnMouseReleased(e -> applySharpnessToPreview((float) sliderSharpness.getValue() / 100f));
+        sliderSharpness.setOnMouseReleased(e -> applySharpnessToPreview((float) spinnerFileAdjustmentSharpness.getValue() / 100f));
 
         sliderSharpness.valueProperty().addListener(((observable, oldValue, newValue) -> {
             spinnerFileAdjustmentSharpness.getValueFactory().setValue(newValue.intValue());
@@ -333,7 +342,7 @@ public class ScanController implements Initializable, IViewController {
                 } else if (object instanceof File file) {
                     icon.setText("\ue958");
                     setText(setFileLabel(file));
-                    setStyle(file.isStaged() ? "-fx-font-weight: bold;" : "");
+                    setStyle(file.isStaged() || file.isModified() ? "-fx-font-weight: bold;" : "");
 
                     // context menu :)
                     ContextMenu contextMenu = new ContextMenu();
@@ -350,6 +359,36 @@ public class ScanController implements Initializable, IViewController {
                 setGraphic(icon);
             }
         });
+    }
+
+    private MenuItem menuItemSetup(String command, String shortcut, Runnable onSelected) {
+
+        MenuItem menuItem = new MenuItem();
+
+        Label commandLbl = new Label(command);
+        commandLbl.setMinWidth(120);
+        commandLbl.setMaxWidth(120);
+        commandLbl.setAlignment(Pos.CENTER_LEFT);
+
+        Region growingSpacer = new Region();
+        growingSpacer.setMinWidth(30);
+        HBox.setHgrow(growingSpacer, Priority.ALWAYS);
+
+        Label shortcutLbl = new Label(shortcut);
+        shortcutLbl.setMinWidth(45);
+        shortcutLbl.setAlignment(Pos.CENTER_RIGHT);
+
+        HBox container = new HBox(commandLbl, growingSpacer, shortcutLbl);
+
+        menuItem.setGraphic(container);
+
+        menuItem.setOnAction(e -> {
+            onSelected.run();
+            e.consume();
+        });
+
+        return menuItem;
+
     }
 
     public void expandAll(TreeItem<?> item) {
@@ -500,7 +539,7 @@ public class ScanController implements Initializable, IViewController {
      * Starts the continuous scan loop on a background thread.
      * <p>
      * A {@value scanDelay} ms delay is inserted after each successful scan
-     * so the scanner hardware has time to advance the next page.
+     * so the scanner has time to advance the next page.
      * The first scan of an empty box always fetches a barcode page (enforced by ScanManager).
      * <p>
      * Each scan result pushes one undo entry. The undo removes the scanned file.
@@ -651,9 +690,6 @@ public class ScanController implements Initializable, IViewController {
         undoStack.clear();
     }
 
-    /**
-     * TODO: prompt a before or after split while selecting a file
-     */
     private void onSplitDocument(int choice) {
         if (selectedFile == null || selectedDocument == null || scanModel == null || !sessionActive) return;
 
@@ -870,11 +906,9 @@ public class ScanController implements Initializable, IViewController {
         if (selectedFile == null) return;
         if (!fileAdjustmentSideMenu.isVisible()) {
             populateFileAdjustmentsFields(selectedFile);
-            fileAdjustmentSideMenu.setManaged(true);
-            fileAdjustmentSideMenu.setVisible(true);
+            setFileAdjustmentSideMenu(true);
         } else {
-            fileAdjustmentSideMenu.setManaged(false);
-            fileAdjustmentSideMenu.setVisible(false);
+            setFileAdjustmentSideMenu(false);
         }
     }
 
@@ -883,12 +917,12 @@ public class ScanController implements Initializable, IViewController {
     private void onApplyFileAdjustments(ActionEvent e) {
         if (selectedFile == null || scanModel == null) return;
         try {
-            int rotation = (int) sliderRotation.getValue();
-            double hue = sliderHue.getValue();
-            double brightness = sliderBrightness.getValue();
-            double contrast = sliderContrast.getValue();
-            double saturation = sliderSaturation.getValue();
-            double sharpness = sliderSharpness.getValue();
+            int rotation = spinnerFileAdjustmentRotation.getValue();
+            double hue = spinnerFileAdjustmentHue.getValue();
+            double brightness = spinnerFileAdjustmentBrightness.getValue();
+            double contrast = spinnerFileAdjustmentContrast.getValue();
+            double saturation = spinnerFileAdjustmentSaturation.getValue();
+            double sharpness = spinnerFileAdjustmentSharpness.getValue();
 
             // snapshot old settings into a copy before any mutation
             FileAdjustmentSettings oldSettings = new FileAdjustmentSettings(selectedFile.getRotation(), selectedFile.getHue(), selectedFile.getBrightness(), selectedFile.getContrast(), selectedFile.getSaturation(), selectedFile.getSharpness());
@@ -905,7 +939,7 @@ public class ScanController implements Initializable, IViewController {
                 }
             });
 
-            rebuildPreviewCard();
+            rebuildCard();
         } catch (IllegalArgumentException ex) {
             AlertHelper.showError("Invalid Input", ex.getMessage());
             // TODO add visual feedback
@@ -962,7 +996,7 @@ public class ScanController implements Initializable, IViewController {
                 }
             });
 
-            rebuildPreviewCard();
+            rebuildCard();
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Rotation Failed", "Could not update file rotation.");
@@ -989,7 +1023,7 @@ public class ScanController implements Initializable, IViewController {
 
         // prevents bugs with treeSelectionListener sometimes re-selecting the previous selection with onTreeSelectionChanged
         boxTreeView.getSelectionModel().selectedItemProperty().removeListener(treeSelectionListener);
-        rebuildPreviewCard();
+        rebuildCard();
         syncTreeSelection();
         boxTreeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
     }
@@ -997,13 +1031,13 @@ public class ScanController implements Initializable, IViewController {
     @FXML
     private void onZoomIn(ActionEvent e) {
         zoomLevel = Math.min(zoomLevel + ZOOM_STEP, ZOOM_MAX);
-        rebuildPreviewCard();
+        rebuildCard();
     }
 
     @FXML
     private void onZoomOut(ActionEvent e) {
         zoomLevel = Math.max(zoomLevel - ZOOM_STEP, ZOOM_MIN);
-        rebuildPreviewCard();
+        rebuildCard();
     }
 
     /**
@@ -1135,7 +1169,7 @@ public class ScanController implements Initializable, IViewController {
             selectedFile = null;
         }
 
-        rebuildPreviewCard();
+        rebuildCard();
     }
 
     /** Moves {@code file} to the end of {@code target}'s file list. */
@@ -1212,7 +1246,7 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void rebuild() {
-        rebuildPreviewCard();
+        rebuildCard();
         refreshTree();
         refreshStatusBar();
     }
@@ -1224,7 +1258,7 @@ public class ScanController implements Initializable, IViewController {
      * a barcode split or manual split where the new doc now has a file), the first
      * file of that document is shown automatically.
      */
-    private void rebuildPreviewCard() {
+    private void rebuildCard() {
         pageGrid.getChildren().clear();
         currentPreviewImageView = null;
 
@@ -1234,21 +1268,18 @@ public class ScanController implements Initializable, IViewController {
             for (File file : document.getFiles()) {
                 // if no file is selected and this file is not the selected file then skip it
                 if (selectedFile != null && file != selectedFile) continue;
-                pageGrid.getChildren().add(buildThumbnailCard(document, file));
+                pageGrid.getChildren().add(buildCard(document, file));
             }
         }
 
         if (selectedFile != null) {
-            btnFileAdjustments.setManaged(true);
-            btnFileAdjustments.setVisible(true);
+            setFileAdjustmentBtn(true);
             if (fileAdjustmentSideMenu.isVisible()) {
                 populateFileAdjustmentsFields(selectedFile);
             }
         } else {
-            fileAdjustmentSideMenu.setManaged(false);
-            fileAdjustmentSideMenu.setVisible(false);
-            btnFileAdjustments.setManaged(false);
-            btnFileAdjustments.setVisible(false);
+            setFileAdjustmentSideMenu(false);
+            setFileAdjustmentBtn(false);
         }
 
         updateCurrentPageLabel();
@@ -1299,106 +1330,180 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void refreshStatusBar() {
-        stDocsLabel.setText("Documents: " + documents.size());
-        stPagesLabel.setText("Files: " + totalPageCount());
+        lblTotalDocuments.setText("Documents: " + documents.size());
+        lblTotalPages.setText("Files: " + totalPageCount());
     }
 
     private void updateCurrentPageLabel() {
-        if (selectedFile == null || selectedDocument == null) {
-            lblCurrentPage.setText("File: 0 / 0");
-            return;
-        }
+        boolean show = selectedFile != null && selectedDocument != null;
 
-        int pageIndex = selectedDocument.getFiles().indexOf(selectedFile);
-        int pageCount = selectedDocument.getFiles().size();
+        lblCurrentPage.setVisible(show);
+        lblCurrentPage.setManaged(show);
 
-        if (pageIndex < 0) {
-            lblCurrentPage.setText("File: 0 / 0");
-            return;
-        }
+        if (!show) return;
 
-        lblCurrentPage.setText("File: " + (pageIndex + 1) + " / " + pageCount);
+        int index = selectedDocument.getFiles().indexOf(selectedFile);
+        int total = selectedDocument.getFiles().size();
+
+        lblCurrentPage.setText(index >= 0 ? "File: " + (index + 1) + " / " + total : "File: 0 / 0");
     }
 
     private void updateCurrentDocumentLabel() {
-        if (selectedDocument == null || documents.isEmpty()) {
-            lblCurrentDocument.setText("Doc: 0");
-            return;
-        }
-        int docIndex = documents.indexOf(selectedDocument);
-        if (docIndex < 0) {
-            lblCurrentDocument.setText("Doc: 0");
-            return;
-        }
-        lblCurrentDocument.setText("Doc: " + (docIndex + 1));
+        boolean show = selectedDocument != null && selectedBox == null;
+
+        lblCurrentDocument.setVisible(show);
+        lblCurrentDocument.setManaged(show);
+
+        if (!show) return;
+
+        int index = documents.indexOf(selectedDocument);
+        lblCurrentDocument.setText(index >= 0 ? "Doc: " + (index + 1) : "Doc: 0");
     }
 
-    private VBox buildThumbnailCard(Document document, File file) {
-        double thumbWidth = selectedFile != null ? 400 * zoomLevel : 380 * zoomLevel; // A4 ratio
-        double thumbHeight = selectedFile != null ? 566 * zoomLevel : 538 * zoomLevel; // A4 ratio
+    private VBox buildCard(Document document, File file) {
 
-        ImageView thumbnail = new ImageView();
-        thumbnail.setPreserveRatio(true);
+        // image bounds inside the card (available space for the image inside the card)
+        double maxImageWidth = cardWidth() - 8;
+        double maxImageHeight = cardHeight() - 30;
 
         int rotation = file.getRotation();
-        boolean sideways = (rotation == 90 || rotation == 270);
-        thumbnail.setFitWidth(sideways ? thumbHeight - 30 : thumbWidth - 8);
-        thumbnail.setFitHeight(sideways ? thumbWidth - 8 : thumbHeight - (selectedBox != null ? 50 : 30));
+        ImageView thumbnail = new ImageView();
+        thumbnail.setPreserveRatio(true);
+        thumbnail.setSmooth(true);
+        // TODO set style with border outline
+        thumbnail.setFitWidth(maxImageWidth);
+        thumbnail.setFitHeight(maxImageHeight);
         thumbnail.setRotate(rotation);
-        thumbnail.setEffect(new ColorAdjust(file.getHue() / 100, file.getSaturation() / 100, file.getBrightness() / 100, file.getContrast() / 100));
+        thumbnail.setEffect(new ColorAdjust(
+                file.getHue() / 100.0,
+                file.getSaturation() / 100.0,
+                file.getBrightness() / 100.0,
+                file.getContrast() / 100.0
+        ));
 
-        // loading screen
+        // clip container for preventing rotated image overflow
+        StackPane previewPane = new StackPane(thumbnail);
+        previewPane.setPrefSize(maxImageWidth, maxImageHeight);
+        previewPane.setMinSize(maxImageWidth, maxImageHeight);
+        previewPane.setMaxSize(maxImageWidth, maxImageHeight);
+        previewPane.setClip(new Rectangle(maxImageWidth, maxImageHeight));
+
+        // loading card
         Thread loader = new Thread(() -> {
             try {
                 scanModel.loadImageData(file);
                 Image image = file.getPreviewImage();
 
                 if (file.getSharpness() != 0 && file.getImageData() != null) {
-                    image = buildSharpImage(file,(float) file.getSharpness() / 100f);
+                    image = buildSharpImage(file, (float) (file.getSharpness() / 100f));
                 }
-                final Image finalImage = image;
+
                 if (image != null && !image.isError()) {
-                    // TODO add somethings to tell its buffering/loading
-                    Platform.runLater(() -> thumbnail.setImage(finalImage));
+                    final Image finalImage = image;
+
+                    // bounding box of the image before any rotations
+                    double originalWidth = image.getWidth();
+                    double originalHeight = image.getHeight();
+
+                    // rotation math helpers
+                    double radians = Math.toRadians(rotation);
+                    double cos = Math.abs(Math.cos(radians));
+                    double sin = Math.abs(Math.sin(radians));
+
+                    // bounding box after rotation (axis-aligned)
+                    double rotatedBoundingWidth = originalWidth * cos + originalHeight * sin;
+                    double rotatedBoundingHeight = originalWidth * sin + originalHeight * cos;
+
+                    // scale factor to fit rotated image within constraints
+                    double scale = Math.min(maxImageWidth / rotatedBoundingWidth, maxImageHeight / rotatedBoundingHeight);
+
+                    // final displayed (rotated bounding box size in UI space)
+                    double displayedWidth = rotatedBoundingWidth * scale;
+                    double displayedHeight = rotatedBoundingHeight * scale;
+
+                    // ImageView fit sizes (based on original image and not rotated bounds)
+                    double imageViewFitWidth = originalWidth * scale;
+                    double imageViewFitHeight = originalHeight * scale;
+
+                    Platform.runLater(() -> {
+                        thumbnail.setFitWidth(imageViewFitWidth);
+                        thumbnail.setFitHeight(imageViewFitHeight);
+                        // update the placeholder clip container
+                        previewPane.setPrefSize(displayedWidth, displayedHeight);
+                        previewPane.setMinSize(displayedWidth, displayedHeight);
+                        previewPane.setMaxSize(displayedWidth, displayedHeight);
+                        previewPane.setClip(new Rectangle(displayedWidth, displayedHeight));
+                        thumbnail.setImage(finalImage);
+                    });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        loader.setDaemon(true);
+        loader.setDaemon(true); // runs in background and doesn't prevent closing the program mid-loading
         loader.start();
+
+        boolean showFileLabel = (selectedBox != null || selectedDocument != null) && selectedFile == null;
+        boolean showDocLabel = selectedBox != null && selectedFile == null;
 
         Label lblFile = new Label(setFileLabel(file));
         lblFile.getStyleClass().add("lbl");
-        lblFile.setMaxWidth(thumbWidth - 8);
-        lblFile.setVisible((selectedBox != null || selectedDocument != null) && selectedFile == null);
-        lblFile.setManaged((selectedBox != null || selectedDocument != null) && selectedFile == null);
+        lblFile.setMaxWidth(cardWidth() - 8);
+        lblFile.setVisible(showFileLabel);
+        lblFile.setManaged(showFileLabel);
 
         Label lblDocument = new Label(setDocumentLabel(document));
         lblDocument.getStyleClass().add("lbl");
-        lblDocument.setMaxWidth(thumbWidth - 8);
-        lblDocument.setVisible(selectedBox != null && selectedFile == null);
-        lblDocument.setManaged(selectedBox != null && selectedFile == null);
+        lblDocument.setMaxWidth(cardWidth() - 8);
+        lblDocument.setVisible(showDocLabel);
+        lblDocument.setManaged(showDocLabel);
 
-        VBox card = new VBox(4, thumbnail, lblFile, lblDocument);
-        card.setPrefWidth(thumbWidth);
-        card.setPrefHeight(thumbHeight);
+        VBox card = new VBox(4, previewPane, lblFile, lblDocument);
+        card.setPrefWidth(cardWidth());
+        card.setPrefHeight(cardHeight());
         card.setAlignment(Pos.CENTER);
-        card.getStyleClass().addAll("card", "card-bg", "shadow");
+        card.getStyleClass().addAll("pageCard", "card-bg", "shadow");
         card.setPadding(new Insets(4));
         card.setUserData(file);
 
-        if (file == selectedFile) {
-            currentPreviewImageView = thumbnail;
-        }
+        if (file == selectedFile) { currentPreviewImageView = thumbnail; }
 
         card.setOnMouseClicked(event -> {
+            // if file is already selected, then just return to avoid unnecessary rebuild
+            if (file == selectedFile) {
+                return;
+            }
+
+            //
             selectPage(document, file);
             updateCurrentPageLabel();
             updateCurrentDocumentLabel();
             rebuild();
             boxTreeView.requestFocus();
+            rebuildCard();
+
+            // prevents recursive tree selection events
+            boxTreeView.getSelectionModel().selectedItemProperty().removeListener(treeSelectionListener);
+            refreshTree();
+            syncTreeSelection();
+            boxTreeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
         });
+
+        if (file != selectedFile) {
+            ScaleTransition scaleUp = new ScaleTransition(Duration.millis(120), card);
+            ScaleTransition scaleDown = new ScaleTransition(Duration.millis(120), card);
+
+            card.setOnMouseEntered(e -> {
+                scaleDown.stop();
+                scaleUp.setToX(1.02); scaleUp.setToY(1.02);
+                scaleUp.playFromStart();
+            });
+            card.setOnMouseExited(e -> {
+                scaleUp.stop();
+                scaleDown.setToX(1.0); scaleDown.setToY(1.0);
+                scaleDown.playFromStart();
+            });
+        }
 
         return card;
     }
@@ -1421,20 +1526,20 @@ public class ScanController implements Initializable, IViewController {
 
         FileAdjustmentSettings settings = profile.getFileAdjustmentSettings();
         txtFldGlobalRotation.setText(String.valueOf(settings.getRotation()));
-        txtFldGlobalHue.setText(String.valueOf(settings.getHue()));
-        txtFldGlobalBrightness.setText(String.valueOf(settings.getBrightness()));
-        txtFldGlobalContrast.setText(String.valueOf(settings.getContrast()));
-        txtFldGlobalSaturation.setText(String.valueOf(settings.getSaturation()));
+        txtFldGlobalHue.setText(String.format("%.0f", settings.getHue()));
+        txtFldGlobalBrightness.setText(String.format("%.0f", settings.getBrightness()));
+        txtFldGlobalContrast.setText(String.format("%.0f", settings.getContrast()));
+        txtFldGlobalSaturation.setText(String.format("%.0f", settings.getSaturation()));
     }
 
     private void populateFileAdjustmentsFields(File file) {
-        sliderHue.setValue(file.getHue());
-        sliderBrightness.setValue(file.getBrightness());
-        sliderContrast.setValue(file.getContrast());
-        sliderSaturation.setValue(file.getSaturation());
-        sliderRotation.setValue(file.getRotation());
-        sliderSharpness.setValue(file.getSharpness());
-        applySharpnessToPreview((float) sliderSharpness.getValue() / 100f);
+        spinnerFileAdjustmentRotation.getValueFactory().setValue(file.getRotation());
+        spinnerFileAdjustmentHue.getValueFactory().setValue((int) file.getHue());
+        spinnerFileAdjustmentBrightness.getValueFactory().setValue((int) file.getBrightness());
+        spinnerFileAdjustmentContrast.getValueFactory().setValue((int) file.getContrast());
+        spinnerFileAdjustmentSaturation.getValueFactory().setValue((int) file.getSaturation());
+        spinnerFileAdjustmentSharpness.getValueFactory().setValue((int) file.getSharpness());
+        applySharpnessToPreview(spinnerFileAdjustmentSharpness.getValue() / 100f);
     }
 
     private BufferedImage scaleToPreviewSize(BufferedImage source, int width, int height) {
@@ -1454,7 +1559,7 @@ public class ScanController implements Initializable, IViewController {
     private void bindSlider(Slider slider, Spinner<Integer> spinner) {
         slider.valueProperty().addListener((obs, o, newValue) -> {
             spinner.getValueFactory().setValue(newValue.intValue());
-            applySliderPreview();
+            applySpinnerPreview();
         });
         spinner.getEditor().textProperty().addListener((obs, o, newValue) -> {
             try {
@@ -1464,22 +1569,18 @@ public class ScanController implements Initializable, IViewController {
     }
 
     /**
-     * Applies the current slider values as a live preview on the selected File's
+     * Applies the current spinner values as a live preview on the selected File's
      * image without persisting anything to the File object.
      */
-    private void applySliderPreview() {
+    private void applySpinnerPreview() {
         if (!fileAdjustmentSideMenu.isVisible() || currentPreviewImageView == null) return;
 
         currentPreviewImageView.setEffect(new ColorAdjust(
-                sliderHue.getValue() / 100,
-                sliderSaturation.getValue() / 100,
-                sliderBrightness.getValue() / 100,
-                sliderContrast.getValue() / 100
+                spinnerFileAdjustmentHue.getValue() / 100.0,
+                spinnerFileAdjustmentSaturation.getValue() / 100.0,
+                spinnerFileAdjustmentBrightness.getValue() / 100.0,
+                spinnerFileAdjustmentContrast.getValue() / 100.0
         ));
-
-        if (!pageGrid.getChildren().isEmpty()) {
-            pageGrid.getChildren().getFirst().setRotate(sliderRotation.getValue());
-        }
     }
 
     private void applySharpnessToPreview(float strength) {
@@ -1510,6 +1611,7 @@ public class ScanController implements Initializable, IViewController {
     private void selectPage(Document document, File file) {
         selectedDocument = document;
         selectedFile = file;
+        selectedBox = null;
     }
 
     /** Syncs the observable list from the model's in-memory box state. */
@@ -1534,6 +1636,16 @@ public class ScanController implements Initializable, IViewController {
         btnZoomIn.setDisable(disabled);
         btnRotLeft.setDisable(disabled);
         btnRotRight.setDisable(disabled);
+    }
+
+    private void setFileAdjustmentSideMenu(boolean disabled) {
+        fileAdjustmentSideMenu.setVisible(disabled);
+        fileAdjustmentSideMenu.setManaged(disabled);
+    }
+
+    private void setFileAdjustmentBtn(boolean disabled) {
+        btnFileAdjustments.setVisible(disabled);
+        btnFileAdjustments.setManaged(disabled);
     }
 
     private void setExportInProgress(boolean inProgress) {
