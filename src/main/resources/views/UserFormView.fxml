@@ -17,7 +17,7 @@
               <padding>
                <Insets bottom="0" left="20" right="20" top="0" />
             </padding>
-              <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+              <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" styleClass="green-logo-icon">
                   <image>
                       <Image url="@../images/Green/WeblagerGreenIcon.png" />
                   </image>
