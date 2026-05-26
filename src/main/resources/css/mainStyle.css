@@ -1117,3 +1117,47 @@
     -fx-font-family: "Montserrat SemiBold";
 
 }
+
+/* The keycap "chip". Small element => 3px radius per the styleguide. */
+.kbd {
+
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 3px;
+
+    -fx-border-color: #E2E4E8;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1;
+
+    -fx-padding: 1 6 2 6;
+
+    -fx-font-family: "Montserrat SemiBold";
+    -fx-font-size: 10;
+    -fx-font-weight: 600;
+    -fx-text-fill: #2D3D4F;
+
+}
+
+/* The descriptive word next to each keycap. Helper-text scale, de-emphasised. */
+.shortcut-lbl {
+
+    -fx-font-size: 10;
+    -fx-font-weight: 400;
+    -fx-text-fill: #64748B;
+
+}
+
+/* The scroll container that holds the hints; must stay transparent so the
+   status-bar card background shows through. */
+.shortcut-scroll {
+
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+
+}
+
+.shortcut-scroll > .viewport {
+
+    -fx-background-color: transparent;
+
+}
