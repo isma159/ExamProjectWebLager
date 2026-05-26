@@ -12,6 +12,7 @@ import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.models.ScanModel;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.ViewHandler;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -31,6 +32,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.ToggleSwitch;
 
@@ -1347,7 +1349,7 @@ public class ScanController implements Initializable, IViewController {
         card.setPrefWidth(cardWidth());
         card.setPrefHeight(cardHeight());
         card.setAlignment(Pos.CENTER);
-        card.getStyleClass().addAll("card", "card-bg", "shadow");
+        card.getStyleClass().addAll("pageCard", "card-bg", "shadow");
         card.setPadding(new Insets(4));
         card.setUserData(file);
 
@@ -1371,6 +1373,22 @@ public class ScanController implements Initializable, IViewController {
             syncTreeSelection();
             boxTreeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
         });
+
+        if (file != selectedFile) {
+            ScaleTransition scaleUp = new ScaleTransition(Duration.millis(120), card);
+            ScaleTransition scaleDown = new ScaleTransition(Duration.millis(120), card);
+
+            card.setOnMouseEntered(e -> {
+                scaleDown.stop();
+                scaleUp.setToX(1.02); scaleUp.setToY(1.02);
+                scaleUp.playFromStart();
+            });
+            card.setOnMouseExited(e -> {
+                scaleUp.stop();
+                scaleDown.setToX(1.0); scaleDown.setToY(1.0);
+                scaleDown.playFromStart();
+            });
+        }
 
         return card;
     }
