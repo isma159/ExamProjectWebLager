@@ -336,6 +336,18 @@
 
 }
 
+.combo-box-base .arrow-button {
+
+    -fx-background-color: TRANSPARENT;
+
+}
+
+.combo-box-base .text-field {
+
+    -fx-background-color: TRANSPARENT;
+
+}
+
 .searchable-combo-box {
 
     -fx-background-color: WHITE;
