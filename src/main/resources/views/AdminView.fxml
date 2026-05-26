@@ -288,11 +288,6 @@
                                         <HBox alignment="CENTER_LEFT" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="240.0">
                                             <children>
                                                 <Region prefHeight="200.0" prefWidth="15.0" />
-                                                <Pane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="30.0" prefWidth="30.0" styleClass="avatar-initial">
-                                                    <children>
-                                                        <Label alignment="CENTER" prefHeight="30.0" prefWidth="30.0" styleClass="lbl" textFill="WHITE" />
-                                                    </children>
-                                                </Pane>
                                                 <Region layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="9.0" />
                                                 <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="90.0">
                                                     <children>

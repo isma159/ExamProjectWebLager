@@ -22,13 +22,8 @@
                                 <Image url="@../images/Green/LogoGreen2H.png" />
                             </image>
                         </ImageView>
-                  <Region HBox.hgrow="ALWAYS" />
-                        <VBox alignment="CENTER" spacing="4.0">
-                            <children>
-                                <Label styleClass="h1" text="Scanning Workspace" />
-                                <Label fx:id="lblSessionStatus" alignment="CENTER" prefWidth="240.0" styleClass="lbl" text="–" />
-                            </children>
-                        </VBox>
+                  <Region prefHeight="0.0" prefWidth="300.0" HBox.hgrow="ALWAYS" />
+                          <Label styleClass="h1" text="Scanning Workspace" />
                   <Region HBox.hgrow="ALWAYS" />
                         <ToggleSwitch fx:id="darkMode" onMouseClicked="#onDarkModeToggle" prefHeight="30.0" prefWidth="60.0" scaleX="1.25" scaleY="1.25" scaleZ="1.25" text="Dark Mode ">
                             <HBox.margin>
@@ -96,146 +91,160 @@
         <center>
             <VBox>
                 <children>
-                    <VBox alignment="CENTER">
-                        <children>
-                            <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="45.0" spacing="4.0">
-                                <padding>
-                                    <Insets bottom="6.0" left="10.0" right="10.0" top="6.0" />
-                                </padding>
-                                <children>
-                                    <Button mnemonicParsing="false" onAction="#onSessionStartup" prefHeight="33.0" prefWidth="135.0" styleClass="secondary-btn">
-                                        <graphic>
-                                            <HBox alignment="CENTER">
-                                                <children>
-                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                                        <font><Font size="16.0" /></font>
-                                                    </Label>
-                                                    <Region prefWidth="3.0" />
-                                                    <Label styleClass="bold-lbl" text="Session Startup" textFill="WHITE">
-                                                        <font><Font size="12.0" /></font>
-                                                    </Label>
-                                                </children>
-                                            </HBox>
-                                        </graphic>
-                                        <tooltip>
-                                            <Tooltip text="Ctrl + S to start session" />
-                                        </tooltip>
-                                    </Button>
+                      <HBox alignment="CENTER_LEFT" spacing="4.0">
+                          <padding>
+                              <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
+                          </padding>
+                          <children>
+                              <Button mnemonicParsing="false" onAction="#onSessionStartup" prefHeight="33.0" prefWidth="135.0" styleClass="secondary-btn">
+                                  <graphic>
+                                      <HBox alignment="CENTER">
+                                          <children>
+                                              <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                  <font>
+                                       <Font size="16.0" />
+                                    </font>
+                                              </Label>
+                                              <Region prefWidth="3.0" />
+                                              <Label styleClass="bold-lbl" text="Session Startup" textFill="WHITE">
+                                                  <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                              </Label>
+                                          </children>
+                                      </HBox>
+                                  </graphic>
+                                  <tooltip>
+                                      <Tooltip text="Ctrl + S to start session" />
+                                  </tooltip>
+                              </Button>
+                     <Region prefWidth="180.0" />
 
-                                    <Separator orientation="VERTICAL" styleClass="grey-separator" />
+                              <Button fx:id="btnScan" mnemonicParsing="false" onAction="#onScan" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
+                                  <graphic>
+                                      <HBox alignment="CENTER">
+                                          <children>
+                                              <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                  <font>
+                                       <Font size="16.0" />
+                                    </font>
+                                              </Label>
+                                              <Region prefWidth="3.0" />
+                                              <Label styleClass="bold-lbl" text="Scan" textFill="WHITE">
+                                                  <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                              </Label>
+                                          </children>
+                                      </HBox>
+                                  </graphic>
+                                  <tooltip>
+                                      <Tooltip text="Space to start scanning" />
+                                  </tooltip>
+                              </Button>
 
-                                    <Button fx:id="btnScan" mnemonicParsing="false" onAction="#onScan" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
-                                        <graphic>
-                                            <HBox alignment="CENTER">
-                                                <children>
-                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                                        <font><Font size="16.0" /></font>
-                                                    </Label>
-                                                    <Region prefWidth="3.0" />
-                                                    <Label styleClass="bold-lbl" text="Scan" textFill="WHITE">
-                                                        <font><Font size="12.0" /></font>
-                                                    </Label>
-                                                </children>
-                                            </HBox>
-                                        </graphic>
-                                        <tooltip>
-                                            <Tooltip text="Space to start scanning" />
-                                        </tooltip>
-                                    </Button>
+                              <Button fx:id="btnStop" mnemonicParsing="false" onAction="#onStop" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
+                                  <graphic>
+                                      <HBox alignment="CENTER">
+                                          <children>
+                                              <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                  <font>
+                                       <Font size="16.0" />
+                                    </font>
+                                              </Label>
+                                              <Region prefWidth="3.0" />
+                                              <Label styleClass="bold-lbl" text="Stop" textFill="WHITE">
+                                                  <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                              </Label>
+                                          </children>
+                                      </HBox>
+                                  </graphic>
+                                  <tooltip>
+                                      <Tooltip text="Space to stop scanning" />
+                                  </tooltip>
+                              </Button>
 
-                                    <Button fx:id="btnStop" mnemonicParsing="false" onAction="#onStop" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
-                                        <graphic>
-                                            <HBox alignment="CENTER">
-                                                <children>
-                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                                        <font><Font size="16.0" /></font>
-                                                    </Label>
-                                                    <Region prefWidth="3.0" />
-                                                    <Label styleClass="bold-lbl" text="Stop" textFill="WHITE">
-                                                        <font><Font size="12.0" /></font>
-                                                    </Label>
-                                                </children>
-                                            </HBox>
-                                        </graphic>
-                                        <tooltip>
-                                            <Tooltip text="Space to stop scanning" />
-                                        </tooltip>
-                                    </Button>
+                              <Separator orientation="VERTICAL" styleClass="grey-separator" />
 
-                                    <Separator orientation="VERTICAL" styleClass="grey-separator" />
+                              <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#onUndo" prefHeight="33.0" prefWidth="75.0" styleClass="secondary-btn">
+                                  <graphic>
+                                      <HBox alignment="CENTER">
+                                          <children>
+                                              <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="↩">
+                                                  <font>
+                                       <Font size="16.0" />
+                                    </font>
+                                              </Label>
+                                              <Region prefWidth="3.0" />
+                                              <Label styleClass="bold-lbl" text="Undo" textFill="WHITE">
+                                                  <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                              </Label>
+                                          </children>
+                                      </HBox>
+                                  </graphic>
+                                  <tooltip>
+                                      <Tooltip text="Ctrl + Z to undo" />
+                                  </tooltip>
+                              </Button>
 
-                                    <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#onUndo" prefHeight="33.0" prefWidth="75.0" styleClass="secondary-btn">
-                                        <graphic>
-                                            <HBox alignment="CENTER">
-                                                <children>
-                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="↩">
-                                                        <font><Font size="16.0" /></font>
-                                                    </Label>
-                                                    <Region prefWidth="3.0" />
-                                                    <Label styleClass="bold-lbl" text="Undo" textFill="WHITE">
-                                                        <font><Font size="12.0" /></font>
-                                                    </Label>
-                                                </children>
-                                            </HBox>
-                                        </graphic>
-                                        <tooltip>
-                                            <Tooltip text="Ctrl + Z to undo" />
-                                        </tooltip>
-                                    </Button>
+                              <Separator orientation="VERTICAL" styleClass="grey-separator" />
 
-                                    <Separator orientation="VERTICAL" styleClass="grey-separator" />
+                              <Button fx:id="btnExport" mnemonicParsing="false" onAction="#onExport" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
+                                  <graphic>
+                                      <HBox alignment="CENTER">
+                                          <children>
+                                              <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                  <font>
+                                       <Font size="16.0" />
+                                    </font>
+                                              </Label>
+                                              <Region prefWidth="3.0" />
+                                              <Label styleClass="bold-lbl" text="Export" textFill="WHITE">
+                                                  <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                              </Label>
+                                          </children>
+                                      </HBox>
+                                  </graphic>
+                        <tooltip>
+                           <Tooltip text="Ctrl + E to export" />
+                        </tooltip>
+                              </Button>
 
-                                    <Button fx:id="btnExport" mnemonicParsing="false" onAction="#onExport" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
-                                        <graphic>
-                                            <HBox alignment="CENTER">
-                                                <children>
-                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                                        <font><Font size="16.0" /></font>
-                                                    </Label>
-                                                    <Region prefWidth="3.0" />
-                                                    <Label styleClass="bold-lbl" text="Export" textFill="WHITE">
-                                                        <font><Font size="12.0" /></font>
-                                                    </Label>
-                                                </children>
-                                            </HBox>
-                                        </graphic>
-                              <tooltip>
-                                 <Tooltip text="Ctrl + E to export" />
-                              </tooltip>
-                                    </Button>
+                              <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
 
-                                    <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
-                                    <Button fx:id="btnFileAdjustments" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onToggleFileAdjustments" prefHeight="33.0" prefWidth="33.0" styleClass="clear-btn">
-                                        <graphic>
-                                            <HBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0">
-                                                <children>
-                                                    <Label alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="icon" text="☰">
-                                                        <font><Font size="12.0" /></font>
-                                                    </Label>
-                                                </children>
-                                            </HBox>
-                                        </graphic>
-                                        <tooltip>
-                                            <Tooltip text="Ctrl + F to open file properties" />
-                                        </tooltip>
-                                    </Button>
-                                </children>
+                              <Separator fx:id="separatorFileAdjustment" orientation="VERTICAL" styleClass="grey-separator" />
+                              <Button fx:id="btnFileAdjustments" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onToggleFileAdjustments" prefHeight="33.0" prefWidth="33.0" styleClass="clear-btn">
+                                  <graphic>
+                                      <HBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0">
+                                          <children>
+                                              <Label alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="icon" text="☰">
+                                                  <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                              </Label>
+                                          </children>
+                                      </HBox>
+                                  </graphic>
+                                  <tooltip>
+                                      <Tooltip text="Ctrl + F to open file properties" />
+                                  </tooltip>
+                              </Button>
+                          </children>
 
-                                <VBox.margin>
-                                    <Insets />
-                                </VBox.margin>
-                            </HBox>
-                        </children>
-
-                        <styleClass>
-                            <String fx:value="card-bg" />
-                            <String fx:value="half-card" />
-                        </styleClass>
-
-                        <VBox.margin>
-                            <Insets left="3.0" right="3.0" top="3.0" />
-                        </VBox.margin>
-                    </VBox>
+                          <VBox.margin>
+                              <Insets left="3.0" right="3.0" top="3.0" />
+                          </VBox.margin>
+                  <styleClass>
+                     <String fx:value="card-bg" />
+                     <String fx:value="half-card" />
+                  </styleClass>
+                      </HBox>
 
                     <StackPane styleClass="background" VBox.vgrow="ALWAYS">
 
@@ -256,7 +265,7 @@
                         <Label fx:id="lblEmptyState" styleClass="lbl" text="No pages scanned yet. Press Space or click Scan" textAlignment="CENTER" wrapText="true" />
                     </StackPane>
 
-                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="200.0">
                         <styleClass>
                             <String fx:value="half-card-bottom" />
                             <String fx:value="card-bg" />
@@ -293,17 +302,17 @@
                         </tooltip>
                             </Button>
 
-                            <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+                            <Separator fx:id="separator1" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
                      <VBox alignment="CENTER">
                         <HBox.margin>
                            <Insets left="6.0" right="6.0" />
                         </HBox.margin>
                         <children>
-                           <Label fx:id="lblCurrentPage" styleClass="lbl" text="Page: 0 / 0" />
+                           <Label fx:id="lblCurrentFile" styleClass="lbl" text="Page: 0 / 0" />
                            <Label fx:id="lblCurrentDocument" styleClass="lbl" text="Doc: 0" />
                         </children>
                      </VBox>
-                     <Separator layoutX="393.0" layoutY="22.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+                     <Separator fx:id="separator2" layoutX="393.0" layoutY="22.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
 
                             <Button fx:id="btnRotLeft" mnemonicParsing="false" onAction="#onRotateLeft" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
                                 <graphic>
@@ -380,79 +389,76 @@
 
                     <children>
                         <Label fx:id="lblTotalDocuments" styleClass="lbl" text="Documents: 0" />
+                     <Region prefWidth="0.0" />
                         <Separator orientation="VERTICAL" styleClass="grey-separator" />
+                     <Region layoutX="112.0" layoutY="16.0" prefWidth="0.0" />
                         <Label fx:id="lblTotalPages" styleClass="lbl" text="Files: 0" />
 
                         <Region HBox.hgrow="ALWAYS" />
-
-                        <ScrollPane fitToHeight="true" hbarPolicy="NEVER" vbarPolicy="NEVER" styleClass="shortcut-scroll" HBox.hgrow="ALWAYS">
-                            <content>
-                                <HBox alignment="CENTER_RIGHT" spacing="14.0">
-                                    <children>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="Ctrl S" />
-                                                <Label styleClass="shortcut-lbl" text="Session startup" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="Space" />
-                                                <Label styleClass="shortcut-lbl" text="Scan" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="↑ ↓" />
-                                                <Label styleClass="shortcut-lbl" text="Navigate" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="Ctrl ← →" />
-                                                <Label styleClass="shortcut-lbl" text="Rotate" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="Ctrl A / D" />
-                                                <Label styleClass="shortcut-lbl" text="Split" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="Ctrl N" />
-                                                <Label styleClass="shortcut-lbl" text="New doc" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="Del" />
-                                                <Label styleClass="shortcut-lbl" text="Delete" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="Ctrl E" />
-                                                <Label styleClass="shortcut-lbl" text="Export" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="Ctrl Z" />
-                                                <Label styleClass="shortcut-lbl" text="Undo" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
-                                            <children>
-                                                <Label styleClass="kbd" text="F2" />
-                                                <Label styleClass="shortcut-lbl" text="Dark mode" />
-                                            </children>
-                                        </HBox>
-                                    </children>
-                                </HBox>
-                            </content>
-                        </ScrollPane>
+                          <HBox alignment="CENTER_RIGHT" spacing="14.0">
+                              <children>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="Ctrl + S" />
+                                          <Label styleClass="shortcut-lbl" text="Session startup" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="Space" />
+                                          <Label styleClass="shortcut-lbl" text="Scan" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="↑ ↓" />
+                                          <Label styleClass="shortcut-lbl" text="Navigate" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="Ctrl + ← →" />
+                                          <Label styleClass="shortcut-lbl" text="Rotate" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="Ctrl + A / D" />
+                                          <Label styleClass="shortcut-lbl" text="Split" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="Ctrl + N" />
+                                          <Label styleClass="shortcut-lbl" text="New doc" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="Del" />
+                                          <Label styleClass="shortcut-lbl" text="Delete" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="Ctrl E" />
+                                          <Label styleClass="shortcut-lbl" text="Export" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="Ctrl + Z" />
+                                          <Label styleClass="shortcut-lbl" text="Undo" />
+                                      </children>
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                      <children>
+                                          <Label styleClass="kbd" text="F2" />
+                                          <Label styleClass="shortcut-lbl" text="Dark mode" />
+                                      </children>
+                                  </HBox>
+                              </children>
+                          </HBox>
                     </children>
 
                     <styleClass>
