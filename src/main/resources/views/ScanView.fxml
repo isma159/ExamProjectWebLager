@@ -390,30 +390,94 @@
                      <ProgressBar fx:id="progressBarExport" maxWidth="1.7976931348623157E308" prefHeight="21.0" progress="0.0" HBox.hgrow="ALWAYS" />
                   </children>
                </HBox>
-                  <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="12.0">
-                      <padding>
-                          <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
-                      </padding>
-      
-                      <children>
-                          <Label fx:id="stDocsLabel" styleClass="lbl" text="Documents: 0" />
-                          <Separator orientation="VERTICAL" />
-                          <Label fx:id="stPagesLabel" styleClass="lbl" text="Pages: 0" />
-                          <Region HBox.hgrow="ALWAYS" />
-                          <Label styleClass="lbl" text="Space scan" />
-                          <Label styleClass="lbl" text="←→ nav" />
-                          <Label styleClass="lbl" text="[] rotate" />
-                          <Label styleClass="lbl" text="Del delete" />
-                          <Label styleClass="lbl" text="Ctrl+E export" />
-                          <Label styleClass="lbl" text="Ctrl+Z undo" />
-                      </children>
-      
-                      <styleClass>
-                          <String fx:value="card" />
-                          <String fx:value="card-bg" />
-                          <String fx:value="shadow" />
-                      </styleClass>
-                  </HBox>
+                <HBox alignment="CENTER_LEFT" prefHeight="34.0" spacing="14.0">
+                    <padding>
+                        <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
+                    </padding>
+
+                    <children>
+                        <Label fx:id="stDocsLabel" styleClass="lbl" text="Documents: 0" />
+                        <Separator orientation="VERTICAL" styleClass="grey-separator" />
+                        <Label fx:id="stPagesLabel" styleClass="lbl" text="Files: 0" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <ScrollPane fitToHeight="true" hbarPolicy="NEVER" vbarPolicy="NEVER" styleClass="shortcut-scroll" HBox.hgrow="ALWAYS">
+                            <content>
+                                <HBox alignment="CENTER_RIGHT" spacing="14.0">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="Ctrl S" />
+                                                <Label styleClass="shortcut-lbl" text="Session startup" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="Space" />
+                                                <Label styleClass="shortcut-lbl" text="Scan" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="↑ ↓" />
+                                                <Label styleClass="shortcut-lbl" text="Navigate" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="Ctrl ← →" />
+                                                <Label styleClass="shortcut-lbl" text="Rotate" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="Ctrl A / D" />
+                                                <Label styleClass="shortcut-lbl" text="Split" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="Ctrl N" />
+                                                <Label styleClass="shortcut-lbl" text="New doc" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="Del" />
+                                                <Label styleClass="shortcut-lbl" text="Delete" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="Ctrl E" />
+                                                <Label styleClass="shortcut-lbl" text="Export" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="Ctrl Z" />
+                                                <Label styleClass="shortcut-lbl" text="Undo" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
+                                            <children>
+                                                <Label styleClass="kbd" text="F2" />
+                                                <Label styleClass="shortcut-lbl" text="Dark mode" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </HBox>
+                            </content>
+                        </ScrollPane>
+                    </children>
+
+                    <styleClass>
+                        <String fx:value="card" />
+                        <String fx:value="card-bg" />
+                        <String fx:value="shadow" />
+                    </styleClass>
+                </HBox>
             </children>
          </VBox>
         </bottom>
