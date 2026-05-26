@@ -5,8 +5,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
@@ -23,633 +25,620 @@
 <?import org.controlsfx.control.SearchableComboBox?>
 <?import org.controlsfx.control.ToggleSwitch?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
-   <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
-      <top>
-         <VBox>
-            <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="75.0" prefWidth="1280.0" spacing="12.0" styleClass="card,card-bg,shadow">
-               <padding>
-                  <Insets bottom="14.0" left="18.0" right="18.0" top="14.0" />
-               </padding>
-               <children>
-                  <ImageView fitHeight="60.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" styleClass="green-logo-h">
-                     <image>
-                        <Image url="@../images/Green/LogoGreen2H.png" />
-                     </image>
-                  </ImageView>
-                  <Region prefHeight="42.0" prefWidth="420.0" HBox.hgrow="ALWAYS" />
-                  <VBox alignment="CENTER" spacing="4.0">
-                     <children>
-                        <Label styleClass="h1" text="Scanning Workspace" />
-                        <Label fx:id="lblSessionStatus" alignment="CENTER" prefWidth="240.0" styleClass="lbl" text="–" />
-                     </children>
-                  </VBox>
-                  <Region prefHeight="42.0" prefWidth="60.0" HBox.hgrow="ALWAYS" />
-                  <ToggleSwitch fx:id="darkMode" onMouseClicked="#onDarkModeToggle" prefHeight="30.0" prefWidth="60.0" scaleX="1.25" scaleY="1.25" scaleZ="1.25" text="Dark Mode ">
-                     <HBox.margin>
-                        <Insets right="12.0" />
-                     </HBox.margin>
-                     <tooltip>
-                        <Tooltip text="F2 for dark mode" />
-                     </tooltip>
-                  </ToggleSwitch>
-                  <VBox alignment="CENTER_RIGHT" spacing="3.0">
-                     <children>
-                        <Label fx:id="lblUsername" styleClass="h3" text="Username" />
-                        <Label fx:id="lblRole" styleClass="lbl" text="Role: User/Admin" />
-                     </children>
-                  </VBox>
-                  <Separator orientation="VERTICAL" prefHeight="40.0" styleClass="grey-separator" />
-                  <Button mnemonicParsing="false" onAction="#onExit" prefHeight="33.0" prefWidth="33.0" styleClass="primary-btn">
-                     <graphic>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                           <font><Font size="16.0" /></font>
-                        </Label>
-                     </graphic>
-                  </Button>
-               </children>
-               <VBox.margin>
-                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
-               </VBox.margin>
-            </HBox>
-         </VBox>
-      </top>
-
-      <left>
-         <VBox prefWidth="240.0" styleClass="card,card-bg,shadow">
-            <HBox alignment="CENTER_LEFT">
-               <padding>
-                  <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
-               </padding>
-               <children>
-                  <Label prefHeight="27.0" styleClass="lbl" text="Document Tree" HBox.hgrow="ALWAYS" />
-               </children>
-               <styleClass>
-                  <String fx:value="card-bg" />
-                  <String fx:value="half-card" />
-               </styleClass>
-            </HBox>
-            <Separator prefWidth="200.0" styleClass="grey-separator" />
-            <TreeView fx:id="boxTreeView" VBox.vgrow="ALWAYS">
-               <styleClass>
-                  <String fx:value="scan-list" />
-                  <String fx:value="tree-view-scanner" />
-               </styleClass>
-               <VBox.margin>
-                  <Insets bottom="3.0" left="3.0" right="3.0" />
-               </VBox.margin>
-            </TreeView>
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+    <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
+        <top>
+            <VBox>
+                <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="75.0" prefWidth="1280.0" spacing="12.0" styleClass="card,card-bg,shadow">
+                    <padding>
+                        <Insets bottom="14.0" left="18.0" right="18.0" top="14.0" />
+                    </padding>
+                    <children>
+                        <ImageView fitHeight="60.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" styleClass="green-logo-h">
+                            <image>
+                                <Image url="@../images/Green/LogoGreen2H.png" />
+                            </image>
+                        </ImageView>
+                  <Region HBox.hgrow="ALWAYS" />
+                        <VBox alignment="CENTER" spacing="4.0">
+                            <children>
+                                <Label styleClass="h1" text="Scanning Workspace" />
+                                <Label fx:id="lblSessionStatus" alignment="CENTER" prefWidth="240.0" styleClass="lbl" text="–" />
+                            </children>
+                        </VBox>
+                  <Region HBox.hgrow="ALWAYS" />
+                        <ToggleSwitch fx:id="darkMode" onMouseClicked="#onDarkModeToggle" prefHeight="30.0" prefWidth="60.0" scaleX="1.25" scaleY="1.25" scaleZ="1.25" text="Dark Mode ">
+                            <HBox.margin>
+                                <Insets right="12.0" />
+                            </HBox.margin>
+                            <tooltip>
+                                <Tooltip text="F2 for dark mode" />
+                            </tooltip>
+                        </ToggleSwitch>
+                        <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                            <children>
+                                <Label fx:id="lblUsername" styleClass="h3" text="Username" />
+                                <Label fx:id="lblRole" styleClass="lbl" text="Role: User/Admin" />
+                            </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="40.0" styleClass="grey-separator" />
+                        <Button mnemonicParsing="false" onAction="#onExit" prefHeight="33.0" prefWidth="33.0" styleClass="primary-btn">
+                            <graphic>
+                                <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                    <font><Font size="16.0" /></font>
+                                </Label>
+                            </graphic>
+                        </Button>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                    </VBox.margin>
+                </HBox>
             <BorderPane.margin>
-               <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               <Insets bottom="3.0" />
             </BorderPane.margin>
-         </VBox>
-      </left>
+            </VBox>
+        </top>
 
-      <center>
-         <VBox>
-            <children>
-               <VBox alignment="CENTER">
-                  <children>
-                     <HBox alignment="CENTER" prefHeight="45.0" spacing="4.0">
-                        <padding>
-                           <Insets bottom="6.0" left="10.0" right="10.0" top="6.0" />
-                        </padding>
+        <left>
+            <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0" styleClass="card,card-bg,shadow">
+                <HBox alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets bottom="9.0" left="9.0" right="9.0" top="9.0" />
+                    </padding>
+                    <children>
+                        <Label prefHeight="27.0" styleClass="h3" text="Document Tree" HBox.hgrow="ALWAYS" />
+                    </children>
+                    <styleClass>
+                        <String fx:value="card-bg" />
+                        <String fx:value="half-card" />
+                    </styleClass>
+                </HBox>
+                <Separator prefHeight="3.0" prefWidth="200.0" styleClass="grey-separator" />
+                <TreeView fx:id="boxTreeView" VBox.vgrow="ALWAYS">
+                    <styleClass>
+                        <String fx:value="scan-list" />
+                        <String fx:value="tree-view-scanner" />
+                    </styleClass>
+                    <VBox.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" />
+                    </VBox.margin>
+                </TreeView>
+                <BorderPane.margin>
+                    <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                </BorderPane.margin>
+            </VBox>
+        </left>
+
+        <center>
+            <VBox>
+                <children>
+                    <VBox alignment="CENTER">
                         <children>
-                           <Button mnemonicParsing="false" onAction="#onSessionStartup" prefHeight="33.0" prefWidth="135.0" styleClass="secondary-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Session Startup" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
+                            <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="45.0" spacing="4.0">
+                                <padding>
+                                    <Insets bottom="6.0" left="10.0" right="10.0" top="6.0" />
+                                </padding>
+                                <children>
+                                    <Button mnemonicParsing="false" onAction="#onSessionStartup" prefHeight="33.0" prefWidth="135.0" styleClass="secondary-btn">
+                                        <graphic>
+                                            <HBox alignment="CENTER">
+                                                <children>
+                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                        <font><Font size="16.0" /></font>
+                                                    </Label>
+                                                    <Region prefWidth="3.0" />
+                                                    <Label styleClass="bold-lbl" text="Session Startup" textFill="WHITE">
+                                                        <font><Font size="12.0" /></font>
+                                                    </Label>
+                                                </children>
+                                            </HBox>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Ctrl + S to start session" />
+                                        </tooltip>
+                                    </Button>
+
+                                    <Separator orientation="VERTICAL" styleClass="grey-separator" />
+
+                                    <Button fx:id="btnScan" mnemonicParsing="false" onAction="#onScan" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
+                                        <graphic>
+                                            <HBox alignment="CENTER">
+                                                <children>
+                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                        <font><Font size="16.0" /></font>
+                                                    </Label>
+                                                    <Region prefWidth="3.0" />
+                                                    <Label styleClass="bold-lbl" text="Scan" textFill="WHITE">
+                                                        <font><Font size="12.0" /></font>
+                                                    </Label>
+                                                </children>
+                                            </HBox>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Space to start scanning" />
+                                        </tooltip>
+                                    </Button>
+
+                                    <Button fx:id="btnStop" mnemonicParsing="false" onAction="#onStop" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
+                                        <graphic>
+                                            <HBox alignment="CENTER">
+                                                <children>
+                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                        <font><Font size="16.0" /></font>
+                                                    </Label>
+                                                    <Region prefWidth="3.0" />
+                                                    <Label styleClass="bold-lbl" text="Stop" textFill="WHITE">
+                                                        <font><Font size="12.0" /></font>
+                                                    </Label>
+                                                </children>
+                                            </HBox>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Space to stop scanning" />
+                                        </tooltip>
+                                    </Button>
+
+                                    <Separator orientation="VERTICAL" styleClass="grey-separator" />
+
+                                    <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#onUndo" prefHeight="33.0" prefWidth="75.0" styleClass="secondary-btn">
+                                        <graphic>
+                                            <HBox alignment="CENTER">
+                                                <children>
+                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="↩">
+                                                        <font><Font size="16.0" /></font>
+                                                    </Label>
+                                                    <Region prefWidth="3.0" />
+                                                    <Label styleClass="bold-lbl" text="Undo" textFill="WHITE">
+                                                        <font><Font size="12.0" /></font>
+                                                    </Label>
+                                                </children>
+                                            </HBox>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Ctrl + Z to undo" />
+                                        </tooltip>
+                                    </Button>
+
+                                    <Separator orientation="VERTICAL" styleClass="grey-separator" />
+
+                                    <Button fx:id="btnExport" mnemonicParsing="false" onAction="#onExport" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
+                                        <graphic>
+                                            <HBox alignment="CENTER">
+                                                <children>
+                                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                        <font><Font size="16.0" /></font>
+                                                    </Label>
+                                                    <Region prefWidth="3.0" />
+                                                    <Label styleClass="bold-lbl" text="Export" textFill="WHITE">
+                                                        <font><Font size="12.0" /></font>
+                                                    </Label>
+                                                </children>
+                                            </HBox>
+                                        </graphic>
                               <tooltip>
-                                 <Tooltip text="Ctrl + S to start session" />
+                                 <Tooltip text="Ctrl + E to export" />
                               </tooltip>
-                           </Button>
+                                    </Button>
 
-                           <Separator orientation="VERTICAL" styleClass="grey-separator" />
+                                    <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
+                                    <Button fx:id="btnFileAdjustments" managed="false" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onToggleFileAdjustments" prefHeight="33.0" prefWidth="33.0" styleClass="clear-btn" visible="false">
+                                        <graphic>
+                                            <HBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0">
+                                                <children>
+                                                    <Label alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="33.0" styleClass="icon" text="☰">
+                                                        <font><Font size="12.0" /></font>
+                                                    </Label>
+                                                </children>
+                                            </HBox>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Ctrl + F to open file properties" />
+                                        </tooltip>
+                                    </Button>
+                                </children>
 
-                           <Button fx:id="btnScan" mnemonicParsing="false" onAction="#onScan" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Scan" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Enter to start scanning" />
-                              </tooltip>
-                           </Button>
-
-                           <Button fx:id="btnStop" mnemonicParsing="false" onAction="#onStop" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Stop" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Esc to stop scanning" />
-                              </tooltip>
-                           </Button>
-
-                           <Separator orientation="VERTICAL" styleClass="grey-separator" />
-
-                           <Button fx:id="btnNewDoc" mnemonicParsing="false" onAction="#onNewDocument" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="New Doc" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Left arrow to rotate left" />
-                              </tooltip>
-                           </Button>
-                           <Button fx:id="btnSplitDoc" mnemonicParsing="false" onAction="#onSplitDocument" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font>
-                                             <Font size="16.0" />
-                                          </font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Split Doc" textFill="WHITE">
-                                          <font>
-                                             <Font size="12.0" />
-                                          </font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Right arrow to rotate right" />
-                              </tooltip>
-                           </Button>
-
-                           <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#onDeleteFileOrDocument" prefHeight="33.0" prefWidth="75.0" styleClass="destructive-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Delete" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Ctrl + N to create new document" />
-                              </tooltip>
-                           </Button>
-
-                           <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#onUndo" prefHeight="33.0" prefWidth="75.0" styleClass="secondary-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Undo" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Del to delete document/page" />
-                              </tooltip>
-                           </Button>
-
-                           <Separator orientation="VERTICAL" styleClass="grey-separator" />
-
-                           <Button fx:id="btnExport" mnemonicParsing="false" onAction="#onExport" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                       <Region prefWidth="3.0" />
-                                       <Label styleClass="bold-lbl" text="Export" textFill="WHITE">
-                                          <font><Font size="12.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                           </Button>
-
-                           <ComboBox fx:id="comboBoxExport" prefWidth="163.0" styleClass="container" />
-                           <Button mnemonicParsing="false" onAction="#onFileAdjustments" prefHeight="33.0" prefWidth="33.0">
-                              <graphic>
-                                 <HBox alignment="CENTER">
-                                    <children>
-                                       <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="☰">
-                                          <font><Font size="16.0" /></font>
-                                       </Label>
-                                    </children>
-                                 </HBox>
-                              </graphic>
-                              <tooltip>
-                                 <Tooltip text="Ctrl + E to export documents" />
-                              </tooltip>
-                           </Button>
+                                <VBox.margin>
+                                    <Insets />
+                                </VBox.margin>
+                            </HBox>
                         </children>
 
+                        <styleClass>
+                            <String fx:value="card-bg" />
+                            <String fx:value="half-card" />
+                        </styleClass>
+
                         <VBox.margin>
-                           <Insets />
+                            <Insets left="3.0" right="3.0" top="3.0" />
                         </VBox.margin>
-                     </HBox>
-                  </children>
+                    </VBox>
 
-                  <styleClass>
-                     <String fx:value="card-bg" />
-                     <String fx:value="half-card" />
-                  </styleClass>
+                    <StackPane styleClass="background" VBox.vgrow="ALWAYS">
 
-                  <VBox.margin>
-                     <Insets right="3.0" top="3.0" />
-                  </VBox.margin>
-               </VBox>
+                        <ScrollPane fx:id="scrollPanePageGrid" fitToHeight="false" fitToWidth="true" pannable="true" styleClass="v-card">
+                            <content>
+                                <FlowPane fx:id="pageGrid" alignment="CENTER" columnHalignment="CENTER" hgap="16" vgap="16">
+                                    <padding>
+                                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                    </padding>
+                                </FlowPane>
+                            </content>
 
-               <StackPane styleClass="background" VBox.vgrow="ALWAYS">
+                            <StackPane.margin>
+                                <Insets left="3.0" right="3.0" top="3.0" />
+                            </StackPane.margin>
+                        </ScrollPane>
 
-                  <ScrollPane fitToHeight="false" fitToWidth="true" pannable="true" styleClass="v-card">
-                     <content>
-                        <FlowPane fx:id="pageGrid" alignment="CENTER" columnHalignment="CENTER" hgap="16" vgap="16">
-                           <padding>
-                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                           </padding>
-                        </FlowPane>
-                     </content>
+                        <Label fx:id="lblEmptyState" styleClass="lbl" text="No pages scanned yet. Press Space or click Scan" textAlignment="CENTER" wrapText="true" />
+                    </StackPane>
 
-                     <StackPane.margin>
-                        <Insets right="3.0" top="3.0" />
-                     </StackPane.margin>
-                  </ScrollPane>
+                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                        <styleClass>
+                            <String fx:value="half-card-bottom" />
+                            <String fx:value="card-bg" />
+                        </styleClass>
 
-                  <Label fx:id="lblEmptyState" styleClass="lbl" text="No pages scanned yet. Press Space or click Scan" textAlignment="CENTER" visible="true" wrapText="true" />
-               </StackPane>
+                        <children>
+                            <Button fx:id="btnZoomOut" mnemonicParsing="false" onAction="#onZoomOut" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                                <graphic>
+                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                        <font><Font size="16.0" /></font>
+                                    </Label>
+                                </graphic>
 
-               <HBox alignment="CENTER" maxHeight="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="200.0">
-                  <styleClass>
-                     <String fx:value="half-card-bottom" />
-                     <String fx:value="card-bg" />
-                  </styleClass>
+                                <HBox.margin>
+                                    <Insets left="3.0" right="3.0" />
+                                </HBox.margin>
+                                <tooltip>
+                                    <Tooltip text="Ctrl + - to zoom out" />
+                                </tooltip>
+                            </Button>
 
-                  <children>
-                     <Button fx:id="btnZoomOut" mnemonicParsing="false" onAction="#onZoomOut" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
-                        <graphic>
-                           <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                              <font><Font size="16.0" /></font>
-                           </Label>
-                        </graphic>
+                            <Button fx:id="btnZoomIn" mnemonicParsing="false" onAction="#onZoomIn" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                                <graphic>
+                                    <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                        <font><Font size="16.0" /></font>
+                                    </Label>
+                                </graphic>
 
-                        <HBox.margin>
-                           <Insets left="3.0" right="3.0" />
-                        </HBox.margin>
-                        <tooltip>
-                           <Tooltip text="Ctrl + - to zoom out" />
-                        </tooltip>
-                     </Button>
-
-                     <Button fx:id="btnZoomIn" mnemonicParsing="false" onAction="#onZoomIn" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
-                        <graphic>
-                           <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                              <font><Font size="16.0" /></font>
-                           </Label>
-                        </graphic>
-
-                        <HBox.margin>
-                           <Insets left="3.0" right="3.0" />
-                        </HBox.margin>
-                     </Button>
-
-                     <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
-
-                     <Button fx:id="btnRotLeft" mnemonicParsing="false" onAction="#onRotateLeft" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
-                        <graphic>
-                           <HBox alignment="CENTER">
-                              <children>
-                                 <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                    <font>
-                                       <Font size="16.0" />
-                                    </font>
-                                 </Label>
-                                 <Region prefWidth="3.0" />
-                                 <Label styleClass="bold-lbl" text="Rotate L" textFill="WHITE">
-                                    <font>
-                                       <Font size="12.0" />
-                                    </font>
-                                 </Label>
-                              </children>
-                           </HBox>
-                        </graphic>
-                        <HBox.margin>
-                           <Insets left="3.0" right="3.0" />
-                        </HBox.margin>
-                     </Button>
-                     <Spinner fx:id="spinnerRotation" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
-
-                     <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="90.0" styleClass="secondary-btn">
-                        <graphic>
-                           <HBox alignment="CENTER">
-                              <children>
-                                 <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
-                                    <font>
-                                       <Font size="16.0" />
-                                    </font>
-                                 </Label>
-                                 <Region prefWidth="3.0" />
-                                 <Label styleClass="bold-lbl" text="Rotate R" textFill="WHITE">
-                                    <font>
-                                       <Font size="12.0" />
-                                    </font>
-                                 </Label>
-                              </children>
-                           </HBox>
-                        </graphic>
-                        <HBox.margin>
-                           <Insets left="3.0" right="3.0" />
-                        </HBox.margin>
+                                <HBox.margin>
+                                    <Insets left="3.0" right="3.0" />
+                                </HBox.margin>
                         <tooltip>
                            <Tooltip text="Ctrl + + to zoom in" />
                         </tooltip>
-                     </Button>
-                  </children>
+                            </Button>
 
-                  <VBox.margin>
-                     <Insets bottom="3.0" right="3.0" />
-                  </VBox.margin>
-               </HBox>
-            </children>
+                            <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
+                     <VBox alignment="CENTER">
+                        <HBox.margin>
+                           <Insets left="6.0" right="6.0" />
+                        </HBox.margin>
+                        <children>
+                           <Label fx:id="lblCurrentPage" text="Page: 0 / 0" />
+                           <Label fx:id="lblCurrentDocument" text="Doc: 0" />
+                        </children>
+                     </VBox>
+                     <Separator layoutX="393.0" layoutY="22.0" maxHeight="-Infinity" orientation="VERTICAL" prefHeight="21.0" styleClass="grey-separator" />
 
-            <BorderPane.margin>
-               <Insets top="3.0" />
-            </BorderPane.margin>
-         </VBox>
-      </center>
+                            <Button fx:id="btnRotLeft" mnemonicParsing="false" onAction="#onRotateLeft" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                                <graphic>
+                                    <HBox alignment="CENTER">
+                                        <children>
+                                            <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                <font>
+                                                    <Font size="16.0" />
+                                                </font>
+                                            </Label>
+                                        </children>
+                                    </HBox>
+                                </graphic>
+                                <HBox.margin>
+                                    <Insets left="3.0" right="3.0" />
+                                </HBox.margin>
+                        <tooltip>
+                           <Tooltip text="Ctrl + left arrow to rotate left" />
+                        </tooltip>
+                            </Button>
+                            <Spinner fx:id="spinnerRotation" editable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="45.0" styleClass="arrowless-spinner" />
 
-      <bottom>
-         <HBox alignment="CENTER_LEFT" spacing="12.0">
-            <padding>
-               <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
-            </padding>
+                            <Button fx:id="btnRotRight" mnemonicParsing="false" onAction="#onRotateRight" prefHeight="33.0" prefWidth="33.0" styleClass="secondary-btn">
+                                <graphic>
+                                    <HBox alignment="CENTER">
+                                        <children>
+                                            <Label alignment="CENTER" prefHeight="16.0" prefWidth="16.0" styleClass="white-icon" text="">
+                                                <font>
+                                                    <Font size="16.0" />
+                                                </font>
+                                            </Label>
+                                        </children>
+                                    </HBox>
+                                </graphic>
+                                <HBox.margin>
+                                    <Insets left="3.0" right="3.0" />
+                                </HBox.margin>
+                                <tooltip>
+                                    <Tooltip text="Ctrl + right arrow to rotate right" />
+                                </tooltip>
+                            </Button>
+                        </children>
 
-            <children>
-               <Label fx:id="stDocsLabel" styleClass="lbl" text="Documents: 0" />
-               <Separator orientation="VERTICAL" />
-               <Label fx:id="stPagesLabel" styleClass="lbl" text="Pages: 0" />
-               <Separator layoutX="111.0" layoutY="14.0" orientation="VERTICAL" />
-               <Label fx:id="pageInfoLabel" styleClass="lbl" text="0 / 0" />
-               <Region HBox.hgrow="ALWAYS" />
-               <Label styleClass="lbl" text="Space scan" />
-               <Label styleClass="lbl" text="←→ nav" />
-               <Label styleClass="lbl" text="[] rotate" />
-               <Label styleClass="lbl" text="Del delete" />
-               <Label styleClass="lbl" text="Ctrl+E export" />
-               <Label styleClass="lbl" text="Ctrl+Z undo" />
-            </children>
+                        <VBox.margin>
+                            <Insets bottom="3.0" left="3.0" right="3.0" />
+                        </VBox.margin>
+                    </HBox>
+                </children>
 
+                <BorderPane.margin>
+                    <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                </BorderPane.margin>
+            </VBox>
+        </center>
+
+        <bottom>
+         <VBox>
             <BorderPane.margin>
                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
             </BorderPane.margin>
+            <children>
+               <HBox fx:id="hboxProgressBarExport" managed="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="21.0" visible="false">
+                  <VBox.margin>
+                     <Insets bottom="3.0" top="3.0" />
+                  </VBox.margin>
+                  <children>
+                     <ProgressBar fx:id="progressBarExport" maxWidth="1.7976931348623157E308" prefHeight="21.0" progress="0.0" HBox.hgrow="ALWAYS" />
+                  </children>
+               </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="12.0">
+                      <padding>
+                          <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
+                      </padding>
+      
+                      <children>
+                          <Label fx:id="stDocsLabel" styleClass="lbl" text="Documents: 0" />
+                          <Separator orientation="VERTICAL" />
+                          <Label fx:id="stPagesLabel" styleClass="lbl" text="Pages: 0" />
+                          <Region HBox.hgrow="ALWAYS" />
+                          <Label styleClass="lbl" text="Space scan" />
+                          <Label styleClass="lbl" text="←→ nav" />
+                          <Label styleClass="lbl" text="[] rotate" />
+                          <Label styleClass="lbl" text="Del delete" />
+                          <Label styleClass="lbl" text="Ctrl+E export" />
+                          <Label styleClass="lbl" text="Ctrl+Z undo" />
+                      </children>
+      
+                      <styleClass>
+                          <String fx:value="card" />
+                          <String fx:value="card-bg" />
+                          <String fx:value="shadow" />
+                      </styleClass>
+                  </HBox>
+            </children>
+         </VBox>
+        </bottom>
+      <right>
+         <StackPane fx:id="fileAdjustmentSideMenu" managed="false" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0" visible="false">
+            <children>
+               <VBox alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0" spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
+                  <children>
+                     <HBox alignment="CENTER">
+                        <children>
+                           <Label styleClass="h3" text="Current File Adjustments" />
+                        </children>
+                        <VBox.margin>
+                           <Insets left="15.0" right="15.0" top="15.0" />
+                        </VBox.margin>
+                     </HBox>
+                     <Separator styleClass="grey-separator" />
+                     <VBox alignment="TOP_CENTER" spacing="12">
+                        <padding>
+                           <Insets bottom="15.0" top="15.0" />
+                        </padding>
+                        <children>
+                           <VBox spacing="4">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <children>
+                                       <Label prefWidth="120.0" styleClass="lbl" text="Hue" HBox.hgrow="ALWAYS" />
+                                       <Region HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spinnerFileAdjustmentHue" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                 <Slider fx:id="sliderHue" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
+                              </children>
+                           </VBox>
+                           <Separator minWidth="-Infinity" styleClass="grey-separator" />
+                           <VBox spacing="4">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <children>
+                                       <Label prefWidth="120.0" styleClass="lbl" text="Brightness" HBox.hgrow="ALWAYS" />
+                                       <Region HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spinnerFileAdjustmentBrightness" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                 <Slider fx:id="sliderBrightness" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
+                              </children>
+                           </VBox>
+                           <Separator minWidth="-Infinity" styleClass="grey-separator" />
+                           <VBox spacing="4">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <children>
+                                       <Label prefWidth="120.0" styleClass="lbl" text="Contrast" HBox.hgrow="ALWAYS" />
+                                       <Region HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spinnerFileAdjustmentContrast" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                 <Slider fx:id="sliderContrast" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
+                              </children>
+                           </VBox>
+                           <Separator minWidth="-Infinity" styleClass="grey-separator" />
+                           <VBox spacing="4">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <children>
+                                       <Label prefWidth="120.0" styleClass="lbl" text="Saturation" HBox.hgrow="ALWAYS" />
+                                       <Region HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spinnerFileAdjustmentSaturation" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                 <Slider fx:id="sliderSaturation" blockIncrement="1" max="100" min="-100" minorTickCount="5" value="0" />
+                              </children>
+                           </VBox>
+                           <Separator layoutX="26.0" layoutY="263.0" minWidth="-Infinity" styleClass="grey-separator" />
+                           <VBox spacing="4.0">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <children>
+                                       <Label prefWidth="120.0" styleClass="lbl" text="Rotation" HBox.hgrow="ALWAYS" />
+                                       <Region HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spinnerFileAdjustmentRotation" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                 <Slider fx:id="sliderRotation" blockIncrement="5.0" majorTickUnit="90.0" max="360.0" min="-360.0" minorTickCount="5" value="0" />
+                              </children>
+                           </VBox>
+                           <Separator layoutX="10.0" layoutY="311.0" minWidth="-Infinity" styleClass="grey-separator" />
+                           <VBox layoutX="10.0" layoutY="325.0" spacing="4.0">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <children>
+                                       <Label prefWidth="120.0" styleClass="lbl" text="Sharpness" HBox.hgrow="ALWAYS" />
+                                       <Region HBox.hgrow="ALWAYS" />
+                                       <Spinner fx:id="spinnerFileAdjustmentSharpness" editable="true" prefHeight="30.0" prefWidth="60.0" styleClass="arrowless-spinner" />
+                                    </children>
+                                 </HBox>
+                                 <Slider fx:id="sliderSharpness" blockIncrement="5.0" majorTickUnit="20.0" min="-100.0" minorTickCount="1" snapToTicks="true" value="0" />
+                              </children>
+                           </VBox>
+                        </children>
+                        <VBox.margin>
+                           <Insets left="12.0" right="12.0" />
+                        </VBox.margin>
+                     </VBox>
+                     <Separator maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" styleClass="grey-separator" />
+                     <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onApplyFileAdjustments" prefHeight="30.0" prefWidth="60.0" styleClass="primary-btn" text="Apply">
+                        <VBox.margin>
+                           <Insets />
+                        </VBox.margin></Button>
+                  </children>
+               </VBox>
+            </children>
+            <BorderPane.margin>
+               <Insets bottom="3.0" left="3.0" top="3.0" />
+            </BorderPane.margin>
+         </StackPane>
+      </right>
+      <padding>
+         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+      </padding>
+    </BorderPane>
 
-            <styleClass>
-               <String fx:value="box-card" />
-               <String fx:value="card-bg" />
-               <String fx:value="shadow" />
-            </styleClass>
-         </HBox>
-      </bottom>
-   </BorderPane>
+    <StackPane fx:id="sessionPopupOverlay" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false">
+        <VBox spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
 
-   <StackPane fx:id="sessionPopupOverlay" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false">
-      <VBox spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
-         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Label styleClass="h2" text="Session Setup" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#onSessionPopupClose" prefHeight="28.0" styleClass="secondary-btn" text="✕" />
+                    </children>
+                </HBox>
 
-         <children>
-            <HBox alignment="CENTER_LEFT">
-               <children>
-                  <Label styleClass="h2" text="Session Setup" />
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" onAction="#onSessionPopupClose" prefHeight="28.0" styleClass="secondary-btn" text="✕" />
-               </children>
-            </HBox>
+                <Label styleClass="lbl" text="Choose the assigned profile and enter the box ID." wrapText="true" />
 
-            <Label styleClass="lbl" text="Choose the assigned profile and enter the box ID." wrapText="true" />
+                <VBox spacing="6.0">
+                    <children>
+                        <Label styleClass="h3" text="Profile" />
+                        <SearchableComboBox fx:id="comboBoxProfiles" prefWidth="320.0" />
+                    </children>
+                </VBox>
 
-            <VBox spacing="6.0">
-               <children>
-                  <Label styleClass="h3" text="Profile" />
-                  <SearchableComboBox fx:id="comboBoxProfiles" prefWidth="320.0" />
-               </children>
-            </VBox>
+                <VBox spacing="6.0">
+                    <children>
+                        <Label styleClass="h3" text="Box ID" />
+                        <TextField fx:id="txtFldBoxId" promptText="e.g. BOX-042" styleClass="container" />
+                    </children>
+                </VBox>
+                <HBox alignment="CENTER" spacing="9.0">
+                    <children>
+                        <VBox>
+                            <children>
 
-            <VBox spacing="6.0">
-               <children>
-                  <Label styleClass="h3" text="Box ID" />
-                  <TextField fx:id="txtFldBoxId" promptText="e.g. BOX-042" styleClass="container" />
-               </children>
-            </VBox>
-            <HBox alignment="CENTER" spacing="9.0">
-               <children>
-                  <VBox>
-                     <children>
-
-                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Rotation" />
-                        <TextField fx:id="txtFldGlobalRotation" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets></TextField>
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </VBox>
-                  <VBox layoutX="10.0" layoutY="10.0">
-                     <children>
-                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Hue" />
-                        <TextField fx:id="txtFldGlobalHue" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                        </TextField>
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </VBox>
-                  <VBox layoutX="79.0" layoutY="10.0">
-                     <children>
-                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Brightness" />
-                        <TextField fx:id="txtFldGlobalBrightness" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                        </TextField>
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </VBox>
-                  <VBox layoutX="79.0" layoutY="10.0">
-                     <children>
-                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Contrast" />
-                        <TextField fx:id="txtFldGlobalContrast" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                        </TextField>
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </VBox>
-                  <VBox layoutX="79.0" layoutY="10.0">
-                     <children>
-                        <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Saturation" />
-                        <TextField fx:id="txtFldGlobalSaturation" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                        </TextField>
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </VBox>
-               </children>
-            </HBox>
+                                <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Rotation" />
+                                <TextField fx:id="txtFldGlobalRotation" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets></TextField>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </VBox>
+                        <VBox layoutX="10.0" layoutY="10.0">
+                            <children>
+                                <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Hue" />
+                                <TextField fx:id="txtFldGlobalHue" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                </TextField>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </VBox>
+                        <VBox layoutX="79.0" layoutY="10.0">
+                            <children>
+                                <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Brightness" />
+                                <TextField fx:id="txtFldGlobalBrightness" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                </TextField>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </VBox>
+                        <VBox layoutX="79.0" layoutY="10.0">
+                            <children>
+                                <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Contrast" />
+                                <TextField fx:id="txtFldGlobalContrast" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                </TextField>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </VBox>
+                        <VBox layoutX="79.0" layoutY="10.0">
+                            <children>
+                                <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Saturation" />
+                                <TextField fx:id="txtFldGlobalSaturation" disable="true" editable="false" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                </TextField>
+                            </children>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </VBox>
+                    </children>
+                </HBox>
 
             <Button mnemonicParsing="false" onAction="#onStartSession" prefHeight="33.0" styleClass="primary-btn" text="Start Session" />
             <Separator />
          </children>
       </VBox>
-   </StackPane>
-   <StackPane fx:id="sessionPopupOverlay1" disable="true" layoutX="460.0" layoutY="180.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false">
-      <children>
-         <VBox spacing="12.0" styleClass="card,card-bg,shadow" StackPane.alignment="CENTER">
-            <padding>
-               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-            </padding>
-            <children>
-               <HBox alignment="CENTER_LEFT">
-                  <children>
-                     <Label styleClass="h2" text="Current Image Adjustment Settings" />
-                     <Region HBox.hgrow="ALWAYS" />
-                     <Button mnemonicParsing="false" onAction="#onFileAdjustmentsClose" prefHeight="28.0" styleClass="secondary-btn" text="✕" />
-                  </children>
-               </HBox>
-               <HBox alignment="CENTER" spacing="9.0">
-                  <children>
-                     <VBox>
-                        <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Rotation" />
-                           <TextField fx:id="txtFldIndividualFileRotation" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
-                        </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
-                     </VBox>
-                     <VBox layoutX="10.0" layoutY="10.0">
-                        <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Hue" />
-                           <TextField fx:id="txtFldIndividualFileHue" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
-                        </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
-                     </VBox>
-                     <VBox layoutX="79.0" layoutY="10.0">
-                        <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Brightness" />
-                           <TextField fx:id="txtFldIndividualFileBrightness" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
-                        </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
-                     </VBox>
-                     <VBox layoutX="79.0" layoutY="10.0">
-                        <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Contrast" />
-                           <TextField fx:id="txtFldIndividualFileContrast" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
-                        </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
-                     </VBox>
-                     <VBox layoutX="79.0" layoutY="10.0">
-                        <children>
-                           <Label alignment="CENTER" minWidth="-Infinity" prefWidth="60.0" text="Saturation" />
-                           <TextField fx:id="txtFldIndividualFileSaturation" minWidth="-Infinity" prefWidth="60.0" styleClass="container">
-                              <opaqueInsets>
-                                 <Insets />
-                              </opaqueInsets>
-                           </TextField>
-                        </children>
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
-                     </VBox>
-                  </children>
-               </HBox>
-               <Separator />
-               <Button mnemonicParsing="false" onAction="#onApplyFileAdjustments" styleClass="primary-btn" text="Apply" />
-            </children>
-         </VBox>
-      </children>
    </StackPane>
 </StackPane>

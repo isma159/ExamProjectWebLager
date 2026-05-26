@@ -17,9 +17,7 @@ import java.util.*;
 
 public class UserDAO implements IDataAccess<User> {
 
-    private final DBConnector dbConnector = new DBConnector();
-
-    public UserDAO() throws IOException {}
+    public UserDAO() {}
 
     @Override
     public User createData(User newUser) throws Exception {
@@ -31,7 +29,7 @@ public class UserDAO implements IDataAccess<User> {
         String insertJunctionSQL = "INSERT INTO UserProfiles (userId, profileId) VALUES (?, ?)";
         String insertUserClientSQL = "INSERT INTO UserClients (userId, clientId) VALUES (?, ?)";
 
-        try (Connection connection = dbConnector.getConnection()) {
+        try (Connection connection = DBConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -94,7 +92,7 @@ public class UserDAO implements IDataAccess<User> {
                 ORDER BY u.username, p.profileName
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -142,7 +140,7 @@ public class UserDAO implements IDataAccess<User> {
                 WHERE u.username = ? AND u.deleted_at IS NULL
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name);
@@ -181,6 +179,12 @@ public class UserDAO implements IDataAccess<User> {
     }
 
     @Override
+    public User getDataFromId(int id) throws Exception {
+        return null;
+    }
+
+    // TODO remove userclients
+    @Override
     public void updateData(User updatedUser) throws Exception {
         String sql = "UPDATE Users SET username = ?, passwordHash = ?, role = ? WHERE userId = ?";
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
@@ -188,7 +192,7 @@ public class UserDAO implements IDataAccess<User> {
         String deleteUserClientsSQL = "DELETE FROM UserClients WHERE userId = ?";
         String insertUserClientSQL = "INSERT INTO UserClients (userId, clientId) VALUES (?, ?)";
 
-        try (Connection connection = dbConnector.getConnection()) {
+        try (Connection connection = DBConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -240,7 +244,7 @@ public class UserDAO implements IDataAccess<User> {
         String deleteJunctionSQL = "DELETE FROM UserProfiles WHERE userId = ?";
         String deleteUserClientsSQL = "DELETE FROM UserClients WHERE userId = ?";
 
-        try (Connection connection = dbConnector.getConnection()) {
+        try (Connection connection = DBConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -280,7 +284,8 @@ public class UserDAO implements IDataAccess<User> {
                         rs.getInt("hue"),
                         rs.getInt("brightness"),
                         rs.getInt("contrast"),
-                        rs.getInt("saturation"))
+                        rs.getInt("saturation"),
+                        0)
         );
     }
 }

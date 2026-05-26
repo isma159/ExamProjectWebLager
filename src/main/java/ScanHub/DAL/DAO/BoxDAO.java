@@ -19,11 +19,8 @@ import java.util.List;
 
 public class BoxDAO implements IDataAccess<Box> {
 
-    private final DBConnector dbConnector;
 
-    public BoxDAO() throws IOException {
-        this.dbConnector = new DBConnector();
-    }
+    public BoxDAO() {}
 
     @Override
     public Box createData(Box box) throws Exception {
@@ -34,7 +31,7 @@ public class BoxDAO implements IDataAccess<Box> {
                 VALUES (?, ?)
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, box.getBoxName());
@@ -59,7 +56,7 @@ public class BoxDAO implements IDataAccess<Box> {
         List<Box> boxes = new ArrayList<>();
         String sql = getSelectSql() + " WHERE b.deleted_at IS NULL ORDER BY b.created_at DESC";
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -77,7 +74,7 @@ public class BoxDAO implements IDataAccess<Box> {
     public Box getDataFromName(String name) throws Exception {
         String sql = getSelectSql() + " WHERE b.boxName = ? AND b.deleted_at IS NULL";
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name);
@@ -92,7 +89,7 @@ public class BoxDAO implements IDataAccess<Box> {
     public Box getDataFromId(int boxId) throws Exception {
         String sql = getSelectSql() + " WHERE b.boxId = ? AND b.deleted_at IS NULL";
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, boxId);
@@ -108,7 +105,7 @@ public class BoxDAO implements IDataAccess<Box> {
     public void updateData(Box box) throws Exception {
         String sql = "UPDATE Boxes SET boxName = ?, profileId = ?, modified_at = SYSUTCDATETIME() WHERE boxId = ? AND deleted_at IS NULL";
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, box.getBoxName());
@@ -124,7 +121,7 @@ public class BoxDAO implements IDataAccess<Box> {
     public void deleteData(Box box) throws Exception {
         String sql = "UPDATE Boxes SET deleted_at = SYSUTCDATETIME() WHERE boxId = ?";
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, box.getBoxId());
@@ -160,7 +157,8 @@ public class BoxDAO implements IDataAccess<Box> {
                         rs.getInt("hue"),
                         rs.getInt("brightness"),
                         rs.getInt("contrast"),
-                        rs.getInt("saturation"))
+                        rs.getInt("saturation"),
+                        0)
         );
 
         box.setProfile(profile);

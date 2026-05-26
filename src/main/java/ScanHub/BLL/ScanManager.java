@@ -1,15 +1,11 @@
 package ScanHub.BLL;
 
-import ScanHub.BE.Box;
-import ScanHub.BE.Document;
-import ScanHub.BE.File;
-import ScanHub.BE.FileAdjustmentSettings;
+import ScanHub.BE.*;
 import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.util.BarcodeDetector;
 import ScanHub.DAL.ApiClient.ScanResult;
-import ScanHub.DAL.DAO.DocumentDAO;
-import ScanHub.DAL.DAO.FileDAO;
 import ScanHub.DAL.interfaces.IScanSource;
+import ScanHub.DAL.facade.DAOFacade;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -21,6 +17,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
@@ -28,6 +26,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleConsumer;
 
 /**
  * Core scanning logic: fetches pages from the scan source, stages them in memory,
@@ -36,24 +35,19 @@ import java.util.List;
 public class ScanManager {
 
     private final IScanSource scanSource;
-    private final DocumentDAO documentDAO;
-    private final FileDAO fileDAO;
+    private final DAOFacade daoFacade = DAOFacade.getInstance();
 
     private Document currentDocument;
-    private final Box targetBox;
+    private Box targetBox;
     private int referenceCounter = 0;
 
-    public boolean needsBarcodeFirst; // true when box has no files and documents
+    private boolean needsBarcodeFirst; // true when box has no files and documents
     private final List<Integer> pendingDeleteFileIds = new ArrayList<>(); // list of file id's to be deleted at the next commit
     private final List<Integer> pendingDeleteDocumentIds = new ArrayList<>(); // list document id's to be deleted at the next commit
-
-    public record StoredScan(File file, Document document, boolean barcodeSplit) {} // record returned to controller after each successful scan
 
     public ScanManager(IScanSource scanSource, Box targetBox) throws Exception {
         this.scanSource = scanSource;
         this.targetBox = targetBox;
-        this.documentDAO = new DocumentDAO();
-        this.fileDAO = new FileDAO();
 
         if (targetBox.getProfile() == null) {
             throw new IllegalArgumentException("A scan session box must have a profile");
@@ -98,34 +92,59 @@ public class ScanManager {
     }
 
     /**
+     * Returns the image bytes for a file.
+     * Staged files already carry data in memory while persisted files,
+     * fall back to loading from DB if the data is not currently loaded.
+     */
+    public byte[] resolveImageData(File file) throws Exception {
+        if (file.getImageData() != null) return file.getImageData();
+        if (!file.isStaged() && file.getFileId() > 0) {
+            byte[] data = daoFacade.getFileDAO().loadImageData(file.getFileId());
+            file.setImageData(data);
+            return data;
+        }
+        return null;
+    }
+
+    /**
      * Applies all pending in-memory deletes to the DB, then walks every staged
      * document and file in order, persists them and updates their real DB ids.
      */
     public void commitAll() throws Exception {
-        // delete
+
         for (int fileId : pendingDeleteFileIds) {
-            fileDAO.deleteFile(fileId);
+            daoFacade.getFileDAO().deleteFile(fileId);
         }
+
         pendingDeleteFileIds.clear();
 
         for (int documentId : pendingDeleteDocumentIds) {
-            documentDAO.deleteDocument(documentId);
+            daoFacade.getDocumentDAO().deleteDocument(documentId);
         }
+
         pendingDeleteDocumentIds.clear();
 
-        // persist staged files and documents
+        // persist staged files and documents. Also handles files moved to new documents
+
+        if (targetBox.isStaged()) {
+            Box savedBox = daoFacade.getBoxDAO().createData(targetBox);
+            targetBox.setBoxId(savedBox.getBoxId());
+            targetBox.setStaged(false);
+        }
+
         for (Document document : targetBox.getDocuments()) {
-            if (document.isStaged()) {
-                Document persisted = documentDAO.createDocument(targetBox.getBoxId());
+            if (document.isStaged() || document.isModified()) {
+                Document persisted = daoFacade.getDocumentDAO().createDocument(targetBox.getBoxId());
                 document.setDocumentId(persisted.getDocumentId());
                 document.setCreatedAt(persisted.getCreatedAt());
                 document.setStaged(false);
+                document.setModified(false);
             }
 
             for (File file : document.getFiles()) {
                 if (file.isStaged()) {
                     file.setDocumentId(document.getDocumentId());
-                    File persisted = fileDAO.createFile(
+                    File persisted = daoFacade.getFileDAO().createFile(
                             document.getDocumentId(),
                             file.getReferenceId(),
                             file.getSortId(),
@@ -134,38 +153,43 @@ public class ScanManager {
                     file.setFileId(persisted.getFileId());
                     file.setCreatedAt(persisted.getCreatedAt());
                     if (file.hasCustomFileSettings()) {
-                        fileDAO.upsertFileSettings(file.getFileId(), file.getFileSettings());
+                        daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
                     }
                     file.setStaged(false);
+                }
+                else if (file.getDocumentId() != document.getDocumentId()) {
+                    daoFacade.getFileDAO().moveFile(file.getFileId(), document.getDocumentId());
+                    file.setDocumentId(document.getDocumentId());
                 }
             }
         }
     }
 
     /**
-     * Exports every document in the box to the local filesystem under {@code exportDir}.
+     * Exports all documents to the given directory using the chosen mode.
      * <p>
-     * <b>Single-Page TIFF</b> - each page is its own TIFF inside its own sub-folder:
+     * Single-Page TIFF - each file in its own sub-folder:
      * <pre>
      *   exportDir/boxName/Document1/File1.tiff
      *   exportDir/boxName/Document1/File2.tiff
      * </pre>
-     * <p>
-     * <b>Multi-Page TIFF</b> - all pages of a document are merged into one
-     * multi-frame TIFF placed flat inside the document folder:
+     * Multi-Page TIFF - all pages of a document merged into one TIFF:
      * <pre>
      *   exportDir/boxName/Document_1/Document_1.tiff
      * </pre>
      */
-    public void exportToDirectory(java.io.File exportDirectory, ExportMode mode) throws Exception {
-        ImageIO.scanForPlugins(); // ensure TwelveMonkeys TIFF writer/reader is registered
-
+    public void exportToDirectory(java.io.File exportDirectory, ExportMode mode, DoubleConsumer progressCallback) throws Exception {
         Path boxRoot = exportDirectory.toPath().resolve(targetBox.getBoxName());
         Files.createDirectories(boxRoot);
 
         int documentIndex = 1;
-        for (Document document : targetBox.getDocuments()) {
-            if (document.getFiles().isEmpty()) { documentIndex++; continue; }
+
+        List<Document> documents = targetBox.getDocuments().stream().filter(document -> !document.getFiles().isEmpty()).toList();
+
+        int totalFiles = documents.stream().mapToInt(document -> document.getFiles().size()).sum();
+        int processed = 0;
+
+        for (Document document : documents) {
 
             String documentFolderName = "Document" + documentIndex;
             Path docDirectory = boxRoot.resolve(documentFolderName);
@@ -177,6 +201,8 @@ public class ScanManager {
                 exportMultiPage(document, docDirectory, documentFolderName);
             }
 
+            processed += document.getFiles().size();
+            progressCallback.accept((double) processed / totalFiles); // stores the result of processed / totalFiles in a Consumer, that is used for tracking progress in a Task
             documentIndex++;
         }
     }
@@ -186,7 +212,10 @@ public class ScanManager {
         int fileIndex = 1;
         for (File file : document.getFiles()) {
             byte[] data = renderAdjustedImageData(file);
-            if (data == null) { fileIndex++; continue; }
+            if (data == null) {
+                fileIndex++;
+                continue;
+            }
 
             Path outputFile = documentDirectory.resolve("File" + fileIndex + ".tiff");
             Files.write(outputFile, data);
@@ -225,19 +254,7 @@ public class ScanManager {
         }
     }
 
-    /**
-     * Returns the image bytes for a file.
-     * Staged files already carry data in memory; persisted files are fetched on demand from DB.
-     */
-    private byte[] resolveImageData(File file) throws Exception {
-        if (file.getImageData() != null) return file.getImageData();
-        if (!file.isStaged() && file.getFileId() > 0) {
-            return fileDAO.loadImageData(file.getFileId());
-        }
-        return null;
-    }
-
-    /** Loads a file image, applies any active adjustments, and returns the rendered TIFF bytes. */
+    /** Loads a file image, applies any active adjustments and returns the rendered TIFF bytes. */
     private byte[] renderAdjustedImageData(File file) throws Exception {
         byte[] sourceData = resolveImageData(file);
         if (sourceData == null) return null;
@@ -258,135 +275,109 @@ public class ScanManager {
         return rotateFile(colorAdjusted, settings.getRotation());
     }
 
-    /**
-     * Applies brightness, contrast, hue, and saturation adjustments pixel-by-pixel.
-     * Explained in-depth in method cause there's A LOT of new going on
-     */
+    /** Applies brightness, contrast, hue, and saturation adjustments pixel-by-pixel. */
     private BufferedImage applyColorAdjustments(BufferedImage source, FileAdjustmentSettings settings) {
 
-        // original image dimensions
         int width = source.getWidth();
         int height = source.getHeight();
+        int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB; // preserve transparency (alpha) if present
 
-        // preserve alpha channel support if the source image contains transparency
-        int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+        BufferedImage result = new BufferedImage(width, height, type); // destination image that will contain the adjusted pixels
 
-        // destination image that will contain the adjusted pixels
-        BufferedImage result = new BufferedImage(width, height, type);
+        double contrastFactor = 1.0 + (settings.getContrast() / 100.0); // 0 (1.0) = unchanged, 100 (2.0) = stronger contrast, -50 (0.5) = reduced contrast
+        float saturationFactor = (float) (1.0 + (settings.getSaturation() / 100.0)); // 0 (1.0) = unchanged, 100 (2.0) = more vivid/saturated colors, -50 (0.5) = more gray/desaturated
+        float brightnessShift = (float) (settings.getBrightness() / 100.0); // positive values brighten, negative values darken
+        float hueShift = (float) (settings.getHue() / 100.0); // positive/negative values rotate colors around the color wheel as Hue is circular
+        float sharpness = (float) settings.getSharpness() / 100;
 
-        // Contrast multiplier: 0 -> 1.0 (no change), 100 -> 2.0 (stronger contrast), -50 -> 0.5 (reduced contrast)
-        double contrastFactor = 1.0 + (settings.getContrast() / 100.0);
-
-        // Hue is stored in HSB as a circular value between 0.0-1.0 (positive/negative values rotate colors around the color wheel)
-        float hueShift = (float) (settings.getHue() / 100.0);
-
-        // Saturation multiplier: 1.0 = unchanged, >1 = more vivid/saturated colors, <1 = more gray/desaturated
-        float saturationFactor = (float) (1.0 + (settings.getSaturation() / 100.0));
-
-        // Brightness offset: positive values brighten, negative values darken
-        float brightnessShift = (float) (settings.getBrightness() / 100.0);
-
-        // walk through every pixel in the image
+        // loop through every pixel in the image
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
 
-                // read the packed ARGB integer from the source image
-                int argb = source.getRGB(x, y);
+                int argb = source.getRGB(x, y); // read the packed ARGB integer from the source image
 
-                // extract each 8-bit color channel using bit shifting
+                // extract each 8-bit color channel using bit shifting (splits ARGB)
                 int alpha = (argb >>> 24) & 0xff;
                 int red = (argb >>> 16) & 0xff;
                 int green = (argb >>> 8) & 0xff;
                 int blue = argb & 0xff;
 
-                // convert RGB to HSB because hue/saturation/brightness are easier to manipulate independently in HSB space
-                float[] hsb = Color.RGBtoHSB(red, green, blue, null);
+                float[] hsb = Color.RGBtoHSB(red, green, blue, null); // hue/saturation/brightness are easier to manipulate independently in HSB space
 
-                // Shift hue around the color wheel (Hue is circular, unlike Brightness, Saturation and Contrast (which is linear) so values must wrap instead of clamp
-                hsb[0] = ((hsb[0] + hueShift) % 1.0f + 1.0f) % 1.0f;
+                hsb[0] = ((hsb[0] + hueShift) % 1.0f + 1.0f) % 1.0f; // adjust hue (wrap around - shift)
+                hsb[1] = Math.clamp(hsb[1] * saturationFactor, 0.0f, 1.0f); // adjust saturation (clamp keeps the value inside the valid 0.0-1.0 HSB range)
+                hsb[2] = Math.clamp(hsb[2] + brightnessShift, 0.0f, 1.0f); // adjust brightness (clamp keeps the value inside the valid 0.0-1.0 HSB range)
 
-                // increase/decrease saturation - clamp keeps the value inside the valid 0.0-1.0 HSB range
-                hsb[1] = Math.clamp(hsb[1] * saturationFactor, 0.0f, 1.0f);
-
-                // increase/decrease brightness - clamp prevents invalid brightness values
-                hsb[2] = Math.clamp(hsb[2] + brightnessShift, 0.0f, 1.0f);
-
-                // convert adjusted HSB values back into packed RGB format
+                // convert adjusted HSB values back into packed RGB format and update RGB
                 int adjustedRgb = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-
-                // extract adjusted RGB channels from the packed integer
                 red = (adjustedRgb >>> 16) & 0xff;
                 green = (adjustedRgb >>> 8) & 0xff;
                 blue = adjustedRgb & 0xff;
 
-                // apply contrast around midpoint 128 (RGB channels are integer-based): values above 128 become brighter, values below 128 become darker
+                // apply contrast to each RGB around midpoint 128 (RGB channels are integer-based) - values above 128 become brighter, values below 128 become darker
                 red = Math.clamp(Math.round(((red - 128) * contrastFactor) + 128), 0, 255);
                 green = Math.clamp(Math.round(((green - 128) * contrastFactor) + 128), 0, 255);
                 blue = Math.clamp(Math.round(((blue - 128) * contrastFactor) + 128), 0, 255);
 
-                // repack ARGB channels back into a single integer pixel value
+                // repack ARGB channels back into a single integer pixel value and write it into the destination image
                 int adjustedArgb = (alpha << 24) | (red << 16) | (green << 8) | blue;
-
-                // write the adjusted pixel into the destination image
                 result.setRGB(x, y, adjustedArgb);
             }
         }
 
-        return result;
+        return sharpen(result, sharpness);
     }
 
-    /**
-     * Applies rotation (by 90, 180, 270 degrees for now) and smoothes the pixels when rotated
-     * Explained in-depth in method cause there's A LOT of new stuff going on.
-     */
+    public BufferedImage sharpen(BufferedImage source, float strength) {
+        float center = 1 + (4 * strength);
+        float edge = -strength;
+
+        float[] kernelInfo = {
+                0f, edge, 0f,
+                edge, center, edge,
+                0f, edge, 0f
+        };
+
+        Kernel kernel = new Kernel(3, 3, kernelInfo);
+        ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+
+        return op.filter(source, null);
+    }
+
+    /** Applies rotation and smoothes the pixels when rotated while preserving the full visible bounds. */
     private BufferedImage rotateFile(BufferedImage source, int rotation) {
 
-        // normalize rotation so only valid values remain: 0/90/180/270
-        int normalised = normaliseRotation(rotation);
+        int normalize = normalizeRotation(rotation);
+        if (normalize == 0) return source; // no rotation needed
 
-        // no rotation needed
-        if (normalised == 0) return source;
-
-        // original image dimensions
         int width = source.getWidth();
         int height = source.getHeight();
 
-        // rotating 90 or 270 degrees swaps width/height
-        int rotatedWidth = normalised == 180 ? width : height;
-        int rotatedHeight = normalised == 180 ? height : width;
+        double radians = Math.toRadians(normalize); // Java’s math and rotation functions only understand radians
+        double sin = Math.abs(Math.sin(radians)); // tells how much the image “leans” vertically after rotation, used for sizing the new canvas
+        double cos = Math.abs(Math.cos(radians)); // tells how much the image “stays horizontal” after rotation, also used for sizing the new canvas
 
-        // keeps transparency (like PNG see-through areas) if the image has it (people online said it was a good idea)
-        int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+        // compute bounding box of rotated image
+        int rotatedWidth = (int) Math.ceil(width * cos + height * sin); // calculates the maximum possible width after rotation (rounded up)
+        int rotatedHeight = (int) Math.ceil(height * cos + width * sin); // calculates the maximum possible height after rotation (rounded up)
+        int type = source.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB; // keeps transparency if the image has it
 
-        // destination image that will contain the rotated result
-        BufferedImage rotated = new BufferedImage(rotatedWidth, rotatedHeight, type);
+        BufferedImage rotated = new BufferedImage(rotatedWidth, rotatedHeight, type); // destination image that will contain the rotated result
 
-        // tool used to draw the image onto the new rotated canvas
-        Graphics2D graphics = rotated.createGraphics();
+        // quality ensuring
+        Graphics2D graphics = rotated.createGraphics(); // used for drawing the image onto the new rotated canvas
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC); // smoother rotation/resizing
+        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY); // quality > speed
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // smooths jagged edges in rotated graphics
 
-        // use higher-quality interpolation during rotation = image looks smoother and less pixelated when rotated (without the image will becoming jagged or blocky)
-        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-
-        // defines how the image should be transformed when drawn (rotation + translation)
+        // define how the image should be transformed when drawn (rotation + translation)
         AffineTransform transform = new AffineTransform();
-        switch (normalised) {
-            case 90 -> {
-                transform.translate(height, 0); // move drawing origin right so rotated image stays visible
-                transform.rotate(Math.toRadians(90)); // rotate 90 degrees around origin to the right
-            }
-            case 180 -> {
-                transform.translate(width, height); // move image into positive coordinate space after rotation
-                transform.rotate(Math.toRadians(180)); // rotate image upside down
-            }
-            case 270 -> {
-                transform.translate(0, width); // move drawing origin downward after rotation
-                transform.rotate(Math.toRadians(270)); // rotate 270 degrees (or 90 to the left)
-            }
-            default -> { }
-        }
+        transform.translate(rotatedWidth / 2.0, rotatedHeight / 2.0); // move image center into destination canvas center
+        transform.rotate(radians); // rotate around center
+        transform.translate(-width / 2.0, -height / 2.0); // move original image center to origin before rotation
 
         graphics.drawImage(source, transform, null); // draw the source image using the configured transformation
-        graphics.dispose(); // Release native graphics resources
+        graphics.dispose(); // release native graphics resources
         return rotated;
     }
 
@@ -402,7 +393,7 @@ public class ScanManager {
      */
     public void updateFileRotation(File file, int rotation) throws Exception {
         FileAdjustmentSettings settings = FileAdjustmentSettings.copyOf(file.getFileSettings());
-        settings.setRotation(normaliseRotation(rotation));
+        settings.setRotation(normalizeRotation(rotation));
         updateFileSettings(file, settings);
     }
 
@@ -412,7 +403,7 @@ public class ScanManager {
     public void updateFileSettings(File file, FileAdjustmentSettings settings) throws Exception {
         file.applyCustomFileSettings(settings);
         if (!file.isStaged()) {
-            fileDAO.upsertFileSettings(file.getFileId(), file.getFileSettings());
+            daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
         }
     }
 
@@ -451,13 +442,14 @@ public class ScanManager {
      * nearest preceding document so the next scan lands in the right place.
      * {@code needsBarcodeFirst} is re-evaluated after removal (if everything is deleted the first file should be a barcode).
      */
-    public void deleteDocument(Document document) throws Exception {
+    public void deleteDocument(Document document) {
         // queue all persisted files for deletion
         for (File file : new ArrayList<>(document.getFiles())) {
             if (!file.isStaged() && file.getFileId() > 0) {
                 pendingDeleteFileIds.add(file.getFileId());
             }
         }
+
         document.getFiles().clear();
 
         // queue the document row for deletion
@@ -481,6 +473,27 @@ public class ScanManager {
         }
 
         refreshNeedsBarcodeFirst();
+    }
+
+    public void deleteBox() throws Exception {
+
+        for (Document document : targetBox.getDocuments()) {
+
+            for (File file : document.getFiles()) {
+                if (!file.isStaged() && file.getFileId() > 0) {
+                    daoFacade.getFileDAO().deleteFile(file.getFileId());
+                }
+            }
+            if (!document.isStaged() && document.getDocumentId() > 0) {
+                daoFacade.getDocumentDAO().deleteDocument(document.getDocumentId());
+            }
+        }
+
+        if (!targetBox.isStaged() && targetBox.getBoxId() > 0) {
+            daoFacade.getBoxDAO().deleteData(targetBox);
+        }
+
+        targetBox.getDocuments().clear();
     }
 
     public Document getCurrentDocument() { return currentDocument; }
@@ -540,11 +553,5 @@ public class ScanManager {
         }
     }
 
-    private static int normaliseRotation(int rotation) {
-        int normalised = ((rotation % 360) + 360) % 360;
-        return switch (normalised) {
-            case 90, 180, 270 -> normalised;
-            default -> 0;
-        };
-    }
+    private static int normalizeRotation(int rotation) { return ((rotation % 360) + 360) % 360; }
 }

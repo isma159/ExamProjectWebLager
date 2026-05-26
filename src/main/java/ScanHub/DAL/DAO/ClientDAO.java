@@ -17,9 +17,7 @@ import java.util.List;
 
 public class ClientDAO implements IDataAccess<Client> {
 
-    DBConnector dbConnector = new DBConnector();
-
-    public ClientDAO() throws IOException {}
+    public ClientDAO() {}
 
     @Override
     public Client createData(Client client) throws Exception {
@@ -29,7 +27,7 @@ public class ClientDAO implements IDataAccess<Client> {
                 VALUES (?)
                 """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, client.getClientName());
@@ -60,7 +58,7 @@ public class ClientDAO implements IDataAccess<Client> {
                                        WHERE p.clientId = ? AND p.deleted_at IS NULL
                                        """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
              PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);
              ResultSet rs = ps.executeQuery()) {
@@ -105,7 +103,7 @@ public class ClientDAO implements IDataAccess<Client> {
                                        WHERE p.clientId = ? AND p.deleted_at IS NULL
                                        """;
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
              PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);) {
 
@@ -138,10 +136,15 @@ public class ClientDAO implements IDataAccess<Client> {
     }
 
     @Override
+    public Client getDataFromId(int id) throws Exception {
+        return null;
+    }
+
+    @Override
     public void updateData(Client client) throws Exception {
         String sql = "UPDATE Clients SET clientName = ? WHERE clientId = ? AND deleted_at IS NULL";
 
-        try (Connection connection = dbConnector.getConnection();
+        try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, client.getClientName());
@@ -157,7 +160,7 @@ public class ClientDAO implements IDataAccess<Client> {
         String sql = "UPDATE Clients SET deleted_at = SYSUTCDATETIME() WHERE clientId = ?";
         String deleteUserClientsSql = "DELETE FROM UserClients WHERE clientId = ?";
 
-        try (Connection connection = dbConnector.getConnection()) {
+        try (Connection connection = DBConnector.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -196,7 +199,9 @@ public class ClientDAO implements IDataAccess<Client> {
                         rs.getInt("hue"),
                         rs.getInt("brightness"),
                         rs.getInt("contrast"),
-                        rs.getInt("saturation"))
+                        rs.getInt("saturation"),
+                        0
+                )
         );
 
     }

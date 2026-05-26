@@ -2,37 +2,33 @@ package ScanHub.BLL;
 
 // project imports
 import ScanHub.BE.User;
-import ScanHub.DAL.DAO.UserDAO;
-import ScanHub.DAL.interfaces.IDataAccess;
+import ScanHub.DAL.facade.DAOFacade;
 
 //java imports
-import java.util.Collections;
 import java.util.List;
 
 public class UserManager {
-    private final IDataAccess<User> dataAccess;
+    private final DAOFacade daoFacade = DAOFacade.getInstance();
 
-    public UserManager() throws Exception {
-        dataAccess = new UserDAO();
-    }
+    public UserManager() {}
 
     public User createUser(User newUser) throws Exception {
-        return dataAccess.createData(newUser);
+        return daoFacade.getUserDAO().createData(newUser);
     }
 
     public List<User> getUsers() throws Exception {
-        return dataAccess.getData();
+        return daoFacade.getUserDAO().getData();
     }
 
     public User getUserFromUsername(String username) throws Exception {
-        return dataAccess.getDataFromName(username);
+        return daoFacade.getUserDAO().getDataFromName(username);
     }
 
     public void updateUser(User updatedUser) throws Exception {
-        dataAccess.updateData(updatedUser);
+        daoFacade.getUserDAO().updateData(updatedUser);
     }
 
     public void deleteUser(User selectedUser) throws Exception {
-        dataAccess.deleteData(selectedUser);
+        daoFacade.getUserDAO().deleteData(selectedUser);
     }
 }

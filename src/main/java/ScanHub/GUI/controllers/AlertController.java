@@ -54,6 +54,15 @@ public class AlertController {
                 btnCancel.setText("Discard changes");
                 btnConfirm.setText("Save Changes");
             }
+            case SPLIT -> {
+                btnBefore.setVisible(true);
+                btnBefore.setManaged(true);
+                btnCancel.getStyleClass().add("secondary-btn");
+                btnCancel.setText("Cancel");
+                btnBefore.getStyleClass().add("secondary-btn");
+                btnBefore.setText("Before selected page");
+                btnConfirm.setText("After selected page");
+            }
         }
     }
 
@@ -81,4 +90,14 @@ public class AlertController {
         if (onCancel != null) onCancel.run();
         stage.close();
     }
+    @FXML
+    private void handleBefore() {
+        if (onBefore != null) onBefore.run();
+        stage.close();
+    }
+
+    @FXML private Button btnBefore;
+    private Runnable onBefore;
+
+    public void setOnBefore(Runnable onBefore) { this.onBefore = onBefore; }
 }

@@ -1,7 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.Log;
-import ScanHub.DAL.DAO.LogDAO;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,18 +10,16 @@ import java.util.List;
 
 public class LogManager {
 
-    private final LogDAO logDAO;
+    private final DAOFacade daoFacade = DAOFacade.getInstance();
 
-    public LogManager() throws Exception {
-        logDAO = new LogDAO();
-    }
+    public LogManager() {}
 
     public List<Log> getLogs() throws Exception {
-        return logDAO.getData();
+        return daoFacade.getLogDAO().getData();
     }
 
     public Log createLog(Log log) throws Exception {
-        return logDAO.createData(log);
+        return daoFacade.getLogDAO().createData(log);
     }
 
     public void exportLogs(Path path, List<Log> logs) throws Exception {

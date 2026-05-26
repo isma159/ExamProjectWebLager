@@ -4,7 +4,7 @@ import ScanHub.BE.*;
 import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
-import ScanHub.GUI.util.ThemeManager;
+import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
 import javafx.event.ActionEvent;
@@ -50,7 +50,7 @@ public class ProfileFormController implements Initializable {
         this.modelFacade = modelFacade;
         this.editingProfile = profile;
 
-        ThemeManager.apply(currentStage.getScene());
+        ThemeHandler.apply(currentStage.getScene());
 
         searchableComboBoxClient.setItems(modelFacade.getClientModel().getClients());
 
@@ -72,7 +72,7 @@ public class ProfileFormController implements Initializable {
         spnBrightness.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
         spnContrast.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
         spnSaturation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-100, 100, 0, 1));
-        spnRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-270, 270, 0, 1));
+        spnRotation.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-360, 360, 0, 1));
 
         profileNameField.textProperty().addListener(((observable, oldValue, newValue) -> {
 
@@ -224,13 +224,7 @@ public class ProfileFormController implements Initializable {
     }
 
     private FileAdjustmentSettings buildFileSettings() {
-        return new FileAdjustmentSettings(
-                rotation,
-                hue,
-                brightness,
-                contrast,
-                saturation
-        );
+        return new FileAdjustmentSettings(rotation, hue, brightness, contrast, saturation, 0);
     }
 
     private String buildExportLabel(String profileName, String clientName) {

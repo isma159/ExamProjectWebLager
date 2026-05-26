@@ -1,36 +1,33 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.Client;
-import ScanHub.DAL.DAO.ClientDAO;
-import ScanHub.DAL.interfaces.IDataAccess;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.util.List;
 
 public class ClientManager {
 
-    private final IDataAccess<Client> dataAccess;
+    private final DAOFacade daoFacade = DAOFacade.getInstance();
 
-    public ClientManager() throws Exception {
-        dataAccess = new ClientDAO();
-    }
+    public ClientManager() {}
 
     public Client createClient(Client client) throws Exception {
-        return dataAccess.createData(client);
+        return daoFacade.getClientDAO().createData(client);
     }
 
     public List<Client> getClients() throws Exception {
-        return dataAccess.getData();
+        return daoFacade.getClientDAO().getData();
     }
 
     public Client getClientFromName(String name) throws Exception {
-        return dataAccess.getDataFromName(name);
+        return daoFacade.getClientDAO().getDataFromName(name);
     }
 
     public void updateClient(Client client) throws Exception {
-        dataAccess.updateData(client);
+        daoFacade.getClientDAO().updateData(client);
     }
 
     public void deleteClient(Client client) throws Exception {
-        dataAccess.deleteData(client);
+        daoFacade.getClientDAO().deleteData(client);
     }
 }

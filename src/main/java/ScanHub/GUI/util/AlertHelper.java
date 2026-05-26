@@ -100,4 +100,42 @@ public class AlertHelper {
     public static void showSaveDialog(String content, Runnable onSave, Runnable onDiscard) {
         show("UNSAVED CHANGES", "Unsaved Changes", content, AlertTypes.SAVE, onSave, onDiscard);
     }
+    public static void showSplitDialog(String header, Runnable onBefore, Runnable onAfter) {
+        // reuse the private show() but we need to set onBefore too
+        // simplest: inline it here
+        try {
+            FXMLLoader loader = new FXMLLoader(AlertHelper.class.getResource(ALERT_FXML));
+            Parent root = loader.load();
+            AlertController controller = loader.getController();
+
+            Rectangle clip = new Rectangle();
+            clip.setArcWidth(20); clip.setArcHeight(20);
+            clip.widthProperty().bind(root.layoutBoundsProperty().map(b -> b.getWidth()));
+            clip.heightProperty().bind(root.layoutBoundsProperty().map(b -> b.getHeight()));
+            root.setClip(clip);
+
+            Stage stage = new Stage(StageStyle.TRANSPARENT);
+            stage.setTitle("SPLIT DOCUMENT");
+            Scene scene = new Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.getScene().setOnKeyPressed(e -> {
+                if (e.getCode() == KeyCode.ESCAPE) { stage.close(); e.consume(); }
+            });
+
+            controller.setStage(stage);
+            controller.setHeaderText(header);
+            controller.setContentText("");
+            controller.setAlertType(AlertTypes.SPLIT);
+            controller.setOnConfirm(onAfter);
+            controller.setOnCancel(null);
+            controller.setOnBefore(onBefore);
+
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

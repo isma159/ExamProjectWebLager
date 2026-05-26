@@ -2,7 +2,8 @@ package ScanHub.GUI.controllers;
 
 // project imports
 import ScanHub.GUI.interfaces.IShortcutHandler;
-import ScanHub.GUI.util.ThemeManager;
+import ScanHub.GUI.util.GlobalKeyHandler;
+import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IViewController;
 import ScanHub.GUI.util.AlertHelper;
@@ -14,12 +15,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.net.URL;
@@ -39,7 +38,6 @@ public class AdminController implements IViewController, Initializable {
     private Stage currentStage;
     private ModelFacade modelFacade;
     private final Map<KeyCodeCombination, Runnable> adminShortcuts = new HashMap<>();
-    private final Map<KeyCodeCombination, Runnable> activeShortcuts = new HashMap<>();
 
     public void setModel(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
@@ -83,7 +81,11 @@ public class AdminController implements IViewController, Initializable {
         );
         adminShortcuts.put(
                 new KeyCodeCombination(KeyCode.F2),
-                () -> {darkMode.setSelected(!darkMode.isSelected()); ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());}
+                () -> {darkMode.setSelected(!darkMode.isSelected()); ThemeHandler.toggle(contentArea.getScene(), darkMode.isSelected());}
+        );
+        adminShortcuts.put(
+                new KeyCodeCombination(KeyCode.ESCAPE),
+                () -> onClickLogOut(null)
         );
 
         sidebarBtns.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
@@ -108,7 +110,9 @@ public class AdminController implements IViewController, Initializable {
             }
         });
 
-        javafx.application.Platform.runLater(this::registerShortcuts);
+        // Push admin shortcuts as the persistent global layer so they are
+        // always active regardless of which sub-page is loaded.
+        GlobalKeyHandler.getInstance().setLayer(adminShortcuts);
     }
 
     private void loadPage(String fxml) {
@@ -141,7 +145,11 @@ public class AdminController implements IViewController, Initializable {
             Node page = loader.load();
 
             IShortcutHandler controller = loader.getController();
-            setShortcuts(controller.getShortcuts());
+            // Merge admin-level + page-level shortcuts into GlobalKeyHandler
+            Map<KeyCodeCombination, Runnable> merged = new HashMap<>(adminShortcuts);
+            merged.putAll(controller.getShortcuts());
+
+            GlobalKeyHandler.getInstance().setLayer(merged);
 
             if (darkMode.isSelected()) {
                 page.getStyleClass().add("dark");
@@ -153,33 +161,6 @@ public class AdminController implements IViewController, Initializable {
         }
     }
 
-    private void registerShortcuts() {
-        Scene scene = contentArea.getScene();
-        if (scene == null) {
-            contentArea.sceneProperty().addListener(((observable, oldValue, newValue) -> {
-                if (newValue != null) {
-                    registerShortcuts();
-                }
-            }));
-            return;
-        }
-
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            new HashMap<>(activeShortcuts).forEach(((keyCodeCombination, runnable) -> {
-                if (keyCodeCombination.match(event)) {
-                    runnable.run();
-                    event.consume();
-                }
-            }));
-        });
-
-    }
-
-    private void setShortcuts(Map<KeyCodeCombination, Runnable> shortcuts) {
-        activeShortcuts.clear();
-        activeShortcuts.putAll(adminShortcuts);
-        activeShortcuts.putAll(shortcuts);
-    }
 
     @FXML
     private void onClickLogOut(ActionEvent actionEvent) {
@@ -199,14 +180,19 @@ public class AdminController implements IViewController, Initializable {
 
     @FXML
     private void onDarkModeToggle() {
-        ThemeManager.toggle(contentArea.getScene(), darkMode.isSelected());
+        ThemeHandler.toggle(contentArea.getScene(), darkMode.isSelected());
     }
 
-    public void onClickOpenScanView(MouseEvent mouseEvent) {
+    public void onClickOpenScanView() {
         try {
             ViewHandler handler = ViewHandler.SCAN_VIEW;
             handler.reset();
-            handler.show(modelFacade).setMaximized(true);
+
+            Stage stage = new Stage();
+            stage.setMinWidth(1366);
+            stage.setMinHeight(768);
+
+            handler.show(modelFacade, stage).setMaximized(true);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

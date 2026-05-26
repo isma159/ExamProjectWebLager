@@ -1,10 +1,18 @@
 package ScanHub.BE;
 
 // java imports
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import ScanHub.BE.interfaces.TreeNode;
+import javafx.scene.image.Image;
+
+import javax.imageio.ImageIO;
 
 public class File implements TreeNode {
+
+    static { ImageIO.scanForPlugins(); } // register TwelveMonkeys (for TIFF reading/writing) once when the class is first loaded
 
     private int fileId;
     private int documentId;
@@ -16,6 +24,9 @@ public class File implements TreeNode {
     private boolean staged = false;
     private FileAdjustmentSettings fileAdjustmentSettings;
     private boolean customFileSettings = false;
+
+    // transient = only runtime cache - it isn't persisted
+    private transient Image cachedPreview;
 
     public File() {
         fileAdjustmentSettings = new FileAdjustmentSettings();
@@ -43,6 +54,7 @@ public class File implements TreeNode {
     public double getBrightness()       { return fileAdjustmentSettings.getBrightness(); }
     public double getContrast()         { return fileAdjustmentSettings.getContrast(); }
     public double getSaturation()       { return fileAdjustmentSettings.getSaturation(); }
+    public double getSharpness()        { return fileAdjustmentSettings.getSharpness();}
     public boolean isStaged()           { return staged; }
     public FileAdjustmentSettings getFileSettings() { return fileAdjustmentSettings; }
     public boolean hasCustomFileSettings() { return customFileSettings; }
@@ -59,9 +71,11 @@ public class File implements TreeNode {
     public void setBrightness(double brightness)      { fileAdjustmentSettings.setBrightness(brightness); }
     public void setContrast(double contrast)          { fileAdjustmentSettings.setContrast(contrast); }
     public void setSaturation(double saturation)      { fileAdjustmentSettings.setSaturation(saturation); }
+    public void setSharpness(double sharpness)        { fileAdjustmentSettings.setSharpness(sharpness);}
     public void setStaged(boolean staged)             { this.staged = staged; }
     public void setFileSettings(FileAdjustmentSettings fileAdjustmentSettings) {
-        this.fileAdjustmentSettings = fileAdjustmentSettings == null ? new FileAdjustmentSettings() : FileAdjustmentSettings.copyOf(fileAdjustmentSettings);
+        this.fileAdjustmentSettings = fileAdjustmentSettings == null ? new FileAdjustmentSettings()
+                : FileAdjustmentSettings.copyOf(fileAdjustmentSettings);
     }
     public void setCustomFileSettings(boolean customFileSettings) { this.customFileSettings = customFileSettings; }
 
@@ -73,6 +87,28 @@ public class File implements TreeNode {
     public void applyCustomFileSettings(FileAdjustmentSettings customSettings) {
         setFileSettings(customSettings);
         setCustomFileSettings(true);
+    }
+
+    public Image getPreviewImage() {
+        if (imageData == null) return null;
+        if (cachedPreview != null) return cachedPreview;
+
+        try {
+            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
+            if (bufferedImage != null) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "png", output);
+                cachedPreview = new Image(new ByteArrayInputStream(output.toByteArray()));
+                return cachedPreview;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void clearCache() {
+        cachedPreview = null;
     }
 
     @Override

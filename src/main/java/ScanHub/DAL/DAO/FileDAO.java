@@ -4,6 +4,7 @@ package ScanHub.DAL.DAO;
 import ScanHub.BE.File;
 import ScanHub.BE.FileAdjustmentSettings;
 import ScanHub.DAL.DB.DBConnector;
+import ScanHub.DAL.interfaces.IDataAccess;
 
 // java imports
 import java.io.IOException;
@@ -13,11 +14,7 @@ import java.util.List;
 
 public class FileDAO {
 
-    private final DBConnector dbConnector;
-
-    public FileDAO() throws IOException {
-        this.dbConnector = new DBConnector();
-    }
+    public FileDAO() {}
 
     /**
      * Inserts a new scanned TIFF file into the Files table.
@@ -30,7 +27,7 @@ public class FileDAO {
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, documentId);
@@ -56,12 +53,13 @@ public class FileDAO {
     }
 
     /**
-     * Loads imageData only when actively needed (viewing/exporting).
-     * The File BE object intentionally omits imageData in list views.
+     * Loads raw image data for preview generation and exporting.
+     * JavaFX Image previews are cached lazily in the File BE object
+     * to avoid repeated TIFF decoding and PNG re-encoding.
      */
     public byte[] loadImageData(int fileId) throws SQLException {
         String sql = "SELECT imageData FROM Files WHERE fileId = ? AND deleted_at IS NULL";
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, fileId);
             ResultSet rs = ps.executeQuery();
@@ -80,34 +78,36 @@ public class FileDAO {
 
         String updateSql = """
                 UPDATE FileAdjustmentSettings
-                SET rotation = ?, hue = ?, brightness = ?, contrast = ?, saturation = ?,
+                SET rotation = ?, hue = ?, brightness = ?, contrast = ?, saturation = ?, sharpness = ?,
                     modified_at = SYSUTCDATETIME(), deleted_at = NULL
                 WHERE fileId = ?
                 """;
         String insertSql = """
-                INSERT INTO FileAdjustmentSettings (fileId, rotation, hue, brightness, contrast, saturation)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO FileAdjustmentSettings (fileId, rotation, hue, brightness, contrast, saturation, sharpness)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
-        try (Connection conn = dbConnector.getConnection()) {
+        try (Connection conn = DBConnector.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
-                updatePs.setInt(1, normalizeRotation(settings.getRotation()));
+                updatePs.setInt(1, settings.getRotation());
                 updatePs.setInt(2, settingValue(settings.getHue()));
                 updatePs.setInt(3, settingValue(settings.getBrightness()));
                 updatePs.setInt(4, settingValue(settings.getContrast()));
                 updatePs.setInt(5, settingValue(settings.getSaturation()));
-                updatePs.setInt(6, fileId);
+                updatePs.setInt(6, settingValue(settings.getSharpness()));
+                updatePs.setInt(7, fileId);
 
                 int updated = updatePs.executeUpdate();
                 if (updated == 0) {
                     try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
                         insertPs.setInt(1, fileId);
-                        insertPs.setInt(2, normalizeRotation(settings.getRotation()));
+                        insertPs.setInt(2, settings.getRotation());
                         insertPs.setInt(3, settingValue(settings.getHue()));
                         insertPs.setInt(4, settingValue(settings.getBrightness()));
                         insertPs.setInt(5, settingValue(settings.getContrast()));
                         insertPs.setInt(6, settingValue(settings.getSaturation()));
+                        insertPs.setInt(7, settingValue(settings.getSharpness()));
                         insertPs.executeUpdate();
                     }
                 }
@@ -122,10 +122,11 @@ public class FileDAO {
     public List<File> getFilesForDocument(int documentId) throws SQLException {
         List<File> files = new ArrayList<>();
         String sql = """
-            SELECT f.fileId, f.documentId, f.referenceId, f.sortId, f.imageData, f.fileSizeBytes,
-                   f.created_at, fas.fileAdjustmentSettingsId, fas.rotation AS adjustmentRotation,
+            SELECT f.fileId, f.documentId, f.referenceId, f.sortId, f.fileSizeBytes, f.created_at,
+                   fas.fileAdjustmentSettingsId, fas.rotation AS adjustmentRotation,
                    fas.hue AS adjustmentHue, fas.brightness AS adjustmentBrightness,
-                   fas.contrast AS adjustmentContrast, fas.saturation AS adjustmentSaturation
+                   fas.contrast AS adjustmentContrast, fas.saturation AS adjustmentSaturation,
+                   fas.sharpness AS adjustmentSharpness
             FROM Files f
             LEFT JOIN FileAdjustmentSettings fas
                 ON f.fileId = fas.fileId AND fas.deleted_at IS NULL
@@ -133,7 +134,7 @@ public class FileDAO {
             ORDER BY f.sortId
             """;
 
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, documentId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -143,7 +144,6 @@ public class FileDAO {
                     file.setDocumentId(rs.getInt("documentId"));
                     file.setReferenceId(rs.getInt("referenceId"));
                     file.setSortId(rs.getInt("sortId"));
-                    file.setImageData(rs.getBytes("imageData")); // loads the TIFF blob
                     file.setFileSizeBytes(rs.getInt("fileSizeBytes"));
                     file.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
 
@@ -153,7 +153,8 @@ public class FileDAO {
                                 rs.getDouble("adjustmentHue"),
                                 rs.getDouble("adjustmentBrightness"),
                                 rs.getDouble("adjustmentContrast"),
-                                rs.getDouble("adjustmentSaturation")
+                                rs.getDouble("adjustmentSaturation"),
+                                rs.getDouble("adjustmentSharpness")
                         ));
                     }
                     files.add(file);
@@ -166,7 +167,7 @@ public class FileDAO {
     public void deleteFile(int fileId) throws SQLException {
         String sql = "UPDATE Files SET deleted_at = SYSUTCDATETIME() WHERE fileId = ?";
 
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, fileId);
@@ -176,20 +177,12 @@ public class FileDAO {
 
     public void moveFile(int fileId, int newDocumentId) throws SQLException {
         String sql = "UPDATE Files SET documentId = ? WHERE fileId = ?";
-        try (Connection conn = dbConnector.getConnection();
+        try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, newDocumentId);
             ps.setInt(2, fileId);
             ps.executeUpdate();
         }
-    }
-
-    private int normalizeRotation(int rotation) {
-        int normalized = ((rotation % 360) + 360) % 360;
-        return switch (normalized) {
-            case 90, 180, 270 -> normalized;
-            default -> 0;
-        };
     }
 
     private int settingValue(double value) { return (int) Math.round(value); }

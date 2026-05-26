@@ -1,7 +1,7 @@
 package ScanHub.BLL;
 
 import ScanHub.BE.Document;
-import ScanHub.DAL.DAO.DocumentDAO;
+import ScanHub.DAL.facade.DAOFacade;
 
 import java.util.List;
 
@@ -13,17 +13,15 @@ import java.util.List;
  */
 public class DocumentManager {
 
-    private final DocumentDAO documentDAO;
+    private final DAOFacade daoFacade = DAOFacade.getInstance();
 
-    public DocumentManager() throws Exception {
-        documentDAO = new DocumentDAO();
-    }
+    public DocumentManager() {}
 
     /**
      * Creates a new empty Document in the given box.
      */
     public Document createDocument(int boxId) throws Exception {
-        return documentDAO.createDocument(boxId);
+        return daoFacade.getDocumentDAO().createDocument(boxId);
     }
 
     /**
@@ -31,20 +29,20 @@ public class DocumentManager {
      * Used to restore the state of a box when resuming a session.
      */
     public List<Document> getDocumentsWithFilesByBoxId(int boxId) throws Exception {
-        return documentDAO.getDocumentsWithFilesByBoxId(boxId);
+        return daoFacade.getDocumentDAO().getDocumentsWithFilesByBoxId(boxId);
     }
 
     /**
      * Returns all Documents for a box without loading their Files.
      */
     public List<Document> getDocumentsByBoxId(int boxId) throws Exception {
-        return documentDAO.getDocumentsByBoxId(boxId);
+        return daoFacade.getDocumentDAO().getDocumentsByBoxId(boxId);
     }
 
     /**
      * Returns the number of documents in a box (not the deleted ones).
      */
     public int countDocumentsForBox(int boxId) throws Exception {
-        return documentDAO.countDocumentsForBox(boxId);
+        return daoFacade.getDocumentDAO().countDocumentsForBox(boxId);
     }
 }

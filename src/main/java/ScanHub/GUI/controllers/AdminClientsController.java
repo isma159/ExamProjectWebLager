@@ -142,6 +142,5 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
     public void initialize(URL location, ResourceBundle resources) {
         loadClients();
         pgClients.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> loadClients()));
-
     }
 }
