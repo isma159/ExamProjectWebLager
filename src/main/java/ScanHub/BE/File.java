@@ -22,6 +22,7 @@ public class File implements TreeNode {
     private int fileSizeBytes;
     private LocalDateTime createdAt;
     private boolean staged = false;
+    private boolean modified = false;
     private FileAdjustmentSettings fileAdjustmentSettings;
     private boolean customFileSettings = false;
 
@@ -50,12 +51,14 @@ public class File implements TreeNode {
     public int getFileSizeBytes()       { return fileSizeBytes; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public int getRotation()            { return fileAdjustmentSettings.getRotation(); }
-    public double getHue()              { return  fileAdjustmentSettings.getHue(); }
+    public double getHue()              { return fileAdjustmentSettings.getHue(); }
     public double getBrightness()       { return fileAdjustmentSettings.getBrightness(); }
     public double getContrast()         { return fileAdjustmentSettings.getContrast(); }
     public double getSaturation()       { return fileAdjustmentSettings.getSaturation(); }
     public double getSharpness()        { return fileAdjustmentSettings.getSharpness();}
     public boolean isStaged()           { return staged; }
+    public boolean isModified() { return modified; }
+
     public FileAdjustmentSettings getFileSettings() { return fileAdjustmentSettings; }
     public boolean hasCustomFileSettings() { return customFileSettings; }
 
@@ -73,6 +76,8 @@ public class File implements TreeNode {
     public void setSaturation(double saturation)      { fileAdjustmentSettings.setSaturation(saturation); }
     public void setSharpness(double sharpness)        { fileAdjustmentSettings.setSharpness(sharpness);}
     public void setStaged(boolean staged)             { this.staged = staged; }
+    public void setModified(boolean modified) { this.modified = modified; }
+
     public void setFileSettings(FileAdjustmentSettings fileAdjustmentSettings) {
         this.fileAdjustmentSettings = fileAdjustmentSettings == null ? new FileAdjustmentSettings()
                 : FileAdjustmentSettings.copyOf(fileAdjustmentSettings);

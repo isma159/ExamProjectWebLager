@@ -25,7 +25,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.DoubleConsumer;
 
 /**
@@ -44,6 +46,7 @@ public class ScanManager {
     private boolean needsBarcodeFirst; // true when box has no files and documents
     private final List<Integer> pendingDeleteFileIds = new ArrayList<>(); // list of file id's to be deleted at the next commit
     private final List<Integer> pendingDeleteDocumentIds = new ArrayList<>(); // list document id's to be deleted at the next commit
+    private final Set<Integer> pendingSettingsFileIds = new LinkedHashSet<>(); // set of file settings to be upserted at the next commit
 
     public ScanManager(IScanSource scanSource, Box targetBox) throws Exception {
         this.scanSource = scanSource;
@@ -112,20 +115,30 @@ public class ScanManager {
      */
     public void commitAll() throws Exception {
 
+        for (int fileId : pendingSettingsFileIds) {
+            // find the file in memory to get its current settings
+            targetBox.getDocuments().stream().flatMap(document -> document.getFiles().stream())
+                    .filter(file -> file.getFileId() == fileId).findFirst().ifPresent(file -> {
+                        try {
+                            daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        }
+        pendingSettingsFileIds.clear();
+
         for (int fileId : pendingDeleteFileIds) {
             daoFacade.getFileDAO().deleteFile(fileId);
         }
-
         pendingDeleteFileIds.clear();
 
         for (int documentId : pendingDeleteDocumentIds) {
             daoFacade.getDocumentDAO().deleteDocument(documentId);
         }
-
         pendingDeleteDocumentIds.clear();
 
-        // persist staged files and documents. Also handles files moved to new documents
-
+        // persist staged files and documents
         if (targetBox.isStaged()) {
             Box savedBox = daoFacade.getBoxDAO().createData(targetBox);
             targetBox.setBoxId(savedBox.getBoxId());
@@ -156,8 +169,11 @@ public class ScanManager {
                         daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
                     }
                     file.setStaged(false);
-                }
-                else if (file.getDocumentId() != document.getDocumentId()) {
+                    file.setModified(false);
+                } else if (file.isModified()) {
+                    daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
+                    file.setModified(false);
+                } else if (file.getDocumentId() != document.getDocumentId()) { // handles files moved to new documents
                     daoFacade.getFileDAO().moveFile(file.getFileId(), document.getDocumentId());
                     file.setDocumentId(document.getDocumentId());
                 }
@@ -401,10 +417,18 @@ public class ScanManager {
      * Applies file-specific adjustment overrides without changing the source TIFF bytes.
      */
     public void updateFileSettings(File file, FileAdjustmentSettings settings) throws Exception {
+
+        if (file.getFileSettings().equals(settings)) {
+            return;
+        }
+
         file.applyCustomFileSettings(settings);
         if (!file.isStaged()) {
-            daoFacade.getFileDAO().upsertFileSettings(file.getFileId(), file.getFileSettings());
+            pendingSettingsFileIds.add(file.getFileId());
+            file.setModified(true);
         }
+        targetBox.getDocuments().stream().filter(document -> document.getFiles().contains(file)).findFirst()
+                .ifPresent(document -> document.setModified(true));
     }
 
     /**
@@ -425,8 +449,9 @@ public class ScanManager {
             }
         }
 
-        // queue db delete for persisted files (applied at commitAll)
+        // queue db delete for persisted files and their settings (applied at commitAll)
         if (!file.isStaged() && file.getFileId() > 0) {
+            pendingSettingsFileIds.remove(file.getFileId());
             pendingDeleteFileIds.add(file.getFileId());
         }
         refreshNeedsBarcodeFirst();
@@ -528,7 +553,7 @@ public class ScanManager {
         file.applyDefaultFileSettings(targetBox.getProfile().getFileAdjustmentSettings());
         document.getFiles().add(file);
         if (!document.isStaged()) {
-            document.setModified(true); // visual
+            document.setModified(true);
         }
         return file;
     }
