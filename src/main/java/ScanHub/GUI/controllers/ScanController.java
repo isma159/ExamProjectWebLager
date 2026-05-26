@@ -1416,11 +1416,15 @@ public class ScanController implements Initializable, IViewController {
         lblDocument.setVisible(showDocumentLabel);
         lblDocument.setManaged(showDocumentLabel);
 
-        VBox card = new VBox(4, previewPane, lblFile, lblDocument);
-        card.setPrefWidth(cardWidth());
-        card.setPrefHeight(cardHeight());
-        card.setAlignment(Pos.CENTER);
-        card.getStyleClass().addAll("pageCard", "card-bg", "shadow");
+        StackPane imageContainer = new StackPane(previewPane);
+        imageContainer.setAlignment(Pos.CENTER);
+        VBox.setVgrow(imageContainer, Priority.ALWAYS);
+
+        VBox card = new VBox(4, imageContainer, lblFile, lblDocument);
+        card.setPrefSize(cardWidth(), cardHeight());
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setFillWidth(true);
+        card.getStyleClass().addAll("card", "card-bg", "shadow");
         card.setPadding(new Insets(4));
         card.setUserData(file);
 

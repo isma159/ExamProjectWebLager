@@ -384,14 +384,12 @@
                </HBox>
                 <HBox alignment="CENTER_LEFT" prefHeight="34.0" spacing="14.0">
                     <padding>
-                        <Insets bottom="4.0" left="12.0" right="12.0" top="4.0" />
+                        <Insets bottom="3.0" left="15.0" right="12.0" top="3.0" />
                     </padding>
 
                     <children>
                         <Label fx:id="lblTotalDocuments" styleClass="lbl" text="Documents: 0" />
-                     <Region prefWidth="0.0" />
                         <Separator orientation="VERTICAL" styleClass="grey-separator" />
-                     <Region layoutX="112.0" layoutY="16.0" prefWidth="0.0" />
                         <Label fx:id="lblTotalPages" styleClass="lbl" text="Files: 0" />
 
                         <Region HBox.hgrow="ALWAYS" />
@@ -406,7 +404,7 @@
                                   <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
                                       <children>
                                           <Label styleClass="kbd" text="Space" />
-                                          <Label styleClass="shortcut-lbl" text="Scan" />
+                                          <Label styleClass="shortcut-lbl" text="Scan/Stop" />
                                       </children>
                                   </HBox>
                                   <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
@@ -454,7 +452,7 @@
                                   <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
                                       <children>
                                           <Label styleClass="kbd" text="F2" />
-                                          <Label styleClass="shortcut-lbl" text="Dark mode" />
+                                          <Label styleClass="shortcut-lbl" text="Dark Mode" />
                                       </children>
                                   </HBox>
                               </children>
