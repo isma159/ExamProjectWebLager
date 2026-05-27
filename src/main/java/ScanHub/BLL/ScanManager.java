@@ -208,13 +208,13 @@ public class ScanManager {
         for (Document document : documents) {
 
             String documentFolderName = "Document" + documentIndex;
-            Path docDirectory = boxRoot.resolve(documentFolderName);
-            Files.createDirectories(docDirectory);
 
             if (mode == ExportMode.SinglePageTIFF) {
-                exportSinglePage(document, docDirectory);
+                Path documentDirectory = boxRoot.resolve(documentFolderName);
+                Files.createDirectories(documentDirectory);
+                exportSinglePage(document, documentDirectory);
             } else {
-                exportMultiPage(document, docDirectory, documentFolderName);
+                exportMultiPage(document, boxRoot, documentFolderName);
             }
 
             processed += document.getFiles().size();
@@ -240,7 +240,7 @@ public class ScanManager {
     }
 
     /** Multi-Page mode: all pages of a document are merged into one multi-frame TIFF. */
-    private void exportMultiPage(Document document, Path docDirectory, String baseName) throws Exception {
+    private void exportMultiPage(Document document, Path documentDirectory, String baseName) throws Exception {
         List<byte[]> pages = new ArrayList<>();
         for (File file : document.getFiles()) {
             byte[] data = renderAdjustedImageData(file);
@@ -248,7 +248,7 @@ public class ScanManager {
         }
         if (pages.isEmpty()) return;
 
-        java.io.File outFile = docDirectory.resolve(baseName + ".tiff").toFile();
+        java.io.File outFile = documentDirectory.resolve(baseName + ".tiff").toFile();
 
         ImageWriter writer = ImageIO.getImageWritersByFormatName("tiff").next();
         ImageWriteParam param = writer.getDefaultWriteParam();
