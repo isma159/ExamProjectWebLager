@@ -44,7 +44,7 @@ public class BoxMetadata {
     public void setBoxCreatedAt(LocalDateTime boxCreatedAt) { this.boxCreatedAt = boxCreatedAt; }
 
     @Override
-    public String toString() { // TODO find out format for the return string
+    public String toString() {
         return "BoxMetadata [" + boxName + "] - Docs: " + documentCount + ", Files: " + fileCount;
     }
 }

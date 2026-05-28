@@ -85,15 +85,4 @@ public class AdminMetadataController implements Initializable, IShortcutHandler 
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
         return Map.of();
     }
-
-    // TODO: needs to be removed properly
-    @FXML private void onTbAllMetadataClick()   { loadMetadata(); }
-    @FXML private void onTbWithMetadataClick()  {}
-    @FXML private void onTbNoMetadataClick()    {}
-    @FXML private void onDocumentIdClick()      {}
-    @FXML private void onTitleClick()           {}
-    @FXML private void onDocumentTypeClick()    {}
-    @FXML private void onAuthorClick()          {}
-    @FXML private void onReferenceNumberClick() {}
-    @FXML private void onDocumentDateClick()    {}
 }

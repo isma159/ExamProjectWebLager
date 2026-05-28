@@ -179,7 +179,7 @@ public class ScanController implements Initializable, IViewController {
             try {
                 sliderSharpness.setValue(Integer.parseInt(newValue));
             }
-            catch (NumberFormatException e) {}
+            catch (NumberFormatException _) {}
         }));
 
         spinnerFileAdjustmentSharpness.getEditor().setOnAction(e-> {
@@ -217,7 +217,6 @@ public class ScanController implements Initializable, IViewController {
         }
 
         return boxIds;
-
     }
 
     private void initializeExportComboBoxes() {

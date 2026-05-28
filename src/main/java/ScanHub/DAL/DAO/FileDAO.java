@@ -78,8 +78,7 @@ public class FileDAO {
 
         String updateSql = """
                 UPDATE FileAdjustmentSettings
-                SET rotation = ?, hue = ?, brightness = ?, contrast = ?, saturation = ?, sharpness = ?,
-                    modified_at = SYSUTCDATETIME(), deleted_at = NULL
+                SET rotation = ?, hue = ?, brightness = ?, contrast = ?, saturation = ?, sharpness = ?, deleted_at = NULL
                 WHERE fileId = ?
                 """;
         String insertSql = """

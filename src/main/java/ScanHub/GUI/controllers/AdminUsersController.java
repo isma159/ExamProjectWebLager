@@ -121,7 +121,7 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
         });
     }
 
-    private void openUserForm(User user) { // TODO
+    private void openUserForm(User user) {
         try {
             ViewHandler handler = user == null ? ViewHandler.CREATE_USER : ViewHandler.EDIT_USER;
             handler.reset();
@@ -146,7 +146,7 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
         }
     }
 
-    private void filterUsers() { // TODO: needs rework
+    private void filterUsers() {
 
         String search = txtFldUserSearch.getText();
 

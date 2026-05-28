@@ -123,7 +123,7 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
         );
     }
 
-    private void openProfileForm(Profile profile) { // TODO
+    private void openProfileForm(Profile profile) {
         try {
             ViewHandler handler = profile == null ? ViewHandler.CREATE_PROFILE : ViewHandler.EDIT_PROFILE;
             handler.reset();
@@ -148,7 +148,7 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
         }
     }
 
-    private void filterProfiles() { // TODO: needs rework
+    private void filterProfiles() {
 
         String search = txtFldSearchProfiles.getText().toLowerCase();
 

@@ -56,14 +56,6 @@ public class BoxManager {
         return getBoxFromName(boxInput);
     }
 
-    /**
-     * The core of BoxManager
-     * TODO: add detailed description
-     * @param boxInput
-     * @param profile
-     * @return
-     * @throws Exception
-     */
     public Box getOrCreateSessionBox(String boxInput, Profile profile) throws Exception {
         if (profile == null) {
             throw new IllegalArgumentException("A profile is required to start a scan session");

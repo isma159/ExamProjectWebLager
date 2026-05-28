@@ -98,9 +98,6 @@ public class ClientFormController implements Initializable {
         }
     }
 
-    /**
-     * TODO find out if a user should be be able to be updated to admin and vice versa
-     */
     private void updateClient() {
         String newClientName = clientNameField.getText();
 
