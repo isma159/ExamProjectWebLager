@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import org.controlsfx.control.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.SearchableComboBox?>
+<?import org.controlsfx.control.ToggleSwitch?>
 
-<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
+<StackPane styleClass="background" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.ScanController">
     <BorderPane fx:id="workspaceView" prefHeight="700.0" prefWidth="1280.0" styleClass="background">
         <top>
             <VBox>
@@ -91,7 +108,7 @@
         <center>
             <VBox>
                 <children>
-                      <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="45.0" spacing="4.0">
                           <padding>
                               <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
                           </padding>
@@ -118,7 +135,7 @@
                                       <Tooltip text="Ctrl + S to start session" />
                                   </tooltip>
                               </Button>
-                     <Region prefWidth="180.0" />
+                     <Region prefWidth="180.0" HBox.hgrow="ALWAYS" />
 
                               <Button fx:id="btnScan" mnemonicParsing="false" onAction="#onScan" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
                                   <graphic>
@@ -235,6 +252,7 @@
                                       <Tooltip text="Ctrl + F to open file properties" />
                                   </tooltip>
                               </Button>
+                     <Region layoutX="144.0" layoutY="16.0" prefWidth="180.0" HBox.hgrow="ALWAYS" />
                           </children>
 
                           <VBox.margin>
@@ -265,7 +283,7 @@
                         <Label fx:id="lblEmptyState" styleClass="lbl" text="No pages scanned yet. Press Space or click Scan" textAlignment="CENTER" wrapText="true" />
                     </StackPane>
 
-                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="200.0">
+                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="200.0">
                         <styleClass>
                             <String fx:value="half-card-bottom" />
                             <String fx:value="card-bg" />
@@ -457,6 +475,7 @@
                                   </HBox>
                               </children>
                           </HBox>
+                     <Region layoutX="186.0" layoutY="15.0" HBox.hgrow="ALWAYS" />
                     </children>
 
                     <styleClass>
