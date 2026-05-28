@@ -1121,6 +1121,7 @@ public class ScanController implements Initializable, IViewController {
             selectedDocument = document;
             selectedFile = null;
             selectedBox = null;
+            zoomLevel = 1.0;
         } else if (value instanceof File file) {
             for (Document document : documents) {
                 if (document.getFiles().contains(file)) {
@@ -1132,6 +1133,7 @@ public class ScanController implements Initializable, IViewController {
             selectedBox = box;
             selectedDocument = null;
             selectedFile = null;
+            zoomLevel = 1.0;
         }
 
         displayRotateBtnsAndSeparators();
@@ -1430,22 +1432,16 @@ public class ScanController implements Initializable, IViewController {
         if (file == selectedFile) { currentPreviewImageView = thumbnail; }
 
         card.setOnMouseClicked(event -> {
-            // if file is already selected, then just return to avoid unnecessary rebuild
-            if (file == selectedFile) {
-                return;
-            }
+            // if file is already selected then just return to avoid unnecessary rebuild
+            if (file == selectedFile) return;
 
-            //
             selectPage(document, file);
-            updateCurrentPlaceLabel();
-            rebuild();
-            boxTreeView.requestFocus();
-            rebuildCard();
 
             // prevents recursive tree selection events
             boxTreeView.getSelectionModel().selectedItemProperty().removeListener(treeSelectionListener);
-            refreshTree();
-            syncTreeSelection();
+            updateCurrentPlaceLabel();
+            rebuild();
+            boxTreeView.requestFocus();
             boxTreeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
         });
 
@@ -1572,6 +1568,7 @@ public class ScanController implements Initializable, IViewController {
         selectedDocument = document;
         selectedFile = file;
         selectedBox = null;
+        zoomLevel = 1.0;
     }
 
     /** Syncs the observable list from the model's in-memory box state. */

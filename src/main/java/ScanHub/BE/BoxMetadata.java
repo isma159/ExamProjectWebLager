@@ -12,8 +12,6 @@ public class BoxMetadata {
     private int fileCount;
     private LocalDateTime boxCreatedAt;
 
-    public BoxMetadata() {}
-
     public BoxMetadata(int metadataId, int boxId, String profileName, int documentCount, int fileCount, LocalDateTime boxCreatedAt) {
         this.metadataId = metadataId;
         this.boxId = boxId;
