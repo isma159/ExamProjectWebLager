@@ -35,9 +35,9 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
     @FXML private Pagination pgProfiles;
 
     private final ModelFacade modelFacade;
-    private Stage currentStage;
+    private final Stage currentStage;
 
-    private List<Profile> currentProfiles = new ArrayList<>();
+    private final List<Profile> currentProfiles = new ArrayList<>();
     private boolean profileAscending;
     private Profile selectedProfile = null;
     private ProfileStatus selectedStatus = null;
@@ -63,9 +63,9 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
             selectedProfileRow = null;
 
             // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
-            TableLoader.loadTable(profileTableBox, pgProfiles, TOTAL_TABLE_SIZE, profiles, item ->{
+            TableLoader.loadTable(profileTableBox, pgProfiles, TOTAL_TABLE_SIZE, profiles, item -> {
                 Profile profile = (Profile) item;
-                return RowMaker.addProfileRow(profile, this::selectProfile);
+                return RowMaker.addProfileRow(profile, this::selectProfile, this::openProfileForm, this::deleteProfile);
             });
 
         } catch (Exception e) {
@@ -77,8 +77,12 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
     private void selectProfile(Profile profile, HBox rowHBox) {
         if (selectedProfileRow != null) {
             selectedProfileRow.getStyleClass().remove("row-selected");
+        }
+
+        if (selectedProfileRow == rowHBox) {
             selectedProfile = null;
             selectedProfileRow = null;
+            return;
         }
 
         selectedProfile = profile;
@@ -86,44 +90,24 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
         rowHBox.getStyleClass().add("row-selected");
     }
 
-
     @FXML
-    private void onClickCreateProfile() {
-        openProfileForm(null);
+    private void onClickCreateProfile() { openProfileForm(null); }
+
+    private void deleteProfile(Profile profile) {
+        AlertHelper.showConfirmation("Delete Profile", "Are you sure you want to delete the profile \"" + profile.getProfileName() + "\"? This action cannot be undone.", () -> {
+            try {
+                modelFacade.getProfileModel().deleteProfile(profile);
+                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), profile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
+                modelFacade.getClientModel().refreshClients();
+                modelFacade.getUserModel().refreshUsers();
+                filterProfiles();
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertHelper.showError("Delete Failed", "Failed to delete profile. Please try again.");}
+        });
     }
 
-    @FXML
-    private void onClickUpdateProfile() {
-        if (selectedProfile == null) {
-            AlertHelper.showWarning("No Selection", "Please select a profile to edit.");
-            return;
-        }
-        openProfileForm(selectedProfile);
-    }
-
-    @FXML
-    private void onClickDeleteProfile(MouseEvent mouseEvent) {
-        if (selectedProfile == null) {
-            AlertHelper.showWarning("No Selection", "Please select a profile to delete.");
-            return;
-        }
-
-        AlertHelper.showConfirmation("Delete Profile", "Are you sure you want to delete the profile \"" + selectedProfile.getProfileName() + "\"? This action cannot be undone.", () -> {
-                    try {
-                        modelFacade.getProfileModel().deleteProfile(selectedProfile);
-                        modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedProfile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
-                        modelFacade.getClientModel().refreshClients();
-                        modelFacade.getUserModel().refreshUsers();
-                        filterProfiles();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        AlertHelper.showError("Delete Failed", "Failed to delete profile. Please try again.");
-                    }
-                }
-        );
-    }
-
-    private void openProfileForm(Profile profile) { // TODO
+    private void openProfileForm(Profile profile) {
         try {
             ViewHandler handler = profile == null ? ViewHandler.CREATE_PROFILE : ViewHandler.EDIT_PROFILE;
             handler.reset();
@@ -148,7 +132,7 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
         }
     }
 
-    private void filterProfiles() { // TODO: needs rework
+    private void filterProfiles() {
 
         String search = txtFldSearchProfiles.getText().toLowerCase();
 
@@ -169,8 +153,14 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
         return Map.of(
                 new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateProfile,
-                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), this::onClickUpdateProfile,
-                new KeyCodeCombination(KeyCode.DELETE), () -> onClickDeleteProfile(null)
+                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), () -> {
+                    if (selectedProfile == null) { AlertHelper.showWarning("No Selection", "Please select a profile to edit."); return; }
+                    openProfileForm(selectedProfile);
+                },
+                new KeyCodeCombination(KeyCode.DELETE), () -> {
+                    if (selectedProfile == null) { AlertHelper.showWarning("No Selection", "Please select a profile to delete."); return; }
+                    deleteProfile(selectedProfile);
+                }
         );
     }
 
@@ -199,25 +189,6 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
         profileAscending = !profileAscending;
         // sorting the profile names on the direction
         currentProfiles.sort(profileAscending ? Comparator.comparing(Profile::getProfileName) : Comparator.comparing(Profile::getProfileName).reversed());
-        profileTableBox.getChildren().clear();
-
-        for (Profile profile : currentProfiles) {
-            HBox row = RowMaker.addProfileRow(profile, (clickedProfile, rowHBox) -> {
-                if (selectedProfile != null) selectedProfileRow.getStyleClass().remove("row-selected");
-                if (selectedProfile == clickedProfile) { selectedProfile = null; selectedProfileRow = null; return;}
-                selectedProfile = clickedProfile;
-                selectedProfileRow = rowHBox;
-                rowHBox.getStyleClass().add("row-selected");
-            });
-            row.setFocusTraversable(true);
-            row.focusedProperty().addListener((observable, oldValue, isFocused) -> {
-                if (isFocused) {
-                    selectProfile(profile, row);
-                }
-            });
-            row.setUserData(profile);
-            profileTableBox.getChildren().add(row);
-        }
         filterProfiles();
     }
 }

@@ -14,19 +14,17 @@ public class Box implements TreeNode {
     private int profileId;
     private Profile profile;
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
     private List<Document> documents;
     private boolean staged = false;
     private boolean modified = false;
 
     public Box() { this.documents = new ArrayList<>(); }
 
-    public Box(int boxId, String boxName, int profileId, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+    public Box(int boxId, String boxName, int profileId, LocalDateTime createdAt) {
         this.boxId = boxId;
         this.boxName = boxName;
         this.profileId = profileId;
         this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
         this.documents = new ArrayList<>();
     }
 
@@ -36,7 +34,6 @@ public class Box implements TreeNode {
     public int getProfileId() { return profileId; }
     public Profile getProfile() { return profile; }
     public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getModifiedAt() { return modifiedAt; }
     public boolean isStaged() { return staged; }
     public boolean isModified() { return modified; }
 
@@ -46,7 +43,6 @@ public class Box implements TreeNode {
     public void setProfileId(int profileId) { this.profileId = profileId; }
     public void setProfile(Profile profile) { this.profile = profile; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public void setModifiedAt(LocalDateTime modifiedAt) { this.modifiedAt = modifiedAt; }
     public void setStaged(boolean staged) { this.staged = staged; }
     public void setModified(boolean modified) { this.modified = modified; }
 

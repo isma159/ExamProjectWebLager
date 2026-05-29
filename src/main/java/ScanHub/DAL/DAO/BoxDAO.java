@@ -26,8 +26,7 @@ public class BoxDAO implements IDataAccess<Box> {
     public Box createData(Box box) throws Exception {
         String sql = """
                 INSERT INTO Boxes (boxName, profileId)
-                OUTPUT INSERTED.boxId, INSERTED.boxName, INSERTED.profileId,
-                       INSERTED.created_at, INSERTED.modified_at
+                OUTPUT INSERTED.boxId, INSERTED.boxName, INSERTED.profileId, INSERTED.created_at
                 VALUES (?, ?)
                 """;
 
@@ -103,7 +102,7 @@ public class BoxDAO implements IDataAccess<Box> {
 
     @Override
     public void updateData(Box box) throws Exception {
-        String sql = "UPDATE Boxes SET boxName = ?, profileId = ?, modified_at = SYSUTCDATETIME() WHERE boxId = ? AND deleted_at IS NULL";
+        String sql = "UPDATE Boxes SET boxName = ?, profileId = ? WHERE boxId = ? AND deleted_at IS NULL";
 
         try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -133,7 +132,7 @@ public class BoxDAO implements IDataAccess<Box> {
 
     private String getSelectSql() {
         return """
-                SELECT b.boxId, b.boxName, b.profileId, b.created_at, b.modified_at,
+                SELECT b.boxId, b.boxName, b.profileId, b.created_at,
                        p.clientId, p.profileName, p.status, p.exportLabel,
                        p.rotation, p.hue, p.brightness, p.contrast, p.saturation,
                        c.clientName
@@ -167,14 +166,12 @@ public class BoxDAO implements IDataAccess<Box> {
 
     private Box mapBox(ResultSet rs) throws SQLException {
         Timestamp createdAt = rs.getTimestamp("created_at");
-        Timestamp modifiedAt = rs.getTimestamp("modified_at");
 
         return new Box(
                 rs.getInt("boxId"),
                 rs.getString("boxName"),
                 rs.getInt("profileId"),
-                createdAt != null ? createdAt.toLocalDateTime() : null,
-                modifiedAt != null ? modifiedAt.toLocalDateTime() : null
+                createdAt != null ? createdAt.toLocalDateTime() : null
         );
     }
 }

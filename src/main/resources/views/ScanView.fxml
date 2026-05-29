@@ -91,7 +91,7 @@
         <center>
             <VBox>
                 <children>
-                      <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="45.0" spacing="4.0">
                           <padding>
                               <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
                           </padding>
@@ -118,7 +118,7 @@
                                       <Tooltip text="Ctrl + S to start session" />
                                   </tooltip>
                               </Button>
-                     <Region prefWidth="180.0" />
+                     <Region prefWidth="75.0" HBox.hgrow="ALWAYS" />
 
                               <Button fx:id="btnScan" mnemonicParsing="false" onAction="#onScan" prefHeight="33.0" prefWidth="75.0" styleClass="primary-btn">
                                   <graphic>
@@ -235,6 +235,7 @@
                                       <Tooltip text="Ctrl + F to open file properties" />
                                   </tooltip>
                               </Button>
+                     <Region layoutX="144.0" layoutY="16.0" prefWidth="150.0" HBox.hgrow="ALWAYS" />
                           </children>
 
                           <VBox.margin>
@@ -265,7 +266,7 @@
                         <Label fx:id="lblEmptyState" styleClass="lbl" text="No pages scanned yet. Press Space or click Scan" textAlignment="CENTER" wrapText="true" />
                     </StackPane>
 
-                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="200.0">
+                    <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="45.0" prefWidth="200.0">
                         <styleClass>
                             <String fx:value="half-card-bottom" />
                             <String fx:value="card-bg" />
@@ -439,7 +440,7 @@
                                   </HBox>
                                   <HBox alignment="CENTER_LEFT" spacing="5.0" styleClass="shortcut-hint">
                                       <children>
-                                          <Label styleClass="kbd" text="Ctrl E" />
+                                          <Label styleClass="kbd" text="Ctrl + E" />
                                           <Label styleClass="shortcut-lbl" text="Export" />
                                       </children>
                                   </HBox>
@@ -457,6 +458,7 @@
                                   </HBox>
                               </children>
                           </HBox>
+                     <Region layoutX="186.0" layoutY="15.0" HBox.hgrow="ALWAYS" />
                     </children>
 
                     <styleClass>

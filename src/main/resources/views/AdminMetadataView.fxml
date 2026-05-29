@@ -34,48 +34,46 @@
                             <children>
                         <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                            <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onDocumentIdClick" styleClass="lbl" text="Box ID" />
+                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Box ID" />
                            </children>
                         </HBox>
                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                         <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                            <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onTitleClick" styleClass="lbl" text="Profile" />
+                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Profile" />
                            </children>
                         </HBox>
                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                         <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                            <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onDocumentTypeClick" styleClass="lbl" text="Box Name" />
+                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Box Name" />
                            </children>
                         </HBox>
                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                         <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                            <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onAuthorClick" styleClass="lbl" text="Documents" />
+                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Documents" />
                            </children>
                         </HBox>
                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                         <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                            <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onReferenceNumberClick" styleClass="lbl" text="Files" />
+                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Files" />
                            </children>
                         </HBox>
                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                         <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                            <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" onMouseClicked="#onDocumentDateClick" styleClass="lbl" text="Created At" />
+                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Created At" />
                            </children>
                         </HBox>
                             </children>
                         </HBox>
-
                         <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
                             <content>
                                 <VBox fx:id="metadataTableBox" prefHeight="100.0" prefWidth="100.0" />
                             </content>
                         </ScrollPane>
-
                         <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
                             <styleClass>
                                 <String fx:value="half-card-bottom" />
@@ -85,7 +83,6 @@
                                 <Pagination fx:id="metadataPagination" maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
                             </children>
                         </HBox>
-
                     </children>
                 </VBox>
             </children>

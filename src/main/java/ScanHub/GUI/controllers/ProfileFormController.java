@@ -4,6 +4,7 @@ import ScanHub.BE.*;
 import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
+import ScanHub.BE.interfaces.CheckTreeNode;
 import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.util.AlertHelper;
@@ -12,28 +13,38 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.control.SearchableComboBox;
 
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.function.DoubleConsumer;
+import java.util.stream.Collectors;
 
 public class ProfileFormController implements Initializable {
 
     @FXML private ToggleGroup toggleGroupProfileStatus;
-    @FXML private Label formTitle, exportPreviewLabel;
+    @FXML private Label formTitle;
     @FXML private Spinner<Integer> spnHue, spnBrightness, spnContrast, spnSaturation, spnRotation;
     @FXML private RadioButton radioACTIVE, radioINACTIVE;
     @FXML private VBox vboxStatus;
-    @FXML private TextField profileNameField;
+    @FXML private TextField profileNameField, txtFldExportPreview, txtFldUserSearch;
     @FXML private SearchableComboBox<Client> searchableComboBoxClient;
     @FXML private Slider sliderHue, sliderBrightness, sliderContrast, sliderSaturation, sliderRotation;
     @FXML private Button saveButton;
-    @FXML private ImageView imgPreview;
+    @FXML private StackPane previewPaneBefore, previewPaneAfter;
+    @FXML private ImageView imgPreviewBefore, imgPreviewAfter;
+    @FXML private CheckTreeView<CheckTreeNode> userTreeView;
 
     private Stage currentStage;
     private ModelFacade modelFacade;
@@ -52,6 +63,9 @@ public class ProfileFormController implements Initializable {
 
         ThemeHandler.apply(currentStage.getScene());
 
+        applyUserFilters();
+        txtFldUserSearch.textProperty().addListener((obs, oldVal, newVal) -> applyUserFilters());
+
         searchableComboBoxClient.setItems(modelFacade.getClientModel().getClients());
 
         if (editingProfile != null) {
@@ -59,7 +73,6 @@ public class ProfileFormController implements Initializable {
             saveButton.setText("Save Changes");
             populateFields(editingProfile);
         }
-
     }
 
     @Override
@@ -78,7 +91,7 @@ public class ProfileFormController implements Initializable {
 
             String clientName = (searchableComboBoxClient.getValue() != null) ? searchableComboBoxClient.getValue().getClientName() : "";
 
-            exportPreviewLabel.setText(buildExportLabel(newValue, clientName) + "1");
+            txtFldExportPreview.setText(buildExportLabel(newValue, clientName) + "1");
         }));
 
         // Wire sliders to their value labels
@@ -87,8 +100,6 @@ public class ProfileFormController implements Initializable {
         bindSlider(sliderContrast, spnContrast, val -> contrast = val);
         bindSlider(sliderSaturation, spnSaturation, val -> saturation = val);
         bindSlider(sliderRotation, spnRotation, val -> rotation = (int) val);
-
-
     }
 
     // event handlers
@@ -197,9 +208,60 @@ public class ProfileFormController implements Initializable {
         }));
     }
 
+    private void loadUsers(List<User> users) {
+        userTreeView.setRoot(null);
+
+        CheckBoxTreeItem<CheckTreeNode> root = new CheckBoxTreeItem<>();
+        userTreeView.setRoot(root);
+        root.setExpanded(true);
+
+        Set<Integer> assignedUserIds = (editingProfile != null)
+                ? editingProfile.getUsers().stream().map(User::getUserId).collect(Collectors.toSet())
+                : Collections.emptySet();
+
+        for (User user : users) {
+            if (user.isAdmin()) continue;
+
+            CheckBoxTreeItem<CheckTreeNode> userItem = new CheckBoxTreeItem<>(user);
+            userItem.setSelected(assignedUserIds.contains(user.getUserId()));
+            root.getChildren().add(userItem);
+        }
+    }
+
+    private void applyUserFilters() {
+        String search = txtFldUserSearch.getText().toLowerCase();
+
+        List<User> filtered = modelFacade.getUserModel().getUsers().stream()
+                .filter(u -> !u.isAdmin())
+                .filter(u -> u.getUsername().toLowerCase().contains(search))
+                .toList();
+
+        loadUsers(filtered);
+    }
+
     private void updatePreview() {
-        imgPreview.setEffect(new ColorAdjust(hue / 100, saturation / 100, brightness / 100, contrast / 100));
-        imgPreview.setRotate(rotation);
+        Image image = imgPreviewAfter.getImage();
+        if (image == null || image.isError()) return;
+
+        double maxWidth = previewPaneAfter.getWidth() - 30;
+        double maxHeight = previewPaneAfter.getHeight() - 30;
+
+        double originalWidth = image.getWidth();
+        double originalHeight = image.getHeight();
+
+        double radians = Math.toRadians(rotation);
+        double cos = Math.abs(Math.cos(radians));
+        double sin = Math.abs(Math.sin(radians));
+
+        double rotatedBoundingWidth = originalWidth * cos + originalHeight * sin;
+        double rotatedBoundingHeight = originalWidth * sin + originalHeight * cos;
+
+        double scale = Math.min(maxWidth / rotatedBoundingWidth, maxHeight / rotatedBoundingHeight);
+
+        imgPreviewAfter.setFitWidth(originalWidth * scale);
+        imgPreviewAfter.setFitHeight(originalHeight * scale);
+        imgPreviewAfter.setRotate(rotation);
+        imgPreviewAfter.setEffect(new ColorAdjust(hue / 100, saturation / 100, brightness / 100, contrast / 100));
     }
 
     private boolean validateFields(String profile, Client client, Toggle statusToggle) {

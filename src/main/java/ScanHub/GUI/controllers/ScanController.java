@@ -150,7 +150,7 @@ public class ScanController implements Initializable, IViewController {
             cbBoxId.show();
         }));
         setFileAdjustmentSideMenu(false);
-        setFileAdjustmentBtn(false);
+        setFileAdjustment(false);
         setExportInProgress(false);
 
         comboBoxProfiles.valueProperty().addListener((obs, oldValue, newValue) -> updateProfileAdjustmentsFields(newValue));
@@ -179,7 +179,7 @@ public class ScanController implements Initializable, IViewController {
             try {
                 sliderSharpness.setValue(Integer.parseInt(newValue));
             }
-            catch (NumberFormatException e) {}
+            catch (NumberFormatException _) {}
         }));
 
         spinnerFileAdjustmentSharpness.getEditor().setOnAction(e-> {
@@ -217,7 +217,6 @@ public class ScanController implements Initializable, IViewController {
         }
 
         return boxIds;
-
     }
 
     private void initializeExportComboBoxes() {
@@ -1122,6 +1121,7 @@ public class ScanController implements Initializable, IViewController {
             selectedDocument = document;
             selectedFile = null;
             selectedBox = null;
+            zoomLevel = 1.0;
         } else if (value instanceof File file) {
             for (Document document : documents) {
                 if (document.getFiles().contains(file)) {
@@ -1133,9 +1133,9 @@ public class ScanController implements Initializable, IViewController {
             selectedBox = box;
             selectedDocument = null;
             selectedFile = null;
+            zoomLevel = 1.0;
         }
 
-        displayRotateBtnsAndSeparators();
         rebuildCard();
     }
 
@@ -1240,13 +1240,15 @@ public class ScanController implements Initializable, IViewController {
         }
 
         if (selectedFile != null) {
-            setFileAdjustmentBtn(true);
+            setFileAdjustment(true);
+            displayRotateBtnsAndSeparators(true);
             if (fileAdjustmentSideMenu.isVisible()) {
                 populateFileAdjustmentsFields(selectedFile);
             }
         } else {
             setFileAdjustmentSideMenu(false);
-            setFileAdjustmentBtn(false);
+            setFileAdjustment(false);
+            displayRotateBtnsAndSeparators(false);
         }
 
         updateCurrentPlaceLabel();
@@ -1431,22 +1433,16 @@ public class ScanController implements Initializable, IViewController {
         if (file == selectedFile) { currentPreviewImageView = thumbnail; }
 
         card.setOnMouseClicked(event -> {
-            // if file is already selected, then just return to avoid unnecessary rebuild
-            if (file == selectedFile) {
-                return;
-            }
+            // if file is already selected then just return to avoid unnecessary rebuild
+            if (file == selectedFile) return;
 
-            //
             selectPage(document, file);
-            updateCurrentPlaceLabel();
-            rebuild();
-            boxTreeView.requestFocus();
-            rebuildCard();
 
             // prevents recursive tree selection events
             boxTreeView.getSelectionModel().selectedItemProperty().removeListener(treeSelectionListener);
-            refreshTree();
-            syncTreeSelection();
+            updateCurrentPlaceLabel();
+            rebuild();
+            boxTreeView.requestFocus();
             boxTreeView.getSelectionModel().selectedItemProperty().addListener(treeSelectionListener);
         });
 
@@ -1573,6 +1569,7 @@ public class ScanController implements Initializable, IViewController {
         selectedDocument = document;
         selectedFile = file;
         selectedBox = null;
+        zoomLevel = 1.0;
     }
 
     /** Syncs the observable list from the model's in-memory box state. */
@@ -1608,17 +1605,14 @@ public class ScanController implements Initializable, IViewController {
         fileAdjustmentSideMenu.setManaged(disabled);
     }
 
-    private void setFileAdjustmentBtn(boolean disabled) {
+    private void setFileAdjustment(boolean disabled) {
         btnFileAdjustments.setVisible(disabled);
         btnFileAdjustments.setManaged(disabled);
         separatorFileAdjustment.setVisible(disabled);
         separatorFileAdjustment.setManaged(disabled);
     }
 
-    public void displayRotateBtnsAndSeparators() {
-        TreeItem<TreeNode> selected = boxTreeView.getSelectionModel().getSelectedItem();
-        boolean visible = selected != null && selected.getValue() instanceof File;
-
+    public void displayRotateBtnsAndSeparators(boolean visible) {
         btnRotLeft.setVisible(visible);
         btnRotLeft.setManaged(visible);
         btnRotRight.setVisible(visible);

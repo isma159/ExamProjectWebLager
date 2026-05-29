@@ -201,9 +201,6 @@ public class UserFormController implements Initializable {
         }
     }
 
-    /**
-     * TODO find out if a user should be be able to be updated to admin and vice versa
-     */
     private void updateUser() {
         String newUsername = usernameField.getText();
         String newPassword = passwordField.getText();
@@ -270,18 +267,6 @@ public class UserFormController implements Initializable {
 
         loadClientsAndProfiles(filtered);
 
-    }
-
-    // TODO find out if clients should be saved in UserClients in database. If not then the method below in unnecessary.
-    private List<Client> retrieveSelectedClients() {
-        List<Client> clients = new ArrayList<>();
-        for (TreeItem<CheckTreeNode> item: clientTreeView.getRoot().getChildren()) {
-            CheckBoxTreeItem<CheckTreeNode> clientItem = (CheckBoxTreeItem<CheckTreeNode>) item;
-            if (clientItem.isSelected() || clientItem.isIndeterminate()) {
-                clients.add((Client) clientItem.getValue());
-            }
-        }
-        return clients;
     }
 
     private List<Profile> retrieveSelectedProfiles() {

@@ -158,20 +158,13 @@ public class ClientDAO implements IDataAccess<Client> {
     @Override
     public void deleteData(Client client) throws Exception {
         String sql = "UPDATE Clients SET deleted_at = SYSUTCDATETIME() WHERE clientId = ?";
-        String deleteUserClientsSql = "DELETE FROM UserClients WHERE clientId = ?";
 
         try (Connection connection = DBConnector.getConnection()) {
             connection.setAutoCommit(false);
 
-            try (PreparedStatement ps = connection.prepareStatement(sql);
-                 PreparedStatement deleteUserClientsPS = connection.prepareStatement(deleteUserClientsSql)) {
-
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setInt(1, client.getClientId());
                 ps.executeUpdate();
-
-                deleteUserClientsPS.setInt(1, client.getClientId());
-                deleteUserClientsPS.executeUpdate();
-
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();

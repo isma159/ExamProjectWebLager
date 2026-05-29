@@ -1,7 +1,6 @@
 package ScanHub.GUI.controllers;
 
 // project imports
-import ScanHub.BE.Client;
 import ScanHub.BE.Log;
 import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.LogAction;
@@ -19,7 +18,6 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
@@ -35,14 +33,15 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
     @FXML private VBox userTableBox;
     @FXML private TextField txtFldUserSearch;
     @FXML private Pagination pgUsers;
-    private List<User> currentUsers = new ArrayList<>();
+
+    private final List<User> currentUsers = new ArrayList<>();
     private boolean userAscending = true;
 
     private final ModelFacade modelFacade;
     private User selectedUser = null;
     private HBox selectedUserRow = null;
     private Role selectedRole = null;
-    private Stage currentStage;
+    private final Stage currentStage;
 
     private final int TOTAL_TABLE_SIZE = 15;
 
@@ -66,7 +65,7 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
 
             TableLoader.loadTable(userTableBox, pgUsers, TOTAL_TABLE_SIZE, users, item -> {
                 User user = (User) item;
-                return RowMaker.addUserRow(user, this::selectUser);
+                return RowMaker.addUserRow(user, this::selectUser, this::openUserForm, this::deleteUser);
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,6 +76,10 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
     private void selectUser(User user, HBox rowHBox) {
         if (selectedUserRow != null) {
             selectedUserRow.getStyleClass().remove("row-selected");
+        }
+
+        // clicking the already-selected row deselects it
+        if (selectedUserRow == rowHBox) {
             selectedUser = null;
             selectedUserRow = null;
             return;
@@ -87,41 +90,10 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
         rowHBox.getStyleClass().add("row-selected");
     }
 
-
     @FXML
-    private void onClickCreateUser() {
-        openUserForm(null);
-    }
+    private void onClickCreateUser() { openUserForm(null); }
 
-    @FXML
-    private void onClickUpdateUser() {
-        if (selectedUser == null) {
-            AlertHelper.showWarning("No Selection", "Please select a user to edit.");
-            return;
-        }
-        openUserForm(selectedUser);
-    }
-
-    @FXML
-    private void onClickDeleteUser(MouseEvent mouseEvent) {
-        if (selectedUser == null) {
-            AlertHelper.showError("No Selection", "Please select a user to delete.");
-            return;
-        }
-
-        AlertHelper.showConfirmation("Delete User", "Are you sure you want to delete \"" + selectedUser.getUsername() + "\"? This action cannot be undone.", () -> {
-            try {
-                modelFacade.getUserModel().deleteUser(selectedUser);
-                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedUser.getUserId(), EntityType.USER, LogAction.DELETE, LocalDateTime.now()));
-                filterUsers();
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertHelper.showError("Delete Failed", "Failed to delete user. Please try again.");
-            }
-        });
-    }
-
-    private void openUserForm(User user) { // TODO
+    private void openUserForm(User user) {
         try {
             ViewHandler handler = user == null ? ViewHandler.CREATE_USER : ViewHandler.EDIT_USER;
             handler.reset();
@@ -146,7 +118,20 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
         }
     }
 
-    private void filterUsers() { // TODO: needs rework
+    private void deleteUser(User user) {
+        AlertHelper.showConfirmation("Delete User", "Are you sure you want to delete \"" + user.getUsername() + "\"? This action cannot be undone.", () -> {
+            try {
+                modelFacade.getUserModel().deleteUser(user);
+                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), user.getUserId(), EntityType.USER, LogAction.DELETE, LocalDateTime.now()));
+                filterUsers();
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertHelper.showError("Delete Failed", "Failed to delete user. Please try again.");
+            }
+        });
+    }
+
+    private void filterUsers() {
 
         String search = txtFldUserSearch.getText();
 
@@ -169,8 +154,14 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
         return Map.of(
                 new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateUser,
-                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), this::onClickUpdateUser,
-                new KeyCodeCombination(KeyCode.DELETE), () -> onClickDeleteUser(null)
+                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), () -> {
+                    if (selectedUser == null) { AlertHelper.showWarning("No Selection", "Please select a user to edit."); return; }
+                    openUserForm(selectedUser);
+                },
+                new KeyCodeCombination(KeyCode.DELETE), () -> {
+                    if (selectedUser == null) { AlertHelper.showWarning("No Selection", "Please select a user to delete."); return; }
+                    deleteUser(selectedUser);
+                }
         );
     }
 
@@ -198,25 +189,6 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
         userAscending = !userAscending;
         // sorting the usernames on the direction
         currentUsers.sort(userAscending ? Comparator.comparing(User::getUsername) : Comparator.comparing(User::getUsername).reversed());
-        userTableBox.getChildren().clear();
-
-        for (User user : currentUsers) {
-            HBox row = RowMaker.addUserRow(user, (clickedUser, rowHBox) -> {
-                if (selectedUser != null) selectedUserRow.getStyleClass().remove("row-selected");
-                if (selectedUser == clickedUser) { selectedUser = null; selectedUserRow = null; return;}
-                selectedUser = clickedUser;
-                selectedUserRow = rowHBox;
-                rowHBox.getStyleClass().add("row-selected");
-            });
-            row.setFocusTraversable(true);
-            row.focusedProperty().addListener((observable, oldValue, isFocused) -> {
-                if (isFocused) {
-                    selectUser(user, row);
-                }
-            });
-            row.setUserData(user);
-            userTableBox.getChildren().add(row);
-        }
         filterUsers();
     }
 }
