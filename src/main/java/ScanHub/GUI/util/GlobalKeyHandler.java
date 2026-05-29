@@ -3,9 +3,9 @@ package ScanHub.GUI.util;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
-
 import java.util.HashMap;
 import java.util.Map;
+
 // TODO read through and add new comments to each method
 
 public class GlobalKeyHandler {
