@@ -3,6 +3,8 @@ package ScanHub.BE;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.BE.interfaces.CheckTreeNode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Profile implements CheckTreeNode {
@@ -14,6 +16,7 @@ public class Profile implements CheckTreeNode {
     private ProfileStatus status;
     private String exportLabel;
     private FileAdjustmentSettings fileAdjustmentSettings;
+    private List<User> users = new ArrayList<>(); // users assigned to this profile
 
     public Profile(int profileId, Client client, String profileName, ProfileStatus status, String exportLabel, FileAdjustmentSettings fileAdjustmentSettings) {
         this.profileId = profileId;
@@ -39,6 +42,7 @@ public class Profile implements CheckTreeNode {
     public ProfileStatus getStatus() { return status; }
     public String getExportLabel() { return exportLabel; }
     public FileAdjustmentSettings getFileAdjustmentSettings() { return fileAdjustmentSettings; }
+    public List<User> getUsers() { return users; }
 
     public void setProfileId(int profileId) { this.profileId = profileId; }
     public void setClientId(int clientId) { this.clientId = clientId; }
@@ -47,6 +51,7 @@ public class Profile implements CheckTreeNode {
     public void setStatus(ProfileStatus status) { this.status = status; }
     public void setExportLabel(String exportLabel) { this.exportLabel = exportLabel; }
     public void setFileAdjustmentSettings(FileAdjustmentSettings fileAdjustmentSettings) { this.fileAdjustmentSettings = fileAdjustmentSettings; }
+    public void setUsers(List<User> users) { this.users = users; }
 
     @Override
     public String toString() { return this.profileName; }

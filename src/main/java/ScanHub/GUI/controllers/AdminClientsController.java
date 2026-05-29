@@ -31,8 +31,8 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
     @FXML private Pagination pgClients;
     @FXML private VBox clientTableBox;
 
-    private ModelFacade modelFacade;
-    private Stage currentStage;
+    private final ModelFacade modelFacade;
+    private final Stage currentStage;
     private Client selectedClient;
     private HBox selectedClientRow;
 
@@ -45,6 +45,12 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
 
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        loadClients();
+        pgClients.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> loadClients()));
+    }
+
     private void loadClients() {
         try {
             selectedClient = null;
@@ -53,7 +59,7 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
             List<Client> clients = modelFacade.getClientModel().getClients();
             TableLoader.loadTable(clientTableBox, pgClients, TOTAL_TABLE_SIZE, clients, item -> {
                 Client client = (Client) item;
-                return RowMaker.addClientRow(client, this::selectClient);
+                return RowMaker.addClientRow(client, this::selectClient, this::openClientForm, this::deleteClient);
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,6 +70,9 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
     private void selectClient(Client client, HBox rowHBox) {
         if (selectedClientRow != null) {
             selectedClientRow.getStyleClass().remove("row-selected");
+        }
+
+        if (selectedClientRow == rowHBox) {
             selectedClient = null;
             selectedClientRow = null;
             return;
@@ -73,6 +82,9 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
         selectedClientRow = rowHBox;
         rowHBox.getStyleClass().add("row-selected");
     }
+
+    @FXML
+    private void onClickCreateClient() { openClientForm(null); }
 
     private void openClientForm(Client client) {
         try {
@@ -100,27 +112,11 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
         }
     }
 
-    @FXML
-    private void onClickCreateClient() {openClientForm(null);}
-
-    @FXML private void onClickUpdateClient() {
-        if (selectedClient == null) {
-            AlertHelper.showError("No Selection", "Please select a client to edit.");
-            return;
-        }
-        openClientForm(selectedClient);
-    }
-
-    @FXML private void onClickDeleteClient() {
-        if (selectedClient == null) {
-            AlertHelper.showError("No Selection", "Please select a client to delete.");
-            return;
-        }
-
-        AlertHelper.showConfirmation("Delete Client", "Are you sure you want to delete \"" + selectedClient.getClientName() + "\"? This action cannot be undone.", () -> {
+    private void deleteClient(Client client) {
+        AlertHelper.showConfirmation("Delete Client", "Are you sure you want to delete \"" + client.getClientName() + "\"? This action cannot be undone.", () -> {
             try {
-                modelFacade.getClientModel().deleteClient(selectedClient);
-                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), selectedClient.getClientId(), EntityType.CLIENT, LogAction.DELETE, LocalDateTime.now()));
+                modelFacade.getClientModel().deleteClient(client);
+                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), client.getClientId(), EntityType.CLIENT, LogAction.DELETE, LocalDateTime.now()));
                 loadClients();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -133,14 +129,14 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
         return Map.of(
                 new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateClient,
-                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), this::onClickUpdateClient,
-                new KeyCodeCombination(KeyCode.DELETE), this::onClickDeleteClient
+                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), () -> {
+                    if (selectedClient == null) { AlertHelper.showWarning("No Selection", "Please select a client to edit."); return; }
+                    openClientForm(selectedClient);
+                },
+                new KeyCodeCombination(KeyCode.DELETE), () -> {
+                    if (selectedClient == null) { AlertHelper.showWarning("No Selection", "Please select a client to delete."); return; }
+                    deleteClient(selectedClient);
+                }
         );
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        loadClients();
-        pgClients.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> loadClients()));
     }
 }

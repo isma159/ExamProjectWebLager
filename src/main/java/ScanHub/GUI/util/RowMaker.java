@@ -7,6 +7,7 @@ import ScanHub.BE.*;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.enums.ProfileStatus;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -17,6 +18,7 @@ import javafx.scene.paint.Paint;
 
 import java.time.format.DateTimeFormatter;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Utility class for creating styled JavaFX rows representing domain objects.
@@ -33,20 +35,24 @@ public class RowMaker {
     private static final double ROW_PREF_WIDTH = 200.0;
     private static final double COL_PREF_HEIGHT = 100.0;
     private static final double COL_PREF_WIDTH = 200.0;
-    private static final double AVATAR_SIZE = 30.0;
     private static final double SPACER_WIDTH = 9.0;
+    private static final double ACTIONS_WIDTH = 160.0; // edit + delete + gap
 
     private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
+    // ----- Dashboard overloads (no action buttons) -----
+
     public static HBox addUserRow(User user) {
-        return addUserRow(user, null);
+        return addUserRow(user, null, null, null);
     }
 
     public static HBox addProfileRow(Profile profile) {
-        return addProfileRow(profile, null);
+        return addProfileRow(profile, null, null, null);
     }
 
-    public static HBox addUserRow(User user, BiConsumer<User, HBox> onSelect) {
+    // ----- Full overloads (select + edit + delete) -----
+
+    public static HBox addUserRow(User user, BiConsumer<User, HBox> onSelect, Consumer<User> onEdit, Consumer<User> onDelete) {
         Label usernameLabel = createLabel(user.getUsername(), 210);
         HBox roleBox = centeredCol(ChipMaker.createChip(user.getRole().toString(), "chip-color"));
 
@@ -55,23 +61,12 @@ public class RowMaker {
         row.setAlignment(Pos.CENTER_LEFT);
         row.getChildren().addAll(usernameLabel, roleBox);
 
+        appendActionButtons(row, user, onEdit, onDelete);
         attachClickHandler(row, user, onSelect);
         return row;
     }
 
-    public static HBox addClientRow (Client client, BiConsumer<Client, HBox> onSelect) {
-        Label clientNameLabel = createLabel(client.getClientName(), 210);
-
-        HBox row = createBaseRow();
-        row.getStyleClass().add("user-row");
-        row.setAlignment(Pos.CENTER_LEFT);
-        row.getChildren().add(clientNameLabel);
-
-        attachClickHandler(row, client, onSelect);
-        return row;
-    }
-
-    public static HBox addProfileRow(Profile profile, BiConsumer<Profile, HBox> onSelect) {
+    public static HBox addProfileRow(Profile profile, BiConsumer<Profile, HBox> onSelect, Consumer<Profile> onEdit, Consumer<Profile> onDelete) {
         HBox col1 = centeredCol(createLabel(profile.getProfileName()));
         HBox col2 = centeredCol(createLabel(profile.getExportLabel()));
         HBox col3 = centeredCol(profileStatusChip(profile));
@@ -81,9 +76,25 @@ public class RowMaker {
         row.setAlignment(Pos.CENTER_LEFT);
         row.getChildren().addAll(col1, col2, col3);
 
+        appendActionButtons(row, profile, onEdit, onDelete);
         attachClickHandler(row, profile, onSelect);
         return row;
     }
+
+    public static HBox addClientRow(Client client, BiConsumer<Client, HBox> onSelect, Consumer<Client> onEdit, Consumer<Client> onDelete) {
+        Label clientNameLabel = createLabel(client.getClientName(), 210);
+
+        HBox row = createBaseRow();
+        row.getStyleClass().add("user-row");
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.getChildren().add(clientNameLabel);
+
+        appendActionButtons(row, client, onEdit, onDelete);
+        attachClickHandler(row, client, onSelect);
+        return row;
+    }
+
+    // -----  -----
 
     public static HBox addMetadataRow(BoxMetadata metadata, BiConsumer<BoxMetadata, HBox> onSelect) {
         HBox col1 = centeredCol(createLabel("Box #" + metadata.getBoxId()));
@@ -103,7 +114,7 @@ public class RowMaker {
     }
 
     public static HBox addLogRow(Log log) {
-        // Indicator dot
+        // indicator dot
         Pane dot = new Pane();
         dot.setMaxWidth(Region.USE_PREF_SIZE);
         dot.setMaxHeight(Region.USE_PREF_SIZE);
@@ -126,7 +137,7 @@ public class RowMaker {
         col2.setPrefSize(100.0, COL_PREF_HEIGHT);
         HBox.setHgrow(col2, Priority.NEVER);
 
-        // Description
+        // description
         HBox col3 = new HBox(createLabel(buildLogDescription(log)));
         col3.setAlignment(Pos.CENTER_LEFT);
         col3.setPrefSize(COL_PREF_WIDTH, COL_PREF_HEIGHT);
@@ -139,33 +150,57 @@ public class RowMaker {
         return row;
     }
 
-    public static HBox addProfileRowToForm(Profile profile, User user, BiConsumer<Profile, Boolean> onCheckChanged) {
-        CheckBox checkBox = new CheckBox();
-        checkBox.setMnemonicParsing(false);
+    // ----- Action button injection -----
 
-        if (user != null) {
-            checkBox.setSelected(user.getProfiles().contains(profile));
+    /**
+     * Appends an action button pane (edit + delete) to the row when at least
+     * one handler is non-null. The pane is always managed (takes up space) so
+     * the row layout doesn't shift when it appears, but starts invisible and
+     * is revealed on hover or when the row carries the "row-selected" css.
+     */
+    private static <T> void appendActionButtons(HBox row, T item, Consumer<T> onEdit, Consumer<T> onDelete) {
+        if (onEdit == null && onDelete == null) return;
+
+        HBox actions = new HBox(6);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+        actions.setMinWidth(ACTIONS_WIDTH);
+        actions.setMaxWidth(ACTIONS_WIDTH);
+        actions.setPrefWidth(ACTIONS_WIDTH);
+        actions.setVisible(false);
+
+        if (onEdit != null) {
+            Button editBtn = new Button("\uD83D\uDD89 Edit"); // ✎
+            editBtn.getStyleClass().add("primary-btn");
+            editBtn.setOnAction(e -> {
+                e.consume(); // don't bubble to the row's mouse-click handler
+                onEdit.accept(item);
+            });
+            actions.getChildren().add(editBtn);
         }
 
-        checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> onCheckChanged.accept(profile, newVal));
-
-        return buildFormRow(checkBox, profile.getProfileName(), profileStatusChip(profile));
-    }
-
-    public static HBox addUserRowToForm(User user, Profile profile, BiConsumer<User, Boolean> onCheckChanged) {
-        CheckBox checkBox = new CheckBox();
-        checkBox.setMnemonicParsing(false);
-
-        if (profile != null) {
-            checkBox.setSelected(user.getProfiles().contains(profile));
+        if (onDelete != null) {
+            Button deleteBtn = new Button("\uD83D\uDDD1 Delete");
+            deleteBtn.getStyleClass().add("destructive-btn");
+            deleteBtn.setOnAction(e -> {
+                e.consume();
+                onDelete.accept(item);
+            });
+            actions.getChildren().add(deleteBtn);
         }
 
-        checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> onCheckChanged.accept(user, newVal));
+        // reveal on hover
+        row.hoverProperty().addListener((obs, wasHovered, isHovered) ->
+                actions.setVisible(isHovered || row.getStyleClass().contains("row-selected")));
 
-        return buildFormRow(checkBox, user.getUsername(), ChipMaker.createChip(user.getRole().toString(), "chip-color"));
+        // reveal when selected
+        row.getStyleClass().addListener((javafx.collections.ListChangeListener<String>) change ->
+                actions.setVisible(row.isHover() || row.getStyleClass().contains("row-selected")));
+
+        row.getChildren().addAll(fixedSpacer(), actions, fixedSpacer());
     }
 
-    /** Base row shared by all non-form rows. */
+    // ----- Helpers -----
+
     private static HBox createBaseRow() {
         HBox row = new HBox();
         row.getStyleClass().add("box-card");
@@ -176,40 +211,6 @@ public class RowMaker {
         return row;
     }
 
-    /**
-     * Builds the checkbox form row shared by {@code addProfileRowToForm} and
-     * {@code addUserRowToForm}, differing only in the display name and chip.
-     */
-    private static HBox buildFormRow(CheckBox checkBox, String displayName, HBox chip) {
-        HBox chipHolder = new HBox(chip);
-        chipHolder.setAlignment(Pos.CENTER);
-        chipHolder.setMaxWidth(Region.USE_COMPUTED_SIZE);
-        chipHolder.setMinWidth(Region.USE_COMPUTED_SIZE);
-        chipHolder.setPrefSize(90.0, COL_PREF_HEIGHT);
-        HBox.setHgrow(chipHolder, Priority.NEVER);
-
-        HBox row = new HBox(
-                fixedSpacer(),
-                checkBox,
-                fixedSpacer(),
-                createAvatarPane(displayName),
-                fixedSpacer(),
-                createLabel(displayName),
-                growingSpacer(),
-                chipHolder,
-                fixedSpacer()
-        );
-
-        row.setAlignment(Pos.CENTER);
-        row.setMaxHeight(Region.USE_PREF_SIZE);
-        row.setMinHeight(Region.USE_PREF_SIZE);
-        row.setPrefHeight(ROW_HEIGHT);
-        row.setPrefWidth(ROW_PREF_WIDTH);
-        row.getStyleClass().add("box-card");
-        return row;
-    }
-
-    /** Creates a centered, growing HBox column containing the given node. */
     private static HBox centeredCol(javafx.scene.Node node) {
         HBox col = new HBox(node);
         col.setAlignment(Pos.CENTER);
@@ -218,20 +219,6 @@ public class RowMaker {
         return col;
     }
 
-    /** Column 1 variant: circular avatar + spacer + name label. */
-    private static HBox createAvatarNameCol(String name) {
-        HBox col = new HBox(
-                createAvatarPane(name),
-                fixedSpacer(),
-                createLabel(name)
-        );
-        col.setAlignment(Pos.CENTER);
-        col.setPrefSize(COL_PREF_WIDTH, COL_PREF_HEIGHT);
-        HBox.setHgrow(col, Priority.ALWAYS);
-        return col;
-    }
-
-    /** Creates a label with the "lbl" style class and optional preferred width. */
     private static Label createLabel(String text, double prefWidth) {
         Label lbl = createLabel(text);
         lbl.setAlignment(Pos.CENTER);
@@ -248,62 +235,31 @@ public class RowMaker {
         return lbl;
     }
 
-    /** Circular avatar pane showing the first character of {@code name}. */
-    private static Pane createAvatarPane(String name) {
-        Label initial = new Label(name.strip().substring(0, 1));
-        initial.setAlignment(Pos.CENTER);
-        initial.setPrefSize(AVATAR_SIZE, AVATAR_SIZE);
-        initial.getStyleClass().add("lbl");
-        initial.setTextFill(Paint.valueOf("WHITE"));
-
-        Pane avatar = new Pane(initial);
-        avatar.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        avatar.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        avatar.setPrefSize(AVATAR_SIZE, AVATAR_SIZE);
-        avatar.getStyleClass().add("avatar-initial");
-        return avatar;
-    }
-
-    /** Fixed-width spacer that never grows. */
     private static Region fixedSpacer() {
         Region spacer = new Region();
         spacer.setMaxWidth(Region.USE_PREF_SIZE);
         spacer.setMinWidth(Region.USE_PREF_SIZE);
-        spacer.setPrefSize(RowMaker.SPACER_WIDTH, COL_PREF_HEIGHT);
+        spacer.setPrefSize(SPACER_WIDTH, COL_PREF_HEIGHT);
         HBox.setHgrow(spacer, Priority.NEVER);
         return spacer;
     }
 
-    /** Growing spacer that pushes subsequent nodes to the right. */
-    private static Region growingSpacer() {
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        return spacer;
-    }
-
-    /** Returns the appropriate status chip for a {@link Profile}. */
     private static HBox profileStatusChip(Profile profile) {
         return profile.getStatus() == ProfileStatus.ACTIVE
-                ? ChipMaker.createChip("Active", "chip-color-success")
+                ? ChipMaker.createChip("Active",   "chip-color-success")
                 : ChipMaker.createChip("Inactive", "chip-color-error");
     }
 
-    /** Builds the human-readable description string for a log entry. */
     private static String buildLogDescription(Log log) {
         String ts = log.getTimestamp().format(DATETIME_FORMATTER);
-
-        if (log.getAction() == LogAction.LOGIN) {
+        if (log.getAction() == LogAction.LOGIN)
             return log.getUser().getUsername() + " " + log.getAction().getVerb() + " at " + ts;
-        }
-
-        return log.getUser().getUsername() + " " + log.getAction().getVerb() + " " + log.getEntityType().getLabel()
+        return log.getUser().getUsername() + " " + log.getAction().getVerb()
+                + " " + log.getEntityType().getLabel()
                 + " " + log.getEntityId() + " on " + ts;
     }
 
-    /** Attaches a mouse-click handler to {@code row} if {@code handler} is non-null. */
     private static <T> void attachClickHandler(HBox row, T item, BiConsumer<T, HBox> handler) {
-        if (handler != null) {
-            row.setOnMouseClicked(e -> handler.accept(item, row));
-        }
+        if (handler != null) row.setOnMouseClicked(e -> handler.accept(item, row));
     }
 }
