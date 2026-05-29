@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.*?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="570.0" prefWidth="900.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.UserFormController">
    <children>
       <VBox styleClass="background" HBox.hgrow="ALWAYS">
           <padding>
@@ -65,7 +65,7 @@
                              </RadioButton>
                              <VBox spacing="2">
                                  <Label styleClass="lbl" text="User" />
-                                 <Label prefWidth="360" styleClass="lbl" text="Can select profiles, scan documents, review files, and export." wrapText="true" VBox.vgrow="ALWAYS" />
+                                 <Label styleClass="lbl" text="Can select assigned profiles, scan documents, review files, and export." wrapText="true" VBox.vgrow="ALWAYS" />
                              </VBox>
                          </HBox>
                          <Separator />
@@ -73,7 +73,7 @@
                              <RadioButton fx:id="radioADMIN" toggleGroup="$toggleGroupRole" />
                              <VBox spacing="2">
                                  <Label styleClass="lbl" text="Admin" />
-                                 <Label prefWidth="360" styleClass="lbl" text="Full access. Can manage users, profiles, and view all logs." wrapText="true" VBox.vgrow="ALWAYS" />
+                                 <Label prefWidth="360" styleClass="lbl" text="Full access. Can manage users, profiles, clients, view all logs, and do all Users can." wrapText="true" VBox.vgrow="ALWAYS" />
                              </VBox>
                          </HBox>
                      <styleClass>
@@ -95,7 +95,7 @@
                      <String fx:value="card-bg" />
                   </styleClass>
                   <children>
-                     <Label styleClass="bold-lbl" text="Assign profiles" />
+                     <Label styleClass="bold-lbl" text="Assign Profiles" />
                      <Region prefHeight="4" />
                      <Label styleClass="lbl" text="Select which profiles this user can access." />
                      <Region prefHeight="8" />
@@ -130,12 +130,21 @@
                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
             </VBox.margin>
          </HBox>
-          <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="520.0" spacing="8">
+          <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" spacing="8">
               <padding>
                <Insets left="12.0" right="12.0" />
             </padding>
-              <Button onAction="#onClickCancel" prefHeight="30" styleClass="tertiary-btn" text="Cancel" />
-              <Button fx:id="saveButton" defaultButton="true" onAction="#onClickSave" prefHeight="33" styleClass="primary-btn" text="Create user" />
+              <Button onAction="#onClickCancel" prefHeight="30" styleClass="tertiary-btn" text="Cancel">
+               <HBox.margin>
+                  <Insets bottom="12.0" />
+               </HBox.margin></Button>
+              <Button fx:id="saveButton" defaultButton="true" onAction="#onClickSave" prefHeight="33" styleClass="primary-btn" text="Create user">
+               <HBox.margin>
+                  <Insets bottom="12.0" />
+               </HBox.margin></Button>
+            <VBox.margin>
+               <Insets />
+            </VBox.margin>
           </HBox>
       </VBox>
    </children>
