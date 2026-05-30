@@ -392,18 +392,20 @@
     -fx-background-color: TRANSPARENT;
 }
 
-.dark .tree-view-scanner .tree-cell {
+.dark .tree-view-scanner .tree-cell:filled {
     -fx-background-color: TRANSPARENT;
     -fx-background-radius: 3px;
     -fx-text-fill: #ffffff;
 }
 
-.dark .tree-view-scanner .tree-cell:hover {
+.dark .tree-view-scanner .tree-cell:filled:hover {
     -fx-background-color: #2B3B4C;
     -fx-background-radius: 3px;
 }
 
-.dark .tree-view-scanner .tree-cell:selected {
+.dark .tree-view-scanner .tree-cell:filled:selected,
+.dark .tree-view-scanner .tree-cell:filled:selected:focused,
+.dark .tree-view-scanner .tree-cell:filled:focused {
     -fx-background-color: #008FF7;
     -fx-background-radius: 3px;
     -fx-text-fill: #ffffff;
