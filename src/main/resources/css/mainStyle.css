@@ -340,6 +340,8 @@
 
 }
 
+.combo-box-base .
+
 .combo-box-base .arrow-button {
 
     -fx-background-color: TRANSPARENT;
@@ -401,9 +403,15 @@
 
 }
 
-.combo-box .list-cell:focused {
+.combo-box-popup .list-cell:focused {
 
-    -fx-background-color: WHITE;
+    -fx-background-color: #E2E8F0;
+
+}
+
+.combo-box .list-cell:focused .text {
+
+    -fx-fill: #2d3d4f;
 
 }
 
@@ -517,8 +525,7 @@
 
 .secondary-btn:hover {
 
-    -fx-background-color: #F1F5F9;
-    -fx-text-fill: #000000;
+    -fx-background-color: #4E5E6E;
 
 }
 
@@ -557,6 +564,8 @@
     -fx-background-color: #EF4444;
     -fx-background-radius: 6px;
     -fx-background-insets: 1;
+
+    transition: -fx-background-color 150ms ease-out, -fx-text-fill 150ms ease-out;
 
 }
 

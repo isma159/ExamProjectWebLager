@@ -191,8 +191,12 @@
     -fx-text-fill: #ffffff;
 }
 
-.dark .combo-box .list-cell:focused {
-    -fx-background-color: #354556;
+.dark .combo-box-popup .list-cell:focused {
+    -fx-background-color: #475569;
+}
+
+.dark .combo-box .list-cell:focused .text {
+    -fx-fill: #ffffff;
 }
 
 /* ---------- Dark Searchable Combo Box ---------- */
@@ -286,7 +290,7 @@
 }
 
 .dark .primary-btn:hover {
-    -fx-background-color: #0094EA;
+    -fx-background-color: #0077D4;
 }
 
 .dark .primary-btn:focused {
@@ -301,7 +305,7 @@
 }
 
 .dark .secondary-btn:hover {
-    -fx-background-color: #354556;
+    -fx-background-color: #4E5E6E;
     -fx-text-fill: #ffffff;
 }
 
@@ -529,7 +533,7 @@
 
 /* ---------- Dark Chip ---------- */
 .dark .chip {
-    -fx-background-color: #354556;
+    -fx-background-color: #4A5F73;
     -fx-background-radius: 3px;
 }
 
