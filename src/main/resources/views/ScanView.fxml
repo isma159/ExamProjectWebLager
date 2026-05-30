@@ -73,11 +73,7 @@
                     </styleClass>
                 </HBox>
                 <Separator prefHeight="3.0" prefWidth="200.0" styleClass="grey-separator" />
-                <TreeView fx:id="boxTreeView" VBox.vgrow="ALWAYS">
-                    <styleClass>
-                        <String fx:value="scan-list" />
-                        <String fx:value="tree-view-scanner" />
-                    </styleClass>
+                <TreeView fx:id="boxTreeView" styleClass="tree-view-scanner" VBox.vgrow="ALWAYS">
                     <VBox.margin>
                         <Insets bottom="3.0" left="3.0" right="3.0" />
                     </VBox.margin>
