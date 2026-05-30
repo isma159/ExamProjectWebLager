@@ -40,8 +40,4 @@ public class ScanModel {
     public void deleteBox() throws Exception {scanManager.deleteBox();}
 
     public Box getTargetBox() { return scanManager.getTargetBox(); }
-
-    public BufferedImage sharpen(BufferedImage source, float strength) {
-        return scanManager.sharpen(source, strength);
-    }
 }

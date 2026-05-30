@@ -3,6 +3,7 @@ package ScanHub.BLL;
 import ScanHub.BE.*;
 import ScanHub.BE.enums.ExportMode;
 import ScanHub.BLL.util.BarcodeDetector;
+import ScanHub.BLL.util.ImageProcessor;
 import ScanHub.DAL.ApiClient.ScanResult;
 import ScanHub.DAL.interfaces.IScanSource;
 import ScanHub.DAL.facade.DAOFacade;
@@ -17,8 +18,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
@@ -341,29 +340,13 @@ public class ScanManager {
             }
         }
 
-        return sharpen(result, sharpness);
-    }
-
-    public BufferedImage sharpen(BufferedImage source, float strength) {
-        float center = 1 + (4 * strength);
-        float edge = -strength;
-
-        float[] kernelInfo = {
-                0f, edge, 0f,
-                edge, center, edge,
-                0f, edge, 0f
-        };
-
-        Kernel kernel = new Kernel(3, 3, kernelInfo);
-        ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
-
-        return op.filter(source, null);
+        return ImageProcessor.sharpen(result, sharpness);
     }
 
     /** Applies rotation and smoothes the pixels when rotated while preserving the full visible bounds. */
     private BufferedImage rotateFile(BufferedImage source, int rotation) {
 
-        int normalize = normalizeRotation(rotation);
+        int normalize = FileAdjustmentSettings.normalizeRotation(rotation);
         if (normalize == 0) return source; // no rotation needed
 
         int width = source.getWidth();
@@ -409,7 +392,7 @@ public class ScanManager {
      */
     public void updateFileRotation(File file, int rotation) throws Exception {
         FileAdjustmentSettings settings = FileAdjustmentSettings.copyOf(file.getFileSettings());
-        settings.setRotation(normalizeRotation(rotation));
+        settings.setRotation(FileAdjustmentSettings.normalizeRotation(rotation));
         updateFileSettings(file, settings);
     }
 
@@ -577,6 +560,4 @@ public class ScanManager {
             }
         }
     }
-
-    private static int normalizeRotation(int rotation) { return ((rotation % 360) + 360) % 360; }
 }

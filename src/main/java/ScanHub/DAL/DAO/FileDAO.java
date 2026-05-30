@@ -5,6 +5,7 @@ import ScanHub.BE.File;
 import ScanHub.BE.FileAdjustmentSettings;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
+import ScanHub.DAL.util.DAOutil;
 
 // java imports
 import java.io.IOException;
@@ -90,11 +91,11 @@ public class FileDAO {
             conn.setAutoCommit(false);
             try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
                 updatePs.setInt(1, settings.getRotation());
-                updatePs.setInt(2, settingValue(settings.getHue()));
-                updatePs.setInt(3, settingValue(settings.getBrightness()));
-                updatePs.setInt(4, settingValue(settings.getContrast()));
-                updatePs.setInt(5, settingValue(settings.getSaturation()));
-                updatePs.setInt(6, settingValue(settings.getSharpness()));
+                updatePs.setInt(2, DAOutil.settingValue(settings.getHue()));
+                updatePs.setInt(3, DAOutil.settingValue(settings.getBrightness()));
+                updatePs.setInt(4, DAOutil.settingValue(settings.getContrast()));
+                updatePs.setInt(5, DAOutil.settingValue(settings.getSaturation()));
+                updatePs.setInt(6, DAOutil.settingValue(settings.getSharpness()));
                 updatePs.setInt(7, fileId);
 
                 int updated = updatePs.executeUpdate();
@@ -102,11 +103,11 @@ public class FileDAO {
                     try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
                         insertPs.setInt(1, fileId);
                         insertPs.setInt(2, settings.getRotation());
-                        insertPs.setInt(3, settingValue(settings.getHue()));
-                        insertPs.setInt(4, settingValue(settings.getBrightness()));
-                        insertPs.setInt(5, settingValue(settings.getContrast()));
-                        insertPs.setInt(6, settingValue(settings.getSaturation()));
-                        insertPs.setInt(7, settingValue(settings.getSharpness()));
+                        insertPs.setInt(3, DAOutil.settingValue(settings.getHue()));
+                        insertPs.setInt(4, DAOutil.settingValue(settings.getBrightness()));
+                        insertPs.setInt(5, DAOutil.settingValue(settings.getContrast()));
+                        insertPs.setInt(6, DAOutil.settingValue(settings.getSaturation()));
+                        insertPs.setInt(7, DAOutil.settingValue(settings.getSharpness()));
                         insertPs.executeUpdate();
                     }
                 }
@@ -183,6 +184,4 @@ public class FileDAO {
             ps.executeUpdate();
         }
     }
-
-    private int settingValue(double value) { return (int) Math.round(value); }
 }
