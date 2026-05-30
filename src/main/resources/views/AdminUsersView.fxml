@@ -8,11 +8,11 @@
 
 <HBox fx:id="rootNode" prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
     <children>
-        <VBox prefHeight="200.0" prefWidth="1800.0" HBox.hgrow="ALWAYS">
+        <VBox HBox.hgrow="ALWAYS">
             <children>
-                <VBox prefHeight="1200.0" prefWidth="1371.0" styleClass="shadow">
+                <VBox styleClass="shadow" VBox.vgrow="ALWAYS">
                     <children>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0">
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" spacing="6.0">
                             <styleClass>
                                 <String fx:value="half-card" />
                                 <String fx:value="card-bg" />
@@ -56,7 +56,7 @@
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                             </children>
                         </HBox>
-                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
                             <styleClass>
                                 <String fx:value="box-card" />
                                 <String fx:value="second-card-bg" />
@@ -87,7 +87,7 @@
                                 <TextField fx:id="txtFldUserSearch" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for specific user" styleClass="container" />
                             </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
                             <styleClass>
                                 <String fx:value="second-card-bg" />
                                 <String fx:value="box-card" />
@@ -96,6 +96,7 @@
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onUsernameClick" onMouseClicked="#onUsernameClick" prefWidth="210.0" styleClass="lbl" text="Username" HBox.hgrow="ALWAYS" />
                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Role" HBox.hgrow="ALWAYS" />
+                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
                             </children>
                         </HBox>
                         <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
@@ -103,7 +104,7 @@
                                 <VBox fx:id="userTableBox" prefHeight="100.0" prefWidth="100.0" />
                             </content>
                         </ScrollPane>
-                        <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                        <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0">
                             <styleClass>
                                 <String fx:value="half-card-bottom" />
                                 <String fx:value="card-bg" />
@@ -116,7 +117,7 @@
                 </VBox>
             </children>
             <HBox.margin>
-                <Insets right="6.0" />
+                <Insets />
             </HBox.margin>
         </VBox>
     </children>

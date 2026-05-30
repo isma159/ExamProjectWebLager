@@ -51,7 +51,6 @@ public class ClientFormController implements Initializable {
 
     /**
      * Pre-fills input fields when editing an existing client.
-     * TODO: populate profile checkboxes from user's assigned profiles
      */
     private void populateFields(Client client) {
         clientNameField.setText(client.getClientName());

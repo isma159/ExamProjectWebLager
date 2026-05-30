@@ -1,5 +1,7 @@
 package ScanHub.BE;
 
+import java.util.Objects;
+
 public class FileAdjustmentSettings {
 
     private int rotation;
@@ -49,4 +51,22 @@ public class FileAdjustmentSettings {
     public void setSharpness(double sharpness)   { this.sharpness = sharpness;}
 
     public static int normalizeRotation(int rotation) { return ((rotation % 360) + 360) % 360; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FileAdjustmentSettings)) return false;
+        FileAdjustmentSettings other = (FileAdjustmentSettings) o;
+        return rotation == other.rotation
+                && Double.compare(hue, other.hue) == 0
+                && Double.compare(brightness, other.brightness) == 0
+                && Double.compare(contrast, other.contrast) == 0
+                && Double.compare(saturation, other.saturation) == 0
+                && Double.compare(sharpness, other.sharpness) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rotation, hue, brightness, contrast, saturation, sharpness);
+    }
 }

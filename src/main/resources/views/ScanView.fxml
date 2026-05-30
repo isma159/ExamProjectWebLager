@@ -22,9 +22,9 @@
                                 <Image url="@../images/Green/LogoGreen2H.png" />
                             </image>
                         </ImageView>
-                  <Region prefHeight="0.0" prefWidth="300.0" HBox.hgrow="ALWAYS" />
+                  <Region fx:id="regionLeft" prefWidth="314.0" HBox.hgrow="ALWAYS" />
                           <Label styleClass="h1" text="Scanning Workspace" />
-                  <Region HBox.hgrow="ALWAYS" />
+                  <Region fx:id="regionRight" prefWidth="234.0" HBox.hgrow="ALWAYS" />
                         <ToggleSwitch fx:id="darkMode" onMouseClicked="#onDarkModeToggle" prefHeight="30.0" prefWidth="60.0" scaleX="1.25" scaleY="1.25" scaleZ="1.25" text="Dark Mode ">
                             <HBox.margin>
                                 <Insets right="12.0" />

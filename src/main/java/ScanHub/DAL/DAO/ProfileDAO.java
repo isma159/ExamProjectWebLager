@@ -3,11 +3,11 @@ package ScanHub.DAL.DAO;
 // project imports
 import ScanHub.BE.*;
 import ScanHub.BE.enums.ProfileStatus;
+import ScanHub.BE.enums.Role;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
 import ScanHub.DAL.util.DAOutil;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,14 +52,14 @@ public class ProfileDAO implements IDataAccess<Profile> {
         List<Profile> profiles = new ArrayList<>();
 
         String selectProfileSQL = """
-                SELECT p.profileId, p.clientId, p.profileName, p.status,
-                       p.exportLabel, p.rotation, p.hue, p.brightness,
-                       p.contrast, p.saturation, c.clientName
-                FROM Profiles p
-                LEFT JOIN Clients c ON p.clientId = c.clientId
-                WHERE p.deleted_at IS NULL
-                ORDER BY c.clientName, p.profileName
-                """;
+            SELECT p.profileId, p.clientId, p.profileName, p.status,
+                   p.exportLabel, p.rotation, p.hue, p.brightness,
+                   p.contrast, p.saturation, c.clientName
+            FROM Profiles p
+            LEFT JOIN Clients c ON p.clientId = c.clientId
+            WHERE p.deleted_at IS NULL
+            ORDER BY c.clientName, p.profileName
+            """;
 
         try (Connection connection = DBConnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(selectProfileSQL);
@@ -72,7 +72,39 @@ public class ProfileDAO implements IDataAccess<Profile> {
             throw new Exception("Could not get profiles", e);
         }
 
+        for (Profile profile : profiles) {
+            profile.setUsers(getUsersForProfile(profile.getProfileId()));
+        }
+
         return profiles;
+    }
+
+    private List<User> getUsersForProfile(int profileId) throws Exception {
+        String sql = """
+            SELECT u.userId, u.username, u.passwordHash, u.role
+            FROM Users u
+            JOIN UserProfiles up ON u.userId = up.userId
+            WHERE up.profileId = ? AND u.deleted_at IS NULL
+            """;
+
+        List<User> users = new ArrayList<>();
+        try (Connection connection = DBConnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, profileId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    users.add(new User(
+                            rs.getInt("userId"),
+                            rs.getString("username"),
+                            rs.getString("passwordHash"),
+                            Role.valueOf(rs.getString("role"))
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Could not load users for profileId " + profileId, e);
+        }
+        return users;
     }
 
     @Override

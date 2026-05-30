@@ -108,26 +108,23 @@ public class ClientDAO implements IDataAccess<Client> {
              PreparedStatement ps2 = connection.prepareStatement(selectProfilesSQL);) {
 
             ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery();) {
+                if (rs.next()) {
 
-            if (rs.next()) {
+                    Client client = mapRow(rs);
+                    ps2.setInt(1, client.getClientId());
+                    try (ResultSet rs2 = ps2.executeQuery()) {
 
-                Client client = mapRow(rs);
-                ps2.setInt(1, client.getClientId());
-                try (ResultSet rs2 = ps2.executeQuery()) {
-
-                    while (rs2.next()) {
-                        rs2.getInt("profileId");
-                        if (!rs2.wasNull()) {
-                            Profile profile = mapProfile(rs2, client);
-                            client.getProfiles().add(profile);
+                        while (rs2.next()) {
+                            rs2.getInt("profileId");
+                            if (!rs2.wasNull()) {
+                                Profile profile = mapProfile(rs2, client);
+                                client.getProfiles().add(profile);
+                            }
                         }
+                        return client;
                     }
-                    return client;
-                }
-            }
-            else{
-                return null;
+                } else return null;
             }
 
         } catch (SQLException e) {

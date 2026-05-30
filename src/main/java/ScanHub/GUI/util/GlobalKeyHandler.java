@@ -6,8 +6,6 @@ import javafx.scene.input.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO read through and add new comments to each method
-
 public class GlobalKeyHandler {
 
     private static GlobalKeyHandler instance;
@@ -19,7 +17,7 @@ public class GlobalKeyHandler {
         return instance;
     }
 
-    private final Map<KeyCodeCombination, Runnable> globalLayer     = new HashMap<>();
+    private final Map<KeyCodeCombination, Runnable> globalLayer = new HashMap<>();
     private final Map<KeyCodeCombination, Runnable> controllerLayer = new HashMap<>();
 
     private Scene attachedScene;
@@ -37,23 +35,11 @@ public class GlobalKeyHandler {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyEvent);
     }
 
-    public void register(KeyCodeCombination combo, Runnable action) {
-        globalLayer.put(combo, action);
-    }
-
-    public void unregister(KeyCodeCombination combo) {
-        globalLayer.remove(combo);
-    }
-
     public void setLayer(Map<KeyCodeCombination, Runnable> shortcuts) {
         controllerLayer.clear();
         if (shortcuts != null) {
             controllerLayer.putAll(shortcuts);
         }
-    }
-
-    public void clearLayer() {
-        controllerLayer.clear();
     }
 
     private void handleKeyEvent(KeyEvent event) {

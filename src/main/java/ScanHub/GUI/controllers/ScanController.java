@@ -61,6 +61,7 @@ public class ScanController implements Initializable, IViewController {
     @FXML private ProgressBar progressBarExport;
     @FXML private HBox hboxProgressBarExport;
     @FXML private Separator separator1, separator2, separatorFileAdjustment;
+    @FXML private Region regionLeft, regionRight;
 
     // Session Startup Popup
     @FXML private StackPane sessionPopupOverlay;
@@ -514,7 +515,7 @@ public class ScanController implements Initializable, IViewController {
 
             root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
-            // todo modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
+            modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
             syncDocumentsFromModel();
             initializeTreeView(boxTreeView, activeBox);
 
@@ -908,7 +909,6 @@ public class ScanController implements Initializable, IViewController {
             rebuildCard();
         } catch (IllegalArgumentException ex) {
             AlertHelper.showError("Invalid Input", ex.getMessage());
-            // TODO add visual feedback
         } catch (Exception ex) {
             ex.printStackTrace();
             AlertHelper.showError("Settings Failed", "Could not apply file settings. Please try again.");
@@ -921,7 +921,7 @@ public class ScanController implements Initializable, IViewController {
             try {
                 scanModel.deleteBox();
                 modelFacade.getBoxModel().deleteBox(scanModel.getTargetBox());
-                modelFacade.getLogModel().createLog(new Log(currentUser, Integer.parseInt(scanModel.getTargetBox().getBoxName()), EntityType.BOX, LogAction.DELETE, LocalDateTime.now()));
+                modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.DELETE, LocalDateTime.now()));
                 boxTreeView.setShowRoot(false);
 
                 endScanSession();
@@ -1020,7 +1020,6 @@ public class ScanController implements Initializable, IViewController {
         ExportMode mode = comboBoxExport.getValue();
         if (mode == null) {
             AlertHelper.showError("Export", "Please select an export mode.");
-            // TODO add visual feedback
             return;
         }
 
@@ -1329,7 +1328,6 @@ public class ScanController implements Initializable, IViewController {
         ImageView thumbnail = new ImageView();
         thumbnail.setPreserveRatio(true);
         thumbnail.setSmooth(true);
-        // TODO add stylesheet with border outline
         thumbnail.setFitWidth(maxImageWidth);
         thumbnail.setFitHeight(maxImageHeight);
         thumbnail.setRotate(rotation);
@@ -1601,6 +1599,8 @@ public class ScanController implements Initializable, IViewController {
     private void setFileAdjustmentSideMenu(boolean disabled) {
         fileAdjustmentSideMenu.setVisible(disabled);
         fileAdjustmentSideMenu.setManaged(disabled);
+        regionLeft.setPrefWidth(disabled ? 314 : 424);
+        regionRight.setPrefWidth(disabled ? 234 : 124);
     }
 
     private void setFileAdjustment(boolean disabled) {

@@ -13,7 +13,6 @@ public class DAOFacade {
     private final IDataAccess<Client> clientDAO;
     private final IDataAccess<Log> logDAO;
     private final IDataAccess<Box> boxDAO;
-    // todo skal muligvis implementeres IDataAcess?
     private final DocumentDAO documentDAO;
     private final FileDAO fileDAO;
     private final BoxMetadataDAO boxMetadataDAO;

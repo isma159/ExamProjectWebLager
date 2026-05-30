@@ -25,7 +25,7 @@ public class LogModel {
 
     public Log createLog(Log log) throws Exception {
         Log newLog = logManager.createLog(log);
-        logObservableList.add(log);
+        logObservableList.add(newLog);
         return newLog;
     }
 
