@@ -146,14 +146,14 @@ public class AdminLogsController implements Initializable, IShortcutHandler {
             return;
         }
 
-        // Calculate and set page count
+        // calculate and set page count
         int pageCount = Math.ceilDiv(logs.size(), ROWS_PER_PAGE);
         logsPagination.setPageCount(pageCount);
 
         int startIndex = logsPagination.getCurrentPageIndex() * ROWS_PER_PAGE;
         int endIndex = Math.min(startIndex + ROWS_PER_PAGE, logs.size());
 
-        // Extract sublist for the current page
+        // extract sublist for the current page
         List<Log> pageItems = logs.subList(startIndex, endIndex);
 
         for (Log log : pageItems) {
@@ -162,31 +162,33 @@ public class AdminLogsController implements Initializable, IShortcutHandler {
         }
     }
 
-    @FXML private void onExportBtnClick() {
+    @FXML
+    private void onExportBtnClick() {
         try {
-            if (!currentLogs.isEmpty()) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Save Export");
-                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-                fileChooser.setInitialFileName("activityLog.csv");
+            if (currentLogs.isEmpty()) {
+                AlertHelper.showError("No Logs", "There are no logs to export.");
+                return;
+            }
 
-                File file = fileChooser.showSaveDialog(currentStage);
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Export");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+            fileChooser.setInitialFileName("activityLog.csv");
 
+            File file = fileChooser.showSaveDialog(currentStage);
+
+            if (file != null) {
                 modelFacade.getLogModel().exportLogs(file.toPath(), currentLogs);
             }
-            else {
-                AlertHelper.showError("No Logs", "There are no logs to export.");
-            }
-        }
-        catch (Exception e) {
+
+        } catch (Exception e) {
             e.printStackTrace();
-            // TODO Alert View?
+            AlertHelper.showError("Export Failed", "Could not export logs. Please try again.");
         }
     }
 
     @Override
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
-        // TODO implement shortcut for export
-        return Map.of();
+        return Map.of(new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), this::onExportBtnClick);
     }
 }

@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -175,6 +176,7 @@ public class RowMaker {
                 e.consume(); // don't bubble to the row's mouse-click handler
                 onEdit.accept(item);
             });
+            editBtn.setTooltip(new Tooltip("Edit (Ctrl + E)"));
             actions.getChildren().add(editBtn);
         }
 
@@ -185,6 +187,7 @@ public class RowMaker {
                 e.consume();
                 onDelete.accept(item);
             });
+            deleteBtn.setTooltip(new Tooltip("Delete (Del)"));
             actions.getChildren().add(deleteBtn);
         }
 

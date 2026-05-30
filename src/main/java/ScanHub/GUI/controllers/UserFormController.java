@@ -153,10 +153,6 @@ public class UserFormController implements Initializable {
         }
     }
 
-    /**
-     * TODO compare usernames so no identical
-     * TODO minimum username/password length ?
-     */
     private void createUser() {
         String username = usernameField.getText();
         String password = passwordField.getText();
@@ -219,7 +215,6 @@ public class UserFormController implements Initializable {
             return;
         }
 
-        // only validate passwords if the user has entered something
         if (!newPassword.isBlank() || !newPasswordConfirm.isBlank()) {
             // validate passwords
             if (!newPassword.equals(newPasswordConfirm)) {
@@ -236,7 +231,6 @@ public class UserFormController implements Initializable {
         editingUser.setRole(newRole);
         editingUser.setProfiles(retrieveSelectedProfiles());
 
-        // only update password if user filled in a new one
         if (!newPassword.isBlank()) {
             editingUser.setPasswordHash(modelFacade.getEncrypter().hashedPassword(newPassword));
         }

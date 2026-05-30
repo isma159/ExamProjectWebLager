@@ -11,7 +11,7 @@
             <children>
                 <VBox styleClass="shadow" VBox.vgrow="ALWAYS">
                     <children>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0">
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0" spacing="6.0">
                             <styleClass>
                                 <String fx:value="half-card" />
                                 <String fx:value="card-bg" />
@@ -19,7 +19,6 @@
                             <children>
                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
                                 <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="75.0" styleClass="h2" text="Profiles" />
-                                <TextField fx:id="txtFldSearchProfiles" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for profiles" styleClass="container" />
                                 <Region prefHeight="56.0" prefWidth="1482.0" />
                                 <VBox alignment="CENTER">
                                     <children>
@@ -76,6 +75,9 @@
                                 <ToggleButton mnemonicParsing="false" onAction="#onTbInactiveClick" prefHeight="30.0" prefWidth="90.0" text="Inactive" toggleGroup="$profileFilter">
                                     <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
                                 </ToggleButton>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="15.0" />
+                                <TextField fx:id="txtFldSearchProfiles" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for profiles" styleClass="container" />
                             </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
@@ -89,6 +91,7 @@
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Export Label" HBox.hgrow="ALWAYS" />
                                 <Separator orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Status" HBox.hgrow="ALWAYS" />
+                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
                             </children>
                         </HBox>
                         <ScrollPane fitToWidth="true" styleClass="box-card" VBox.vgrow="ALWAYS">
