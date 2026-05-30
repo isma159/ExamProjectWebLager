@@ -27,7 +27,7 @@ public class ScanApiClient implements IScanSource {
         HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
         byte[] tiffBytes = extractTiffFromZip(response.body());
-        return new ScanResult(tiffBytes, false);
+        return new ScanResult(tiffBytes);
     }
 
     /**
@@ -45,7 +45,7 @@ public class ScanApiClient implements IScanSource {
         HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
         byte[] tiffBytes = extractTiffFromZip(response.body());
-        return new ScanResult(tiffBytes, false);
+        return new ScanResult(tiffBytes);
     }
 
     /**

@@ -25,8 +25,8 @@ public class DAOFacade {
         clientDAO = new ClientDAO();
         logDAO = new LogDAO();
         boxDAO = new BoxDAO();
-        documentDAO = new DocumentDAO();
         fileDAO = new FileDAO();
+        documentDAO = new DocumentDAO(fileDAO);
         boxMetadataDAO = new BoxMetadataDAO();
         sessionDAO = new SessionDAO();
     }

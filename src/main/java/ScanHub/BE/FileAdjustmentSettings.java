@@ -41,14 +41,12 @@ public class FileAdjustmentSettings {
     public double getSaturation()  { return saturation; }
     public double getSharpness()   { return sharpness;}
 
-    public void setRotation(int rotation)        { this.rotation = normaliseRotation(rotation); }
+    public void setRotation(int rotation)        { this.rotation = normalizeRotation(rotation); }
     public void setHue(double hue)               { this.hue = hue; }
     public void setBrightness(double brightness) { this.brightness = brightness; }
     public void setContrast(double contrast)     { this.contrast = contrast; }
     public void setSaturation(double saturation) { this.saturation = saturation; }
     public void setSharpness(double sharpness)   { this.sharpness = sharpness;}
 
-    private int normaliseRotation(int rotation) {
-        return ((rotation % 360) + 360) % 360;
-    }
+    public static int normalizeRotation(int rotation) { return ((rotation % 360) + 360) % 360; }
 }

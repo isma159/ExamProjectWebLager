@@ -38,11 +38,4 @@ public class DocumentManager {
     public List<Document> getDocumentsByBoxId(int boxId) throws Exception {
         return daoFacade.getDocumentDAO().getDocumentsByBoxId(boxId);
     }
-
-    /**
-     * Returns the number of documents in a box (not the deleted ones).
-     */
-    public int countDocumentsForBox(int boxId) throws Exception {
-        return daoFacade.getDocumentDAO().countDocumentsForBox(boxId);
-    }
 }

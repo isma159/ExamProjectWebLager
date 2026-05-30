@@ -43,12 +43,5 @@ public class DBConnector {
     public static Connection getConnection() throws SQLServerException {
         return dataSource.getConnection();
     }
-
-    public static void main(String[] args) throws Exception {
-        DBConnector databaseConnector = new DBConnector();
-        try (Connection connection = databaseConnector.getConnection()) {
-            System.out.println("Is it open? " + !connection.isClosed());
-        }
-    }//Connection gets closed here
 }
 

@@ -5,6 +5,7 @@ import ScanHub.BE.*;
 import ScanHub.BE.enums.ProfileStatus;
 import ScanHub.DAL.DB.DBConnector;
 import ScanHub.DAL.interfaces.IDataAccess;
+import ScanHub.DAL.util.DAOutil;
 
 import java.io.IOException;
 import java.sql.*;
@@ -185,11 +186,9 @@ public class ProfileDAO implements IDataAccess<Profile> {
 
     private void bindSettings(PreparedStatement ps, FileAdjustmentSettings settings, int startIndex) throws SQLException {
         ps.setInt(startIndex, settings.getRotation());
-        ps.setInt(startIndex + 1, settingValue(settings.getHue()));
-        ps.setInt(startIndex + 2, settingValue(settings.getBrightness()));
-        ps.setInt(startIndex + 3, settingValue(settings.getContrast()));
-        ps.setInt(startIndex + 4, settingValue(settings.getSaturation()));
+        ps.setInt(startIndex + 1, DAOutil.settingValue(settings.getHue()));
+        ps.setInt(startIndex + 2, DAOutil.settingValue(settings.getBrightness()));
+        ps.setInt(startIndex + 3, DAOutil.settingValue(settings.getContrast()));
+        ps.setInt(startIndex + 4, DAOutil.settingValue(settings.getSaturation()));
     }
-
-    private int settingValue(double value) { return (int) Math.round(value); }
 }

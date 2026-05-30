@@ -5,6 +5,7 @@ import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.enums.ExportMode;
 import ScanHub.BE.enums.LogAction;
 import ScanHub.BE.interfaces.TreeNode;
+import ScanHub.BLL.util.ImageProcessor;
 import ScanHub.GUI.util.ThemeHandler;
 import ScanHub.GUI.util.GlobalKeyHandler;
 import ScanHub.GUI.facade.ModelFacade;
@@ -667,11 +668,9 @@ public class ScanController implements Initializable, IViewController {
     }
 
     private void endScanSession() {
-        System.out.println("endScanSession called - sessionActive: " + sessionActive + " scanModel: " + scanModel);
         if (!sessionActive || scanModel == null) {return;}
 
         try {
-            System.out.println("deleting session for: " + scanModel.getTargetBox().getBoxName());
             modelFacade.getSessionModel().endScanSession(scanModel.getTargetBox().getBoxName());
         }
         catch (Exception e) {
@@ -947,7 +946,7 @@ public class ScanController implements Initializable, IViewController {
 
         int degrees = spinnerRotation.getValue() * direction;
         int oldRotation = selectedFile.getRotation();
-        int newRotation = normalizeRotation(oldRotation + degrees);
+        int newRotation = FileAdjustmentSettings.normalizeRotation(oldRotation + degrees);
 
         try {
             final File capturedFile = selectedFile;
@@ -1496,7 +1495,6 @@ public class ScanController implements Initializable, IViewController {
         spinnerFileAdjustmentContrast.getValueFactory().setValue((int) file.getContrast());
         spinnerFileAdjustmentSaturation.getValueFactory().setValue((int) file.getSaturation());
         spinnerFileAdjustmentSharpness.getValueFactory().setValue((int) file.getSharpness());
-        applySharpnessToPreview(spinnerFileAdjustmentSharpness.getValue() / 100f);
     }
 
     private BufferedImage scaleToPreviewSize(BufferedImage source, int width, int height) {
@@ -1557,7 +1555,7 @@ public class ScanController implements Initializable, IViewController {
     private Image buildSharpImage(File file, float strength) throws IOException {
         BufferedImage scaled = ImageIO.read(new ByteArrayInputStream(file.getImageData()));
 
-        BufferedImage preview = scanModel.sharpen(scaleToPreviewSize(scaled, (int) cardWidth() - 8, (int) cardHeight() - 44), strength);
+        BufferedImage preview = ImageProcessor.sharpen(scaleToPreviewSize(scaled, (int) cardWidth() - 8, (int) cardHeight() - 44), strength);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ImageIO.write(preview, "png", out);
@@ -1652,9 +1650,5 @@ public class ScanController implements Initializable, IViewController {
 
     private Document findOwnerDocument(File file) {
         return documents.stream().filter(document -> document.getFiles().contains(file)).findFirst().orElse(null);
-    }
-
-    private int normalizeRotation(int rotation) {
-        return ((rotation % 360) + 360) % 360;
     }
 }

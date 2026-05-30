@@ -15,7 +15,11 @@ import java.util.List;
 
 public class DocumentDAO {
 
-    public DocumentDAO() {}
+    private FileDAO fileDAO;
+
+    public DocumentDAO(FileDAO fileDAO) {
+        this.fileDAO = fileDAO;
+    }
 
     public Document createDocument(int boxId) throws SQLException {
         String sql = """
@@ -64,7 +68,6 @@ public class DocumentDAO {
 
     public List<Document> getDocumentsWithFilesByBoxId(int boxId) throws SQLException, IOException {
         List<Document> documents = getDocumentsByBoxId(boxId);
-        FileDAO fileDAO = new FileDAO(); // or inject it
         for (Document doc : documents) {
             List<File> files = fileDAO.getFilesForDocument(doc.getDocumentId());
             doc.getFiles().addAll(files);
@@ -80,19 +83,6 @@ public class DocumentDAO {
 
             ps.setInt(1, documentId);
             ps.executeUpdate();
-        }
-    }
-
-    public int countDocumentsForBox(int boxId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Documents WHERE boxId = ? AND deleted_at IS NULL";
-
-        try (Connection connection = DBConnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setInt(1, boxId);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getInt(1) : 0;
-            }
         }
     }
 
