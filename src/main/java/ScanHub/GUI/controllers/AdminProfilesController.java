@@ -15,7 +15,6 @@ import ScanHub.GUI.util.ViewHandler;
 // javafx imports
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
@@ -31,13 +30,15 @@ import java.util.*;
 public class AdminProfilesController implements Initializable, IShortcutHandler {
 
     @FXML private VBox profileTableBox;
-    @FXML private TextField txtFldSearchProfiles;
+    @FXML private TextField txtFldProfileSearch;
     @FXML private Pagination pgProfiles;
 
     private final ModelFacade modelFacade;
     private final Stage currentStage;
 
     private final List<Profile> currentProfiles = new ArrayList<>();
+    private final List<HBox> currentRows = new ArrayList<>();
+    private int selectedRowIndex = -1;
     private boolean profileAscending;
     private Profile selectedProfile = null;
     private ProfileStatus selectedStatus = null;
@@ -53,7 +54,7 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         filterProfiles();
-        txtFldSearchProfiles.textProperty().addListener((observable, oldValue, newValue) -> filterProfiles());
+        txtFldProfileSearch.textProperty().addListener((observable, oldValue, newValue) -> filterProfiles());
         pgProfiles.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> filterProfiles()));
     }
 
@@ -61,12 +62,18 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
         try {
             selectedProfile = null;
             selectedProfileRow = null;
+            selectedRowIndex = -1;
+            currentRows.clear();
 
-            // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
             TableLoader.loadTable(profileTableBox, pgProfiles, TOTAL_TABLE_SIZE, profiles, item -> {
                 Profile profile = (Profile) item;
                 return RowMaker.addProfileRow(profile, this::selectProfile, this::openProfileForm, this::deleteProfile);
             });
+
+            currentRows.addAll(profileTableBox.getChildren().stream()
+                    .filter(n -> n instanceof HBox)
+                    .map(n -> (HBox) n)
+                    .toList());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,12 +89,33 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
         if (selectedProfileRow == rowHBox) {
             selectedProfile = null;
             selectedProfileRow = null;
+            selectedRowIndex = -1;
             return;
         }
 
         selectedProfile = profile;
         selectedProfileRow = rowHBox;
+        selectedRowIndex = currentRows.indexOf(rowHBox);
         rowHBox.getStyleClass().add("row-selected");
+    }
+
+    /** Moves the selection up or down by one row. */
+    private void moveSelection(int delta) {
+        if (currentRows.isEmpty()) return;
+
+        int newIndex;
+        if (selectedRowIndex < 0) {
+            newIndex = delta > 0 ? 0 : currentRows.size() - 1;
+        } else {
+            newIndex = selectedRowIndex + delta;
+            if (newIndex < 0 || newIndex >= currentRows.size()) return;
+        }
+
+        HBox targetRow = currentRows.get(newIndex);
+        Object userData = targetRow.getUserData();
+        if (userData instanceof Profile profile) {
+            selectProfile(profile, targetRow);
+        }
     }
 
     @FXML
@@ -134,7 +162,7 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
 
     private void filterProfiles() {
 
-        String search = txtFldSearchProfiles.getText().toLowerCase();
+        String search = txtFldProfileSearch.getText().toLowerCase();
 
         List<Profile> profiles = modelFacade.getProfileModel().getProfiles();
 
@@ -151,17 +179,27 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
 
     @Override
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
-        return Map.of(
-                new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateProfile,
-                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), () -> {
-                    if (selectedProfile == null) { AlertHelper.showWarning("No Selection", "Please select a profile to edit."); return; }
-                    openProfileForm(selectedProfile);
-                },
-                new KeyCodeCombination(KeyCode.DELETE), () -> {
-                    if (selectedProfile == null) { AlertHelper.showWarning("No Selection", "Please select a profile to delete."); return; }
-                    deleteProfile(selectedProfile);
-                }
-        );
+        Map<KeyCodeCombination, Runnable> shortcuts = new HashMap<>();
+        shortcuts.put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateProfile);
+        shortcuts.put(new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), () -> {
+            if (selectedProfile == null) { AlertHelper.showWarning("No Selection", "Please select a profile to edit."); return; }
+            openProfileForm(selectedProfile);
+        });
+        shortcuts.put(new KeyCodeCombination(KeyCode.DELETE), () -> {
+            if (selectedProfile == null) { AlertHelper.showWarning("No Selection", "Please select a profile to delete."); return; }
+            deleteProfile(selectedProfile);
+        });
+        shortcuts.put(new KeyCodeCombination(KeyCode.UP), () -> {
+            if (!txtFldProfileSearch.isFocused()) moveSelection(-1);
+        });
+        shortcuts.put(new KeyCodeCombination(KeyCode.DOWN), () -> {
+            if (!txtFldProfileSearch.isFocused()) moveSelection(1);
+        });
+        shortcuts.put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), () -> {
+            txtFldProfileSearch.requestFocus();
+            txtFldProfileSearch.selectAll();
+        });
+        return shortcuts;
     }
 
     @FXML

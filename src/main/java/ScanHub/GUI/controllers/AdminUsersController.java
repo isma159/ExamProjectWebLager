@@ -35,6 +35,8 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
     @FXML private Pagination pgUsers;
 
     private final List<User> currentUsers = new ArrayList<>();
+    private final List<HBox> currentRows = new ArrayList<>();
+    private int selectedRowIndex = -1;
     private boolean userAscending = true;
 
     private final ModelFacade modelFacade;
@@ -54,7 +56,6 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
     public void initialize(URL location, ResourceBundle resources) {
         filterUsers();
         txtFldUserSearch.textProperty().addListener((observable, oldValue, newValue) -> filterUsers());
-
         pgUsers.currentPageIndexProperty().addListener(((observable, oldValue, newValue) -> filterUsers()));
     }
 
@@ -62,11 +63,18 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
         try {
             selectedUser = null;
             selectedUserRow = null;
+            selectedRowIndex = -1;
+            currentRows.clear();
 
             TableLoader.loadTable(userTableBox, pgUsers, TOTAL_TABLE_SIZE, users, item -> {
                 User user = (User) item;
                 return RowMaker.addUserRow(user, this::selectUser, this::openUserForm, this::deleteUser);
             });
+
+            currentRows.addAll(userTableBox.getChildren().stream()
+                    .filter(n -> n instanceof HBox)
+                    .map(n -> (HBox) n)
+                    .toList());
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Load Error", "Failed to load users.");
@@ -82,12 +90,34 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
         if (selectedUserRow == rowHBox) {
             selectedUser = null;
             selectedUserRow = null;
+            selectedRowIndex = -1;
             return;
         }
 
         selectedUser = user;
         selectedUserRow = rowHBox;
+        selectedRowIndex = currentRows.indexOf(rowHBox);
         rowHBox.getStyleClass().add("row-selected");
+    }
+
+    /** Moves the selection up or down by one row. */
+    private void moveSelection(int delta) {
+        if (currentRows.isEmpty()) return;
+
+        int newIndex;
+        if (selectedRowIndex < 0) {
+            // nothing selected yet: delta > 0 selects first row, delta < 0 selects last
+            newIndex = delta > 0 ? 0 : currentRows.size() - 1;
+        } else {
+            newIndex = selectedRowIndex + delta;
+            if (newIndex < 0 || newIndex >= currentRows.size()) return; // already at edge
+        }
+
+        HBox targetRow = currentRows.get(newIndex);
+        Object userData = targetRow.getUserData();
+        if (userData instanceof User user) {
+            selectUser(user, targetRow);
+        }
     }
 
     @FXML
@@ -152,17 +182,27 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
 
     @Override
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
-        return Map.of(
-                new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateUser,
-                new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), () -> {
-                    if (selectedUser == null) { AlertHelper.showWarning("No Selection", "Please select a user to edit."); return; }
-                    openUserForm(selectedUser);
-                },
-                new KeyCodeCombination(KeyCode.DELETE), () -> {
-                    if (selectedUser == null) { AlertHelper.showWarning("No Selection", "Please select a user to delete."); return; }
-                    deleteUser(selectedUser);
-                }
-        );
+        Map<KeyCodeCombination, Runnable> shortcuts = new HashMap<>();
+        shortcuts.put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::onClickCreateUser);
+        shortcuts.put(new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), () -> {
+            if (selectedUser == null) { AlertHelper.showWarning("No Selection", "Please select a user to edit."); return; }
+            openUserForm(selectedUser);
+        });
+        shortcuts.put(new KeyCodeCombination(KeyCode.DELETE), () -> {
+            if (selectedUser == null) { AlertHelper.showWarning("No Selection", "Please select a user to delete."); return; }
+            deleteUser(selectedUser);
+        });
+        shortcuts.put(new KeyCodeCombination(KeyCode.UP), () -> {
+            if (!txtFldUserSearch.isFocused()) moveSelection(-1);
+        });
+        shortcuts.put(new KeyCodeCombination(KeyCode.DOWN), () -> {
+            if (!txtFldUserSearch.isFocused()) moveSelection(1);
+        });
+        shortcuts.put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), () -> {
+            txtFldUserSearch.requestFocus();
+            txtFldUserSearch.selectAll();
+        });
+        return shortcuts;
     }
 
     @FXML

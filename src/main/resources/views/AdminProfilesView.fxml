@@ -5,105 +5,115 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
-    <children>
-        <VBox HBox.hgrow="ALWAYS">
-            <children>
-                <VBox styleClass="shadow" VBox.vgrow="ALWAYS">
-                    <children>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0" spacing="6.0">
-                            <styleClass>
-                                <String fx:value="half-card" />
-                                <String fx:value="card-bg" />
-                            </styleClass>
-                            <children>
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="75.0" styleClass="h2" text="Profiles" />
-                                <Region prefHeight="56.0" prefWidth="1482.0" />
-                                <VBox alignment="CENTER">
-                                    <children>
-                                        <Button mnemonicParsing="false" onAction="#onClickCreateProfile" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
-                                            <graphic>
-                                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="135.0" styleClass="primary-btn">
-                                                    <children>
-                                                        <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
-                                                            <font>
-                                                                <Font size="16.0" />
-                                                            </font>
-                                                        </Label>
-                                                        <Region prefHeight="200.0" prefWidth="6.0" />
-                                                        <Label alignment="CENTER" styleClass="lbl" text="Create Profile" textFill="WHITE">
-                                                            <font>
-                                                                <Font size="12.0" />
-                                                            </font>
-                                                        </Label>
-                                                    </children>
-                                                </HBox>
-                                            </graphic>
-                                            <tooltip>
-                                                <Tooltip text="Create a new Profile (Ctrl + N)" />
-                                            </tooltip>
-                                        </Button>
-                                        <Label alignment="CENTER" styleClass="shortcut-lbl" text="Ctrl + N">
-                                            <font>
-                                                <Font size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                </VBox>
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                            </children>
-                        </HBox>
-                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
-                            <styleClass>
-                                <String fx:value="box-card" />
-                                <String fx:value="second-card-bg" />
-                            </styleClass>
-                            <children>
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbAllProfilesClick" prefHeight="30.0" prefWidth="90.0" selected="true" text="All Profiles">
-                                    <toggleGroup><ToggleGroup fx:id="profileFilter" /></toggleGroup>
-                                    <styleClass>
-                                        <String fx:value="filter-btn" />
-                                        <String fx:value="lbl" />
-                                    </styleClass>
-                                </ToggleButton>
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbActiveClick" prefHeight="30.0" prefWidth="90.0" text="Active" toggleGroup="$profileFilter">
-                                    <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
-                                </ToggleButton>
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbInactiveClick" prefHeight="30.0" prefWidth="90.0" text="Inactive" toggleGroup="$profileFilter">
-                                    <styleClass><String fx:value="filter-btn" /><String fx:value="lbl" /></styleClass>
-                                </ToggleButton>
-                        <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="15.0" />
-                                <TextField fx:id="txtFldSearchProfiles" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for profiles" styleClass="container" />
-                            </children>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
-                            <styleClass>
-                                <String fx:value="second-card-bg" />
-                                <String fx:value="box-card" />
-                            </styleClass>
-                            <children>
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Profile Name" HBox.hgrow="ALWAYS" />
-                                <Separator orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Export Label" HBox.hgrow="ALWAYS" />
-                                <Separator orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Status" HBox.hgrow="ALWAYS" />
-                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
-                            </children>
-                        </HBox>
-                        <ScrollPane fitToWidth="true" styleClass="box-card" VBox.vgrow="ALWAYS">
-                            <content><VBox fx:id="profileTableBox" prefHeight="100.0" prefWidth="100.0" /></content>
-                        </ScrollPane>
-                        <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
-                            <styleClass><String fx:value="half-card-bottom" /><String fx:value="card-bg" /></styleClass>
-                            <children><Pagination fx:id="pgProfiles" maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" /></children>
-                        </HBox>
-                    </children>
-                </VBox>
-            </children>
-        </VBox>
-    </children>
-</HBox>
+<VBox prefHeight="720.0" prefWidth="1800.0" styleClass="shadow" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminProfilesController">
+        <children>
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0" spacing="6.0">
+                <styleClass>
+                    <String fx:value="half-card" />
+                    <String fx:value="card-bg" />
+                </styleClass>
+                <children>
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                    <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" styleClass="h2" text="Profiles" />
+                    <TextField fx:id="txtFldProfileSearch" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for profiles" styleClass="container">
+                        <tooltip>
+                            <Tooltip text="Search (Ctrl + F)" />
+                        </tooltip>
+                    </TextField>
+                    <Region prefHeight="56.0" prefWidth="1482.0" />
+                    <VBox alignment="CENTER">
+                        <children>
+                            <Button mnemonicParsing="false" onAction="#onClickCreateProfile" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                                <graphic>
+                                    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="135.0" styleClass="primary-btn">
+                                        <children>
+                                            <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
+                                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                                <font>
+                                                    <Font size="16.0" />
+                                                </font>
+                                            </Label>
+                                            <Region prefHeight="200.0" prefWidth="6.0" />
+                                            <Label alignment="CENTER" styleClass="lbl" text="Create Profile" textFill="WHITE">
+                                                <font>
+                                                    <Font size="12.0" />
+                                                </font>
+                                            </Label>
+                                        </children>
+                                    </HBox>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Create a new Profile (Ctrl + N)" />
+                                </tooltip>
+                            </Button>
+                            <Label alignment="CENTER" styleClass="shortcut-lbl" text="Ctrl + N">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </Label>
+                        </children>
+                    </VBox>
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                </children>
+            </HBox>
+            <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                <styleClass>
+                    <String fx:value="box-card" />
+                    <String fx:value="second-card-bg" />
+                </styleClass>
+                <children>
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                    <ToggleButton mnemonicParsing="false" onAction="#onTbAllProfilesClick" prefHeight="30.0" prefWidth="90.0" selected="true" text="All Profiles">
+                        <toggleGroup>
+                  <ToggleGroup fx:id="profileFilter" />
+               </toggleGroup>
+                        <styleClass>
+                            <String fx:value="filter-btn" />
+                            <String fx:value="lbl" />
+                        </styleClass>
+                    </ToggleButton>
+                    <ToggleButton mnemonicParsing="false" onAction="#onTbActiveClick" prefHeight="30.0" prefWidth="90.0" text="Active" toggleGroup="$profileFilter">
+                        <styleClass>
+                  <String fx:value="filter-btn" />
+                  <String fx:value="lbl" />
+               </styleClass>
+                    </ToggleButton>
+                    <ToggleButton mnemonicParsing="false" onAction="#onTbInactiveClick" prefHeight="30.0" prefWidth="90.0" text="Inactive" toggleGroup="$profileFilter">
+                        <styleClass>
+                  <String fx:value="filter-btn" />
+                  <String fx:value="lbl" />
+               </styleClass>
+                    </ToggleButton>
+            <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="15.0" />
+                </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                <styleClass>
+                    <String fx:value="second-card-bg" />
+                    <String fx:value="box-card" />
+                </styleClass>
+                <children>
+                    <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onProfileNameClick" onMouseClicked="#onProfileNameClick" prefWidth="210.0" styleClass="lbl" text="Profile Name" HBox.hgrow="ALWAYS" />
+                    <Separator orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                    <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Export Label" HBox.hgrow="ALWAYS" />
+                    <Separator orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                    <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Status" HBox.hgrow="ALWAYS" />
+            <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
+                </children>
+            </HBox>
+            <ScrollPane fitToWidth="true" styleClass="box-card" VBox.vgrow="ALWAYS">
+                <content>
+            <VBox fx:id="profileTableBox" prefHeight="100.0" prefWidth="100.0" />
+         </content>
+            </ScrollPane>
+            <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                <styleClass>
+            <String fx:value="half-card-bottom" />
+            <String fx:value="card-bg" />
+         </styleClass>
+                <children>
+            <Pagination fx:id="pgProfiles" maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
+         </children>
+            </HBox>
+        </children>
+    </VBox>

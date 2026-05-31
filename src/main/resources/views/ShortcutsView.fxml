@@ -332,6 +332,50 @@
 
                                                         <Separator styleClass="grey-separator" />
 
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Delete User/Profile/Client" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Delete" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
+                                                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
+                                                            <styleClass>
+                                                                <String fx:value="box-card" />
+                                                                <String fx:value="card-bg" />
+                                                            </styleClass>
+                                                            <children>
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Navigate rows (Users / Profiles / Clients)" />
+                                                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
+                                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                                    <children>
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="↑" />
+                                                                        <Label styleClass="lbl" text="/" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="↓" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Separator styleClass="grey-separator" />
+
                                                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0">
                                                             <styleClass>
                                                                 <String fx:value="box-card-bottom" />
@@ -339,12 +383,14 @@
                                                             </styleClass>
                                                             <children>
                                                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
-                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Delete User/Profile" />
+                                                                <Label alignment="CENTER_LEFT" prefWidth="300.0" styleClass="lbl" text="Focus search bar" />
                                                                 <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="39.0" styleClass="grey-separator" />
                                                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="15.0" />
                                                                 <HBox alignment="CENTER_LEFT" spacing="6.0">
                                                                     <children>
-                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Delete" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="Ctrl" />
+                                                                        <Label styleClass="lbl" text="+" />
+                                                                        <Label style="-fx-padding: 2 6 2 6; -fx-background-radius: 6px;" styleClass="bold-lbl" text="F" />
                                                                     </children>
                                                                 </HBox>
                                                             </children>
