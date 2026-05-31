@@ -164,7 +164,7 @@ create table Logs
     userId        int                                not null
         constraint FK_Logs_User
             references Users,
-    entityId      int,
+    entityName    varchar(100)                       not null,
     entityType    varchar(50)                        not null
         constraint CK_Logs_EntityType
             check ([entityType] = 'USER' OR [entityType] = 'FILE' OR [entityType] = 'DOCUMENT' OR
