@@ -35,7 +35,7 @@ public class LogManager {
                     .append(log.getUser().getUsername()).append(delimiter)
                     .append(log.getAction()).append(delimiter)
                     .append(log.getEntityType()).append(delimiter)
-                    .append(log.getEntityId()).append(delimiter)
+                    .append(log.getEntityName()).append(delimiter)
                     .append(log.getTimestamp().format(formatter)).append("\n");
         }
 

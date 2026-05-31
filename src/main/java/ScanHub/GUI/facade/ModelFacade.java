@@ -1,8 +1,13 @@
 package ScanHub.GUI.facade;
 
 // project imports
+import ScanHub.BE.Log;
+import ScanHub.BE.enums.EntityType;
+import ScanHub.BE.enums.LogAction;
 import ScanHub.BLL.util.PasswordEncrypter;
 import ScanHub.GUI.models.*;
+
+import java.time.LocalDateTime;
 
 public class ModelFacade {
 
@@ -38,4 +43,13 @@ public class ModelFacade {
     public BoxMetadataModel getMetadataModel() { return metadataModel; }
     public LogModel getLogModel() { return logModel; }
     public SessionModel getSessionModel() {return sessionModel;}
+
+    public void auditLog(EntityType type, String name, LogAction action) {
+        try {
+            logModel.createLog(new Log(sessionModel.getCurrentUser(), name, type, action));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -141,7 +141,7 @@ public class ProfileFormController implements Initializable {
 
             Profile newProfile = new Profile(selectedClient, profileName, status, buildExportLabel(profileName, selectedClient.getClientName()), buildFileSettings());
             Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
-            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), createdProfile.getProfileId(), EntityType.PROFILE, LogAction.CREATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.PROFILE, createdProfile.getProfileName(), LogAction.CREATE);
             currentStage.close();
 
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class ProfileFormController implements Initializable {
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);
-            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), editingProfile.getProfileId(), EntityType.PROFILE, LogAction.UPDATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.PROFILE, editingProfile.getProfileName(), LogAction.UPDATE);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -243,8 +243,12 @@ public class ProfileFormController implements Initializable {
         Image image = imgPreviewAfter.getImage();
         if (image == null || image.isError()) return;
 
-        double maxWidth = previewPaneAfter.getWidth() - 30;
-        double maxHeight = previewPaneAfter.getHeight() - 30;
+        // fall back to the fixed FXML size (240) when the pane reports 0, which happens when sliders fire during populateFields() before the stage is shown.
+        // Otherwise scale becomes Infinity/NaN and the image fills the entire window
+        double paneWidth = previewPaneAfter.getWidth();
+        double paneHeight = previewPaneAfter.getHeight();
+        double maxWidth = (paneWidth > 0 ? paneWidth : 270) - 30;
+        double maxHeight = (paneHeight > 0 ? paneHeight : 270) - 30;
 
         double originalWidth = image.getWidth();
         double originalHeight = image.getHeight();

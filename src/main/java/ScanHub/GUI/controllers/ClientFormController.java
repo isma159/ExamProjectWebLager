@@ -89,7 +89,7 @@ public class ClientFormController implements Initializable {
         try {
             Client newClient = new Client(clientName);
             modelFacade.getClientModel().createClient(newClient);
-            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), newClient.getClientId(), EntityType.CLIENT, LogAction.CREATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.CLIENT, newClient.getClientName(), LogAction.CREATE);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,7 +113,7 @@ public class ClientFormController implements Initializable {
 
         try {
             modelFacade.getClientModel().updateClient(editingClient);
-            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), editingClient.getClientId(), EntityType.CLIENT, LogAction.UPDATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.CLIENT, editingClient.getClientName(), LogAction.UPDATE);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

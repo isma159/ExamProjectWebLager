@@ -340,8 +340,6 @@
 
 }
 
-.combo-box-base .
-
 .combo-box-base .arrow-button {
 
     -fx-background-color: TRANSPARENT;
@@ -403,13 +401,18 @@
 
 }
 
-.combo-box-popup .list-cell:focused {
+.combo-box-popup .list-cell:filled:focused,
+.combo-box-popup .list-cell:filled:selected,
+.combo-box-popup .list-cell:filled:focused:selected {
 
     -fx-background-color: #E2E8F0;
+    -fx-text-fill: #2d3d4f;
 
 }
 
-.combo-box .list-cell:focused .text {
+.combo-box .list-cell:filled:focused .text,
+.combo-box .list-cell:filled:selected .text,
+.combo-box .list-cell:filled:focused:selected .text {
 
     -fx-fill: #2d3d4f;
 
@@ -756,14 +759,29 @@
 
 }
 
-.avatar-success {
+.avatar-green {
     -fx-background-color: #4CD07D;
     -fx-background-radius: 6px;
 }
 
-.avatar-error {
+.avatar-red {
     -fx-background-color: #FF3D32;
     -fx-background-radius: 6px;
+}
+
+.avatar-yellow {
+    -fx-background-color: #EAB308;
+    -fx-background-radius: 6px;
+}
+
+.avatar-purple {
+    -fx-background-radius: 6px;
+    -fx-background-color: #7C3AED;
+}
+
+.avatar-orange {
+    -fx-background-radius: 6px;
+    -fx-background-color: #F97316;
 }
 
 .half-card {

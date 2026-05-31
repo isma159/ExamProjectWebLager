@@ -9,8 +9,14 @@ import ScanHub.DAL.interfaces.IDataAccess;
 
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class LogDAO implements IDataAccess<Log> {
 
@@ -21,7 +27,7 @@ public class LogDAO implements IDataAccess<Log> {
         List<Log> logs = new ArrayList<>();
 
         String sql = """
-            SELECT l.logsId, l.userId AS logUserId, l.entityId, l.entityType, l.action, l.log_timestamp, u.userId AS userId, u.username, u.passwordHash, u.role
+            SELECT l.logsId, l.userId AS logUserId, l.entityName, l.entityType, l.action, l.log_timestamp, u.userId AS userId, u.username, u.passwordHash, u.role
             FROM Logs l
             JOIN Users u ON l.userId = u.userId
             ORDER BY l.log_timestamp ASC
@@ -64,7 +70,7 @@ public class LogDAO implements IDataAccess<Log> {
     @Override
     public Log createData(Log log) throws Exception {
         String sql = """
-                INSERT INTO Logs (userId, entityId, entityType, action, log_timestamp)
+                INSERT INTO Logs (userId, entityName, entityType, action, log_timestamp)
                 OUTPUT INSERTED.logsId, INSERTED.log_timestamp
                 VALUES (?, ?, ?, ?, SYSUTCDATETIME())
                 """;
@@ -73,17 +79,26 @@ public class LogDAO implements IDataAccess<Log> {
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, log.getUser().getUserId());
-            ps.setInt(2, log.getEntityId());
+            ps.setString(2, log.getEntityName());
             ps.setString(3, log.getEntityType().toString());
             ps.setString(4, log.getAction().toString());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Log(rs.getInt("logsId"),
+
+                    LocalDateTime utcTime = rs.getTimestamp("log_timestamp").toLocalDateTime();
+                    ZonedDateTime localTime = utcTime.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault());
+
+                    Log newLog = new Log(rs.getInt("logsId"),
                             log.getUser(),
-                            log.getEntityId(),
+                            log.getEntityName(),
                             log.getEntityType(),
-                            log.getAction(),
-                            rs.getTimestamp("log_timestamp").toLocalDateTime());
+                            log.getAction());
+
+                    newLog.setTimestamp(localTime);
+
+                    System.out.println("createData timestamp: " + newLog.getTimestamp());
+
+                    return newLog;
                 }
             }
 
@@ -95,16 +110,24 @@ public class LogDAO implements IDataAccess<Log> {
     }
 
     private Log mapRow(ResultSet rs) throws SQLException {
-        return new Log(
+
+        Log log = new Log(
                 rs.getInt("logsId"),
                 new User(rs.getInt("userId"),
                         rs.getString("username"),
                         rs.getString("passwordHash"),
                         Role.valueOf(rs.getString("role"))),
-                rs.getInt("entityId"),
+                rs.getString("entityName"),
                 EntityType.valueOf(rs.getString("entityType")),
-                LogAction.valueOf(rs.getString("action")),
-                rs.getTimestamp("log_timestamp").toLocalDateTime()
-        );
+                LogAction.valueOf(rs.getString("action")));
+
+        ZonedDateTime timestamp = rs.getTimestamp("log_timestamp", Calendar.getInstance(TimeZone.getTimeZone("UTC")))
+                .toInstant().atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault());
+
+        log.setTimestamp(timestamp);
+
+        System.out.println("mapRow timestamp: " + log.getTimestamp());
+
+        return log;
     }
 }

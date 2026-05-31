@@ -1,28 +1,18 @@
 package ScanHub.GUI.controllers;
 
-import ScanHub.BE.enums.EntityType;
 import ScanHub.BE.Log;
 import ScanHub.BE.enums.LogAction;
-import ScanHub.BE.enums.ProfileStatus;
-import ScanHub.BE.enums.Role;
 import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
-import ScanHub.GUI.util.ViewHandler;
-import javafx.collections.FXCollections;
-import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -30,9 +20,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AdminLogsController implements Initializable, IShortcutHandler {
 
@@ -47,10 +35,7 @@ public class AdminLogsController implements Initializable, IShortcutHandler {
     private Stage currentStage;
 
     private List<Log> currentLogs = new ArrayList<>();
-
     private final int ROWS_PER_PAGE = 15;
-
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public AdminLogsController(ModelFacade modelFacade, Stage currentStage) {
         this.modelFacade = modelFacade;
@@ -75,7 +60,7 @@ public class AdminLogsController implements Initializable, IShortcutHandler {
 
         cbFilter.getSelectionModel().select(LogAction.ALL);
 
-        // Manual Pagination Listener (instead of Page Factory)
+        // manual Pagination Listener (instead of Page Factory)
         logsPagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
             applyFilters();
         });

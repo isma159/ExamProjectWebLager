@@ -97,7 +97,7 @@ public class RowMaker {
 
     // -----  -----
 
-    public static HBox addMetadataRow(BoxMetadata metadata, BiConsumer<BoxMetadata, HBox> onSelect) {
+    public static HBox addMetadataRow(BoxMetadata metadata) {
         HBox col1 = centeredCol(createLabel("Box #" + metadata.getBoxId()));
         HBox col2 = centeredCol(createLabel(metadata.getProfileName()));
         HBox col3 = centeredCol(createLabel(metadata.getBoxName()));
@@ -110,7 +110,6 @@ public class RowMaker {
         row.setAlignment(Pos.CENTER_LEFT);
         row.getChildren().addAll(col1, col2, col3, col4, col5, col6);
 
-        attachClickHandler(row, metadata, onSelect);
         return row;
     }
 
@@ -123,8 +122,11 @@ public class RowMaker {
         dot.setMinHeight(Region.USE_PREF_SIZE);
         dot.setPrefSize(6.0, 6.0);
 
-        if (log.getAction() == LogAction.CREATE) {dot.getStyleClass().add("avatar-success");}
-        else if (log.getAction() == LogAction.DELETE) {dot.getStyleClass().add("avatar-error");}
+        if (log.getAction() == LogAction.CREATE) {dot.getStyleClass().add("avatar-green");}
+        else if (log.getAction() == LogAction.DELETE) {dot.getStyleClass().add("avatar-orange");}
+        else if (log.getAction() == LogAction.EXPORT) {dot.getStyleClass().add("avatar-purple");}
+        else if (log.getAction() == LogAction.UPDATE) {dot.getStyleClass().add("avatar-yellow");}
+        else if (log.getAction() == LogAction.ERROR) {dot.getStyleClass().add("avatar-red");}
         else {dot.getStyleClass().add("avatar-initial");}
 
         HBox col1 = new HBox(dot);
@@ -259,7 +261,7 @@ public class RowMaker {
             return log.getUser().getUsername() + " " + log.getAction().getVerb() + " at " + ts;
         return log.getUser().getUsername() + " " + log.getAction().getVerb()
                 + " " + log.getEntityType().getLabel()
-                + " " + log.getEntityId() + " on " + ts;
+                + " " + log.getEntityName() + " on " + ts;
     }
 
     private static <T> void attachClickHandler(HBox row, T item, BiConsumer<T, HBox> handler) {

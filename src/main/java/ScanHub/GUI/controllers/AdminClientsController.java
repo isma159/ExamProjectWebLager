@@ -159,7 +159,7 @@ public class AdminClientsController implements Initializable, IShortcutHandler {
         AlertHelper.showConfirmation("Delete Client", "Are you sure you want to delete \"" + client.getClientName() + "\"? This action cannot be undone.", () -> {
             try {
                 modelFacade.getClientModel().deleteClient(client);
-                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), client.getClientId(), EntityType.CLIENT, LogAction.DELETE, LocalDateTime.now()));
+                modelFacade.auditLog(EntityType.CLIENT, client.getClientName(), LogAction.DELETE);
                 filterClients();
             } catch (Exception e) {
                 e.printStackTrace();

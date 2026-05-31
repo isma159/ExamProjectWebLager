@@ -189,7 +189,7 @@ public class UserFormController implements Initializable {
             User newUser = new User(username, hashedPassword, role);
             newUser.setProfiles(retrieveSelectedProfiles());
             modelFacade.getUserModel().createUser(newUser);
-            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), newUser.getUserId(), EntityType.USER, LogAction.CREATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.USER, newUser.getUsername(), LogAction.CREATE);
             currentStage.close();
         } catch (Exception e) {
             //e.printStackTrace();
@@ -237,7 +237,7 @@ public class UserFormController implements Initializable {
 
         try {
             modelFacade.getUserModel().updateUser(editingUser);
-            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), editingUser.getUserId(), EntityType.USER, LogAction.UPDATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.USER, editingUser.getUsername(), LogAction.UPDATE);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

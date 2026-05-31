@@ -5,6 +5,7 @@ import ScanHub.GUI.facade.ModelFacade;
 import ScanHub.GUI.interfaces.IShortcutHandler;
 import ScanHub.GUI.util.AlertHelper;
 import ScanHub.GUI.util.RowMaker;
+import ScanHub.GUI.util.TableLoader;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -37,45 +38,35 @@ public class AdminMetadataController implements Initializable, IShortcutHandler 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        loadMetadata();
+        applyFilter();
+        txtFldSearchMetadata.textProperty().addListener(((obs, oldVal, newVal) -> applyFilter()));
     }
 
-    private void loadMetadata() {
+    private void loadMetadata(List<BoxMetadata> metadata) {
         try {
             // resets
-            metadataTableBox.getChildren().clear();
             selected = null;
             selectedRow = null;
 
-            // sets up with all profiles by running a for-loop that makes an interactive HBox of every profile
-            List<BoxMetadata> metadata = modelFacade.getMetadataModel().getAllMetadata();
-            metadataPagination.setPageCount(Math.ceilDiv(metadata.size(), TOTAL_TABLE_SIZE));
+            TableLoader.loadTable(metadataTableBox, metadataPagination, TOTAL_TABLE_SIZE, metadata, item -> {
+                BoxMetadata boxMetadata = (BoxMetadata) item;
+                return RowMaker.addMetadataRow(boxMetadata);
+            });
 
-            int startIndex = metadataPagination.getCurrentPageIndex() * TOTAL_TABLE_SIZE;
-            int endIndex = Math.min(startIndex + TOTAL_TABLE_SIZE, metadata.size());
-
-            List<BoxMetadata> currentMetadata = new ArrayList<>(metadata.subList(startIndex, endIndex));
-            for (BoxMetadata boxMetadata : currentMetadata) {
-                HBox row = RowMaker.addMetadataRow(boxMetadata, (clickedMetadata, rowHBox) -> {
-                    if (selectedRow != null) {
-                        selectedRow.getStyleClass().remove("row-selected");
-                    }
-                    if (selected == clickedMetadata) {
-                        selected = null;
-                        selectedRow = null;
-                        return;
-                    }
-                    selected = clickedMetadata;
-                    selectedRow = rowHBox;
-                    rowHBox.getStyleClass().add("row-selected");
-                });
-                row.setUserData(boxMetadata);
-                metadataTableBox.getChildren().add(row);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Load Error", "Failed to load metadata.");
         }
+    }
+
+    private void applyFilter() {
+
+        String search = txtFldSearchMetadata.getText();
+        List<BoxMetadata> metadata = modelFacade.getMetadataModel().getAllMetadata();
+
+        metadata = metadata.stream().filter(boxMetadata -> search.isBlank() || String.valueOf(boxMetadata.getBoxId()).contains(search) || boxMetadata.getBoxName().contains(search)).toList();
+
+        loadMetadata(metadata);
     }
 
     @Override
