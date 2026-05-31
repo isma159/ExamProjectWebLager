@@ -96,8 +96,6 @@ public class LogDAO implements IDataAccess<Log> {
 
                     newLog.setTimestamp(localTime);
 
-                    System.out.println("createData timestamp: " + newLog.getTimestamp());
-
                     return newLog;
                 }
             }
@@ -125,8 +123,6 @@ public class LogDAO implements IDataAccess<Log> {
                 .toInstant().atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault());
 
         log.setTimestamp(timestamp);
-
-        System.out.println("mapRow timestamp: " + log.getTimestamp());
 
         return log;
     }
