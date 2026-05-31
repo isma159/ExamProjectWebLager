@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Pagination?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import org.controlsfx.control.SearchableComboBox?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.*?>
 
-<VBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminLogsController">
+<VBox prefHeight="720.0" prefWidth="1800.0" styleClass="shadow" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminLogsController">
 
-    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="1800.0">
+    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="1800.0" spacing="6.0">
         <styleClass>
             <String fx:value="half-card" />
             <String fx:value="card-bg" />
@@ -25,9 +17,13 @@
         <Region prefWidth="15.0" />
         <Label styleClass="h2" text="Activity Logs" />
         <TextField fx:id="txtFldSearchLogs" prefHeight="30.0" prefWidth="210.0" promptText="Search logs…" styleClass="container">
-         <HBox.margin>
-            <Insets left="15.0" right="15.0" />
-         </HBox.margin></TextField>
+            <tooltip>
+                <Tooltip text="Search logs (Ctrl + F)" />
+            </tooltip>
+            <HBox.margin>
+                <Insets />
+            </HBox.margin>
+        </TextField>
         <Region HBox.hgrow="ALWAYS" />
       <Button mnemonicParsing="false" onAction="#onExportBtnClick" prefHeight="33.0" prefWidth="135.0" styleClass="primary-btn">
          <graphic>
@@ -57,7 +53,7 @@
             <String fx:value="box-card" />
         </styleClass>
         <Region prefWidth="15.0" />
-      <Label prefWidth="60.0" styleClass="bold-lbl" text="Filter by: " />
+      <Label styleClass="bold-lbl" text="Filter by: " />
       <SearchableComboBox fx:id="cbFilter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="150.0" />
 
         <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="24.0" styleClass="grey-separator" />

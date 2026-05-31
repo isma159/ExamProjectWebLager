@@ -1,124 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox fx:id="rootNode" prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
-    <children>
-        <VBox HBox.hgrow="ALWAYS">
-            <children>
-                <VBox styleClass="shadow" VBox.vgrow="ALWAYS">
-                    <children>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" spacing="6.0">
-                            <styleClass>
-                                <String fx:value="half-card" />
-                                <String fx:value="card-bg" />
-                            </styleClass>
-                            <children>
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="60.0" styleClass="h2" text="Users" />
-                                <Region prefHeight="56.0" prefWidth="1482.0" HBox.hgrow="ALWAYS" />
-                                <VBox alignment="CENTER">
-                                    <children>
-                                        <Button mnemonicParsing="false" onAction="#onClickCreateUser" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
-                                            <graphic>
-                                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="135.0" styleClass="primary-btn">
-                                                    <children>
-                                                        <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
-                                                        <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
-                                                            <font>
-                                                                <Font size="16.0" />
-                                                            </font>
-                                                        </Label>
-                                                        <Region prefHeight="200.0" prefWidth="6.0" />
-                                                        <Label alignment="CENTER" styleClass="lbl" text="Create User" textFill="WHITE">
-                                                            <font>
-                                                                <Font size="12.0" />
-                                                            </font>
-                                                        </Label>
-                                                    </children>
-                                                </HBox>
-                                            </graphic>
-                                            <tooltip>
-                                                <Tooltip text="Create a new User (Ctrl + N)" />
-                                            </tooltip>
-                                        </Button>
-                                        <Label alignment="CENTER" styleClass="shortcut-lbl" text="Ctrl + N">
-                                            <font>
-                                                <Font size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                </VBox>
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                            </children>
-                        </HBox>
-                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
-                            <styleClass>
-                                <String fx:value="box-card" />
-                                <String fx:value="second-card-bg" />
-                            </styleClass>
-                            <children>
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbAllUsersClick" prefHeight="30.0" prefWidth="75.0" selected="true" text="All Users">
-                                    <toggleGroup>
-                                        <ToggleGroup fx:id="userFilter" />
-                                    </toggleGroup>
-                                    <styleClass>
-                                        <String fx:value="filter-btn" />
-                                        <String fx:value="lbl" />
-                                    </styleClass>
-                                </ToggleButton>
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbAdminsClick" prefHeight="30.0" prefWidth="75.0" text="Admins" toggleGroup="$userFilter">
-                                    <styleClass>
-                                        <String fx:value="filter-btn" />
-                                        <String fx:value="lbl" />
-                                    </styleClass></ToggleButton>
-                                <ToggleButton mnemonicParsing="false" onAction="#onTbUsersClick" prefHeight="30.0" prefWidth="75.0" text="Users" toggleGroup="$userFilter">
-                                    <styleClass>
-                                        <String fx:value="filter-btn" />
-                                        <String fx:value="lbl" />
-                                    </styleClass></ToggleButton>
-                                <Separator orientation="VERTICAL" prefHeight="200.0" styleClass="grey-separator" />
-                                <Region layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <TextField fx:id="txtFldUserSearch" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for specific user" styleClass="container" />
-                            </children>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
-                            <styleClass>
-                                <String fx:value="second-card-bg" />
-                                <String fx:value="box-card" />
-                            </styleClass>
-                            <children>
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onUsernameClick" onMouseClicked="#onUsernameClick" prefWidth="210.0" styleClass="lbl" text="Username" HBox.hgrow="ALWAYS" />
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Role" HBox.hgrow="ALWAYS" />
-                        <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
-                            </children>
-                        </HBox>
-                        <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
+<VBox prefHeight="720.0" prefWidth="1800.0" styleClass="shadow" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminUsersController">
+        <children>
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" spacing="6.0">
+                <styleClass>
+                    <String fx:value="half-card" />
+                    <String fx:value="card-bg" />
+                </styleClass>
+                <children>
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                    <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" styleClass="h2" text="Users" />
+                    <TextField fx:id="txtFldUserSearch" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search for specific user" styleClass="container">
+                        <tooltip>
+                            <Tooltip text="Search (Ctrl + F)" />
+                        </tooltip>
+                    </TextField>
+                    <Region prefHeight="56.0" prefWidth="1482.0" HBox.hgrow="ALWAYS" />
+                    <VBox alignment="CENTER">
+                        <children>
+                            <Button mnemonicParsing="false" onAction="#onClickCreateUser" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                                <graphic>
+                                    <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="135.0" styleClass="primary-btn">
+                                        <children>
+                                            <Region layoutX="34.0" layoutY="10.0" prefHeight="200.0" prefWidth="6.0" />
+                                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="24.0" styleClass="white-icon" text="">
+                                                <font>
+                                                    <Font size="16.0" />
+                                                </font>
+                                            </Label>
+                                            <Region prefHeight="200.0" prefWidth="6.0" />
+                                            <Label alignment="CENTER" styleClass="lbl" text="Create User" textFill="WHITE">
+                                                <font>
+                                                    <Font size="12.0" />
+                                                </font>
+                                            </Label>
+                                        </children>
+                                    </HBox>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Create a new User (Ctrl + N)" />
+                                </tooltip>
+                            </Button>
+                            <Label alignment="CENTER" styleClass="shortcut-lbl" text="Ctrl + N">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </Label>
+                        </children>
+                    </VBox>
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                </children>
+            </HBox>
+            <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
+                <styleClass>
+                    <String fx:value="box-card" />
+                    <String fx:value="second-card-bg" />
+                </styleClass>
+                <children>
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                    <ToggleButton mnemonicParsing="false" onAction="#onTbAllUsersClick" prefHeight="30.0" prefWidth="75.0" selected="true" text="All Users">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="userFilter" />
+                        </toggleGroup>
+                        <styleClass>
+                            <String fx:value="filter-btn" />
+                            <String fx:value="lbl" />
+                        </styleClass>
+                    </ToggleButton>
+                    <ToggleButton mnemonicParsing="false" onAction="#onTbAdminsClick" prefHeight="30.0" prefWidth="75.0" text="Admins" toggleGroup="$userFilter">
+                        <styleClass>
+                            <String fx:value="filter-btn" />
+                            <String fx:value="lbl" />
+                        </styleClass>
+            </ToggleButton>
+                    <ToggleButton mnemonicParsing="false" onAction="#onTbUsersClick" prefHeight="30.0" prefWidth="75.0" text="Users" toggleGroup="$userFilter">
+                        <styleClass>
+                            <String fx:value="filter-btn" />
+                            <String fx:value="lbl" />
+                        </styleClass>
+            </ToggleButton>
+                    <Region layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0">
+                <styleClass>
+                    <String fx:value="second-card-bg" />
+                    <String fx:value="box-card" />
+                </styleClass>
+                <children>
+                    <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onKeyPressed="#onUsernameClick" onMouseClicked="#onUsernameClick" prefWidth="210.0" styleClass="lbl" text="Username" HBox.hgrow="ALWAYS" />
+                    <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+                    <Label alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="210.0" styleClass="lbl" text="Role" HBox.hgrow="ALWAYS" />
+            <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
+                </children>
+            </HBox>
+            <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
                             <content>
-                                <VBox fx:id="userTableBox" prefHeight="100.0" prefWidth="100.0" />
-                            </content>
-                        </ScrollPane>
-                        <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0">
-                            <styleClass>
-                                <String fx:value="half-card-bottom" />
-                                <String fx:value="card-bg" />
-                            </styleClass>
-                            <children>
-                                <Pagination fx:id="pgUsers" maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
-            </children>
-            <HBox.margin>
-                <Insets />
-            </HBox.margin>
-        </VBox>
-    </children>
-</HBox>
+                    <VBox fx:id="userTableBox" prefHeight="100.0" prefWidth="100.0" />
+                </content>
+            </ScrollPane>
+            <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0">
+                <styleClass>
+                    <String fx:value="half-card-bottom" />
+                    <String fx:value="card-bg" />
+                </styleClass>
+                <children>
+                    <Pagination fx:id="pgUsers" maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>

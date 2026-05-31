@@ -15,10 +15,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class AdminMetadataController implements Initializable, IShortcutHandler {
 
@@ -83,6 +80,11 @@ public class AdminMetadataController implements Initializable, IShortcutHandler 
 
     @Override
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
-        return Map.of();
+        Map<KeyCodeCombination, Runnable> shortcuts = new HashMap<>();
+        shortcuts.put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), () -> {
+            txtFldSearchMetadata.requestFocus();
+            txtFldSearchMetadata.selectAll();
+        });
+        return shortcuts;
     }
 }

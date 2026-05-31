@@ -31,10 +31,7 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AdminLogsController implements Initializable, IShortcutHandler {
@@ -189,6 +186,12 @@ public class AdminLogsController implements Initializable, IShortcutHandler {
 
     @Override
     public Map<KeyCodeCombination, Runnable> getShortcuts() {
-        return Map.of(new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), this::onExportBtnClick);
+        Map<KeyCodeCombination, Runnable> shortcuts = new HashMap<>();
+        shortcuts.put(new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), this::onExportBtnClick);
+        shortcuts.put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), () -> {
+            txtFldSearchLogs.requestFocus();
+            txtFldSearchLogs.selectAll();
+        });
+        return shortcuts;
     }
 }

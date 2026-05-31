@@ -4,88 +4,85 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox prefHeight="720.0" prefWidth="1800.0" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminMetadataController">
-    <children>
-        <VBox prefHeight="200.0" prefWidth="1800.0" HBox.hgrow="ALWAYS">
-            <children>
-                <VBox prefHeight="1200.0" prefWidth="1371.0" styleClass="shadow">
-                    <children>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0">
-                            <styleClass>
-                                <String fx:value="half-card" />
-                                <String fx:value="card-bg" />
-                            </styleClass>
-                            <children>
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                                <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="100.0" styleClass="h2" text="Metadata" />
-                                <TextField fx:id="txtFldSearchMetadata" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search metadata" styleClass="container" />
-                                <Region prefHeight="56.0" prefWidth="1482.0" HBox.hgrow="ALWAYS" />
 
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+    <VBox prefHeight="720.0" prefWidth="1800.0" styleClass="shadow" stylesheets="@../css/mainStyle.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ScanHub.GUI.controllers.AdminMetadataController">
+        <children>
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="510.0" spacing="6.0">
+                <styleClass>
+                    <String fx:value="half-card" />
+                    <String fx:value="card-bg" />
+                </styleClass>
+                <children>
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                    <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" styleClass="h2" text="Metadata" />
+                    <TextField fx:id="txtFldSearchMetadata" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="Search metadata" styleClass="container">
+                        <tooltip>
+                            <Tooltip text="Search (Ctrl + F)" />
+                        </tooltip>
+                    </TextField>
+                    <Region prefHeight="56.0" prefWidth="1482.0" HBox.hgrow="ALWAYS" />
 
-                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
-                            </children>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
-                            <styleClass>
-                                <String fx:value="second-card-bg" />
-                                <String fx:value="box-card" />
-                            </styleClass>
-                            <children>
-                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                           <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Box ID" />
-                           </children>
-                        </HBox>
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                           <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Profile" />
-                           </children>
-                        </HBox>
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                           <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Box Name" />
-                           </children>
-                        </HBox>
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                           <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Documents" />
-                           </children>
-                        </HBox>
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                           <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Files" />
-                           </children>
-                        </HBox>
-                                <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
-                        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                           <children>
-                                      <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Created At" />
-                           </children>
-                        </HBox>
-                            </children>
-                        </HBox>
-                        <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
-                            <content>
-                                <VBox fx:id="metadataTableBox" prefHeight="100.0" prefWidth="100.0" />
-                            </content>
-                        </ScrollPane>
-                        <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
-                            <styleClass>
-                                <String fx:value="half-card-bottom" />
-                                <String fx:value="card-bg" />
-                            </styleClass>
-                            <children>
-                                <Pagination fx:id="metadataPagination" maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
-            </children>
-        </VBox>
-    </children>
-</HBox>
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+
+                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="15.0" />
+                </children>
+            </HBox>
+             <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                <styleClass>
+                    <String fx:value="second-card-bg" />
+                    <String fx:value="box-card" />
+                </styleClass>
+                <children>
+            <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+               <children>
+                          <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Box ID" />
+               </children>
+            </HBox>
+                    <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+            <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+               <children>
+                          <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Profile" />
+               </children>
+            </HBox>
+                    <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+            <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+               <children>
+                          <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Box Name" />
+               </children>
+            </HBox>
+                    <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+            <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+               <children>
+                          <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Documents" />
+               </children>
+            </HBox>
+                    <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+            <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+               <children>
+                          <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Files" />
+               </children>
+            </HBox>
+                    <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="30.0" styleClass="grey-separator" />
+            <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+               <children>
+                          <Label alignment="CENTER" maxWidth="-Infinity" styleClass="lbl" text="Created At" />
+               </children>
+            </HBox>
+                </children>
+            </HBox>
+            <ScrollPane fitToWidth="true" prefHeight="1200.0" styleClass="box-card">
+                <content>
+                    <VBox fx:id="metadataTableBox" prefHeight="100.0" prefWidth="100.0" />
+                </content>
+            </ScrollPane>
+            <HBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" prefWidth="200.0">
+                <styleClass>
+                    <String fx:value="half-card-bottom" />
+                    <String fx:value="card-bg" />
+                </styleClass>
+                <children>
+                    <Pagination fx:id="metadataPagination" maxPageIndicatorCount="5" prefHeight="45.0" prefWidth="538.0" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
