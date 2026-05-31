@@ -340,8 +340,6 @@
 
 }
 
-.combo-box-base .
-
 .combo-box-base .arrow-button {
 
     -fx-background-color: TRANSPARENT;
@@ -403,13 +401,18 @@
 
 }
 
-.combo-box-popup .list-cell:focused {
+.combo-box-popup .list-cell:filled:focused,
+.combo-box-popup .list-cell:filled:selected,
+.combo-box-popup .list-cell:filled:focused:selected {
 
     -fx-background-color: #E2E8F0;
+    -fx-text-fill: #2d3d4f;
 
 }
 
-.combo-box .list-cell:focused .text {
+.combo-box .list-cell:filled:focused .text,
+.combo-box .list-cell:filled:selected .text,
+.combo-box .list-cell:filled:focused:selected .text {
 
     -fx-fill: #2d3d4f;
 

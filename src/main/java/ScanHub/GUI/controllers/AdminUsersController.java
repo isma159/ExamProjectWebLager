@@ -152,7 +152,7 @@ public class AdminUsersController implements Initializable, IShortcutHandler {
         AlertHelper.showConfirmation("Delete User", "Are you sure you want to delete \"" + user.getUsername() + "\"? This action cannot be undone.", () -> {
             try {
                 modelFacade.getUserModel().deleteUser(user);
-                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), user.getUserId(), EntityType.USER, LogAction.DELETE, LocalDateTime.now()));
+                modelFacade.auditLog(EntityType.USER, user.getUsername(), LogAction.DELETE);
                 filterUsers();
             } catch (Exception e) {
                 e.printStackTrace();

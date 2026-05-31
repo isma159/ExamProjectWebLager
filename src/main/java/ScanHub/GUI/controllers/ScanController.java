@@ -515,7 +515,7 @@ public class ScanController implements Initializable, IViewController {
 
             root.setValue(activeBox);
             scanModel = new ScanModel(activeBox);
-            modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.CREATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.BOX, activeBox.getBoxName(), LogAction.CREATE);
             syncDocumentsFromModel();
             initializeTreeView(boxTreeView, activeBox);
 
@@ -921,7 +921,7 @@ public class ScanController implements Initializable, IViewController {
             try {
                 scanModel.deleteBox();
                 modelFacade.getBoxModel().deleteBox(scanModel.getTargetBox());
-                modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.DELETE, LocalDateTime.now()));
+                modelFacade.auditLog(EntityType.BOX, scanModel.getTargetBox().getBoxName(), LogAction.DELETE);
                 boxTreeView.setShowRoot(false);
 
                 endScanSession();
@@ -1044,7 +1044,7 @@ public class ScanController implements Initializable, IViewController {
             try {
                 progressBarExport.progressProperty().unbind();
                 setExportInProgress(false);
-                modelFacade.getLogModel().createLog(new Log(currentUser, scanModel.getTargetBox().getBoxId(), EntityType.BOX, LogAction.EXPORT, LocalDateTime.now()));
+                modelFacade.auditLog(EntityType.BOX, scanModel.getTargetBox().getBoxName(), LogAction.EXPORT);
                 rebuild();
                 AlertHelper.showInformation("Export Complete", "Export finished. \nFiles saved to:" + exportDirectory.getAbsolutePath());
             }

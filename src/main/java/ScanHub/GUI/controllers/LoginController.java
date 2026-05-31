@@ -106,7 +106,7 @@ public class LoginController implements IViewController, Initializable {
                 stage.setMinHeight(768);
 
                 handler.show(modelFacade, stage).setMaximized(true);
-                modelFacade.getLogModel().createLog(new Log(user, user.getUserId(), EntityType.USER, LogAction.LOGIN, LocalDateTime.now()));
+                modelFacade.auditLog(EntityType.USER, user.getUsername(), LogAction.LOGIN);
                 currentStage.close();
             }
         } catch (Exception e) {

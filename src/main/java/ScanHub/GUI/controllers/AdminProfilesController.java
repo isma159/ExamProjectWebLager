@@ -125,7 +125,7 @@ public class AdminProfilesController implements Initializable, IShortcutHandler 
         AlertHelper.showConfirmation("Delete Profile", "Are you sure you want to delete the profile \"" + profile.getProfileName() + "\"? This action cannot be undone.", () -> {
             try {
                 modelFacade.getProfileModel().deleteProfile(profile);
-                modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), profile.getProfileId(), EntityType.PROFILE, LogAction.DELETE, LocalDateTime.now()));
+                modelFacade.auditLog(EntityType.PROFILE, profile.getProfileName(), LogAction.DELETE);
                 modelFacade.getClientModel().refreshClients();
                 modelFacade.getUserModel().refreshUsers();
                 filterProfiles();

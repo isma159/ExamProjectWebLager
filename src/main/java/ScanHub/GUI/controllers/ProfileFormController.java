@@ -141,7 +141,7 @@ public class ProfileFormController implements Initializable {
 
             Profile newProfile = new Profile(selectedClient, profileName, status, buildExportLabel(profileName, selectedClient.getClientName()), buildFileSettings());
             Profile createdProfile = modelFacade.getProfileModel().createProfile(newProfile);
-            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), createdProfile.getProfileId(), EntityType.PROFILE, LogAction.CREATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.PROFILE, createdProfile.getProfileName(), LogAction.CREATE);
             currentStage.close();
 
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class ProfileFormController implements Initializable {
 
         try {
             modelFacade.getProfileModel().updateProfile(editingProfile);
-            modelFacade.getLogModel().createLog(new Log(modelFacade.getSessionModel().getCurrentUser(), editingProfile.getProfileId(), EntityType.PROFILE, LogAction.UPDATE, LocalDateTime.now()));
+            modelFacade.auditLog(EntityType.PROFILE, editingProfile.getProfileName(), LogAction.UPDATE);
             currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();

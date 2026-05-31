@@ -191,11 +191,16 @@
     -fx-text-fill: #ffffff;
 }
 
-.dark .combo-box-popup .list-cell:focused {
+.dark .combo-box-popup .list-cell:filled:focused,
+.dark .combo-box-popup .list-cell:filled:selected,
+.dark .combo-box-popup .list-cell:filled:focused:selected {
     -fx-background-color: #475569;
+    -fx-text-fill: #ffffff;
 }
 
-.dark .combo-box .list-cell:focused .text {
+.dark .combo-box .list-cell:filled:focused .text,
+.dark .combo-box .list-cell:filled:selected .text,
+.dark .combo-box .list-cell:filled:focused:selected .text {
     -fx-fill: #ffffff;
 }
 
