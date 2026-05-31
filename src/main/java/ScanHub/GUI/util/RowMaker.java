@@ -123,8 +123,11 @@ public class RowMaker {
         dot.setMinHeight(Region.USE_PREF_SIZE);
         dot.setPrefSize(6.0, 6.0);
 
-        if (log.getAction() == LogAction.CREATE) {dot.getStyleClass().add("avatar-success");}
-        else if (log.getAction() == LogAction.DELETE) {dot.getStyleClass().add("avatar-error");}
+        if (log.getAction() == LogAction.CREATE) {dot.getStyleClass().add("avatar-green");}
+        else if (log.getAction() == LogAction.DELETE) {dot.getStyleClass().add("avatar-orange");}
+        else if (log.getAction() == LogAction.EXPORT) {dot.getStyleClass().add("avatar-purple");}
+        else if (log.getAction() == LogAction.UPDATE) {dot.getStyleClass().add("avatar-yellow");}
+        else if (log.getAction() == LogAction.ERROR) {dot.getStyleClass().add("avatar-red");}
         else {dot.getStyleClass().add("avatar-initial");}
 
         HBox col1 = new HBox(dot);
