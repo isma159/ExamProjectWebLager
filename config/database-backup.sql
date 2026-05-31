@@ -237,3 +237,7 @@ GROUP BY
     b.boxName,
     b.created_at
     go
+
+INSERT INTO Users (username, passwordHash, role)
+VALUES ('admin', '$argon2id$v=19$m=65536,t=5,p=1$Dl3ueUwD0s4+jZ22UwBtyw$Tb9BfBenZLnEqDmT0IM1tIDH4HiEebFB2DjHTx/rX4w', 'ADMIN'),
+       ('user', '$argon2id$v=19$m=65536,t=5,p=1$LBNdIBDvoj0wRg9zg66a1g$uaLa8JpSbiJN5mS+LIWqCGHA6hAmrnxRnsl5uHdspaM', 'USER');
