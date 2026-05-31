@@ -243,8 +243,12 @@ public class ProfileFormController implements Initializable {
         Image image = imgPreviewAfter.getImage();
         if (image == null || image.isError()) return;
 
-        double maxWidth = previewPaneAfter.getWidth() - 30;
-        double maxHeight = previewPaneAfter.getHeight() - 30;
+        // fall back to the fixed FXML size (240) when the pane reports 0, which happens when sliders fire during populateFields() before the stage is shown.
+        // Otherwise scale becomes Infinity/NaN and the image fills the entire window
+        double paneWidth = previewPaneAfter.getWidth();
+        double paneHeight = previewPaneAfter.getHeight();
+        double maxWidth = (paneWidth > 0 ? paneWidth : 270) - 30;
+        double maxHeight = (paneHeight > 0 ? paneHeight : 270) - 30;
 
         double originalWidth = image.getWidth();
         double originalHeight = image.getHeight();

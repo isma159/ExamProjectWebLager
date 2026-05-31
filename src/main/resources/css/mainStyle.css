@@ -759,14 +759,29 @@
 
 }
 
-.avatar-success {
+.avatar-green {
     -fx-background-color: #4CD07D;
     -fx-background-radius: 6px;
 }
 
-.avatar-error {
+.avatar-red {
     -fx-background-color: #FF3D32;
     -fx-background-radius: 6px;
+}
+
+.avatar-yellow {
+    -fx-background-color: #EAB308;
+    -fx-background-radius: 6px;
+}
+
+.avatar-purple {
+    -fx-background-radius: 6px;
+    -fx-background-color: #7C3AED;
+}
+
+.avatar-orange {
+    -fx-background-radius: 6px;
+    -fx-background-color: #F97316;
 }
 
 .half-card {
